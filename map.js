@@ -341,8 +341,6 @@ class Map {
             ctx.strokeRect(SelectRectangle.x, SelectRectangle.y, SelectRectangle.width, SelectRectangle.height);
         }
 
-        console.log("Formes = " + Formes);
-
         // Dessine les formes rectangulaires de l'utilisateur
         Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
             ctx.save();
@@ -946,12 +944,27 @@ class Pion extends Map {
         const results = hexLine(startHex, endHex);
 
         let visible = true;
+
         results.forEach(hex => {
+            if (!visible) return;
+
+            // Si le pion est sur la case de départ, on ne fait rien
             if (hex[0] === start_col && hex[1] === start_row) return;
+
+            // Si le pion est sur la case d'arrivée, on ne fait rien
             if (hex[0] === col && hex[1] === row) return;
-            const pos = hex[0] + "," + hex[1];
-            const t = Terrains.find(x => x.Model != "Eau" && x.Position === pos);
+
+            // Vérification des terrains (si un terrain Rocher ou Arbre est sur le chemin, le pion ne voit pas la case)
+            const t = Terrains.find(x => x.Model != "Eau" && x.Position === hex[0] + "," + hex[1]);
             if (t != null && typeof t != "undefined") visible = false;
+
+            const x = hex[0] * hexHSpacing + offsetX;
+            const y = hex[1] * hexVSpacing + ((hex[0] % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
+            const h = { x: x, y: y };
+
+            // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
+            const m = Formes.find(r => r.type === "Mur" && FormeUtils.rectangleHexagonIntersect(r, h));
+            if (m != null && typeof m != "undefined") visible = false;
         });
 
         return visible;
@@ -1085,9 +1098,31 @@ canvas.addEventListener("mousedown", (event) => {
     }
     else if (event.button === 0 && isMode_forme && type_forme === "scission") {
         // Si mode Scission: procéder à la scission du mur
-        if (Formes.some(r => r.type === "Mur" && FormeUtils.isOnMur(r, mouseX, mouseY))) {
-            canvas.style.cursor = "crosshair";
-        }
+        let is_find = false;
+        Formes.filter(x => x.type === "Mur").forEach(r => {
+            if (is_find) return;
+
+            is_find = FormeUtils.isOnMur(r, mouseX, mouseY);
+            if (!is_find) return;
+
+            const r1 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+            const r2 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+
+            if (r.width < r.height) {
+                r1.height = mouseY - r.y - 20;
+                r2.y = r.y + r1.height + 40;
+                r2.height = r.height - r1.height - 40;
+            }
+            else {
+                r1.width = mouseX - r.x - 20;
+                r2.x = r.x + r1.width + 40;
+                r2.width = r.width - r1.width - 40;
+            }
+
+            Formes.splice(Formes.indexOf(r), 1);
+            if (r1.width > 0 && r1.height > 0) Formes.push(r1);
+            if (r2.width > 0 && r2.height > 0) Formes.push(r2);
+        });
     }
     else if (event.button === 0 && isMode_forme && type_forme != "gomme") {
         // === MODE FORME : MODIFICATION ===
@@ -1567,7 +1602,7 @@ canvas.addEventListener("mousemove", (event) => {
 
 // Bouton souris relevé
 canvas.addEventListener("mouseup", (event) => {
-    if (isMode_forme && isDragging_left) {
+    if (isMode_forme && isDragging_left && type_forme != "scission") {
         const type = type_forme.substring(0, 1).toUpperCase() + type_forme.substring(1);
         // On enregistre la nouvelle forme
         if (index_forme_move === null) {
