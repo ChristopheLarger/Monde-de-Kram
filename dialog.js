@@ -1025,6 +1025,14 @@ dialog_details_2.querySelector(".arme1").addEventListener("change", function (ev
     let w1 = Armes.find(x => x.Nom === event.target.value);
     let nouvelleOption = null;
 
+
+    // Ouvrir la modale de magie si "Lancement de sort" est sélectionné
+    if (event.target.value === "Lancement de sort") {
+        document.getElementById("modal").style.display = "flex";
+        dialog_details_2.close();
+    }
+    
+
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
     if (event.target.value === "Lancement de sort" || (!w1 && typeof w1 != "undefined" && w1.Deux_mains)) {
         // Nettoyage et ajout d'une option vide
