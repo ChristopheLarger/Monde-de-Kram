@@ -110,7 +110,7 @@ function generateArmeJS($row, $index) {
 }
 
 // === CONNEXION À LA BASE DE DONNÉES ===
-$conn = new mysqli('localhost', 'root', 'Titoon#01', 'Kram');
+$conn = new mysqli('192.168.1.242', 'root', 'Titoon#01', 'Kram');
 $conn->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
 if ($conn->connect_error) {
