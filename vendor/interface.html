@@ -1,0 +1,678 @@
+<!-- === INTERFACE PRINCIPALE === -->
+<!-- Barre de contrôle en haut de l'écran -->
+<div id="div_cartouche" style="margin: 0;">
+    <!-- Sélection du personnage/joueur -->
+    <label for="joueur">Perso :</label>
+    <select id="joueur">
+        <option value="">--</option>
+        <option value="MJ">Maitre du Jeu</option>
+    </select>
+    
+    <!-- Bouton pour lancer 3 dés à 6 faces -->
+    <button id="3D6">3D6</button>
+    
+    <!-- Champ pour lancer des dés personnalisés (format: XdY+Z) -->
+    <input type="text" id="personnalisation" style="width: 80px;" placeholder="prompt...">
+    <hr>
+</div>
+
+<!-- === ZONE DE DIALOGUE === -->
+<!-- Table pour afficher les conversations entre joueurs -->
+<table id="table_dialogue" style="width: 100%; border: 0; margin: 0;">
+    <tr id="titre_dialogue"></tr>  <!-- En-têtes des colonnes de dialogue -->
+    <tr id="dialogue"></tr>         <!-- Contenu des dialogues -->
+</table>
+<!-- === ZONE DE COMBAT === -->
+<!-- Interface de combat (masquée par défaut) -->
+<div id="combat" style="display: none;">
+    <!-- Barre d'outils pour la gestion de la carte -->
+    <div id="div_tools" class="titre_dialogue"
+        style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
+        
+        <!-- Outils de terrain et formes -->
+        <div style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white;">
+            <!-- Outils de terrain -->
+            Terrains :&nbsp;
+            <img id="rocher" src="Images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="arbre" src="Images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="eau" src="Images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="gomme_t" src="Images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;&nbsp;&nbsp;
+            
+            <!-- Outils de formes géométriques -->
+            Formes :&nbsp;
+            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">&nbsp;&nbsp;
+            <img id="rectangle" src="Images/Rectangle.png" onclick="FormeUtils.setFormeMode('rectangle');" alt="Rectangle"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="ellipse" src="Images/Ellipse.png" onclick="FormeUtils.setFormeMode('ellipse');" alt="Ellipse"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="gomme_f" src="Images/Gomme.png" onclick="FormeUtils.setFormeMode('gomme');" alt="Gomme"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+        </div>
+        
+        <!-- Outils de gestion de carte -->
+        <div>
+            <form id="upload_fond" enctype="multipart/form-data">
+                <label for="img_fond" id="fond">Fond de carte</label>
+                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">&nbsp;&nbsp;&nbsp;
+                <button id="synchroniser">Synchroniser</button>&nbsp;&nbsp;
+            </form>
+        </div>
+    </div>
+    
+    <!-- Canvas principal pour la carte hexagonale -->
+    <canvas id="hexCanvas" tabindex="0"
+        style="width: 100%; height: 100%; margin: 0; border: 1px solid black; cursor: default;"></canvas>
+    
+    <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
+    <canvas id="hexCanvas_selected" tabindex="0"
+        style="position: absolute; display: none; border: 0; opacity: 0.5; pointer-events: none;"></canvas>
+</div>
+
+<!-- === DIALOGUE DE DIMENSION DE CARTE === -->
+<!-- Fenêtre pour définir les dimensions de la carte de combat -->
+<dialog id="dialog_dim_carte">
+    <table style="margin: 0; font-size: x-large;">
+        <tr>
+            <td>Largeur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td>Hauteur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <div style="width: 100%; text-align: right;">
+                    <button id="Valider" style="font-size: x-large;">Valider</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE CRÉATION DE RECTANGLE === -->
+<!-- Fenêtre pour créer une forme rectangulaire -->
+<dialog id="dialog_dim_rectangle">
+    <table style="margin: 0; font-size: x-large;">
+        <tr>
+            <td>Largeur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td>Hauteur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <div style="width: 100%; text-align: right;">
+                    <button id="Creer" style="font-size: x-large;">Créer</button>
+                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE CRÉATION D'ELLIPSE === -->
+<!-- Fenêtre pour créer une forme elliptique -->
+<dialog id="dialog_dim_ellipse">
+    <table style="margin: 0; font-size: x-large;">
+        <tr>
+            <td>Grand axe (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="grand_axe" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td>Petit axe (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="petit_axe" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <div style="width: 100%; text-align: right;">
+                    <button id="Creer" style="font-size: x-large;">Créer</button>
+                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE SÉLECTION DE MODÈLE === -->
+<!-- Fenêtre pour choisir le modèle de personnage à placer sur la carte -->
+<dialog id="dialog_details_1">
+    <span style="font-size: x-large;">Modèle :</span>
+    <select id="model" style="font-size: x-large;">
+        <option value="">--</option>
+    </select>
+    <!-- Coordonnées de placement (masquées) -->
+    <input type="text" id="col" style="display: none;">
+    <input type="text" id="row" style="display: none;">
+    <hr>
+    <div style="width: 100%; text-align: right;">
+        <button id="Fermer" style="font-size: x-large;">Fermer</button>
+    </div>
+</dialog>
+<!-- === DIALOGUE DE DÉTAILS DE PERSONNAGE === -->
+<!-- Fenêtre complète pour modifier les propriétés d'un personnage -->
+<dialog id="dialog_details_2">
+    <table style="width: 100%; margin: 0; font-size: x-large;">
+        <tr>
+            <td>Nom :</td>
+            <td colspan="8"><input type="text" style="width: 100%;" class="titre"></td>
+        </tr>
+        <tr>
+            <td>Modèle :</td>
+            <td><span class="model"></span></td>
+            <td>&nbsp;</td>
+            <td>Type :</td>
+            <td>
+                <select class="type" style="font-size: x-large;">
+                    <option value="allies">Allié</option>
+                    <option value="ennemis">Ennemi</option>
+                </select>
+            </td>
+            <td>&nbsp;</td>
+            <td>Fatigue :</td>
+            <td><input type="text" class="fatigue"></td>
+            <td><span class="fatigue"></span></td>
+        </tr>
+        <tr>
+            <td id="indice">Indice :</td>
+            <td><span class="indice"></span></td>
+            <td>&nbsp;</td>
+            <td>Contrôle :</td>
+            <td>
+                <select class="control" style="font-size: x-large;">
+                    <option value="">--</option>
+                </select>
+            </td>
+            <td>&nbsp;</td>
+            <td>Concentration :</td>
+            <td><input type="text" class="concentration"></td>
+            <td><span class="concentration"></span></td>
+        </tr>
+    </table>
+    <hr>
+    <textarea class="note" rows="3" style="width: 100%; resize: vertical; font-size: x-large;"></textarea>
+    <hr>
+    <table style="margin: 0; font-size: x-large;">
+        <tr>
+            <td></td>
+            <td>Vie</td>
+            <td></td>
+            <td>Armure</td>
+            <td style="width: auto;"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Général :</td>
+            <td><input type="text" class="pdv"></td>
+            <td>&nbsp;<span class="pdv"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure" disabled></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>Bonus Feinte de corps :</td>
+            <td><input type="text" class="b_fdc"></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>Gestion automatique :</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" class="auto">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>Tête :</td>
+            <td><input type="text" class="tete"></td>
+            <td>&nbsp;<span class="tete"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_tete"></td>
+            <td></td>
+            <td>Bonus Initiative :</td>
+            <td><input type="text" class="b_ini"></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>Pratique la magie :</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" class="mage">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>Bras Gauche :</td>
+            <td><input type="text" class="brasg"></td>
+            <td>&nbsp;<span class="brasg"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasg"></td>
+            <td></td>
+            <td>Bonus Attaque :</td>
+            <td><input type="text" class="b_att"></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>Combattant à distance :</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" class="dist">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>Bras Droit :</td>
+            <td><input type="text" class="brasd"></td>
+            <td>&nbsp;<span class="brasd"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasd"></td>
+            <td></td>
+            <td>Bonus Dommage :</td>
+            <td><input type="text" class="b_dom"></td>
+            <td>&nbsp;&nbsp;</td>
+            <td>Combattant corps-à-corps :</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" class="cac">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+        <tr>
+            <td>Poitrine :</td>
+            <td><input type="text" class="poitrine"></td>
+            <td>&nbsp;<span class="poitrine"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_poitrine"></td>
+        </tr>
+        <tr>
+            <td>Abdomen :</td>
+            <td><input type="text" class="abdomen"></td>
+            <td>&nbsp;<span class="abdomen"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_abdomen"></td>
+        </tr>
+        <tr>
+            <td>Jambe Gauche :</td>
+            <td><input type="text" class="jambeg"></td>
+            <td>&nbsp;<span class="jambeg"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambeg"></td>
+            <td></td>
+            <td>Arme principale :</td>
+            <td colspan="4">
+                <select class="arme1" style="font-size: x-large;">
+                    <option value="Lancement de sort">Lancement de sort</option>
+                    <option value="">--</option>
+                </select>
+                <span class="info_principale"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>Jambe Droite :</td>
+            <td><input type="text" class="jambed"></td>
+            <td>&nbsp;<span class="jambed"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambed"></td>
+            <td></td>
+            <td>Arme secondaire :</td>
+            <td colspan="4">
+                <select class="arme2" style="font-size: x-large;">
+                    <option value="">--</option>
+                </select>
+                <span class="info_secondaire"></span>
+            </td>
+        </tr>
+    </table>
+    <div style="width: 100%; text-align: right;">
+        <button id="Fermer" style="font-size: x-large;">Fermer</button>
+        <button id="Dupliquer" style="font-size: x-large;">Dupliquer</button>
+    </div>
+</dialog>
+
+<!-- === DIALOGUE DE CHOIX D'ARME D'ATTAQUE === -->
+<!-- Fenêtre pour choisir l'arme à utiliser lors d'une attaque -->
+<dialog id="dialog_attaque_1">
+    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <table>
+        <tr>
+            <td rowspan="3">
+                <p style="font-size: x-large; text-align: center;">Arme à utiliser&nbsp;&nbsp;</p>
+            </td>
+            <td>
+                <input type="radio" name="arme" value="1" class="arme_radio1">
+                <span class="main1" style="font-size: x-large;">1ère main (...)</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="arme" value="2" class="arme_radio2">
+                <span class="main2" style="font-size: x-large;">2nde main (...)</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="arme" value="0" class="arme_radio0">
+                <span style="font-size: x-large;">Aucune</span>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE JET D'ATTAQUE === -->
+<!-- Fenêtre pour afficher le jet de dés et le score d'attaque -->
+<dialog id="dialog_attaque_2" style="width: fit-content;">
+    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <table style="width: 100%; border-collapse: collapse;">
+        <colgroup>
+            <col style="width: 17%;">
+            <col style="width: 17%;">
+            <col style="width: 17%;">
+            <col style="width: 17%;">
+            <col style="width: 17%;">
+            <col style="width: 17%;">
+        </colgroup>
+
+        <tr>
+            <td colspan="2" style="text-align: left;">
+                <span style="font-size: x-large;">Jet de dés :</span>
+                <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
+            </td>
+            <td colspan="2" style="text-align: left;">
+                <span style="font-size: x-large;">Feinte de corps :</span>
+                <input type="text" class="fdc_def" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
+            </td>
+            <td colspan="2" style="text-align: right;">
+                <span style="font-size: x-large;">Score d'attaque :</span>
+                <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <hr>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2">
+                <span style="font-size: x-large;">Malus à la feinte de corps :</span>
+            </td>
+            <td colspan="2">
+                <input type="checkbox" class="surprise_totale">
+                <span style="font-size: x-large;">Surprise totale (0)</span>
+            </td>
+            <td colspan="2">
+                <input type="checkbox" class="immobile">
+                <span style="font-size: x-large;">Immobile (0)</span>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2" rowspan="2">
+                <span style="font-size: x-large;">Variation MJ :</span>
+                <input type="text" class="var_mj" style="font-size: x-large; width: 35px; text-align: center;">
+            </td>
+            <td colspan="2">
+                <input type="checkbox" class="aveugle">
+                <span style="font-size: x-large;">Aveuglé (-2)</span>
+            </td>
+            <td colspan="2">
+                <input type="checkbox" class="surprise_partielle">
+                <span style="font-size: x-large;">Surprise partielle (-2)</span>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2">
+                <input type="checkbox" class="autre_action">
+                <span style="font-size: x-large;">Autre action (-2)</span>
+            </td>
+            <td colspan="2">
+                <input type="checkbox" class="gene_mouvements">
+                <span style="font-size: x-large;">gêné dans ses mouvements (-2)</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <hr>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2">
+                <span style="font-size: x-large;">Ciblage des zones :</span>
+            </td>
+            <td colspan="2" style="text-align: center;">
+                <input type="checkbox" class="tete">
+                <span style="font-size: x-large;">Tête</span>
+            </td>
+            <td colspan="2">
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2" rowspan="2" style="text-align: center;">
+                <input type="checkbox" class="brasg">
+                <span style="font-size: x-large;">Bras gauche</span>
+            </td>
+            <td colspan="2" style="text-align: center;">
+                <input type="checkbox" class="poitrine">
+                <span style="font-size: x-large;">Poitrine</span>
+            </td>
+            <td colspan="2" rowspan="2" style="text-align: center;">
+                <input type="checkbox" class="brasd">
+                <span style="font-size: x-large;">Bras droit</span>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="2" style="text-align: center;">
+                <input type="checkbox" class="abdomen">
+                <span style="font-size: x-large;">Abdomen</span>
+            </td>
+        </tr>
+        <tr style="height: 30px;">
+            <td colspan="3" style="text-align: center;">
+                <input type="checkbox" class="jambeg">
+                <span style="font-size: x-large;">Jambe gauche</span>
+            </td>
+            <td colspan="3" style="text-align: center;">
+                <input type="checkbox" class="jambed">
+                <span style="font-size: x-large;">Jambe droite</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="6">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align: left;">
+                <button class="pt_chance" style="font-size: x-large;">Point de chance</button>
+            </td>
+            <td colspan="3" style="text-align: right;">
+                <button class="accepter" style="font-size: x-large;">Accepter</button>
+            </td>
+        </tr>
+    </table>
+    <div class="tooltip" style="pointer-events: none; display: none;"></div>
+</dialog>
+
+<!-- === DIALOGUE DE LOCALISATION D'ATTAQUE === -->
+<!-- Fenêtre pour choisir la zone corporelle ciblée par l'attaque -->
+<dialog id="dialog_attaque_3" style="width: fit-content;">
+    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <table style="width: 100%; border-collapse: collapse;">
+        <colgroup>
+            <col style="width: 50%;">
+            <col style="width: 50%;">
+        </colgroup>
+        <tr>
+            <td style="text-align: left;">
+                <span style="font-size: x-large;">Jet de dés :</span>
+                <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
+            </td>
+            <td style="text-align: right;">
+                <span style="font-size: x-large;">Score d'attaque :</span>
+                <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="7" style="text-align: left;">
+                <span style="font-size: x-large;">Localisation :</span>
+            </td>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="tête" class="tete_rd">
+                <span class="tete" style="font-size: x-large;">Tête</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="poitrine" class="poitrine_rd">
+                <span class="poitrine" style="font-size: x-large;">Poitrine</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="abdomen" class="abdomen_rd">
+                <span class="abdomen" style="font-size: x-large;">Abdomen</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="bras gauche" class="brasg_rd">
+                <span class="brasg" style="font-size: x-large;">Bras gauche</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="bras droit" class="brasd_rd">
+                <span class="brasd" style="font-size: x-large;">Bras droit</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="jambe gauche" class="jambeg_rd">
+                <span class="jambeg" style="font-size: x-large;">Jambe gauche</span>
+            </td>
+        </tr>
+        <tr>
+            <td style="display: none;">
+                <input type="radio" name="loc" value="jambe droite" class="jambed_rd">
+                <span class="jambed" style="font-size: x-large;">Jamble droite</span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: left;">
+                <button class="pt_chance" style="font-size: x-large;">Point de chance</button>
+            </td>
+            <td style="text-align: right;">
+                <button class="accepter" style="font-size: x-large;">Accepter</button>
+            </td>
+        </tr>
+    </table>
+    <div class="tooltip" style="pointer-events: none; display: none;"></div>
+</dialog>
+
+<!-- === DIALOGUE DE CHOIX DE DÉFENSE === -->
+<!-- Fenêtre pour choisir le type de défense (parade/esquive) -->
+<dialog id="dialog_defense_1">
+    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
+    <table>
+        <tr>
+            <td rowspan="4">
+                <p style="font-size: x-large; text-align: center;">Défense&nbsp;&nbsp;</p>
+            </td>
+            <td>
+                <input type="radio" name="defense" value="pr1" class="arme_radio1">
+                <span class="main1" style="font-size: x-large;">Parade 1ère main (...)</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="defense" value="pr2" class="arme_radio2">
+                <span class="main2" style="font-size: x-large;">Parade 2nde main (...)</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="defense" value="esq" class="arme_radio3">
+                <span style="font-size: x-large;">Esquive</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="defense" value="" class="arme_radio0">
+                <span style="font-size: x-large;">Aucune</span>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE RÉSOLUTION DE DÉFENSE === -->
+<!-- Fenêtre pour afficher le résultat de la défense et les dommages -->
+<dialog id="dialog_defense_2" style="width: fit-content;">
+    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
+    <table style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td rowspan="2" style="text-align: left;">
+                <span style="font-size: x-large;">&nbsp;&nbsp;Jet de dés :</span>
+                <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+            </td>
+            <td style="text-align: right;">
+                <span style="font-size: x-large;">Score d'attaque :</span>
+                <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: right;">
+                <span style="font-size: x-large;">Score de défense :</span>
+                <input type="text" class="scr_def" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align: center;">
+                <span class="dommages" style="font-size: x-large;"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <hr>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: left;">
+                <button class="pt_chance" style="font-size: x-large;">Point de chance</button>
+            </td>
+            <td style="text-align: right;">
+                <button class="accepter" style="font-size: x-large;">Accepter</button>
+            </td>
+        </tr>
+
+    </table>
+    <div class="tooltip" style="pointer-events: none; display: none;"></div>
+</dialog>
+
+<!-- === ÉLÉMENTS D'INTERFACE SUPPLÉMENTAIRES === -->
+<!-- Tooltip pour afficher des informations contextuelles -->
+<div id="tooltip" class="tooltip" style="pointer-events: none; display: none;"></div>
+
+<!-- Popup pour afficher des messages temporaires -->
+<div class="popup" id="popup"></div>
