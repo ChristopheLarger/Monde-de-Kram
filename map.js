@@ -1120,12 +1120,15 @@ canvas.addEventListener("mousedown", (event) => {
                 r2.width = r.width - r1.width - 40;
             }
 
+            if (index_forme_zoom === Formes.indexOf(r)) index_forme_zoom = null;
+            if (index_forme_move === Formes.indexOf(r)) index_forme_move = null;
+
             Formes.splice(Formes.indexOf(r), 1);
             if (r1.width > 0 && r1.height > 0) Formes.push(r1);
             if (r2.width > 0 && r2.height > 0) Formes.push(r2);
         });
     }
-    else if (event.button === 0 && isMode_forme && type_forme != "gomme") {
+    else if (event.button === 0 && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
         // === MODE FORME : MODIFICATION ===
         // Initialisation de la sélection de forme
         SelectRectangle.x = mouseX;
@@ -1232,7 +1235,7 @@ canvas.addEventListener("mousedown", (event) => {
         isDragging_select = true;
         Map.drawHexMap(true);
     }
-    else if (event.button === 2 && isMode_forme && type_forme != "gomme") {
+    else if (event.button === 2 && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
         // On fait pivoter une forme
         event.preventDefault();
 
@@ -1472,7 +1475,7 @@ canvas.addEventListener("mousemove", (event) => {
 
         Map.drawHexMap();
     }
-    else if (isDragging_left && isMode_forme && type_forme != "gomme") {
+    else if (isDragging_left && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
         // Le bouton gauche de la souris est enfoncé : on dessine une forme (sélection)
         if (type_forme === "ellipse") {
             // Ellipse : la souris est positionnée au bord
@@ -1568,13 +1571,15 @@ canvas.addEventListener("mousemove", (event) => {
             is_find = r.type === "Rectangle" ? FormeUtils.isOnRectangle(r, mouseX, mouseY) : FormeUtils.isOnMur(r, mouseX, mouseY);
             if (!is_find) return;
 
-            if (FormeUtils.isOnSommetRectangle(r, mouseX, mouseY)) {
-                canvas.style.cursor = cursor_zoom;
-            }
-            else if (type_forme === "scission" && r.type === "Mur") {
+            if (type_forme === "scission" && r.type === "Mur") {
                 canvas.style.cursor = cursor_scis;
             }
-            else canvas.style.cursor = cursor_move;
+            else if (type_forme !== "scission" && FormeUtils.isOnSommetRectangle(r, mouseX, mouseY)) {
+                canvas.style.cursor = cursor_zoom;
+            }
+            else if (type_forme !== "scission") {
+                canvas.style.cursor = cursor_move;
+            }
         });
 
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
