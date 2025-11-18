@@ -219,6 +219,119 @@ const FormeUtils = {
             return { x: 0, y: -forme.height / 2 };
         }
         return null;
+    },
+
+    /**
+     * Vérifie si un rectangle et un hexagone se croisent
+     * @param {Object} rectangle - Rectangle avec {x, y, width, height, theta}
+     * @param {Object} hexagon - Hexagone avec {x, y} (centre)
+     * @returns {boolean} - true si les formes se croisent
+     */
+    rectangleHexagonIntersect(rectangle, hexagon) {
+        // 1. Obtenir les 6 sommets de l'hexagone
+        const hexVertices = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i;
+            hexVertices.push({
+                x: hexagon.x + hexSize * Math.cos(angle),
+                y: hexagon.y + hexSize * Math.sin(angle)
+            });
+        }
+        
+        // 2. Obtenir les 4 sommets du rectangle (dans le repère non-rotaté)
+        const rectCenterX = rectangle.x + rectangle.width / 2;
+        const rectCenterY = rectangle.y + rectangle.height / 2;
+        
+        const rectVertices = [
+            { x: rectangle.x, y: rectangle.y },
+            { x: rectangle.x + rectangle.width, y: rectangle.y },
+            { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height },
+            { x: rectangle.x, y: rectangle.y + rectangle.height }
+        ];
+        
+        // Transformer les sommets du rectangle selon la rotation
+        const rotatedRectVertices = rectVertices.map(v => 
+            this.rotatePoint(v.x, v.y, rectCenterX, rectCenterY, rectangle.theta || 0)
+        );
+        
+        // 3. Vérifier si un sommet de l'hexagone est dans le rectangle
+        for (const vertex of hexVertices) {
+            if (this.isPointInRotatedRectangle(vertex, rectangle)) {
+                return true;
+            }
+        }
+        
+        // 4. Vérifier si un sommet du rectangle est dans l'hexagone
+        for (const vertex of rotatedRectVertices) {
+            if (this.isPointInHexagon(vertex, hexagon, hexSize)) {
+                return true;
+            }
+        }
+        
+        // 5. Vérifier si les arêtes se croisent
+        // Arêtes de l'hexagone
+        for (let i = 0; i < 6; i++) {
+            const hexEdgeStart = hexVertices[i];
+            const hexEdgeEnd = hexVertices[(i + 1) % 6];
+            
+            // Arêtes du rectangle
+            for (let j = 0; j < 4; j++) {
+                const rectEdgeStart = rotatedRectVertices[j];
+                const rectEdgeEnd = rotatedRectVertices[(j + 1) % 4];
+                
+                if (this.segmentsIntersect(hexEdgeStart, hexEdgeEnd, rectEdgeStart, rectEdgeEnd)) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    },
+
+    /**
+     * Vérifie si un point est dans un rectangle rotaté
+     * @param {Object} point - Point avec {x, y}
+     * @param {Object} rectangle - Rectangle avec {x, y, width, height, theta}
+     * @returns {boolean} - true si le point est dans le rectangle
+     */
+    isPointInRotatedRectangle(point, rectangle) {
+        const cx = rectangle.x + rectangle.width / 2;
+        const cy = rectangle.y + rectangle.height / 2;
+        const rp = this.rotatePoint(point.x, point.y, cx, cy, -(rectangle.theta || 0));
+        
+        const minX = Math.min(rectangle.x, rectangle.x + rectangle.width);
+        const maxX = Math.max(rectangle.x, rectangle.x + rectangle.width);
+        const minY = Math.min(rectangle.y, rectangle.y + rectangle.height);
+        const maxY = Math.max(rectangle.y, rectangle.y + rectangle.height);
+        
+        return (rp.x >= minX && rp.x <= maxX && rp.y >= minY && rp.y <= maxY);
+    },
+
+    /**
+     * Vérifie si un point est dans un hexagone
+     * @param {Object} point - Point avec {x, y}
+     * @param {Object} hexagon - Hexagone avec {x, y} (centre)
+     * @param {number} hexSize - Taille de l'hexagone en pixels
+     * @returns {boolean} - true si le point est dans l'hexagone
+     */
+    isPointInHexagon(point, hexagon, hexSize) {
+        const dx = point.x - hexagon.x;
+        const dy = point.y - hexagon.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        return distance <= hexSize;
+    },
+
+    /**
+     * Vérifie si deux segments de droite se croisent
+     * @param {Object} p1 - Premier point du premier segment {x, y}
+     * @param {Object} p2 - Deuxième point du premier segment {x, y}
+     * @param {Object} p3 - Premier point du deuxième segment {x, y}
+     * @param {Object} p4 - Deuxième point du deuxième segment {x, y}
+     * @returns {boolean} - true si les segments se croisent
+     */
+    segmentsIntersect(p1, p2, p3, p4) {
+        const ccw = (A, B, C) => (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
+        return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
     }
 };
 
