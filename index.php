@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Monde de Kram - Jeu de Rôle</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/magie.css">
 </head>
 
 <body>
@@ -19,6 +20,7 @@
 <script src="general.js"></script>   <!-- Fonctions générales et communication WebSocket -->
 <script src="dialog.js"></script>    <!-- Gestion des dialogues et interfaces utilisateur -->
 <script src="combat.js"></script>    <!-- Système de combat simplifié -->
+<script src="magie.js"></script>    <!-- Système de magie -->
 
 <script>
 <?php
@@ -109,8 +111,47 @@ function generateArmeJS($row, $index) {
     return $js;
 }
 
+/**
+ * Génère le code JavaScript pour initialiser les listes de magie
+ */
+function generateListeMagieJS($row, $index) {
+    $js = "ListesMagie[$index] = createListeMagie({\n";
+    $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . "\n";
+    $js .= "});\n";
+    return $js;
+}
+/**
+ * Génère le code JavaScript pour initialiser les sorts de magie
+ */
+function generateSortJS($row, $index) {
+    $js = "Sorts[$index] = createSort({\n";
+    $js .= "    Nom_sort: " . toJS($row['NOM_SORT']) . ",\n";
+    $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
+    $js .= "    Niveau: " . toJS($row['NIVEAU'], 'int') . ",\n";
+    $js .= "    Portee: " . toJS($row['PORTEE']) . ",\n";
+    $js .= "    Incantation: " . toJS($row['INCANTATION']) . ",\n";
+    $js .= "    Duree: " . toJS($row['DUREE']) . ",\n";
+    $js .= "    Sauvegarde: " . toJS($row['SAUVEGARDE']) . ",\n";
+    $js .= "    Zone: " . toJS($row['ZONE']) . ",\n";
+    $js .= "    Description: " . toJS($row['DESCRIPTION']) . ",\n";
+    $js .= "    Col: " . toJS($row['COL'], 'int') . "\n";
+    $js .= "});\n";
+    return $js;
+}
+/**
+ * Génère le code JavaScript pour initialiser les connecteurs de magie
+ */
+function generateConnecteurJS($row, $index) {
+    $js = "Connecteurs[$index] = createConnecteur({\n";
+    $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
+    $js .= "    Pred_sort: " . toJS($row['PRED_SORT']) . ",\n";
+    $js .= "    Suc_sort: " . toJS($row['SUC_SORT']) . "\n";
+    $js .= "});\n";
+    return $js;
+}
+
 // === CONNEXION À LA BASE DE DONNÉES ===
-$conn = new mysqli('192.168.1.242', 'root', 'Titoon#01', 'Kram');
+$conn = new mysqli('192.168.1.242', 'kram_app', 'Titoon#01', 'Kram');
 $conn->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
 if ($conn->connect_error) {
@@ -143,6 +184,40 @@ if ($result->num_rows > 0) {
         echo generateArmeJS($row, $ligne);
         $ligne++;
     }
+}
+// === CHARGEMENT DES LISTES DE MAGIE ===
+$query = "SELECT * FROM liste";
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $ligne = 0;
+    while ($row = $result->fetch_assoc()) {
+        // Debug pour voir les valeurs de la base de données
+        echo generateListeMagieJS($row, $ligne);
+        $ligne++;
+    }
+    // === CHARGEMENT DES SORTS ===
+$query = "SELECT * FROM sort ORDER BY Nom_liste ASC, Niveau ASC, Col ASC";
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $ligne = 0;
+    while ($row = $result->fetch_assoc()) {
+        echo generateSortJS($row, $ligne);
+        $ligne++;
+    }
+}
+// === CHARGEMENT DES CONNECTEURS ===
+$query = "SELECT * FROM connecteur";
+$result = $conn->query($query);
+
+if ($result->num_rows > 0) {
+    $ligne = 0;
+    while ($row = $result->fetch_assoc()) {
+        echo generateConnecteurJS($row, $ligne);
+        $ligne++;
+    }
+}
 }
 
 $conn->close();
