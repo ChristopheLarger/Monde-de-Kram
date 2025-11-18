@@ -594,6 +594,7 @@ class Pion extends Map {
     Control = "";            // Contrôleur du personnage
     Arme1 = "";              // Arme principale
     Arme2 = "";              // Arme secondaire
+    Sortilege = "";          // Sortilège sélectionné
     Note = "";               // Note personnalisée
 
     // === CAPACITÉS SPÉCIALES ===

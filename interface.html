@@ -7,10 +7,10 @@
         <option value="">--</option>
         <option value="MJ">Maitre du Jeu</option>
     </select>
-    
+
     <!-- Bouton pour lancer 3 dés à 6 faces -->
     <button id="3D6">3D6</button>
-    
+
     <!-- Champ pour lancer des dés personnalisés (format: XdY+Z) -->
     <input type="text" id="personnalisation" style="width: 80px;" placeholder="prompt...">
     <hr>
@@ -19,8 +19,8 @@
 <!-- === ZONE DE DIALOGUE === -->
 <!-- Table pour afficher les conversations entre joueurs -->
 <table id="table_dialogue" style="width: 100%; border: 0; margin: 0;">
-    <tr id="titre_dialogue"></tr>  <!-- En-têtes des colonnes de dialogue -->
-    <tr id="dialogue"></tr>         <!-- Contenu des dialogues -->
+    <tr id="titre_dialogue"></tr> <!-- En-têtes des colonnes de dialogue -->
+    <tr id="dialogue"></tr> <!-- Contenu des dialogues -->
 </table>
 <!-- === ZONE DE COMBAT === -->
 <!-- Interface de combat (masquée par défaut) -->
@@ -28,7 +28,7 @@
     <!-- Barre d'outils pour la gestion de la carte -->
     <div id="div_tools" class="titre_dialogue"
         style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
-        
+
         <!-- Outils de terrain et formes -->
         <div style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white;">
             <!-- Outils de terrain -->
@@ -41,12 +41,12 @@
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
             <img id="gomme_t" src="Images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;&nbsp;&nbsp;
-            
+
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
             <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">&nbsp;&nbsp;
-            <img id="rectangle" src="Images/Rectangle.png" onclick="FormeUtils.setFormeMode('rectangle');" alt="Rectangle"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="rectangle" src="Images/Rectangle.png" onclick="FormeUtils.setFormeMode('rectangle');"
+                alt="Rectangle" style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
             <img id="ellipse" src="Images/Ellipse.png" onclick="FormeUtils.setFormeMode('ellipse');" alt="Ellipse"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
             <img id="mur" src="Images/Mur.png" onclick="FormeUtils.setFormeMode('mur');" alt="Mur"
@@ -56,7 +56,7 @@
             <img id="gomme_f" src="Images/Gomme.png" onclick="FormeUtils.setFormeMode('gomme');" alt="Gomme"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
         </div>
-        
+
         <!-- Outils de gestion de carte -->
         <div>
             <form id="upload_fond" enctype="multipart/form-data">
@@ -66,11 +66,11 @@
             </form>
         </div>
     </div>
-    
+
     <!-- Canvas principal pour la carte hexagonale -->
     <canvas id="hexCanvas" tabindex="0"
         style="width: 100%; height: 100%; margin: 0; border: 1px solid black; cursor: default;"></canvas>
-    
+
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
         style="position: absolute; display: none; border: 0; opacity: 0.5; pointer-events: none;"></canvas>
@@ -90,7 +90,11 @@
             <td>&nbsp;&nbsp;</td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
         </tr>
-        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <hr>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
@@ -115,7 +119,11 @@
             <td>&nbsp;&nbsp;</td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
         </tr>
-        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <hr>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
@@ -141,7 +149,11 @@
             <td>&nbsp;&nbsp;</td>
             <td><input type="text" class="petit_axe" style="width: 45px; font-size: x-large;"></td>
         </tr>
-        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <hr>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
@@ -171,7 +183,7 @@
 <!-- === DIALOGUE DE DÉTAILS DE PERSONNAGE === -->
 <!-- Fenêtre complète pour modifier les propriétés d'un personnage -->
 <dialog id="dialog_details_2">
-    <table style="width: 100%; margin: 0; font-size: x-large;">
+    <table style="width: 1100px; margin: 0; font-size: x-large;">
         <tr>
             <td>Nom :</td>
             <td colspan="8"><input type="text" style="width: 100%;" class="titre"></td>
@@ -314,6 +326,14 @@
                     <option value="">--</option>
                 </select>
                 <span class="info_principale"></span>
+        </tr>
+        <tr>
+            <td colspan="4"></td>
+            <td></td>
+            <td>Sortilège sélectionné :</td>
+            <td colspan="4">
+                <span class="sortilege_selectionne" style="font-size: x-large; font-weight: bold;"></span>
+                
             </td>
         </tr>
         <tr>
@@ -340,7 +360,8 @@
 <!-- === DIALOGUE DE CHOIX D'ARME D'ATTAQUE === -->
 <!-- Fenêtre pour choisir l'arme à utiliser lors d'une attaque -->
 <dialog id="dialog_attaque_1">
-    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
     <table>
         <tr>
             <td rowspan="3">
@@ -369,7 +390,8 @@
 <!-- === DIALOGUE DE JET D'ATTAQUE === -->
 <!-- Fenêtre pour afficher le jet de dés et le score d'attaque -->
 <dialog id="dialog_attaque_2" style="width: fit-content;">
-    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
     <table style="width: 100%; border-collapse: collapse;">
         <colgroup>
             <col style="width: 17%;">
@@ -505,7 +527,8 @@
 <!-- === DIALOGUE DE LOCALISATION D'ATTAQUE === -->
 <!-- Fenêtre pour choisir la zone corporelle ciblée par l'attaque -->
 <dialog id="dialog_attaque_3" style="width: fit-content;">
-    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(255, 64, 64);"></h1>
     <table style="width: 100%; border-collapse: collapse;">
         <colgroup>
             <col style="width: 50%;">
@@ -593,7 +616,8 @@
 <!-- === DIALOGUE DE CHOIX DE DÉFENSE === -->
 <!-- Fenêtre pour choisir le type de défense (parade/esquive) -->
 <dialog id="dialog_defense_1">
-    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
     <table>
         <tr>
             <td rowspan="4">
@@ -628,22 +652,26 @@
 <!-- === DIALOGUE DE RÉSOLUTION DE DÉFENSE === -->
 <!-- Fenêtre pour afficher le résultat de la défense et les dommages -->
 <dialog id="dialog_defense_2" style="width: fit-content;">
-    <h1 class="nom" style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 64, 255);"></h1>
     <table style="width: 100%; border-collapse: collapse;">
         <tr>
             <td rowspan="2" style="text-align: left;">
                 <span style="font-size: x-large;">&nbsp;&nbsp;Jet de dés :</span>
-                <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+                <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
             </td>
             <td style="text-align: right;">
                 <span style="font-size: x-large;">Score d'attaque :</span>
-                <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+                <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
             </td>
         </tr>
         <tr>
             <td style="text-align: right;">
                 <span style="font-size: x-large;">Score de défense :</span>
-                <input type="text" class="scr_def" style="font-size: x-large; width: 35px; text-align: center;" disabled>
+                <input type="text" class="scr_def" style="font-size: x-large; width: 35px; text-align: center;"
+                    disabled>
             </td>
         </tr>
         <tr>

@@ -52,6 +52,17 @@ function createConnecteur(data = {}) {
 // Tableau global contenant toutes les connecteurs disponibles
 let Connecteurs = [];
 
+function createSortConnu(data = {}) {
+  return {
+    Nom_liste: data.Nom_liste || "",
+    Nom_sort: data.Nom_sort || "",
+    Nom_perso: data.Nom_perso || "",
+  };
+}
+
+// Tableau global contenant toutes les sorts connus disponibles
+let SortsConnus = [];
+
 shortName = {
   Air: "liste de l'air",
   Controle: "liste du contrôle de soi",
@@ -71,34 +82,43 @@ shortName = {
   Harmonie: "liste de l'harmonie",
 };
 
+function getShortName(Nom_liste) {
+  for (const [key, value] of Object.entries(shortName)) {
+    if (value === Nom_liste) {
+      return key;
+    }
+  }
+  return null;
+}
+
 function getMaxSize(Nom_liste) {
   let maxSize = 0;
-  Sorts.forEach(s => {
+  Sorts.forEach((s) => {
     if (s.Nom_liste !== Nom_liste) return;
     if (s.Col > maxSize) maxSize = s.Col;
   });
   return maxSize;
 }
 
+/**
+ * Met en majuscule la première lettre d'une chaîne
+ * @param {string} str - Chaîne à capitaliser
+ * @returns {string} Chaîne avec la première lettre en majuscule
+ */
+function capitalizeFirstLetter(str) {
+  if (!str) return str;
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 // Initialisation quand le DOM est prêt
 document.addEventListener("DOMContentLoaded", function () {
   // Récupération des éléments (si présents sur la page)
-  const btn = document.getElementById("btn");
   const modal = document.getElementById("modal");
   const closeBtn = document.querySelector("#modal .close");
 
-  // Fonctions protégées
-  function openModal() {
-    if (modal) modal.style.display = "flex";
-  }
-
+  
   function closeModal() {
     if (modal) modal.style.display = "none";
-  }
-
-  // Lier les événements seulement si les éléments existent
-  if (btn && modal) {
-    btn.addEventListener("click", openModal);
   }
 
   if (closeBtn) {
@@ -143,7 +163,9 @@ function createListeModal(Nom_liste) {
   const sortsListe = Sorts.filter((sort) => sort.Nom_liste === Nom_liste);
 
   // Filtrer les connecteurs pour cette liste
-  const connecteursListe = Connecteurs.filter((conn) => conn.Nom_liste === Nom_liste);
+  const connecteursListe = Connecteurs.filter(
+    (conn) => conn.Nom_liste === Nom_liste
+  );
 
   // Créer la modale
   const modal = document.createElement("div");
@@ -166,7 +188,7 @@ function createListeModal(Nom_liste) {
   const title = document.createElement("h1");
   title.id = "title";
   title.className = "title";
-  title.textContent = Nom_liste;
+  title.textContent = capitalizeFirstLetter(Nom_liste);
 
   // Conteneur des niveaux et sorts
   const conteneur = document.createElement("div");
@@ -193,7 +215,9 @@ function createListeModal(Nom_liste) {
     levelDiv.id = `level-${niveau}`;
     levelDiv.className = "level";
     levelDiv.style.cssText =
-      "grid-template-columns: 30px repeat(" + getMaxSize(Nom_liste) + ", minmax(0, 1fr));";
+      "grid-template-columns: 30px repeat(" +
+      getMaxSize(Nom_liste) +
+      ", minmax(0, 1fr));";
 
     // Numéro de niveau
     const levelNumber = document.createElement("div");
@@ -242,7 +266,10 @@ function createListeModal(Nom_liste) {
   // Créer le marqueur de flèche
   const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
-  const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+  const marker = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "marker"
+  );
   marker.id = "marker";
   marker.setAttribute("id", "arrowhead");
   marker.setAttribute("markerWidth", "6");
@@ -251,7 +278,10 @@ function createListeModal(Nom_liste) {
   marker.setAttribute("refY", "2");
   marker.setAttribute("orient", "auto");
 
-  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  const polygon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "polygon"
+  );
   polygon.id = "polygon";
   polygon.setAttribute("points", "0 0, 6 2, 0 4");
   polygon.setAttribute("fill", "#666");
@@ -329,27 +359,50 @@ function createListeModal(Nom_liste) {
           const fromRect = fromElement.getBoundingClientRect();
           const toRect = toElement.getBoundingClientRect();
 
-          const fromSort = sortsListe.find((s) => s.Nom_sort === conn.Pred_sort);
+          const fromSort = sortsListe.find(
+            (s) => s.Nom_sort === conn.Pred_sort
+          );
           const toSort = sortsListe.find((s) => s.Nom_sort === conn.Suc_sort);
 
-          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+          );
 
           if (fromSort.Niveau === toSort.Niveau) {
             if (fromSort.Col < toSort.Col) {
               line.setAttribute("x1", fromRect.right - containerRect.left);
-              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y1",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
               line.setAttribute("x2", toRect.left - containerRect.left);
-              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y2",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
             } else {
               line.setAttribute("x1", fromRect.left - containerRect.left);
-              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y1",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
               line.setAttribute("x2", toRect.right - containerRect.left);
-              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y2",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
             }
           } else {
-            line.setAttribute("x1", fromRect.left + fromRect.width / 2 - containerRect.left);
+            line.setAttribute(
+              "x1",
+              fromRect.left + fromRect.width / 2 - containerRect.left
+            );
             line.setAttribute("y1", fromRect.bottom - containerRect.top);
-            line.setAttribute("x2", toRect.left + toRect.width / 2 - containerRect.left);
+            line.setAttribute(
+              "x2",
+              toRect.left + toRect.width / 2 - containerRect.left
+            );
             line.setAttribute("y2", toRect.top - containerRect.top);
           }
 
@@ -368,6 +421,42 @@ function createListeModal(Nom_liste) {
   createAllArrows();
 
   // Gestion des clics sur les sorts
+  conteneur.addEventListener("contextmenu", function (e) {
+    if (e.target.classList.contains("spell-node")) {
+      e.preventDefault();
+
+      const spellName = e.target.getAttribute("data-spell");
+      const sort = sortsListe.find((s) => s.Nom_sort === spellName);
+
+      if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
+        // Stocker le sortilège sélectionné et le nom de la liste dans le pion
+        m_selected.Sortilege = sort.Nom_sort;
+        m_selected.Nom_liste_sort = Nom_liste;
+
+        // Mettre à jour l'affichage dans le dialogue de détails
+        const sortilegeSpans = dialog_details_2.querySelectorAll(
+          ".sortilege_selectionne"
+        );
+        if (sortilegeSpans.length >= 2) {
+          sortilegeSpans[0].textContent =
+            capitalizeFirstLetter(Nom_liste) + " / "; // Nom de la liste
+          sortilegeSpans[1].textContent = sort.Nom_sort; // Nom du sort
+        } else if (sortilegeSpans.length === 1) {
+          sortilegeSpans[0].textContent =
+            capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
+        }
+
+        // Fermer la modale
+        if (modal && modal.parentNode) {
+          document.body.removeChild(modal);
+        }
+        if (document.getElementById("modal")) {
+          document.getElementById("modal").style.display = "none";
+        }
+      }
+    }
+  });
+
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
       const spellName = e.target.getAttribute("data-spell");
@@ -377,11 +466,14 @@ function createListeModal(Nom_liste) {
         document.getElementById(`spell-name`).textContent = sort.Nom_sort;
         document.getElementById(`spell-level`).textContent = sort.Niveau;
         document.getElementById(`spell-portee`).textContent = sort.Portee;
-        document.getElementById(`spell-incantation`).textContent = sort.Incantation;
+        document.getElementById(`spell-incantation`).textContent =
+          sort.Incantation;
         document.getElementById(`spell-duree`).textContent = sort.Duree;
-        document.getElementById(`spell-sauvegarde`).textContent = sort.Sauvegarde;
+        document.getElementById(`spell-sauvegarde`).textContent =
+          sort.Sauvegarde;
         document.getElementById(`spell-zone`).textContent = sort.Zone;
-        document.getElementById(`spell-description`).textContent = sort.Description;
+        document.getElementById(`spell-description`).textContent =
+          sort.Description;
 
         spellInfo.style.display = "block";
 
@@ -389,7 +481,40 @@ function createListeModal(Nom_liste) {
         e.target.classList.add("clicked");
         setTimeout(() => {
           e.target.classList.remove("clicked");
-        }, 1000);
+        }, 500);
+      }
+    }
+  });
+
+  // Gestion pour sélectionner le sortilège
+  conteneur.addEventListener("contextmenu", function (e) {
+    if (e.target.classList.contains("spell-node")) {
+      const spellName = e.target.getAttribute("data-spell");
+      const sort = sortsListe.find((s) => s.Nom_sort === spellName);
+
+      if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
+        // Stocker le sortilège sélectionné et le nom de la liste dans le pion
+        m_selected.Sortilege = sort.Nom_sort;
+        m_selected.Nom_liste_sort = Nom_liste;
+
+        // Mettre à jour l'affichage dans le dialogue de détails
+        const sortilegeSpans = dialog_details_2.querySelectorAll(
+          ".sortilege_selectionne"
+        );
+        if (sortilegeSpans.length >= 2) {
+          sortilegeSpans[0].textContent =
+            capitalizeFirstLetter(Nom_liste) + " / "; // Nom de la liste
+          sortilegeSpans[1].textContent = sort.Nom_sort; // Nom du sort
+        } else if (sortilegeSpans.length === 1) {
+          sortilegeSpans[0].textContent =
+            capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
+        }
+
+        // Fermer la modale
+        document.body.removeChild(modal);
+        if (document.getElementById("modal")) {
+          document.getElementById("modal").style.display = "none";
+        }
       }
     }
   });

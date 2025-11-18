@@ -18,7 +18,6 @@ h2 {
 }
 
 button {
-  background-color: #4caf50;
   color: white;
   padding: 15px 32px;
   text-align: center;
@@ -164,7 +163,7 @@ button:hover {
 
 /* Styles pour les boutons magiques */
 .magic-button {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  background-color: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
   color: #000;
   border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 6px 8px;
@@ -187,14 +186,6 @@ button:hover {
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
 }
 
-.magic-button:active,
-.magic-button.clicked {
-  background-color: #4a90e2;
-  color: white;
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
 .title {
   text-align: center;
   color: #000;
@@ -204,7 +195,6 @@ button:hover {
 
 .level {
   display: grid;
-  /* grid-template-columns: repeat(9, 1fr); */
   gap: 30px;
   margin: 18px 0;
   min-height: 6%;
@@ -230,7 +220,6 @@ button:hover {
 }
 
 .spell-node {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 10px;
   padding: 5px 7px;
