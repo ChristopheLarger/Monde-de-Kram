@@ -148,7 +148,7 @@ class Map {
                 let y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0);
 
                 // Propriétés par défaut de la case
-                let color = "rgb(216, 216, 216)"; // Couleur de brouillard
+                let color = "rgb(192, 192, 192)"; // Couleur de brouillard
                 let strie = false;                 // Pas de striage par défaut
                 let brouillard = !Map.is_visible(col, row); // Brouillard si non visible
 
@@ -218,7 +218,7 @@ class Map {
         }
 
         // On dessine le contour de l'hexagone.
-        ctx.strokeStyle = "gray";
+        ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -869,114 +869,151 @@ class Pion extends Map {
     // Renseigne sur le fait qu'un hexagone soit visible ou non du pion.
     ligne_de_vue(col, row) {
         // Sous-fonction donnant la liste des hexagones sur une ligne
-        function hexLine(start, end) {
-            // Convertit (col, row) en coordonnées cubiques (q, r, s)
-            function colRowToCube(col, row) {
-                let q = col;
-                let r = row - Math.floor(col / 2);
-                let s = -q - r;
-                return [q, r, s];
+        // function hexLine(start, end) {
+        //     // Convertit (col, row) en coordonnées cubiques (q, r, s)
+        //     function colRowToCube(col, row) {
+        //         let q = col;
+        //         let r = row - Math.floor(col / 2);
+        //         let s = -q - r;
+        //         return [q, r, s];
+        //     }
+
+        //     // Convertit (q, r, s) en coordonnées (col, row)
+        //     function cubeToColRow(q, r) {
+        //         let col = q;
+        //         let row = r + Math.floor(q / 2);
+        //         return [col, row];
+        //     }
+
+        //     // Interpolation linéaire entre a et b
+        //     function lerp(a, b, t) {
+        //         return a + (b - a) * t;
+        //     }
+
+        //     // Interpolation linéaire entre deux points cubiques
+        //     function cubeLerp(a, b, t) {
+        //         return [
+        //             lerp(a[0], b[0], t),
+        //             lerp(a[1], b[1], t),
+        //             lerp(a[2], b[2], t)
+        //         ];
+        //     }
+
+        //     // Arrondit les coordonnées cubiques vers l'hexagone le plus proche
+        //     function roundCube(cube) {
+        //         let [q, r, s] = cube;
+        //         let rq = Math.round(q);
+        //         let rr = Math.round(r);
+        //         let rs = Math.round(s);
+
+        //         let dq = Math.abs(rq - q);
+        //         let dr = Math.abs(rr - r);
+        //         let ds = Math.abs(rs - s);
+
+        //         if (dq > dr && dq > ds) {
+        //             rq = -rr - rs;
+        //         } else if (dr > ds) {
+        //             rr = -rq - rs;
+        //         } else {
+        //             rs = -rq - rr;
+        //         }
+
+        //         return [rq, rr, rs];
+        //     }
+
+        //     let startCube = colRowToCube(...start);
+        //     let endCube = colRowToCube(...end);
+
+        //     let n = Math.max(Math.abs(startCube[0] - endCube[0]),
+        //         Math.abs(startCube[1] - endCube[1]),
+        //         Math.abs(startCube[2] - endCube[2]));
+
+        //     let hexes = [];
+
+        //     for (let i = 0; i <= n; i++) {
+        //         let t = i / n;
+        //         let cube = cubeLerp(startCube, endCube, t);
+        //         let roundedCube = roundCube(cube);
+        //         let hex = cubeToColRow(...roundedCube);
+
+        //         // Ajouter uniquement si non déjà présent
+        //         if (!hexes.some(h => h[0] === hex[0] && h[1] === hex[1])) {
+        //             hexes.push(hex);
+        //         }
+        //     }
+
+        //     return hexes;
+        // }
+
+        // const start_col = parseInt(this.Position.split(",")[0], 10);
+        // const start_row = parseInt(this.Position.split(",")[1], 10);
+        // const startHex = [start_col, start_row];
+        // const endHex = [col, row];
+
+        // const results = hexLine(startHex, endHex);
+
+        // let visible = true;
+
+        // results.forEach(hex => {
+        //     if (!visible) return;
+
+        //     // Si le pion est sur la case de départ, on ne fait rien
+        //     if (hex[0] === start_col && hex[1] === start_row) return;
+
+        //     // Si le pion est sur la case d'arrivée, on ne fait rien
+        //     if (hex[0] === col && hex[1] === row) return;
+
+        //     // Vérification des terrains (si un terrain Rocher ou Arbre est sur le chemin, le pion ne voit pas la case)
+        //     const t = Terrains.find(x => x.Model != "Eau" && x.Position === hex[0] + "," + hex[1]);
+        //     if (t != null && typeof t != "undefined") visible = false;
+
+        //     const x = hex[0] * hexHSpacing + offsetX;
+        //     const y = hex[1] * hexVSpacing + ((hex[0] % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
+        //     const h = { x: x, y: y };
+
+        //     // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
+        //     const m = Formes.find(r => r.type === "Mur" && FormeUtils.rectangleHexagonIntersect(r, h));
+        //     if (m != null && typeof m != "undefined") visible = false;
+        // });
+
+        // return visible;
+
+        const start_col = this.Position.split(",")[0];
+        const start_row = this.Position.split(",")[1];
+        const start_x = start_col * hexHSpacing;
+        const start_y = start_row * hexVSpacing + ((start_col % 2 != 0) ? hexVSpacing / 2 : 0);
+
+        const end_col = col;
+        const end_row = row;
+        const end_x = end_col * hexHSpacing;
+        const end_y = end_row * hexVSpacing + ((end_col % 2 != 0) ? hexVSpacing / 2 : 0);
+
+        let is_visible = true;
+
+        Terrains.filter(x => x.Model != "Eau").forEach(t => {
+            if (!is_visible) return;
+
+            const hex_col = t.Position.split(",")[0];
+            const hex_row = t.Position.split(",")[1];
+            const hex_x = hex_col * hexHSpacing;
+            const hex_y = hex_row * hexVSpacing + ((hex_col % 2 != 0) ? hexVSpacing / 2 : 0);
+
+            if (FormeUtils.lineIntersectsHexagon({ x: start_x, y: start_y }, { x: end_x, y: end_y }, { x: hex_x, y: hex_y })) {
+                is_visible = false;
             }
-
-            // Convertit (q, r, s) en coordonnées (col, row)
-            function cubeToColRow(q, r) {
-                let col = q;
-                let row = r + Math.floor(q / 2);
-                return [col, row];
-            }
-
-            // Interpolation linéaire entre a et b
-            function lerp(a, b, t) {
-                return a + (b - a) * t;
-            }
-
-            // Interpolation linéaire entre deux points cubiques
-            function cubeLerp(a, b, t) {
-                return [
-                    lerp(a[0], b[0], t),
-                    lerp(a[1], b[1], t),
-                    lerp(a[2], b[2], t)
-                ];
-            }
-
-            // Arrondit les coordonnées cubiques vers l'hexagone le plus proche
-            function roundCube(cube) {
-                let [q, r, s] = cube;
-                let rq = Math.round(q);
-                let rr = Math.round(r);
-                let rs = Math.round(s);
-
-                let dq = Math.abs(rq - q);
-                let dr = Math.abs(rr - r);
-                let ds = Math.abs(rs - s);
-
-                if (dq > dr && dq > ds) {
-                    rq = -rr - rs;
-                } else if (dr > ds) {
-                    rr = -rq - rs;
-                } else {
-                    rs = -rq - rr;
-                }
-
-                return [rq, rr, rs];
-            }
-
-            let startCube = colRowToCube(...start);
-            let endCube = colRowToCube(...end);
-
-            let n = Math.max(Math.abs(startCube[0] - endCube[0]),
-                Math.abs(startCube[1] - endCube[1]),
-                Math.abs(startCube[2] - endCube[2]));
-
-            let hexes = [];
-
-            for (let i = 0; i <= n; i++) {
-                let t = i / n;
-                let cube = cubeLerp(startCube, endCube, t);
-                let roundedCube = roundCube(cube);
-                let hex = cubeToColRow(...roundedCube);
-
-                // Ajouter uniquement si non déjà présent
-                if (!hexes.some(h => h[0] === hex[0] && h[1] === hex[1])) {
-                    hexes.push(hex);
-                }
-            }
-
-            return hexes;
-        }
-
-        const start_col = parseInt(this.Position.split(",")[0], 10);
-        const start_row = parseInt(this.Position.split(",")[1], 10);
-        const startHex = [start_col, start_row];
-        const endHex = [col, row];
-
-        const results = hexLine(startHex, endHex);
-
-        let visible = true;
-
-        results.forEach(hex => {
-            if (!visible) return;
-
-            // Si le pion est sur la case de départ, on ne fait rien
-            if (hex[0] === start_col && hex[1] === start_row) return;
-
-            // Si le pion est sur la case d'arrivée, on ne fait rien
-            if (hex[0] === col && hex[1] === row) return;
-
-            // Vérification des terrains (si un terrain Rocher ou Arbre est sur le chemin, le pion ne voit pas la case)
-            const t = Terrains.find(x => x.Model != "Eau" && x.Position === hex[0] + "," + hex[1]);
-            if (t != null && typeof t != "undefined") visible = false;
-
-            const x = hex[0] * hexHSpacing + offsetX;
-            const y = hex[1] * hexVSpacing + ((hex[0] % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
-            const h = { x: x, y: y };
-
-            // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
-            const m = Formes.find(r => r.type === "Mur" && FormeUtils.rectangleHexagonIntersect(r, h));
-            if (m != null && typeof m != "undefined") visible = false;
         });
 
-        return visible;
+        Formes.filter(x => x.type === "Mur").forEach(m => {
+            if (!is_visible) return;
+
+           if (FormeUtils.lineIntersectsRectangle(
+            { x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY },
+            { x: m.x, y: m.y, width: m.width, height: m.height, theta: m.theta })) {
+                is_visible = false;
+            }
+        });
+
+        return is_visible;
     }
 
     centrer() {
@@ -1117,7 +1154,7 @@ canvas.addEventListener("mousedown", (event) => {
             // Calculer le centre du rectangle original
             const cx = r.x + r.width / 2;
             const cy = r.y + r.height / 2;
-            
+
             // Transformer le point de la souris dans le repère local (centré, non-rotaté) du rectangle
             const mousePoint = FormeUtils.rotatePoint(mouseX, mouseY, cx, cy, -r.theta);
 
@@ -1132,8 +1169,8 @@ canvas.addEventListener("mousedown", (event) => {
             // Le coin supérieur gauche local est (-width/2, -height/2) dans le repère centré
             const original_topLeft_local = { x: -r.width / 2, y: -r.height / 2 };
             const original_topLeft_global = FormeUtils.rotatePoint(
-                cx + original_topLeft_local.x, 
-                cy + original_topLeft_local.y, 
+                cx + original_topLeft_local.x,
+                cy + original_topLeft_local.y,
                 cx, cy, r.theta
             );
 
@@ -1143,7 +1180,7 @@ canvas.addEventListener("mousedown", (event) => {
                 const cutY_local = mouseY_local - (-r.height / 2);
                 const r1_height = Math.max(0, cutY_local - hexSize);
                 const r2_height = Math.max(0, r.height - r1_height - 2 * hexSize);
-                
+
                 // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
                 // Le coin supérieur gauche local de r1 est (-width/2, -r1_height/2) dans son repère centré
                 // On veut que ce point, après rotation de theta autour du centre de r1, soit à original_topLeft_global
@@ -1151,8 +1188,8 @@ canvas.addEventListener("mousedown", (event) => {
                 const r1_topLeft_local = { x: -r.width / 2, y: -r1_height / 2 };
                 // Rotation inverse du coin local pour trouver où doit être le centre
                 const r1_topLeft_rotated = FormeUtils.rotatePoint(
-                    r1_topLeft_local.x, 
-                    r1_topLeft_local.y, 
+                    r1_topLeft_local.x,
+                    r1_topLeft_local.y,
                     0, 0, r.theta
                 );
                 // Le centre de r1 dans le repère global
@@ -1161,38 +1198,38 @@ canvas.addEventListener("mousedown", (event) => {
                 // Le (x, y) de r1 dans le repère non-rotaté
                 r1.x = r1_centerX - r.width / 2;
                 r1.y = r1_centerY - r1_height / 2;
-                r1.height = r1_height;
-                r1.width = r.width;
-                
+                r1.height = Math.abs(r1_height);
+                r1.width = Math.abs(r.width);
+
                 // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
                 // Le coin inférieur de r1 dans le repère local centré est à y = -height/2 + r1_height
                 // Le coin supérieur de r2 doit être à y = -height/2 + r1_height + 2*hexSize
                 // Le centre de r2 dans le repère local centré est à y = -height/2 + r1_height + 2*hexSize + r2_height/2
                 const r2_centerY_local = -r.height / 2 + r1_height + 2 * hexSize + r2_height / 2;
                 const r2_centerX_local = 0; // Même x que l'original
-                
+
                 // Convertir le centre local de r2 en coordonnées globales (après rotation)
                 const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
-                
+
                 // Le (x, y) de r2 dans le repère non-rotaté
                 r2.x = r2_center_global.x - r.width / 2;
                 r2.y = r2_center_global.y - r2_height / 2;
-                r2.width = r.width;
-                r2.height = r2_height;
+                r2.width = Math.abs(r.width);
+                r2.height = Math.abs(r2_height);
             }
             else {
                 // Scission verticale
                 const cutX_local = mouseX_local - (-r.width / 2);
                 const r1_width = Math.max(0, cutX_local - hexSize);
                 const r2_width = Math.max(0, r.width - r1_width - 2 * hexSize);
-                
+
                 // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
                 // Le coin supérieur gauche local de r1 est (-r1_width/2, -height/2) dans son repère centré
                 const r1_topLeft_local = { x: -r1_width / 2, y: -r.height / 2 };
                 // Rotation inverse du coin local pour trouver où doit être le centre
                 const r1_topLeft_rotated = FormeUtils.rotatePoint(
-                    r1_topLeft_local.x, 
-                    r1_topLeft_local.y, 
+                    r1_topLeft_local.x,
+                    r1_topLeft_local.y,
                     0, 0, r.theta
                 );
                 // Le centre de r1 dans le repère global
@@ -1201,21 +1238,21 @@ canvas.addEventListener("mousedown", (event) => {
                 // Le (x, y) de r1 dans le repère non-rotaté
                 r1.x = r1_centerX - r1_width / 2;
                 r1.y = r1_centerY - r.height / 2;
-                r1.width = r1_width;
-                r1.height = r.height;
-                
+                r1.width = Math.abs(r1_width);
+                r1.height = Math.abs(r.height);
+
                 // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
                 const r2_centerX_local = -r.width / 2 + r1_width + 2 * hexSize + r2_width / 2;
                 const r2_centerY_local = 0; // Même y que l'original
-                
+
                 // Convertir le centre local de r2 en coordonnées globales (après rotation)
                 const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
-                
+
                 // Le (x, y) de r2 dans le repère non-rotaté
                 r2.x = r2_center_global.x - r2_width / 2;
                 r2.y = r2_center_global.y - r.height / 2;
-                r2.width = r2_width;
-                r2.height = r.height;
+                r2.width = Math.abs(r2_width);
+                r2.height = Math.abs(r.height);
             }
 
             if (index_forme_zoom === Formes.indexOf(r)) index_forme_zoom = null;
@@ -1577,12 +1614,20 @@ canvas.addEventListener("mousemove", (event) => {
         // Le bouton gauche de la souris est enfoncé : on dessine une forme (sélection)
         if (type_forme === "ellipse") {
             // Ellipse : la souris est positionnée au bord
-            SelectRectangle.width = 2 * Math.sqrt(2) * (mouseX - lastMouseX);
-            SelectRectangle.height = 2 * Math.sqrt(2) * (mouseY - lastMouseY);
+            const w = 2 * Math.sqrt(2) * (mouseX - lastMouseX);
+            const h = 2 * Math.sqrt(2) * (mouseY - lastMouseY);
+            SelectRectangle.width = Math.abs(w);
+            SelectRectangle.height = Math.abs(h);
+            if (w < 0) SelectRectangle.x = mouseX;
+            if (h < 0) SelectRectangle.y = mouseY;
         }
         else { // Rectangle : la souris est le sommet opposé
-            SelectRectangle.width = (mouseX - lastMouseX);
-            SelectRectangle.height = (mouseY - lastMouseY);
+            const w = (mouseX - lastMouseX);
+            const h = (mouseY - lastMouseY);
+            SelectRectangle.width = Math.abs(w);
+            SelectRectangle.height = Math.abs(h);
+            if (w < 0) SelectRectangle.x = mouseX;
+            if (h < 0) SelectRectangle.y = mouseY;
         }
 
         Map.drawHexMap();
@@ -1594,8 +1639,12 @@ canvas.addEventListener("mousemove", (event) => {
         const x2 = mouseX - offsetX;
         const y2 = mouseY - offsetY;
 
-        SelectRectangle.width = x2 - x1;
-        SelectRectangle.height = y2 - y1;
+        const w = x2 - x1;
+        const h = y2 - y1;
+        SelectRectangle.width = Math.abs(w);
+        SelectRectangle.height = Math.abs(h);
+        if (w < 0) SelectRectangle.x = x2 + offsetX;
+        if (h < 0) SelectRectangle.y = y2 + offsetY;
 
         hexMap.forEach(hex => {
             let hexX = hex.col * hexHSpacing;

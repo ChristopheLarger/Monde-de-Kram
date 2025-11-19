@@ -16,8 +16,8 @@ function createForme(type, data = {}) {
         type: type,
         x: data.x || 0,
         y: data.y || 0,
-        width: data.width || 0,
-        height: data.height || 0,
+        width: Math.abs(data.width || 0),
+        height: Math.abs(data.height || 0),
         theta: data.theta || 0,
         color: data.color || null,
 
@@ -221,87 +221,23 @@ const FormeUtils = {
     },
 
     /**
-     * Vérifie si un rectangle et un hexagone se croisent
-     * @param {Object} rectangle - Rectangle avec {x, y, width, height, theta}
-     * @param {Object} hexagon - Hexagone avec {x, y} (centre)
-     * @returns {boolean} - true si les formes se croisent
-     */
-    rectangleHexagonIntersect(rectangle, hexagon) {
-        // 1. Obtenir les 6 sommets de l'hexagone
-        const hexVertices = [];
-        for (let i = 0; i < 6; i++) {
-            const angle = (Math.PI / 3) * i;
-            hexVertices.push({
-                x: hexagon.x + hexSize * Math.cos(angle),
-                y: hexagon.y + hexSize * Math.sin(angle)
-            });
-        }
-        
-        // 2. Obtenir les 4 sommets du rectangle (dans le repère non-rotaté)
-        const rectCenterX = rectangle.x + rectangle.width / 2;
-        const rectCenterY = rectangle.y + rectangle.height / 2;
-        
-        const rectVertices = [
-            { x: rectangle.x, y: rectangle.y },
-            { x: rectangle.x + rectangle.width, y: rectangle.y },
-            { x: rectangle.x + rectangle.width, y: rectangle.y + rectangle.height },
-            { x: rectangle.x, y: rectangle.y + rectangle.height }
-        ];
-        
-        // Transformer les sommets du rectangle selon la rotation
-        const rotatedRectVertices = rectVertices.map(v => 
-            this.rotatePoint(v.x, v.y, rectCenterX, rectCenterY, rectangle.theta || 0)
-        );
-        
-        // 3. Vérifier si un sommet de l'hexagone est dans le rectangle
-        for (const vertex of hexVertices) {
-            if (this.isPointInRotatedRectangle(vertex, rectangle)) {
-                return true;
-            }
-        }
-        
-        // 4. Vérifier si un sommet du rectangle est dans l'hexagone
-        for (const vertex of rotatedRectVertices) {
-            if (this.isPointInHexagon(vertex, hexagon, hexSize)) {
-                return true;
-            }
-        }
-        
-        // 5. Vérifier si les arêtes se croisent
-        // Arêtes de l'hexagone
-        for (let i = 0; i < 6; i++) {
-            const hexEdgeStart = hexVertices[i];
-            const hexEdgeEnd = hexVertices[(i + 1) % 6];
-            
-            // Arêtes du rectangle
-            for (let j = 0; j < 4; j++) {
-                const rectEdgeStart = rotatedRectVertices[j];
-                const rectEdgeEnd = rotatedRectVertices[(j + 1) % 4];
-                
-                if (this.segmentsIntersect(hexEdgeStart, hexEdgeEnd, rectEdgeStart, rectEdgeEnd)) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
-    },
-
-    /**
      * Vérifie si un point est dans un rectangle rotaté
      * @param {Object} point - Point avec {x, y}
      * @param {Object} rectangle - Rectangle avec {x, y, width, height, theta}
+     *                              où x et y sont les coordonnées du coin supérieur gauche (ou coin de départ si width/height sont négatifs)
      * @returns {boolean} - true si le point est dans le rectangle
      */
     isPointInRotatedRectangle(point, rectangle) {
-        const cx = rectangle.x + rectangle.width / 2;
-        const cy = rectangle.y + rectangle.height / 2;
-        const rp = this.rotatePoint(point.x, point.y, cx, cy, -(rectangle.theta || 0));
-        
+        // Gérer les largeurs/hauteurs éventuellement négatives (cohérent avec lineIntersectsRectangle)
         const minX = Math.min(rectangle.x, rectangle.x + rectangle.width);
         const maxX = Math.max(rectangle.x, rectangle.x + rectangle.width);
         const minY = Math.min(rectangle.y, rectangle.y + rectangle.height);
         const maxY = Math.max(rectangle.y, rectangle.y + rectangle.height);
+        
+        // Calculer le centre de manière cohérente
+        const cx = (minX + maxX) / 2;
+        const cy = (minY + maxY) / 2;
+        const rp = this.rotatePoint(point.x, point.y, cx, cy, -(rectangle.theta || 0));
         
         return (rp.x >= minX && rp.x <= maxX && rp.y >= minY && rp.y <= maxY);
     },
@@ -329,8 +265,219 @@ const FormeUtils = {
      * @returns {boolean} - true si les segments se croisent
      */
     segmentsIntersect(p1, p2, p3, p4) {
-        const ccw = (A, B, C) => (C.y - A.y) * (B.x - A.x) > (B.y - A.y) * (C.x - A.x);
-        return ccw(p1, p3, p4) !== ccw(p2, p3, p4) && ccw(p1, p2, p3) !== ccw(p1, p2, p4);
+        // Fonction pour calculer l'orientation de trois points (CCW)
+        const ccw = (A, B, C) => {
+            return (C.y - A.y) * (B.x - A.x) - (B.y - A.y) * (C.x - A.x);
+        };
+        
+        // Vérifier si les segments se croisent
+        const o1 = ccw(p1, p2, p3);
+        const o2 = ccw(p1, p2, p4);
+        const o3 = ccw(p3, p4, p1);
+        const o4 = ccw(p3, p4, p2);
+        
+        // Cas général : les segments se croisent si les orientations sont différentes
+        if ((o1 * o2 < 0) && (o3 * o4 < 0)) {
+            return true;
+        }
+        
+        // Cas spéciaux : segments colinéaires ou points sur les bords
+        // Vérifier si p3 est sur le segment p1-p2
+        if (o1 === 0 && this.isPointOnSegment(p1, p2, p3)) return true;
+        // Vérifier si p4 est sur le segment p1-p2
+        if (o2 === 0 && this.isPointOnSegment(p1, p2, p4)) return true;
+        // Vérifier si p1 est sur le segment p3-p4
+        if (o3 === 0 && this.isPointOnSegment(p3, p4, p1)) return true;
+        // Vérifier si p2 est sur le segment p3-p4
+        if (o4 === 0 && this.isPointOnSegment(p3, p4, p2)) return true;
+        
+        return false;
+    },
+    
+    /**
+     * Vérifie si un point est sur un segment (utilisé pour les cas limites)
+     * @param {Object} segStart - Point de départ du segment {x, y}
+     * @param {Object} segEnd - Point de fin du segment {x, y}
+     * @param {Object} point - Point à vérifier {x, y}
+     * @returns {boolean} - true si le point est sur le segment
+     */
+    isPointOnSegment(segStart, segEnd, point) {
+        // Vérifier si le point est colinéaire avec le segment
+        const crossProduct = (point.y - segStart.y) * (segEnd.x - segStart.x) - 
+                            (point.x - segStart.x) * (segEnd.y - segStart.y);
+        if (Math.abs(crossProduct) > 1e-10) return false;
+        
+        // Vérifier si le point est dans la bounding box du segment
+        const minX = Math.min(segStart.x, segEnd.x);
+        const maxX = Math.max(segStart.x, segEnd.x);
+        const minY = Math.min(segStart.y, segEnd.y);
+        const maxY = Math.max(segStart.y, segEnd.y);
+        
+        return (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY);
+    },
+
+    /**
+     * Vérifie si un segment de droite (définie par deux points) coupe un rectangle
+     * @param {Object} linePoint1 - Premier point du segment de droite {x, y}
+     * @param {Object} linePoint2 - Deuxième point du segment de droite {x, y}
+     * @param {Object} rectangle - Rectangle avec {x, y, width, height, theta}
+     *                              où x et y sont les coordonnées du coin supérieur gauche (ou coin de départ si width/height sont négatifs)
+     * @returns {boolean} - true si la droite coupe le rectangle
+     */
+    lineIntersectsRectangle(linePoint1, linePoint2, rectangle) {
+        // Gérer les largeurs/hauteurs éventuellement négatives
+        const minX = Math.min(rectangle.x, rectangle.x + rectangle.width);
+        const maxX = Math.max(rectangle.x, rectangle.x + rectangle.width);
+        const minY = Math.min(rectangle.y, rectangle.y + rectangle.height);
+        const maxY = Math.max(rectangle.y, rectangle.y + rectangle.height);
+        
+        // Obtenir les 4 sommets du rectangle (dans le repère non-rotaté)
+        const rectCenterX = (minX + maxX) / 2;
+        const rectCenterY = (minY + maxY) / 2;
+        
+        const rectVertices = [
+            { x: minX, y: minY },
+            { x: maxX, y: minY },
+            { x: maxX, y: maxY },
+            { x: minX, y: maxY }
+        ];
+        
+        // Transformer les sommets du rectangle selon la rotation
+        const rotatedRectVertices = rectVertices.map(v => 
+            this.rotatePoint(v.x, v.y, rectCenterX, rectCenterY, rectangle.theta || 0)
+        );
+        
+        // Vérifier d'abord si un des points du segment est dans le rectangle
+        const p1Inside = this.isPointInRotatedRectangle(linePoint1, rectangle);
+        const p2Inside = this.isPointInRotatedRectangle(linePoint2, rectangle);
+        
+        // Si les deux points sont dedans, le segment est entièrement dans le rectangle
+        if (p1Inside && p2Inside) {
+            return true;
+        }
+        
+        // Vérifier si le segment coupe l'une des 4 arêtes du rectangle
+        for (let i = 0; i < 4; i++) {
+            const edgeStart = rotatedRectVertices[i];
+            const edgeEnd = rotatedRectVertices[(i + 1) % 4];
+            
+            if (this.segmentsIntersect(linePoint1, linePoint2, edgeStart, edgeEnd)) {
+                return true;
+            }
+        }
+        
+        // Si un point est dedans et l'autre dehors, le segment coupe forcément
+        if (p1Inside !== p2Inside) {
+            return true;
+        }
+        
+        // Vérifier si la droite infinie (prolongement du segment) coupe le rectangle rotaté
+        // Pour cela, on transforme le segment dans le repère du rectangle non-rotaté
+        const dx = linePoint2.x - linePoint1.x;
+        const dy = linePoint2.y - linePoint1.y;
+        
+        // Si le segment est un point
+        if (dx === 0 && dy === 0) {
+            return p1Inside;
+        }
+        
+        // Transformer les points du segment dans le repère non-rotaté du rectangle
+        const linePoint1Rotated = this.rotatePoint(linePoint1.x, linePoint1.y, rectCenterX, rectCenterY, -(rectangle.theta || 0));
+        const linePoint2Rotated = this.rotatePoint(linePoint2.x, linePoint2.y, rectCenterX, rectCenterY, -(rectangle.theta || 0));
+        
+        // Maintenant, vérifier si le segment (dans le repère non-rotaté) coupe le rectangle (non-rotaté)
+        // Le rectangle non-rotaté va de minX à maxX et de minY à maxY
+        
+        // Calculer la direction du segment dans le repère non-rotaté
+        const dxRot = linePoint2Rotated.x - linePoint1Rotated.x;
+        const dyRot = linePoint2Rotated.y - linePoint1Rotated.y;
+        
+        // Vérifier si la droite infinie coupe le rectangle en testant les 4 coins du rectangle non-rotaté
+        const rectCorners = [
+            { x: minX, y: minY },
+            { x: maxX, y: minY },
+            { x: maxX, y: maxY },
+            { x: minX, y: maxY }
+        ];
+        
+        let cornersOnSameSide = true;
+        let firstCornerSide = null;
+        
+        for (const corner of rectCorners) {
+            // Calculer de quel côté de la droite se trouve le coin
+            const side = (corner.x - linePoint1Rotated.x) * dyRot - (corner.y - linePoint1Rotated.y) * dxRot;
+            
+            if (firstCornerSide === null) {
+                firstCornerSide = side > 0 ? 1 : (side < 0 ? -1 : 0);
+            } else {
+                const currentSide = side > 0 ? 1 : (side < 0 ? -1 : 0);
+                if (currentSide !== 0 && firstCornerSide !== 0 && currentSide !== firstCornerSide) {
+                    cornersOnSameSide = false;
+                    break;
+                }
+            }
+        }
+        
+        // Si les coins ne sont pas tous du même côté, la droite coupe le rectangle
+        if (!cornersOnSameSide) {
+            // Vérifier que le segment lui-même intersecte la bounding box du rectangle non-rotaté
+            const segMinX = Math.min(linePoint1Rotated.x, linePoint2Rotated.x);
+            const segMaxX = Math.max(linePoint1Rotated.x, linePoint2Rotated.x);
+            const segMinY = Math.min(linePoint1Rotated.y, linePoint2Rotated.y);
+            const segMaxY = Math.max(linePoint1Rotated.y, linePoint2Rotated.y);
+            
+            if (maxX >= segMinX && minX <= segMaxX && maxY >= segMinY && minY <= segMaxY) {
+                return true;
+            }
+        }
+        
+        return false;
+    },
+
+    /**
+     * Vérifie si un segment de droite (défini par deux points) coupe un hexagone
+     * @param {Object} linePoint1 - Premier point du segment de droite {x, y}
+     * @param {Object} linePoint2 - Deuxième point du segment de droite {x, y}
+     * @param {Object} hexagon - Hexagone avec {x, y} (centre)
+     * @returns {boolean} - true si le segment coupe l'hexagone
+     */
+    lineIntersectsHexagon(linePoint1, linePoint2, hexagon) {
+        // Obtenir les 6 sommets de l'hexagone
+        const hexVertices = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i;
+            hexVertices.push({
+                x: hexagon.x + hexSize * Math.cos(angle),
+                y: hexagon.y + hexSize * Math.sin(angle)
+            });
+        }
+        
+        // Vérifier si le segment coupe l'une des 6 arêtes de l'hexagone
+        for (let i = 0; i < 6; i++) {
+            const edgeStart = hexVertices[i];
+            const edgeEnd = hexVertices[(i + 1) % 6];
+            
+            if (this.segmentsIntersect(linePoint1, linePoint2, edgeStart, edgeEnd)) {
+                return true;
+            }
+        }
+        
+        // Vérifier aussi si les deux points du segment sont de part et d'autre de l'hexagone
+        // On vérifie si un point est à l'intérieur et l'autre à l'extérieur
+        const p1Inside = this.isPointInHexagon(linePoint1, hexagon, hexSize);
+        const p2Inside = this.isPointInHexagon(linePoint2, hexagon, hexSize);
+        
+        // Si un point est dedans et l'autre dehors, le segment coupe forcément
+        if (p1Inside !== p2Inside) {
+            return true;
+        }
+        
+        // Si les deux points sont dedans, le segment est entièrement dans l'hexagone
+        if (p1Inside && p2Inside) {
+            return true;
+        }
+        
+        return false;
     }
 };
 

@@ -968,8 +968,8 @@ dialog_dim_rectangle
     const r = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
-    r.width = (w / 3) * Math.sqrt(3) * hexSize;
-    r.height = (h / 3) * Math.sqrt(3) * hexSize;
+    r.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
+    r.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
 
     // Positionnement au centre du canvas
     r.x = canvas.width / 2 - r.width / 2;
@@ -1005,8 +1005,8 @@ dialog_dim_mur.querySelector("#Creer").addEventListener("click", function (event
     const r = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
-    r.width = w / 3 * Math.sqrt(3) * hexSize;
-    r.height = h / 3 * Math.sqrt(3) * hexSize;
+    r.width = Math.abs(w / 3 * Math.sqrt(3) * hexSize);
+    r.height = Math.abs(h / 3 * Math.sqrt(3) * hexSize);
 
     // Positionnement au centre du canvas
     r.x = canvas.width / 2 - r.width / 2;
@@ -1046,8 +1046,8 @@ dialog_dim_ellipse
     const e = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
-    e.width = (w / 3) * Math.sqrt(3) * hexSize;
-    e.height = (h / 3) * Math.sqrt(3) * hexSize;
+    e.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
+    e.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
 
     // Positionnement au centre du canvas
     e.x = canvas.width / 2;
