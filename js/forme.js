@@ -111,10 +111,9 @@ const FormeUtils = {
 
     enableFormeMode(forme) {
         const cursors = {
-            rectangle: "url('Images/Rectangle.png') 26 12, auto",
-            ellipse: "url('Images/Ellipse.png') 33 33, auto",
-            mur: "url('Images/Mur.png') 33 33, auto",
-            // scission: "url('Images/Scission.png') 33 33, auto",
+            rectangle: "url('images/Rectangle.png') 39 25, auto",
+            ellipse: "url('images/Ellipse.png') 39 25, auto",
+            mur: "url('images/Mur.png') 39 25, auto",
             gomme: "default"
         };
 
@@ -346,6 +345,12 @@ let SelectRectangle = createForme("Rectangle", { color: "rgb(64, 64, 255)" }); /
 document.getElementById("rectangle").addEventListener("contextmenu", function (event) {
     event.preventDefault();
     afficher_dim_rectangle();
+});
+
+// Clic droit sur le bouton mur : ouvre le dialogue de dimensions
+document.getElementById("mur").addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+    afficher_dim_mur();
 });
 
 // Clic droit sur le bouton ellipse : ouvre le dialogue de dimensions

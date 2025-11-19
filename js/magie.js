@@ -123,15 +123,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // Gestion des clics sur les boutons magiques
 document.addEventListener("click", function (event) {
   if (event.target.classList.contains("magic-button")) {
-    // Animation du bouton cliqué
-    event.target.style.transform = "scale(0.95)";
-    event.target.style.backgroundColor = "#2c5aa0";
-
-    setTimeout(() => {
-      event.target.style.transform = "scale(1)";
-      event.target.style.backgroundColor = "#4a90e2";
-    }, 150);
-
     // Ouvrir la liste voulue si le bouton associé est cliqué
     createListeModal(shortName[event.target.id]);
   }
@@ -211,18 +202,6 @@ function createListeModal(Nom_liste) {
       spellNode.setAttribute("data-spell", sort.Nom_sort);
       spellNode.textContent = sort.Nom_sort;
       spellNode.classList.add(`col-${sort.Col + 1}`);
-
-      // Gestion du hover
-      spellNode.addEventListener("mouseenter", function () {
-        this.style.transform = "translateY(-2px)";
-        this.style.boxShadow = "0 10px 18px rgba(0, 0, 0, 0.15)";
-        this.style.backgroundColor = "#e3f2fd";
-      });
-      spellNode.addEventListener("mouseleave", function () {
-        this.style.transform = "translateY(0)";
-        this.style.boxShadow = "0 2px 6px rgba(0, 0, 0, 0.08)";
-        this.style.backgroundColor = "";
-      });
 
       levelDiv.appendChild(spellNode);
     });

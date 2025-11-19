@@ -49,24 +49,24 @@ let sommet = null;                          // Sommet d'une forme en cours de mo
 let hexMap = new Array;                     // Tableau contenant la grille d'hexagones
 
 // === IMAGES DE TERRAIN ===
-// Images pour les différents types de terrain
+// images pour les différents types de terrain
 const image_rocher = new Image();
-image_rocher.src = "Images/Rocher.png";
+image_rocher.src = "images/Rocher.png";
 const image_arbre = new Image();
-image_arbre.src = "Images/Arbre.png";
+image_arbre.src = "images/Arbre.png";
 const image_eau = new Image();
-image_eau.src = "Images/Eau.png";
+image_eau.src = "images/Eau.png";
 
 // === IMAGES DE PIONS ===
-// Images pour les différents types de pions
+// images pour les différents types de pions
 const image_auto = new Image();
-image_auto.src = "Images/Auto.png";
+image_auto.src = "images/Auto.png";
 const image_cac = new Image();
-image_cac.src = "Images/Cac.png";
+image_cac.src = "images/Cac.png";
 const image_dist = new Image();
-image_dist.src = "Images/Dist.png";
+image_dist.src = "images/Dist.png";
 const image_mage = new Image();
-image_mage.src = "Images/Mage.png";
+image_mage.src = "images/Mage.png";
 
 // === IMAGES DE FOND ===
 let image_fond = null;                       // Image de fond de la carte
@@ -205,12 +205,20 @@ class Map {
 
         // On remplit de la couleur indiquée, si ce n'est pas du blanc.
         if (color != "rgb(255, 255, 255)") {
-            ctx.fillStyle = color;
-            ctx.fill();
+            if (document.getElementById("joueur").value !== "MJ") {
+                ctx.fillStyle = color;
+                ctx.fill();
+            }
+            else {
+                if (brouillard) ctx.globalAlpha = 0.8;
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
         }
 
         // On dessine le contour de l'hexagone.
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = "gray";
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -553,16 +561,16 @@ class Terrain extends Map {
 
         switch (terrain) {
             case "rocher":
-                default_cursor = "url('Images/Rocher.png') 24 24, auto";
+                default_cursor = "url('images/Rocher.png') 24 24, auto";
                 break;
             case "arbre":
-                default_cursor = "url('Images/Arbre.png') 24 24, auto";
+                default_cursor = "url('images/Arbre.png') 24 24, auto";
                 break;
             case "eau":
-                default_cursor = "url('Images/Eau.png') 24 24, auto";
+                default_cursor = "url('images/Eau.png') 24 24, auto";
                 break;
             case "gomme":
-                default_cursor = "url('Images/Gomme.png') 20 60, auto";
+                default_cursor = "url('images/Gomme.png') 20 60, auto";
                 break;
         }
         canvas.style.cursor = default_cursor;
@@ -1105,18 +1113,108 @@ canvas.addEventListener("mousedown", (event) => {
             is_find = FormeUtils.isOnMur(r, mouseX, mouseY);
             if (!is_find) return;
 
+            // Calculer le centre du rectangle original
+            const cx = r.x + r.width / 2;
+            const cy = r.y + r.height / 2;
+            
+            // Transformer le point de la souris dans le repère local (centré, non-rotaté) du rectangle
+            const mousePoint = FormeUtils.rotatePoint(mouseX, mouseY, cx, cy, -r.theta);
+
+            // Convertir en coordonnées locales centrées (comme fillRect(-width/2, -height/2, ...))
+            const mouseX_local = mousePoint.x - cx;
+            const mouseY_local = mousePoint.y - cy;
+
             const r1 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
             const r2 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
 
+            // Calculer le coin supérieur gauche visuel de l'original
+            // Le coin supérieur gauche local est (-width/2, -height/2) dans le repère centré
+            const original_topLeft_local = { x: -r.width / 2, y: -r.height / 2 };
+            const original_topLeft_global = FormeUtils.rotatePoint(
+                cx + original_topLeft_local.x, 
+                cy + original_topLeft_local.y, 
+                cx, cy, r.theta
+            );
+
             if (r.width < r.height) {
-                r1.height = mouseY - r.y - 20;
-                r2.y = r.y + r1.height + 40;
-                r2.height = r.height - r1.height - 40;
+                // Scission horizontale
+                // Distance depuis le haut du rectangle (dans le repère local centré)
+                const cutY_local = mouseY_local - (-r.height / 2);
+                const r1_height = Math.max(0, cutY_local - hexSize);
+                const r2_height = Math.max(0, r.height - r1_height - 2 * hexSize);
+                
+                // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
+                // Le coin supérieur gauche local de r1 est (-width/2, -r1_height/2) dans son repère centré
+                // On veut que ce point, après rotation de theta autour du centre de r1, soit à original_topLeft_global
+                // On inverse : original_topLeft_global - rotate((-width/2, -r1_height/2), theta) = centre de r1
+                const r1_topLeft_local = { x: -r.width / 2, y: -r1_height / 2 };
+                // Rotation inverse du coin local pour trouver où doit être le centre
+                const r1_topLeft_rotated = FormeUtils.rotatePoint(
+                    r1_topLeft_local.x, 
+                    r1_topLeft_local.y, 
+                    0, 0, r.theta
+                );
+                // Le centre de r1 dans le repère global
+                const r1_centerX = original_topLeft_global.x - r1_topLeft_rotated.x;
+                const r1_centerY = original_topLeft_global.y - r1_topLeft_rotated.y;
+                // Le (x, y) de r1 dans le repère non-rotaté
+                r1.x = r1_centerX - r.width / 2;
+                r1.y = r1_centerY - r1_height / 2;
+                r1.height = r1_height;
+                r1.width = r.width;
+                
+                // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
+                // Le coin inférieur de r1 dans le repère local centré est à y = -height/2 + r1_height
+                // Le coin supérieur de r2 doit être à y = -height/2 + r1_height + 2*hexSize
+                // Le centre de r2 dans le repère local centré est à y = -height/2 + r1_height + 2*hexSize + r2_height/2
+                const r2_centerY_local = -r.height / 2 + r1_height + 2 * hexSize + r2_height / 2;
+                const r2_centerX_local = 0; // Même x que l'original
+                
+                // Convertir le centre local de r2 en coordonnées globales (après rotation)
+                const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
+                
+                // Le (x, y) de r2 dans le repère non-rotaté
+                r2.x = r2_center_global.x - r.width / 2;
+                r2.y = r2_center_global.y - r2_height / 2;
+                r2.width = r.width;
+                r2.height = r2_height;
             }
             else {
-                r1.width = mouseX - r.x - 20;
-                r2.x = r.x + r1.width + 40;
-                r2.width = r.width - r1.width - 40;
+                // Scission verticale
+                const cutX_local = mouseX_local - (-r.width / 2);
+                const r1_width = Math.max(0, cutX_local - hexSize);
+                const r2_width = Math.max(0, r.width - r1_width - 2 * hexSize);
+                
+                // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
+                // Le coin supérieur gauche local de r1 est (-r1_width/2, -height/2) dans son repère centré
+                const r1_topLeft_local = { x: -r1_width / 2, y: -r.height / 2 };
+                // Rotation inverse du coin local pour trouver où doit être le centre
+                const r1_topLeft_rotated = FormeUtils.rotatePoint(
+                    r1_topLeft_local.x, 
+                    r1_topLeft_local.y, 
+                    0, 0, r.theta
+                );
+                // Le centre de r1 dans le repère global
+                const r1_centerX = original_topLeft_global.x - r1_topLeft_rotated.x;
+                const r1_centerY = original_topLeft_global.y - r1_topLeft_rotated.y;
+                // Le (x, y) de r1 dans le repère non-rotaté
+                r1.x = r1_centerX - r1_width / 2;
+                r1.y = r1_centerY - r.height / 2;
+                r1.width = r1_width;
+                r1.height = r.height;
+                
+                // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
+                const r2_centerX_local = -r.width / 2 + r1_width + 2 * hexSize + r2_width / 2;
+                const r2_centerY_local = 0; // Même y que l'original
+                
+                // Convertir le centre local de r2 en coordonnées globales (après rotation)
+                const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
+                
+                // Le (x, y) de r2 dans le repère non-rotaté
+                r2.x = r2_center_global.x - r2_width / 2;
+                r2.y = r2_center_global.y - r.height / 2;
+                r2.width = r2_width;
+                r2.height = r.height;
             }
 
             if (index_forme_zoom === Formes.indexOf(r)) index_forme_zoom = null;
@@ -1553,14 +1651,14 @@ canvas.addEventListener("mousemove", (event) => {
         // On affiche un pointeur en petite main s'il y a une forme à attrapper
         canvas.style.cursor = default_cursor;
 
-        let cursor_zoom = "url('Images/Zoom.png') 38 5, auto";
-        let cursor_move = "url('Images/Move.png') 32 32, auto";
-        let cursor_scis = "url('Images/Scission.png') 32 32, auto";
+        let cursor_zoom = "url('images/Zoom.png') 38 4, auto";
+        let cursor_move = "url('images/Move.png') 32 32, auto";
+        let cursor_scis = "url('images/Scission.png') 27 24, auto";
 
         if (type_forme === "gomme") {
-            cursor_zoom = "url('Images/Gomme.png') 20 60, auto";
-            cursor_move = "url('Images/Gomme.png') 20 60, auto";
-            cursor_scis = "url('Images/Gomme.png') 20 60, auto";
+            cursor_zoom = "url('images/Gomme.png') 20 60, auto";
+            cursor_move = "url('images/Gomme.png') 20 60, auto";
+            cursor_scis = "url('images/Gomme.png') 20 60, auto";
         }
 
         let is_find = false;
@@ -1847,7 +1945,7 @@ document.getElementById("img_fond").addEventListener("change", async (event) => 
     }
     else {
         image_fond = new Image();
-        image_fond.src = `Images/Fond.jpg?t=${new Date().getTime()}`;
+        image_fond.src = `images/Fond.jpg?t=${new Date().getTime()}`;
     }
 
     afficher_dim_carte();

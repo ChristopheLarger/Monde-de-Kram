@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['image'])) {
     }
     
     // === TÉLÉCHARGEMENT DU FICHIER ===
-    // Déplacer le fichier temporaire vers le dossier Images avec le nom "Fond.jpg"
+    // Déplacer le fichier temporaire vers le dossier images avec le nom "Fond.jpg"
     // Le fichier remplacera l'ancienne image de fond si elle existe
-    move_uploaded_file($_FILES['image']['tmp_name'], 'Images/Fond.jpg');
+    move_uploaded_file($_FILES['image']['tmp_name'], 'images/Fond.jpg');
 }
 ?>

@@ -33,27 +33,27 @@
         <div style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
-            <img id="rocher" src="Images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
+            <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="arbre" src="Images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
+            <img id="arbre" src="images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="eau" src="Images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
+            <img id="eau" src="images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="gomme_t" src="Images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
+            <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;&nbsp;&nbsp;
             
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
             <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">&nbsp;&nbsp;
-            <img id="rectangle" src="Images/Rectangle.png" onclick="FormeUtils.setFormeMode('rectangle');" alt="Rectangle"
+            <img id="rectangle" src="images/Rectangle.png" onclick="FormeUtils.setFormeMode('rectangle');" alt="Rectangle"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="ellipse" src="Images/Ellipse.png" onclick="FormeUtils.setFormeMode('ellipse');" alt="Ellipse"
+            <img id="ellipse" src="images/Ellipse.png" onclick="FormeUtils.setFormeMode('ellipse');" alt="Ellipse"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="mur" src="Images/Mur.png" onclick="FormeUtils.setFormeMode('mur');" alt="Mur"
+            <img id="mur" src="images/Mur.png" onclick="FormeUtils.setFormeMode('mur');" alt="Mur"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="scission" src="Images/Scission.png" onclick="FormeUtils.setFormeMode('scission');" alt="Scission"
+            <img id="scission" src="images/Scission.png" onclick="FormeUtils.setFormeMode('scission');" alt="Scission"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="gomme_f" src="Images/Gomme.png" onclick="FormeUtils.setFormeMode('gomme');" alt="Gomme"
+            <img id="gomme_f" src="images/Gomme.png" onclick="FormeUtils.setFormeMode('gomme');" alt="Gomme"
                 style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
         </div>
         
@@ -114,6 +114,32 @@
             <td>Hauteur (en m) :</td>
             <td>&nbsp;&nbsp;</td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <div style="width: 100%; text-align: right;">
+                    <button id="Creer" style="font-size: x-large;">Créer</button>
+                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE CRÉATION DE MUR === -->
+<!-- Fenêtre pour créer une forme mur -->
+<dialog id="dialog_dim_mur">
+    <table style="margin: 0; font-size: x-large;">
+        <tr>
+            <td>Largeur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td>Hauteur (en m) :</td>
+            <td>&nbsp;&nbsp;</td>
+            <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;" value="0.5"></td>
         </tr>
         <tr><td colspan="3"><hr></td></tr>
         <tr>
@@ -687,7 +713,7 @@
         <span class="close">&times;</span>
         <h2>Diagramme de Magie</h2>
         <div class="conteneur">
-            <img src="Images/Diagramme_de_magie.png" alt="Diagramme de Magie" class="modal-image">
+            <img src="images/Diagramme_de_magie.png" alt="Diagramme de Magie" class="modal-image">
             <div class="arrow-label arrow-label-top">
                 <button id="Harmonie" class="magic-button">Harmonie</button>
                 <button id="Eau" class="magic-button">Eau</button>

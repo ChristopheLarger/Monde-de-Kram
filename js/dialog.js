@@ -7,7 +7,9 @@
 
 // === RÉFÉRENCES DES DIALOGUES ===
 // Dialogues pour les dimensions de formes
+const dialog_dim_carte = document.getElementById("dialog_dim_carte");
 const dialog_dim_rectangle = document.getElementById("dialog_dim_rectangle");
+const dialog_dim_mur = document.getElementById("dialog_dim_mur");
 const dialog_dim_ellipse = document.getElementById("dialog_dim_ellipse");
 
 // Dialogues pour les détails de personnages
@@ -57,6 +59,14 @@ function afficher_dim_carte() {
 function afficher_dim_rectangle() {
     FormeUtils.setFormeMode('rectangle');
     dialog_dim_rectangle.showModal();
+}
+
+/**
+ * Affiche le dialogue pour définir les dimensions d'un mur
+ */
+function afficher_dim_mur() {
+    FormeUtils.setFormeMode('mur');
+    dialog_dim_mur.showModal();
 }
 
 /**
@@ -786,7 +796,7 @@ dialog_dim_carte.querySelector("#Valider").addEventListener("click", function (e
         const hexHS = hexSize * 1.5;
         const hexVS = hexSize * Math.sqrt(3);
 
-        forme_fond = new Forme("Rectangle");
+        forme_fond = createForme("Rectangle");
         forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
         forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
         forme_fond.x = offsetX - forme_fond.width / 2;
@@ -833,7 +843,7 @@ dialog_dim_rectangle.querySelector("#Creer").addEventListener("click", function 
     const h = dialog_dim_rectangle.querySelector(".hauteur").value;
 
     // Création de la nouvelle forme rectangle
-    Formes[Formes.length] = new Forme("Rectangle");
+    Formes[Formes.length] = createForme("Rectangle");
     const r = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
@@ -858,6 +868,43 @@ dialog_dim_rectangle.addEventListener("keydown", function (event) {
     }
 });
 
+// Fermeture du dialogue de création de rectangle
+dialog_dim_mur.querySelector("#Fermer").addEventListener("click", function (event) {
+    dialog_dim_mur.close();
+});
+
+// Création d'un rectangle avec les dimensions spécifiées
+dialog_dim_mur.querySelector("#Creer").addEventListener("click", function (event) {
+    // Récupération des dimensions saisies
+    const w = dialog_dim_mur.querySelector(".largeur").value;
+    const h = dialog_dim_mur.querySelector(".hauteur").value;
+
+    // Création de la nouvelle forme rectangle
+    Formes[Formes.length] = createForme("Mur");
+    const r = Formes[Formes.length - 1];
+
+    // Calcul des dimensions en pixels selon le système hexagonal
+    r.width = w / 3 * Math.sqrt(3) * hexSize;
+    r.height = h / 3 * Math.sqrt(3) * hexSize;
+
+    // Positionnement au centre du canvas
+    r.x = canvas.width / 2 - r.width / 2;
+    r.y = canvas.height / 2 - r.height / 2;
+
+    // Application de la couleur sélectionnée
+    r.color = document.getElementById("forme_color").value;
+
+    dialog_dim_mur.close();
+    Map.drawHexMap();
+});
+
+// Gestion de la touche Entrée pour créer le rectangle
+dialog_dim_mur.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+        dialog_dim_mur.querySelector("#Creer").click();
+    }
+});
+
 // Fermeture du dialogue de création d'ellipse
 dialog_dim_ellipse.querySelector("#Fermer").addEventListener("click", function (event) {
     dialog_dim_ellipse.close();
@@ -870,7 +917,7 @@ dialog_dim_ellipse.querySelector("#Creer").addEventListener("click", function (e
     const h = dialog_dim_ellipse.querySelector(".petit_axe").value;
 
     // Création de la nouvelle forme ellipse
-    Formes[Formes.length] = new Forme("Ellipse");
+    Formes[Formes.length] = createForme("Ellipse");
     const e = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal

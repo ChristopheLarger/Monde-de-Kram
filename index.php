@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Le Monde de Kram - Jeu de Rôle</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/magie.css">
 </head>
 
@@ -13,14 +13,14 @@
 <?php include("interface.html"); ?>
 
 <!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
-<script src="model.js"></script>     <!-- Classes de base pour les modèles de personnages -->
-<script src="arme.js"></script>      <!-- Classes pour les armes -->
-<script src="map.js"></script>       <!-- Gestion de la carte hexagonale et des pions -->
-<script src="forme.js"></script>     <!-- Gestion des formes géométriques -->
-<script src="general.js"></script>   <!-- Fonctions générales et communication WebSocket -->
-<script src="dialog.js"></script>    <!-- Gestion des dialogues et interfaces utilisateur -->
-<script src="combat.js"></script>    <!-- Système de combat simplifié -->
-<script src="magie.js"></script>    <!-- Système de magie -->
+<script src="js/model.js"></script>     <!-- Classes de base pour les modèles de personnages -->
+<script src="js/arme.js"></script>      <!-- Classes pour les armes -->
+<script src="js/map.js"></script>       <!-- Gestion de la carte hexagonale et des pions -->
+<script src="js/forme.js"></script>     <!-- Gestion des formes géométriques -->
+<script src="js/general.js"></script>   <!-- Fonctions générales et communication WebSocket -->
+<script src="js/dialog.js"></script>    <!-- Gestion des dialogues et interfaces utilisateur -->
+<script src="js/combat.js"></script>    <!-- Système de combat simplifié -->
+<script src="js/magie.js"></script>    <!-- Système de magie -->
 
 <script>
 <?php

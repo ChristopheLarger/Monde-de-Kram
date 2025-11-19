@@ -7,8 +7,10 @@
 
 /* === STYLES DE BASE === */
 /* Configuration générale de la page */
-html, body {
-    overflow: hidden;    /* Empêche le défilement de la page */
+html,
+body {
+    overflow: hidden;
+    /* Empêche le défilement de la page */
     margin: 0;
     padding: 0;
     width: 100%;
@@ -21,6 +23,25 @@ p {
     padding: 0 auto;
 }
 
+button {
+    background-color: white;
+    /* color: #000; */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: rgb(128, 192, 255);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
+}
+
 /* === STYLES DES DIALOGUES === */
 /* Styles pour les titres et zones de dialogue */
 .titre_dialogue,
@@ -30,7 +51,8 @@ p {
     padding: 0 auto;
     width: 100%;
     height: 50px;
-    background-color: rgb(192, 192, 192);  /* Gris clair pour les titres */
+    background-color: rgb(192, 192, 192);
+    /* Gris clair pour les titres */
     text-align: center;
 }
 
@@ -38,7 +60,8 @@ p {
 .dialogue {
     height: 200px;
     background-color: white;
-    overflow-x: auto;    /* Défilement horizontal si nécessaire */
+    overflow-x: auto;
+    /* Défilement horizontal si nécessaire */
     text-align: left;
 }
 
@@ -46,23 +69,27 @@ p {
 /* Styles pour les noms de personnages et VIP */
 .vip,
 .titre_perso {
-    color: rgb(192, 64, 64);    /* Rouge pour les VIP */
+    color: rgb(192, 64, 64);
+    /* Rouge pour les VIP */
     font-weight: bold;
     text-decoration: underline;
-    font-variant: small-caps;   /* Petites capitales */
+    font-variant: small-caps;
+    /* Petites capitales */
     font-size: x-large;
 }
 
 /* Titre de personnage spécifique */
 .titre_perso {
-    color: rgb(64, 64, 192);    /* Bleu pour les personnages */
+    color: rgb(64, 64, 192);
+    /* Bleu pour les personnages */
 }
 
 /* === STYLES DES FENÊTRES MODALES === */
 /* Configuration des dialogues modaux */
 dialog {
     overflow: visible;
-    z-index: 1000;    /* Au-dessus des autres éléments */
+    z-index: 1000;
+    /* Au-dessus des autres éléments */
 }
 
 /* === STYLES DES TOOLTIPS === */
@@ -72,34 +99,41 @@ dialog {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 14px;
-    white-space: nowrap;    /* Empêche le retour à la ligne */
+    white-space: nowrap;
+    /* Empêche le retour à la ligne */
     font-weight: bold;
     color: white;
     background-color: black;
     border: 0px solid white;
-    z-index: 1050;    /* Au-dessus des dialogues */
+    z-index: 1050;
+    /* Au-dessus des dialogues */
 }
 
 /* === STYLES DES BOUTONS === */
 /* Boutons de synchronisation et de fond */
 #synchroniser,
 #fond {
-    background-color: rgb(128, 128, 192);    /* Bleu moyen */
+    background-color: rgb(128, 128, 192);
+    /* Bleu moyen */
     color: white;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
-    font-family: inherit;    /* Utilise la police héritée pour garantir la cohérence */
-    font-weight: normal;     /* Assure le même poids de police */
-    line-height: normal;     /* Assure la même hauteur de ligne */
+    font-family: inherit;
+    /* Utilise la police héritée pour garantir la cohérence */
+    font-weight: normal;
+    /* Assure le même poids de police */
+    line-height: normal;
+    /* Assure la même hauteur de ligne */
 }
 
 /* Effet de survol pour les boutons */
 #synchroniser:hover,
 #fond:hover {
-    background-color: rgb(64, 64, 192);    /* Bleu plus foncé au survol */
+    background-color: rgb(64, 64, 192);
+    /* Bleu plus foncé au survol */
 }
 
 /* === STYLES DES POPUPS === */
@@ -109,15 +143,19 @@ dialog {
     top: 50%;
     left: 50%;
     font-size: 50px;
-    transform: translate(-50%, -50%);    /* Centrage parfait */
+    transform: translate(-50%, -50%);
+    /* Centrage parfait */
     background-color: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);    /* Ombre portée */
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    /* Ombre portée */
     text-align: center;
     z-index: 1000;
-    opacity: 0;    /* Invisible par défaut */
-    transition: opacity 0.5s ease-in-out;    /* Animation de fondu */
+    opacity: 0;
+    /* Invisible par défaut */
+    transition: opacity 0.5s ease-in-out;
+    /* Animation de fondu */
     display: none;
 }
 
@@ -145,9 +183,12 @@ dialog {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;    /* Gris par défaut */
-    transition: .4s;    /* Animation de transition */
-    border-radius: 28px;    /* Forme arrondie */
+    background-color: #ccc;
+    /* Gris par défaut */
+    transition: .4s;
+    /* Animation de transition */
+    border-radius: 28px;
+    /* Forme arrondie */
 }
 
 /* Style du cercle à l'intérieur du slider */
@@ -159,16 +200,20 @@ dialog {
     left: 4px;
     bottom: 4px;
     background-color: white;
-    transition: .4s;    /* Animation de déplacement */
-    border-radius: 50%;    /* Forme circulaire */
+    transition: .4s;
+    /* Animation de déplacement */
+    border-radius: 50%;
+    /* Forme circulaire */
 }
 
 /* Change le style lorsque l'input est coché */
-input:checked + .slider {
-    background-color: #2196F3;    /* Bleu quand activé */
+input:checked+.slider {
+    background-color: #2196F3;
+    /* Bleu quand activé */
 }
 
 /* Déplace le cercle vers la droite lorsque l'input est coché */
-input:checked + .slider:before {
-    transform: translateX(30px);    /* Animation de glissement */
+input:checked+.slider:before {
+    transform: translateX(30px);
+    /* Animation de glissement */
 }

@@ -17,25 +17,6 @@ h2 {
   text-align: center;
 }
 
-button {
-  background-color: #4caf50;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  margin: 4px 2px;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #45a049;
-}
-
 /* Styles pour la modale */
 .modal {
   display: none;
@@ -164,7 +145,7 @@ button:hover {
 
 /* Styles pour les boutons magiques */
 .magic-button {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  background-color: white;
   color: #000;
   border: 1px solid rgba(0, 0, 0, 0.12);
   padding: 6px 8px;
@@ -182,17 +163,9 @@ button:hover {
 }
 
 .magic-button:hover {
-  background-color: #e3f2fd;
+  background-color: rgb(128, 192, 255);
   transform: translateY(-2px);
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
-}
-
-.magic-button:active,
-.magic-button.clicked {
-  background-color: #4a90e2;
-  color: white;
-  transform: translateY(0);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
 
 .title {
@@ -204,7 +177,6 @@ button:hover {
 
 .level {
   display: grid;
-  /* grid-template-columns: repeat(9, 1fr); */
   gap: 30px;
   margin: 18px 0;
   min-height: 6%;
@@ -230,7 +202,7 @@ button:hover {
 }
 
 .spell-node {
-  background: linear-gradient(180deg, #ffffff 0%, #f7f7f7 100%);
+  background-color: white;
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 10px;
   padding: 5px 7px;
@@ -252,14 +224,9 @@ button:hover {
 }
 
 .spell-node:hover {
-  background-color: var(--hover-bg, #eaf1ff);
+  background-color: rgb(128, 192, 255);
   transform: translateY(-2px);
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.15);
-}
-
-.spell-node.clicked {
-  background-color: var(--clicked-bg, #4a90e2);
-  color: white;
 }
 
 .spell-info {
