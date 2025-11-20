@@ -58,7 +58,7 @@ function afficher_dim_carte() {
  * Affiche le dialogue pour définir les dimensions d'un rectangle
  */
 function afficher_dim_rectangle() {
-  FormeUtils.setFormeMode("rectangle");
+  Forme.setFormeMode("rectangle");
   dialog_dim_rectangle.showModal();
 }
 
@@ -66,7 +66,7 @@ function afficher_dim_rectangle() {
  * Affiche le dialogue pour définir les dimensions d'un mur
  */
 function afficher_dim_mur() {
-    FormeUtils.setFormeMode('mur');
+    Forme.setFormeMode('mur');
     dialog_dim_mur.showModal();
 }
 
@@ -74,7 +74,7 @@ function afficher_dim_mur() {
  * Affiche le dialogue pour définir les dimensions d'une ellipse
  */
 function afficher_dim_ellipse() {
-  FormeUtils.setFormeMode("ellipse");
+  Forme.setFormeMode("ellipse");
   dialog_dim_ellipse.showModal();
 }
 
@@ -907,7 +907,7 @@ dialog_dim_carte
       const hexHS = hexSize * 1.5;
       const hexVS = hexSize * Math.sqrt(3);
 
-        forme_fond = createForme("Rectangle");
+        forme_fond = new Forme("Rectangle");
         forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
         forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
         forme_fond.x = offsetX - forme_fond.width / 2;
@@ -964,7 +964,7 @@ dialog_dim_rectangle
     const h = dialog_dim_rectangle.querySelector(".hauteur").value;
 
     // Création de la nouvelle forme rectangle
-    Formes[Formes.length] = createForme("Rectangle");
+    Formes[Formes.length] = new Forme("Rectangle");
     const r = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
@@ -1001,7 +1001,7 @@ dialog_dim_mur.querySelector("#Creer").addEventListener("click", function (event
     const h = dialog_dim_mur.querySelector(".hauteur").value;
 
     // Création de la nouvelle forme rectangle
-    Formes[Formes.length] = createForme("Mur");
+    Formes[Formes.length] = new Forme("Mur");
     const r = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal
@@ -1042,7 +1042,7 @@ dialog_dim_ellipse
     const h = dialog_dim_ellipse.querySelector(".petit_axe").value;
 
     // Création de la nouvelle forme ellipse
-    Formes[Formes.length] = createForme("Ellipse");
+    Formes[Formes.length] = new Forme("Ellipse");
     const e = Formes[Formes.length - 1];
 
     // Calcul des dimensions en pixels selon le système hexagonal

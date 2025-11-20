@@ -45,7 +45,7 @@ function route(data) {
         () => Terrain.receiveMessage(data),
         () => Pion.receiveMessage(data),
         () => Combats.receiveMessage(data),
-        () => FormeUtils.receiveMessage(data),
+        () => Forme.receiveMessage(data),
         () => Map.receiveMessage(data),
         () => Messages.receiveMessage(data)
     ];

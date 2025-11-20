@@ -972,7 +972,7 @@ class Pion extends Map {
         //     const h = { x: x, y: y };
 
         //     // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
-        //     const m = Formes.find(r => r.type === "Mur" && FormeUtils.rectangleHexagonIntersect(r, h));
+        //     const m = Formes.find(r => r.type === "Mur" && Forme.rectangleHexagonIntersect(r, h));
         //     if (m != null && typeof m != "undefined") visible = false;
         // });
 
@@ -998,7 +998,7 @@ class Pion extends Map {
             const hex_x = hex_col * hexHSpacing;
             const hex_y = hex_row * hexVSpacing + ((hex_col % 2 != 0) ? hexVSpacing / 2 : 0);
 
-            if (FormeUtils.lineIntersectsHexagon({ x: start_x, y: start_y }, { x: end_x, y: end_y }, { x: hex_x, y: hex_y })) {
+            if (Forme.lineIntersectsHexagon({ x: start_x, y: start_y }, { x: end_x, y: end_y }, { x: hex_x, y: hex_y })) {
                 is_visible = false;
             }
         });
@@ -1006,9 +1006,7 @@ class Pion extends Map {
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
-           if (FormeUtils.lineIntersectsRectangle(
-            { x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY },
-            { x: m.x, y: m.y, width: m.width, height: m.height, theta: m.theta })) {
+           if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
                 is_visible = false;
             }
         });
@@ -1148,7 +1146,7 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(x => x.type === "Mur").forEach(r => {
             if (is_find) return;
 
-            is_find = FormeUtils.isOnMur(r, mouseX, mouseY);
+            is_find = r.isOnMur(mouseX, mouseY);
             if (!is_find) return;
 
             // Calculer le centre du rectangle original
@@ -1156,19 +1154,19 @@ canvas.addEventListener("mousedown", (event) => {
             const cy = r.y + r.height / 2;
 
             // Transformer le point de la souris dans le repère local (centré, non-rotaté) du rectangle
-            const mousePoint = FormeUtils.rotatePoint(mouseX, mouseY, cx, cy, -r.theta);
+            const mousePoint = Forme.rotatePoint(mouseX, mouseY, cx, cy, -r.theta);
 
             // Convertir en coordonnées locales centrées (comme fillRect(-width/2, -height/2, ...))
             const mouseX_local = mousePoint.x - cx;
             const mouseY_local = mousePoint.y - cy;
 
-            const r1 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
-            const r2 = createForme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+            const r1 = new Forme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+            const r2 = new Forme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
 
             // Calculer le coin supérieur gauche visuel de l'original
             // Le coin supérieur gauche local est (-width/2, -height/2) dans le repère centré
             const original_topLeft_local = { x: -r.width / 2, y: -r.height / 2 };
-            const original_topLeft_global = FormeUtils.rotatePoint(
+            const original_topLeft_global = Forme.rotatePoint(
                 cx + original_topLeft_local.x,
                 cy + original_topLeft_local.y,
                 cx, cy, r.theta
@@ -1187,7 +1185,7 @@ canvas.addEventListener("mousedown", (event) => {
                 // On inverse : original_topLeft_global - rotate((-width/2, -r1_height/2), theta) = centre de r1
                 const r1_topLeft_local = { x: -r.width / 2, y: -r1_height / 2 };
                 // Rotation inverse du coin local pour trouver où doit être le centre
-                const r1_topLeft_rotated = FormeUtils.rotatePoint(
+                const r1_topLeft_rotated = Forme.rotatePoint(
                     r1_topLeft_local.x,
                     r1_topLeft_local.y,
                     0, 0, r.theta
@@ -1209,7 +1207,7 @@ canvas.addEventListener("mousedown", (event) => {
                 const r2_centerX_local = 0; // Même x que l'original
 
                 // Convertir le centre local de r2 en coordonnées globales (après rotation)
-                const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
+                const r2_center_global = Forme.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
 
                 // Le (x, y) de r2 dans le repère non-rotaté
                 r2.x = r2_center_global.x - r.width / 2;
@@ -1227,7 +1225,7 @@ canvas.addEventListener("mousedown", (event) => {
                 // Le coin supérieur gauche local de r1 est (-r1_width/2, -height/2) dans son repère centré
                 const r1_topLeft_local = { x: -r1_width / 2, y: -r.height / 2 };
                 // Rotation inverse du coin local pour trouver où doit être le centre
-                const r1_topLeft_rotated = FormeUtils.rotatePoint(
+                const r1_topLeft_rotated = Forme.rotatePoint(
                     r1_topLeft_local.x,
                     r1_topLeft_local.y,
                     0, 0, r.theta
@@ -1246,7 +1244,7 @@ canvas.addEventListener("mousedown", (event) => {
                 const r2_centerY_local = 0; // Même y que l'original
 
                 // Convertir le centre local de r2 en coordonnées globales (après rotation)
-                const r2_center_global = FormeUtils.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
+                const r2_center_global = Forme.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
 
                 // Le (x, y) de r2 dans le repère non-rotaté
                 r2.x = r2_center_global.x - r2_width / 2;
@@ -1279,12 +1277,12 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
             if (is_find) return;
 
-            is_find = r.type === "Rectangle" ? FormeUtils.isOnRectangle(r, mouseX, mouseY) : FormeUtils.isOnMur(r, mouseX, mouseY);
+            is_find = r.type === "Rectangle" ? r.isOnRectangle(mouseX, mouseY) : r.isOnMur(mouseX, mouseY);
             if (!is_find) return;
 
             old_forme = type_forme;
             type_forme = r.type === "Rectangle" ? "rectangle" : "mur";
-            sommet = FormeUtils.isOnSommetRectangle(r, mouseX, mouseY);
+            sommet = r.isOnSommetRectangle(mouseX, mouseY);
             if (sommet != null) {
                 // Redimensionnement du rectangle
                 index_forme_zoom = Formes.indexOf(r);
@@ -1299,12 +1297,12 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
             if (is_find) return;
 
-            is_find = FormeUtils.isOnEllipse(e, mouseX, mouseY);
+            is_find = e.isOnEllipse(mouseX, mouseY);
             if (!is_find) return;
 
             old_forme = type_forme;
             type_forme = "ellipse";
-            sommet = FormeUtils.isOnSommetEllipse(e, mouseX, mouseY);
+            sommet = e.isOnSommetEllipse(mouseX, mouseY);
             if (sommet != null) {
                 // Redimensionnement de l'ellipse
                 index_forme_zoom = Formes.indexOf(e);
@@ -1327,8 +1325,8 @@ canvas.addEventListener("mousedown", (event) => {
 
         // Suppression des rectangles à la position cliquée
         Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
-            if (r.type === "Rectangle" && !FormeUtils.isOnRectangle(r, mouseX, mouseY)) return;
-            if (r.type === "Mur" && !FormeUtils.isOnMur(r, mouseX, mouseY)) return;
+            if (r.type === "Rectangle" && !r.isOnRectangle(mouseX, mouseY)) return;
+            if (r.type === "Mur" && !r.isOnMur(mouseX, mouseY)) return;
             // Suppression du rectangle
             if (!is_find) Formes.splice(Formes.indexOf(r), 1);
             is_find = true;
@@ -1336,7 +1334,7 @@ canvas.addEventListener("mousedown", (event) => {
 
         // Suppression des ellipses à la position cliquée
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
-            if (!FormeUtils.isOnEllipse(e, mouseX, mouseY)) return;
+            if (!e.isOnEllipse(mouseX, mouseY)) return;
             // Suppression de l'ellipse
             if (!is_find) Formes.splice(Formes.indexOf(e), 1);
             is_find = true;
@@ -1380,7 +1378,7 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(f => f.type === "Rectangle" || f.type === "Mur").forEach(r => {
             if (is_find) return;
 
-            is_find = FormeUtils.isOnRectangle(r, mouseX, mouseY);
+            is_find = r.isOnRectangle(mouseX, mouseY);
             if (!is_find) return;
 
             old_forme = type_forme;
@@ -1391,7 +1389,7 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(f => f.type === "Ellipse").forEach(e => {
             if (is_find) return;
 
-            is_find = FormeUtils.isOnEllipse(e, mouseX, mouseY);
+            is_find = e.isOnEllipse(mouseX, mouseY);
             if (!is_find) return;
 
             old_forme = type_forme;
@@ -1461,35 +1459,35 @@ canvas.addEventListener("mousemove", (event) => {
             let R1 = null;
             if (sommet.x === 0 && sommet.y === 0) {
                 // Sommet en bas à droite
-                R1 = FormeUtils.rotatePoint(
+                R1 = Forme.rotatePoint(
                     r.x + r.width, r.y + r.height,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else if (sommet.x === 0 && sommet.y != 0) {
                 // Sommet en haut à droite
-                R1 = FormeUtils.rotatePoint(
+                R1 = Forme.rotatePoint(
                     r.x + r.width, r.y,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else if (sommet.x != 0 && sommet.y === 0) {
                 // Sommet en bas à gauche
-                R1 = FormeUtils.rotatePoint(
+                R1 = Forme.rotatePoint(
                     r.x, r.y + r.height,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else if (sommet.x != 0 && sommet.y != 0) {
                 // Sommet en haut à gauche
-                R1 = FormeUtils.rotatePoint(
+                R1 = Forme.rotatePoint(
                     r.x, r.y,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
 
             // === CALCUL DU DÉPLACEMENT DE LA SOURIS ===
-            const rLM = FormeUtils.rotatePoint(
+            const rLM = Forme.rotatePoint(
                 mouseX - lastMouseX, mouseY - lastMouseY, 0, 0, - r.theta);
 
             // === MISE À JOUR DES DIMENSIONS ===
@@ -1501,25 +1499,25 @@ canvas.addEventListener("mousemove", (event) => {
 
             let R2 = null;
             if (sommet.x === 0 && sommet.y === 0) {
-                R2 = FormeUtils.rotatePoint(
+                R2 = Forme.rotatePoint(
                     r.x + r.width, r.y + r.height,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else if (sommet.x === 0 && sommet.y != 0) {
-                R2 = FormeUtils.rotatePoint(
+                R2 = Forme.rotatePoint(
                     r.x + r.width, r.y,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else if (sommet.x != 0 && sommet.y === 0) {
-                R2 = FormeUtils.rotatePoint(
+                R2 = Forme.rotatePoint(
                     r.x, r.y + r.height,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
             }
             else { // if (sommet.x != 0 && sommet.y != 0) {
-                R2 = FormeUtils.rotatePoint(
+                R2 = Forme.rotatePoint(
                     r.x, r.y,
                     r.x + r.width / 2, r.y + r.height / 2,
                     r.theta);
@@ -1539,34 +1537,34 @@ canvas.addEventListener("mousemove", (event) => {
             let E1 = null;
             if (sommet.x > 0 && sommet.y === 0) {
                 // Sommet à droite
-                E1 = FormeUtils.rotatePoint(
+                E1 = Forme.rotatePoint(
                     e.x - e.width / 2, e.y,
                     e.x, e.y,
                     e.theta);
             }
             else if (sommet.x < 0 && sommet.y === 0) {
                 // Sommet à gauche
-                E1 = FormeUtils.rotatePoint(
+                E1 = Forme.rotatePoint(
                     e.x + e.width / 2, e.y,
                     e.x, e.y,
                     e.theta);
             }
             else if (sommet.x === 0 && sommet.y > 0) {
                 // Sommet en haut
-                E1 = FormeUtils.rotatePoint(
+                E1 = Forme.rotatePoint(
                     e.x, e.y - e.height / 2,
                     e.x, e.y,
                     e.theta);
             }
             else {
                 // Sommet en bas
-                E1 = FormeUtils.rotatePoint(
+                E1 = Forme.rotatePoint(
                     e.x, e.y + e.height / 2,
                     e.x, e.y,
                     e.theta);
             }
 
-            const rLM = FormeUtils.rotatePoint(
+            const rLM = Forme.rotatePoint(
                 mouseX - lastMouseX, mouseY - lastMouseY, 0, 0, - e.theta);
 
             if (sommet.x > 0) e.width += rLM.x;
@@ -1577,25 +1575,25 @@ canvas.addEventListener("mousemove", (event) => {
 
             let E2 = null;
             if (sommet.x > 0 && sommet.y === 0) {
-                E2 = FormeUtils.rotatePoint(
+                E2 = Forme.rotatePoint(
                     e.x - e.width / 2, e.y,
                     e.x, e.y,
                     e.theta);
             }
             else if (sommet.x < 0 && sommet.y === 0) {
-                E2 = FormeUtils.rotatePoint(
+                E2 = Forme.rotatePoint(
                     e.x + e.width / 2, e.y,
                     e.x, e.y,
                     e.theta);
             }
             else if (sommet.x === 0 && sommet.y > 0) {
-                E2 = FormeUtils.rotatePoint(
+                E2 = Forme.rotatePoint(
                     e.x, e.y - e.height / 2,
                     e.x, e.y,
                     e.theta);
             }
             else {
-                E2 = FormeUtils.rotatePoint(
+                E2 = Forme.rotatePoint(
                     e.x, e.y + e.height / 2,
                     e.x, e.y,
                     e.theta);
@@ -1715,13 +1713,13 @@ canvas.addEventListener("mousemove", (event) => {
         Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
             if (is_find) return;
 
-            is_find = r.type === "Rectangle" ? FormeUtils.isOnRectangle(r, mouseX, mouseY) : FormeUtils.isOnMur(r, mouseX, mouseY);
+            is_find = r.type === "Rectangle" ? r.isOnRectangle(mouseX, mouseY) : r.isOnMur(mouseX, mouseY);
             if (!is_find) return;
 
             if (type_forme === "scission" && r.type === "Mur") {
                 canvas.style.cursor = cursor_scis;
             }
-            else if (type_forme !== "scission" && FormeUtils.isOnSommetRectangle(r, mouseX, mouseY)) {
+            else if (type_forme !== "scission" && r.isOnSommetRectangle(mouseX, mouseY)) {
                 canvas.style.cursor = cursor_zoom;
             }
             else if (type_forme !== "scission") {
@@ -1732,10 +1730,10 @@ canvas.addEventListener("mousemove", (event) => {
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
             if (is_find) return;
 
-            is_find = FormeUtils.isOnEllipse(e, mouseX, mouseY);
+            is_find = e.isOnEllipse(mouseX, mouseY);
             if (!is_find) return;
 
-            const s = FormeUtils.isOnSommetEllipse(e, mouseX, mouseY);
+            const s = e.isOnSommetEllipse(mouseX, mouseY);
             if (s != null) {
                 canvas.style.cursor = cursor_zoom;
             }
@@ -1759,7 +1757,7 @@ canvas.addEventListener("mouseup", (event) => {
         const type = type_forme.substring(0, 1).toUpperCase() + type_forme.substring(1);
         // On enregistre la nouvelle forme
         if (index_forme_move === null) {
-            Formes[Formes.length] = createForme(type);
+            Formes[Formes.length] = new Forme(type);
             const r = Formes[Formes.length - 1];
             r.x = SelectRectangle.x;
             r.y = SelectRectangle.y;
