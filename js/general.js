@@ -15,7 +15,29 @@ const ws = new WebSocket('ws://localhost:8080');        // Serveur local
  */
 ws.onmessage = function (event) {
     console.log("MESSAGE", event.data);
-    route(event.data);
+
+    // Route le message vers les gestionnaires appropriés
+    const handlers = [
+        () => Localisation.receiveMessage(event.data),
+        () => Login.receiveMessage(event.data),
+        () => Terrain.receiveMessage(event.data),
+        () => Pion.receiveMessage(event.data),
+        () => Forme.receiveMessage(event.data),
+        () => Map.receiveMessage(event.data),
+        () => Messages.receiveMessage(event.data)
+    ];
+    for (const handler of handlers) {
+        if (handler()) return true;
+    }
+
+    // Message de chat générique
+    const result = event.data.match(/^([^:]*): (.*)$/);
+    if (result) {
+        Messages.write_chat(result[1], result[2]);
+        return true;
+    }
+
+    return false;
 };
 
 /**
@@ -31,37 +53,6 @@ function send(header, content, copyToChat = false) {
     if (copyToChat) {
         Messages.ecriture_directe(`${header} ${content}`);
     }
-}
-
-/**
- * Route un message vers les gestionnaires appropriés
- * @param {string} data - Message reçu
- * @returns {boolean} true si le message a été traité
- */
-function route(data) {
-    const handlers = [
-        () => Localisation.receiveMessage(data),
-        () => Login.receiveMessage(data),
-        () => Terrain.receiveMessage(data),
-        () => Pion.receiveMessage(data),
-        () => Combats.receiveMessage(data),
-        () => Forme.receiveMessage(data),
-        () => Map.receiveMessage(data),
-        () => Messages.receiveMessage(data)
-    ];
-
-    for (const handler of handlers) {
-        if (handler()) return true;
-    }
-
-    // Message de chat générique
-    const result = data.match(/^([^:]*): (.*)$/);
-    if (result) {
-        Messages.write_chat(result[1], result[2]);
-        return true;
-    }
-
-    return false;
 }
 
 /**
@@ -187,36 +178,36 @@ class Tool {
 }
 
 /**
- * Lance des dés selon un format (ex: "3D6", "2D10+5")
- * @param {string} formula - Formule de dés
- * @returns {number} Résultat du lancer
- */
-function rollDice(formula) {
-    const regex = /^(\d*)[dD](\d+)([+-]*\d*)$/;
-    const match = formula.match(regex);
-    if (!match) return 0;
-
-    const numDice = parseInt(match[1]) || 1;
-    const numFaces = parseInt(match[2]);
-    const modifier = parseInt(match[3]) || 0;
-
-    let result = 0;
-    for (let i = 0; i < numDice; i++) {
-        result += Math.floor(Math.random() * numFaces) + 1;
-    }
-    return result + modifier;
-}
-
-/**
  * Classe LancerDes - Gère les lancers de dés (SIMPLIFIÉE)
  * Utilise les utilitaires mathématiques pour simplifier le code
  */
 class LancerDes {
     /**
+     * Lance des dés selon un format (ex: "3D6", "2D10+5")
+     * @param {string} formula - Formule de dés
+     * @returns {number} Résultat du lancer
+     */
+    static #rollDice(formula) {
+        const regex = /^(\d*)[dD](\d+)([+-]*\d*)$/;
+        const match = formula.match(regex);
+        if (!match) return 0;
+
+        const numDice = parseInt(match[1]) || 1;
+        const numFaces = parseInt(match[2]);
+        const modifier = parseInt(match[3]) || 0;
+
+        let result = 0;
+        for (let i = 0; i < numDice; i++) {
+            result += Math.floor(Math.random() * numFaces) + 1;
+        }
+        return result + modifier;
+    }
+
+    /**
      * Lance 3 dés à 6 faces (3D6)
      */
     static sendMessage_3D6() {
-        const result = rollDice("3D6");
+        const result = LancerDes.#rollDice("3D6");
         send("3D6", result.toString().padStart(2, '0'), true);
     }
 
@@ -225,7 +216,7 @@ class LancerDes {
      */
     static sendMessage_DX() {
         const formula = document.getElementById("personnalisation").value;
-        const result = rollDice(formula);
+        const result = LancerDes.#rollDice(formula);
 
         if (result === 0) {
             alert("Format non compris, utilisez le format tel 5D12+3, etc.");
