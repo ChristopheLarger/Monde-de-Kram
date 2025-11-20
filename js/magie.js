@@ -116,7 +116,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const modal = document.getElementById("modal");
   const closeBtn = document.querySelector("#modal .close");
 
-  
   function closeModal() {
     if (modal) modal.style.display = "none";
   }
@@ -226,6 +225,24 @@ function createListeModal(Nom_liste) {
       spellNode.setAttribute("data-spell", sort.Nom_sort);
       spellNode.textContent = sort.Nom_sort;
       spellNode.classList.add(`col-${sort.Col + 1}`);
+
+      // Vérifier si le sort est connu par le joueur sélectionné
+      if (
+        typeof m_selected !== "undefined" &&
+        m_selected !== null &&
+        m_selected.Model
+      ) {
+        const isKnown = SortsConnus.some(
+          (sc) =>
+            sc.Nom_perso === m_selected.Model &&
+            sc.Nom_liste === Nom_liste &&
+            sc.Nom_sort === sort.Nom_sort
+        );
+        if (isKnown) {
+          spellNode.style.color = "white";
+          spellNode.style.backgroundColor = "green";
+        }
+      }
 
       levelDiv.appendChild(spellNode);
     });
@@ -438,9 +455,23 @@ function createListeModal(Nom_liste) {
 
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
+      // Si Ctrl est pressé, ne pas ouvrir les informations du sort
+      if (e.ctrlKey) {
+        e.preventDefault();
+        // Alterner entre vert et blanc (couleur par défaut)
+        if (e.target.style.backgroundColor === "green") {
+          // Si déjà vert, remettre en blanc (ou supprimer le style pour revenir à la couleur par défaut)
+          e.target.style.backgroundColor = "";
+        } else {
+          // Sinon, mettre en vert
+          e.target.style.backgroundColor = "green";
+        }
+        return; // Empêcher l'ouverture du panneau d'information
+      }
+
+      // Code normal pour ouvrir les informations du sort (sans Ctrl)
       const spellName = e.target.getAttribute("data-spell");
       const sort = sortsListe.find((s) => s.Nom_sort === spellName);
-
       if (sort) {
         document.getElementById(`spell-name`).textContent = sort.Nom_sort;
         document.getElementById(`spell-level`).textContent = sort.Niveau;
