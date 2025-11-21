@@ -152,10 +152,21 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 // Gestion des clics sur les boutons magiques
-document.addEventListener("click", function (event) {
+document.addEventListener("contextmenu", function (event) {
+  if (event.target.classList.contains("level")) {
+    event.preventDefault();    
+    event.stopPropagation(); 
+    return false;
+  }
+});
+
+document.addEventListener("mousedown", function (event) {
   if (event.target.classList.contains("magic-button")) {
+    event.preventDefault();
+    event.stopPropagation();
     // Ouvrir la liste voulue si le bouton associé est cliqué
     createListeModal(shortName[event.target.id]);
+    return false;
   }
 });
 
