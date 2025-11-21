@@ -442,8 +442,13 @@ function createListeModal(Nom_liste) {
         m_selected.Nom_sort = sort.Nom_sort;
 
         // Mettre à jour l'affichage dans le dialogue de détails
-        const sortilegeSpans = dialog_details_2.querySelectorAll(".sortilege");
-        sortilegeSpans.textContent = capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
+        const sortilege = dialog_details_2.querySelector(".sortilege");
+        if (sort.Nom_sort && sort.Nom_sort !== "" && sort.Nom_sort !== "0" &&
+            sort.Nom_liste && sort.Nom_liste !== "" && sort.Nom_liste !== "0") {
+          sortilege.textContent = capitalizeFirstLetter(sort.Nom_liste) + " / " + sort.Nom_sort;
+        } else {
+          sortilege.textContent = "--";
+        }
 
         // Fermer la modale
         if (modal && modal.parentNode) {
@@ -495,39 +500,6 @@ function createListeModal(Nom_liste) {
         setTimeout(() => {
           e.target.classList.remove("clicked");
         }, 500);
-      }
-    }
-  });
-
-  // Gestion pour sélectionner le sortilège
-  conteneur.addEventListener("contextmenu", function (e) {
-    if (e.target.classList.contains("spell-node")) {
-      const spellName = e.target.getAttribute("data-spell");
-      const sort = sortsListe.find((s) => s.Nom_sort === spellName);
-
-      if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
-        // Stocker le sortilège sélectionné et le nom de la liste dans le pion
-        m_selected.Nom_liste = sort.Nom_liste;
-        m_selected.Nom_sort = sort.Nom_sort;
-
-        // Mettre à jour l'affichage dans le dialogue de détails
-        const sortilegeSpans = dialog_details_2.querySelectorAll(
-          ".sortilege_selectionne"
-        );
-        if (sortilegeSpans.length >= 2) {
-          sortilegeSpans[0].textContent =
-            capitalizeFirstLetter(Nom_liste) + " / "; // Nom de la liste
-          sortilegeSpans[1].textContent = sort.Nom_sort; // Nom du sort
-        } else if (sortilegeSpans.length === 1) {
-          sortilegeSpans[0].textContent =
-            capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
-        }
-
-        // Fermer la modale
-        document.body.removeChild(modal);
-        if (document.getElementById("modal")) {
-          document.getElementById("modal").style.display = "none";
-        }
       }
     }
   });

@@ -244,7 +244,7 @@ function afficher_Details(col, row) {
       const field =
         spans[i].className.charAt(0).toUpperCase() +
         spans[i].className.slice(1).toLowerCase();
-      if (["Model", "Indice", "Slider"].includes(field)) continue;
+      if (["Model", "Indice", "Slider", "Titre_arme2", "Titre_sortilege"].includes(field)) continue;
       let value = p_selected[field];
       if (isNaN(value)) value = 0;
       spans[i].innerHTML = " / " + value;
@@ -260,11 +260,12 @@ function afficher_Details(col, row) {
     dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
 
     // Mise à jour du sortilège sélectionné
-    const sortilegeSpans = dialog_details_2.querySelectorAll(".sortilege");
-    if (m_selected.Nom_sort) {
-      sortilegeSpans.textContent = (m_selected.Nom_liste || "--") + " - " + m_selected.Nom_sort;
+    const sortilege = dialog_details_2.querySelector(".sortilege");
+    if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
+        m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
+      sortilege.textContent = capitalizeFirstLetter(m_selected.Nom_liste) + " / " + m_selected.Nom_sort;
     } else {
-      sortilegeSpans.textContent = "--";
+      sortilege.textContent = "--";
     }
 
     // Affichage du dialogue
@@ -1075,9 +1076,7 @@ dialog_details_1
   });
 
 // Création d'un nouveau personnage
-dialog_details_1
-  .querySelector("#model")
-  .addEventListener("change", function (event) {
+dialog_details_1.querySelector("#model").addEventListener("change", function (event) {
     // Récupération des informations du dialogue
     const model = dialog_details_1.querySelector("#model");
     const col = dialog_details_1.querySelector("#col");
@@ -1198,25 +1197,47 @@ function info_arme(arme) {
 }
 
 // Gestion du changement d'arme principale
-dialog_details_2
-  .querySelector(".arme1")
-  .addEventListener("change", function (event) {
+dialog_details_2.querySelector(".arme1").addEventListener("change", function (event) {
     const p_selected = Models.find((p) => p.Nom === m_selected.Model);
     const arme2 = dialog_details_2.querySelector(".arme2");
     let w1 = Armes.find((x) => x.Nom === event.target.value);
     let nouvelleOption = null;
 
+    console.log("Arme1", event.target.value);
+
     // Ouvrir la modale de magie si "Lancement de sort" est sélectionné
     if (event.target.value === "Lancement de sort") {
-      document.getElementById("modal").style.display = "flex";
-      dialog_details_2.style.zIndex = 0;
+      dialog_details_2.querySelector(".titre_arme2").style.display = "none";
+      dialog_details_2.querySelector(".arme2").style.display = "none";
+      dialog_details_2.querySelector(".info_secondaire").style.display = "none";
 
-      const joueurSelectionne = dialog_details_2.querySelector(".model").textContent;
-      SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach((x) => {
-        const element = document.getElementById(getShortName(x.Nom_liste));
-        element.style.color = "white";
-        element.style.backgroundColor = "green";
-      });
+      dialog_details_2.querySelector(".titre_sortilege").style.display = "";
+      dialog_details_2.querySelector(".titre_sortilege").textContent = "Sortilège :";
+      dialog_details_2.querySelector(".sortilege").style.display = "";
+
+      if (event.target.value !== m_selected.Arme1) {
+        document.getElementById("modal").style.display = "flex";
+        dialog_details_2.style.zIndex = 0;
+  
+        const joueurSelectionne = dialog_details_2.querySelector(".model").textContent;
+        SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach((x) => {
+          const element = document.getElementById(getShortName(x.Nom_liste));
+          element.style.color = "white";
+          element.style.backgroundColor = "green";
+        });
+      }
+    }
+    else {
+      dialog_details_2.querySelector(".titre_arme2").style.display = "";
+      dialog_details_2.querySelector(".titre_arme2").textContent = "Arme secondaire :";
+
+      console.log("Titre arme2", dialog_details_2.querySelector(".titre_arme2").textContent);
+
+      dialog_details_2.querySelector(".arme2").style.display = "";
+      dialog_details_2.querySelector(".info_secondaire").style.display = "";
+  
+      dialog_details_2.querySelector(".titre_sortilege").style.display = "none";
+      dialog_details_2.querySelector(".sortilege").style.display = "none";
     }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
@@ -1303,9 +1324,7 @@ dialog_details_2
   });
 
 // Gestion du changement d'arme secondaire
-dialog_details_2
-  .querySelector(".arme2")
-  .addEventListener("change", function (event) {
+dialog_details_2.querySelector(".arme2").addEventListener("change", function (event) {
     m_selected.Arme2 = event.target.value;
 
     // Mise à jour de l'information affichée
@@ -1316,16 +1335,12 @@ dialog_details_2
   });
 
 // Gestion du changement de contrôleur
-dialog_details_2
-  .querySelector(".control")
-  .addEventListener("change", function (event) {
+dialog_details_2.querySelector(".control").addEventListener("change", function (event) {
     m_selected.Control = event.target.value;
   });
 
 // Gestion du changement de type (allié/ennemi)
-dialog_details_2
-  .querySelector(".type")
-  .addEventListener("change", function (event) {
+dialog_details_2.querySelector(".type").addEventListener("change", function (event) {
     m_selected.Type = event.target.value;
 
     // Couleur selon le type
@@ -1350,9 +1365,7 @@ dialog_details_2.addEventListener("contextmenu", function (event) {
 });
 
 // Fermeture du dialogue de détails
-dialog_details_2
-  .querySelector("#Fermer")
-  .addEventListener("click", function (event) {
+dialog_details_2.querySelector("#Fermer").addEventListener("click", function (event) {
     // Synchronisation finale avec le serveur
     m_selected.sendMessage("setall");
 
@@ -1360,9 +1373,7 @@ dialog_details_2
   });
 
 // Duplication du personnage
-dialog_details_2
-  .querySelector("#Dupliquer")
-  .addEventListener("click", function (event) {
+dialog_details_2.querySelector("#Dupliquer").addEventListener("click", function (event) {
     m_selected.dupliquer();
   });
 
