@@ -48,7 +48,7 @@
          */
         function generateModelJS($row, $index)
         {
-            $js = "Models[$index] = createModel({\n";
+            $js = "Models[$index] = new Model({\n";
             $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
             // $js .= "    Image: new Image(\"Images/" . $row['Nom'] . ".png\"),\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
@@ -99,7 +99,7 @@
          */
         function generateArmeJS($row, $index)
         {
-            $js = "Armes[$index] = createArme({\n";
+            $js = "Armes[$index] = new Arme({\n";
             $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
             $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Deux_mains: " . toJS($row['Deux_mains'], 'bool') . ",\n";
@@ -120,7 +120,7 @@
          */
         function generateListeMagieJS($row, $index)
         {
-            $js = "ListesMagie[$index] = createListeMagie({\n";
+            $js = "Listes[$index] = new Liste({\n";
             $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . "\n";
             $js .= "});\n";
             return $js;
@@ -130,7 +130,7 @@
          */
         function generateSortJS($row, $index)
         {
-            $js = "Sorts[$index] = createSort({\n";
+            $js = "Sorts[$index] = new Sort({\n";
             $js .= "    Nom_sort: " . toJS($row['NOM_SORT']) . ",\n";
             $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
             $js .= "    Niveau: " . toJS($row['NIVEAU'], 'int') . ",\n";
@@ -149,7 +149,7 @@
          */
         function generateConnecteurJS($row, $index)
         {
-            $js = "Connecteurs[$index] = createConnecteur({\n";
+            $js = "Connecteurs[$index] = new Connecteur({\n";
             $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
             $js .= "    Pred_sort: " . toJS($row['PRED_SORT']) . ",\n";
             $js .= "    Suc_sort: " . toJS($row['SUC_SORT']) . "\n";
@@ -161,7 +161,7 @@
          */
         function generateSortConnuJS($row, $index)
         {
-            $js = "SortsConnus[$index] = createSortConnu({\n";
+            $js = "SortsConnus[$index] = new SortConnu({\n";
             $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
             $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
             $js .= "    Nom_perso: " . toJS($row['Nom_perso']) . "\n";
@@ -261,7 +261,7 @@
             Models[i].Image = new Image();
             Models[i].Image.src = "Images/" + Models[i].Nom + ".png";
             Models[i].Image.onerror = function() {
-                console.warn("Image non trouvée pour " + Models[i].Nom + ": Images/" + Models[i].Nom + ".png");
+                console.warn("Image non trouvée pour " + Models[i].Nom + ": images/" + Models[i].Nom + ".png");
             };
         }
 

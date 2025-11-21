@@ -1,34 +1,35 @@
 /**
- * FICHIER ARME.JS - VERSION SIMPLIFIÉE
- * =====================================
- * Factory function pour créer des objets arme
- * Remplace la classe complexe par une fonction simple
+ * FICHIER ARME.JS
+ * ===============
+ * Classe pour créer des objets arme
  */
 
 /**
- * Crée un objet arme avec des valeurs par défaut
- * @param {Object} data - Données de l'arme (optionnel)
- * @returns {Object} Objet arme
+ * Classe représentant une arme
  */
-function createArme(data = {}) {
-    return {
+class Arme {
+    /**
+     * Crée une nouvelle instance d'arme avec des valeurs par défaut
+     * @param {Object} data - Données de l'arme (optionnel)
+     */
+    constructor(data = {}) {
         // Propriétés de base
-        Nom: data.Nom || "",
-        Is_personnel: data.Is_personnel || false,
-        Deux_mains: data.Deux_mains || false,
-        A_projectile: data.A_projectile || false,
+        this.Nom = data.Nom || "";
+        this.Is_personnel = data.Is_personnel || false;
+        this.Deux_mains = data.Deux_mains || false;
+        this.A_projectile = data.A_projectile || false;
 
         // Statistiques de combat
-        Facteur: data.Facteur || 1,
-        Bonus: data.Bonus || 0,
-        Plafond: data.Plafond || 0,
-        Coeff_force: data.Coeff_force || 0,
+        this.Facteur = data.Facteur || 1;
+        this.Bonus = data.Bonus || 0;
+        this.Plafond = data.Plafond || 0;
+        this.Coeff_force = data.Coeff_force || 0;
         
         // Caractéristiques tactiques
-        A_distance: data.A_distance || false,
-        Portee: data.Portee || null,
-        Init: data.Init || 0
-    };
+        this.A_distance = data.A_distance || false;
+        this.Portee = data.Portee || null;
+        this.Init = data.Init || 0;
+    }
 }
 
 // Tableau global contenant toutes les armes disponibles

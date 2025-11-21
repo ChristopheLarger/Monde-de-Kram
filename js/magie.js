@@ -1,63 +1,75 @@
 /**
- * Crée un objet Liste avec des valeurs par défaut
- * @param {Object} data - Données de la Liste (optionnel)
- * @returns {Object} Objet Liste
+ * Classe représentant une liste de magie
  */
-function createListeMagie(data = {}) {
-  return {
-    Nom_liste: data.Nom_liste || "",
-  };
+class Liste {
+  /**
+   * Crée une nouvelle instance de liste avec des valeurs par défaut
+   * @param {Object} data - Données de la liste (optionnel)
+   */
+  constructor(data = {}) {
+    this.Nom_liste = data.Nom_liste || "";
+  }
 }
 
 // Tableau global contenant toutes les listes de magie disponibles
-let ListesMagie = [];
+let Listes = [];
 
 /**
- * Crée un objet sort avec des valeurs par défaut
- * @param {Object} data - Données de sort (optionnel)
- * @returns {Object} Objet sort
+ * Classe représentant un sort de magie
  */
-function createSort(data = {}) {
-  return {
-    Nom_sort: data.Nom_sort || "",
-    Nom_liste: data.Nom_liste || "",
-    Niveau: data.Niveau || 0,
-    Portee: data.Portee || "",
-    Incantation: data.Incantation || "",
-    Duree: data.Duree || "",
-    Sauvegarde: data.Sauvegarde || "",
-    Zone: data.Zone || "",
-    Description: data.Description || "",
-    Col: data.Col || 0,
-  };
+class Sort {
+  /**
+   * Crée une nouvelle instance de sort avec des valeurs par défaut
+   * @param {Object} data - Données du sort (optionnel)
+   */
+  constructor(data = {}) {
+    this.Nom_sort = data.Nom_sort || "";
+    this.Nom_liste = data.Nom_liste || "";
+    this.Niveau = data.Niveau || 0;
+    this.Portee = data.Portee || "";
+    this.Incantation = data.Incantation || "";
+    this.Duree = data.Duree || "";
+    this.Sauvegarde = data.Sauvegarde || "";
+    this.Zone = data.Zone || "";
+    this.Description = data.Description || "";
+    this.Col = data.Col || 0;
+  }
 }
 
 // Tableau global contenant toutes les sorts disponibles
 let Sorts = [];
 
 /**
- * Crée un objet connecteur avec des valeurs par défaut
- * @param {Object} data - Données du connecteur (optionnel)
- * @returns {Object} Objet connecteur
+ * Classe représentant un connecteur de magie
  */
-
-function createConnecteur(data = {}) {
-  return {
-    Nom_liste: data.Nom_liste || "",
-    Pred_sort: data.Pred_sort || "",
-    Suc_sort: data.Suc_sort || "",
-  };
+class Connecteur {
+  /**
+   * Crée une nouvelle instance de connecteur avec des valeurs par défaut
+   * @param {Object} data - Données du connecteur (optionnel)
+   */
+  constructor(data = {}) {
+    this.Nom_liste = data.Nom_liste || "";
+    this.Pred_sort = data.Pred_sort || "";
+    this.Suc_sort = data.Suc_sort || "";
+  }
 }
 
 // Tableau global contenant toutes les connecteurs disponibles
 let Connecteurs = [];
 
-function createSortConnu(data = {}) {
-  return {
-    Nom_liste: data.Nom_liste || "",
-    Nom_sort: data.Nom_sort || "",
-    Nom_perso: data.Nom_perso || "",
-  };
+/**
+ * Classe représentant un sort connu par un personnage
+ */
+class SortConnu {
+  /**
+   * Crée une nouvelle instance de sort connu avec des valeurs par défaut
+   * @param {Object} data - Données du sort connu (optionnel)
+   */
+  constructor(data = {}) {
+    this.Nom_liste = data.Nom_liste || "";
+    this.Nom_sort = data.Nom_sort || "";
+    this.Nom_perso = data.Nom_perso || "";
+  }
 }
 
 // Tableau global contenant toutes les sorts connus disponibles
@@ -409,21 +421,12 @@ function createListeModal(Nom_liste) {
 
       if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
-        m_selected.Sortilege = sort.Nom_sort;
-        m_selected.Nom_liste_sort = Nom_liste;
+        m_selected.Nom_liste = sort.Nom_liste;
+        m_selected.Nom_sort = sort.Nom_sort;
 
         // Mettre à jour l'affichage dans le dialogue de détails
-        const sortilegeSpans = dialog_details_2.querySelectorAll(
-          ".sortilege_selectionne"
-        );
-        if (sortilegeSpans.length >= 2) {
-          sortilegeSpans[0].textContent =
-            capitalizeFirstLetter(Nom_liste) + " / "; // Nom de la liste
-          sortilegeSpans[1].textContent = sort.Nom_sort; // Nom du sort
-        } else if (sortilegeSpans.length === 1) {
-          sortilegeSpans[0].textContent =
-            capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
-        }
+        const sortilegeSpans = dialog_details_2.querySelectorAll(".sortilege");
+        sortilegeSpans.textContent = capitalizeFirstLetter(Nom_liste) + " / " + sort.Nom_sort;
 
         // Fermer la modale
         if (modal && modal.parentNode) {
@@ -473,8 +476,8 @@ function createListeModal(Nom_liste) {
 
       if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
-        m_selected.Sortilege = sort.Nom_sort;
-        m_selected.Nom_liste_sort = Nom_liste;
+        m_selected.Nom_liste = sort.Nom_liste;
+        m_selected.Nom_sort = sort.Nom_sort;
 
         // Mettre à jour l'affichage dans le dialogue de détails
         const sortilegeSpans = dialog_details_2.querySelectorAll(

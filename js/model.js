@@ -1,80 +1,82 @@
 /**
  * FICHIER MODEL.JS
  * =================
- * Factory function pour créer des objets modèle de personnage
- * Remplace la classe complexe par une fonction simple avec méthodes utilitaires
+ * Classe pour créer des objets modèle de personnage
  */
 
 /**
- * Crée un objet modèle de personnage avec des valeurs par défaut
- * @param {Object} data - Données du modèle (optionnel)
- * @returns {Object} Objet modèle avec méthodes utilitaires
+ * Classe représentant un modèle de personnage
  */
-function createModel(data = {}) {
-    const model = {
+class Model {
+    /**
+     * Crée une nouvelle instance de modèle avec des valeurs par défaut
+     * @param {Object} data - Données du modèle (optionnel)
+     */
+    constructor(data = {}) {
         // Propriétés de base
-        Nom: data.Nom || "",
-        Image: data.Image || null,
-        Is_joueur: data.Is_joueur || false,
-        Capacites: data.Capacites || "",
-        Etat: data.Etat || "",
+        this.Nom = data.Nom || "";
+        this.Image = data.Image || null;
+        this.Is_joueur = data.Is_joueur || false;
+        this.Capacites = data.Capacites || "";
+        this.Etat = data.Etat || "";
         
         // Statistiques de base
-        Pm: data.Pm || null,
-        Pp: data.Pp || null,
-        Vp: data.Vp || null,
-        Fdc: data.Fdc || null,
+        this.Pm = data.Pm || null;
+        this.Pp = data.Pp || null;
+        this.Vp = data.Vp || null;
+        this.Fdc = data.Fdc || null;
         
         // États temporaires
-        Fatigue: data.Fatigue || 0,
-        Concentration: data.Concentration || 0,
+        this.Fatigue = data.Fatigue || 0;
+        this.Concentration = data.Concentration || 0;
         
         // Capacités de combat
-        Ambidextre: data.Ambidextre || false,
-        Escrime: data.Escrime || 0,
-        Coordination: data.Coordination || null,
-        Force: data.Force || null,
+        this.Ambidextre = data.Ambidextre || false;
+        this.Escrime = data.Escrime || 0;
+        this.Coordination = data.Coordination || null;
+        this.Force = data.Force || null;
         
         // Armes et compétences
-        Arme_1: data.Arme_1 || "",
-        Att_1: data.Att_1 || null,
-        Par_1: data.Par_1 || null,
-        Arme_2: data.Arme_2 || "",
-        Att_2: data.Att_2 || null,
-        Par_2: data.Par_2 || null,
-        Arme_3: data.Arme_3 || "",
-        Att_3: data.Att_3 || null,
-        Par_3: data.Par_3 || null,
-        Par_Bouclier: data.Par_Bouclier || 0,
-        Esquive: data.Esquive || 0,
+        this.Arme_1 = data.Arme_1 || "";
+        this.Att_1 = data.Att_1 || null;
+        this.Par_1 = data.Par_1 || null;
+        this.Arme_2 = data.Arme_2 || "";
+        this.Att_2 = data.Att_2 || null;
+        this.Par_2 = data.Par_2 || null;
+        this.Arme_3 = data.Arme_3 || "";
+        this.Att_3 = data.Att_3 || null;
+        this.Par_3 = data.Par_3 || null;
+        this.Par_Bouclier = data.Par_Bouclier || 0;
+        this.Esquive = data.Esquive || 0;
         
         // Protection par zone
-        Armure_tete: data.Armure_tete || 0,
-        Armure_poitrine: data.Armure_poitrine || 0,
-        Armure_abdomen: data.Armure_abdomen || 0,
-        Armure_brasg: data.Armure_brasg || 0,
-        Armure_brasd: data.Armure_brasd || 0,
-        Armure_jambeg: data.Armure_jambeg || 0,
-        Armure_jambed: data.Armure_jambed || 0,
+        this.Armure_tete = data.Armure_tete || 0;
+        this.Armure_poitrine = data.Armure_poitrine || 0;
+        this.Armure_abdomen = data.Armure_abdomen || 0;
+        this.Armure_brasg = data.Armure_brasg || 0;
+        this.Armure_brasd = data.Armure_brasd || 0;
+        this.Armure_jambeg = data.Armure_jambeg || 0;
+        this.Armure_jambed = data.Armure_jambed || 0;
         
         // Points de vie par zone
-        Pdv: data.Pdv || 0,
-        Tete: data.Tete || 0,
-        Poitrine: data.Poitrine || 0,
-        Abdomen: data.Abdomen || 0,
-        Brasg: data.Brasg || 0,
-        Brasd: data.Brasd || 0,
-        Jambeg: data.Jambeg || 0,
-        Jambed: data.Jambed || 0,
-        
-        // Méthodes utilitaires
-        malus_2nde_main() {
-            if (this.Ambidextre) return 0;
-            return this.Coordination === null ? 0 : Math.floor((18 - this.Coordination) / 2);
-        }
-    };
+        this.Pdv = data.Pdv || 0;
+        this.Tete = data.Tete || 0;
+        this.Poitrine = data.Poitrine || 0;
+        this.Abdomen = data.Abdomen || 0;
+        this.Brasg = data.Brasg || 0;
+        this.Brasd = data.Brasd || 0;
+        this.Jambeg = data.Jambeg || 0;
+        this.Jambed = data.Jambed || 0;
+    }
     
-    return model;
+    /**
+     * Calcule le malus pour l'utilisation de la deuxième main
+     * @returns {number} Le malus à appliquer
+     */
+    malus_2nde_main() {
+        if (this.Ambidextre) return 0;
+        return this.Coordination === null ? 0 : Math.floor((18 - this.Coordination) / 2);
+    }
 }
 
 // Tableau global contenant tous les modèles de personnages

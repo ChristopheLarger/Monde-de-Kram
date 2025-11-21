@@ -47,7 +47,7 @@ function afficher_dim_carte() {
     image_fond.onload = function () {
       dialog_dim_carte.querySelector(".hauteur").value = Math.round(
         (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) /
-          image_fond.width
+        image_fond.width
       );
     };
   }
@@ -66,8 +66,8 @@ function afficher_dim_rectangle() {
  * Affiche le dialogue pour définir les dimensions d'un mur
  */
 function afficher_dim_mur() {
-    Forme.setFormeMode('mur');
-    dialog_dim_mur.showModal();
+  Forme.setFormeMode('mur');
+  dialog_dim_mur.showModal();
 }
 
 /**
@@ -96,6 +96,7 @@ function afficher_Details(col, row) {
 
     while (model.options.length > 1) model.removeChild(model.lastChild);
 
+    // Ajout des modèles de joueurs comme options de contrôle
     for (let i = 0; i < Models.length; i++) {
       if (Models[i].Is_joueur) {
         const p = Pions.find((x) => x.Model === Models[i].Nom);
@@ -105,9 +106,7 @@ function afficher_Details(col, row) {
         nouvelleOption.textContent = Models[i].Nom;
         model.appendChild(nouvelleOption);
       }
-    }
-    for (let i = 0; i < Models.length; i++) {
-      if (!Models[i].Is_joueur) {
+      else {
         let nouvelleOption = document.createElement("option");
         nouvelleOption.value = Models[i].Nom;
         nouvelleOption.textContent = Models[i].Nom;
@@ -140,8 +139,7 @@ function afficher_Details(col, row) {
     }
 
     // Mise à jour de l'armure calculée
-    dialog_details_2.querySelector(".armure").value =
-      m_selected.armure_generale();
+    dialog_details_2.querySelector(".armure").value = m_selected.armure_generale();
 
     // Configuration du sélecteur de contrôleur
     const control = dialog_details_2.querySelector(".control");
@@ -258,30 +256,17 @@ function afficher_Details(col, row) {
     note.innerHTML = m_selected.Note;
 
     // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent =
-      "(" + info_arme(1) + ")";
-    dialog_details_2.querySelector(".info_secondaire").textContent =
-      "(" + info_arme(2) + ")";
+    dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
+    dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
+
     // Mise à jour du sortilège sélectionné
-    const sortilegeSpans = dialog_details_2.querySelectorAll(
-      ".sortilege_selectionne"
-    );
-    if (sortilegeSpans.length >= 2) {
-      if (m_selected.Sortilege) {
-        sortilegeSpans[0].textContent = m_selected.Nom_liste_sort || "--";
-        sortilegeSpans[1].textContent = m_selected.Sortilege;
-      } else {
-        sortilegeSpans[0].textContent = "--";
-        sortilegeSpans[1].textContent = "--";
-      }
-    } else if (sortilegeSpans.length === 1) {
-      if (m_selected.Sortilege) {
-        sortilegeSpans[0].textContent =
-          (m_selected.Nom_liste_sort || "--") + " - " + m_selected.Sortilege;
-      } else {
-        sortilegeSpans[0].textContent = "--";
-      }
+    const sortilegeSpans = dialog_details_2.querySelectorAll(".sortilege");
+    if (m_selected.Nom_sort) {
+      sortilegeSpans.textContent = (m_selected.Nom_liste || "--") + " - " + m_selected.Nom_sort;
+    } else {
+      sortilegeSpans.textContent = "--";
     }
+
     // Affichage du dialogue
     dialog_details_2.style.zIndex = "100";
     dialog_details_2.style.position = "absolute";
@@ -907,11 +892,11 @@ dialog_dim_carte
       const hexHS = hexSize * 1.5;
       const hexVS = hexSize * Math.sqrt(3);
 
-        forme_fond = new Forme("Rectangle");
-        forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
-        forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
-        forme_fond.x = offsetX - forme_fond.width / 2;
-        forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
+      forme_fond = new Forme("Rectangle");
+      forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
+      forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
+      forme_fond.x = offsetX - forme_fond.width / 2;
+      forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
     }
 
     // Régénération et redessin de la carte
@@ -984,46 +969,46 @@ dialog_dim_rectangle
 
 // Gestion de la touche Entrée pour créer le rectangle
 dialog_dim_rectangle.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        dialog_dim_rectangle.querySelector("#Creer").click();
-    }
+  if (event.key === "Enter") {
+    dialog_dim_rectangle.querySelector("#Creer").click();
+  }
 });
 
 // Fermeture du dialogue de création de rectangle
 dialog_dim_mur.querySelector("#Fermer").addEventListener("click", function (event) {
-    dialog_dim_mur.close();
+  dialog_dim_mur.close();
 });
 
 // Création d'un rectangle avec les dimensions spécifiées
 dialog_dim_mur.querySelector("#Creer").addEventListener("click", function (event) {
-    // Récupération des dimensions saisies
-    const w = dialog_dim_mur.querySelector(".largeur").value;
-    const h = dialog_dim_mur.querySelector(".hauteur").value;
+  // Récupération des dimensions saisies
+  const w = dialog_dim_mur.querySelector(".largeur").value;
+  const h = dialog_dim_mur.querySelector(".hauteur").value;
 
-    // Création de la nouvelle forme rectangle
-    Formes[Formes.length] = new Forme("Mur");
-    const r = Formes[Formes.length - 1];
+  // Création de la nouvelle forme rectangle
+  Formes[Formes.length] = new Forme("Mur");
+  const r = Formes[Formes.length - 1];
 
-    // Calcul des dimensions en pixels selon le système hexagonal
-    r.width = Math.abs(w / 3 * Math.sqrt(3) * hexSize);
-    r.height = Math.abs(h / 3 * Math.sqrt(3) * hexSize);
+  // Calcul des dimensions en pixels selon le système hexagonal
+  r.width = Math.abs(w / 3 * Math.sqrt(3) * hexSize);
+  r.height = Math.abs(h / 3 * Math.sqrt(3) * hexSize);
 
-    // Positionnement au centre du canvas
-    r.x = canvas.width / 2 - r.width / 2;
-    r.y = canvas.height / 2 - r.height / 2;
+  // Positionnement au centre du canvas
+  r.x = canvas.width / 2 - r.width / 2;
+  r.y = canvas.height / 2 - r.height / 2;
 
-    // Application de la couleur sélectionnée
-    r.color = document.getElementById("forme_color").value;
+  // Application de la couleur sélectionnée
+  r.color = document.getElementById("forme_color").value;
 
-    dialog_dim_mur.close();
-    Map.drawHexMap();
+  dialog_dim_mur.close();
+  Map.drawHexMap();
 });
 
 // Gestion de la touche Entrée pour créer le rectangle
 dialog_dim_mur.addEventListener("keydown", function (event) {
-    if (event.key === "Enter") {
-        dialog_dim_mur.querySelector("#Creer").click();
-    }
+  if (event.key === "Enter") {
+    dialog_dim_mur.querySelector("#Creer").click();
+  }
 });
 
 // Fermeture du dialogue de création d'ellipse
@@ -1226,22 +1211,16 @@ dialog_details_2
       document.getElementById("modal").style.display = "flex";
       dialog_details_2.style.zIndex = 0;
 
-      const joueurSelectionne =
-        dialog_details_2.querySelector(".model").textContent;
-      SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach(
-        (x) => {
-          const element = document.getElementById(getShortName(x.Nom_liste));
-          element.style.color = "white";
-          element.style.backgroundColor = "green";
-        }
-      );
+      const joueurSelectionne = dialog_details_2.querySelector(".model").textContent;
+      SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach((x) => {
+        const element = document.getElementById(getShortName(x.Nom_liste));
+        element.style.color = "white";
+        element.style.backgroundColor = "green";
+      });
     }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
-    if (
-      event.target.value === "Lancement de sort" ||
-      (!w1 && typeof w1 != "undefined" && w1.Deux_mains)
-    ) {
+    if ((event.target.value === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
       // Nettoyage et ajout d'une option vide
       while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
       nouvelleOption = document.createElement("option");
@@ -1290,16 +1269,11 @@ dialog_details_2
       }
 
       // Sélection de l'arme actuelle si disponible
-      if (
-        [
-          p_selected.Arme_1,
-          p_selected.Arme_2,
-          p_selected.Arme_3,
-          "Bouclier",
-        ].includes(m_selected.Arme2)
-      ) {
+      if ([p_selected.Arme_1, p_selected.Arme_2, p_selected.Arme_3, "Bouclier"].includes(m_selected.Arme2)) {
         arme2.value = m_selected.Arme2;
-      } else arme2.value = "";
+      } else {
+        arme2.value = "";
+      }
     }
 
     // Mise à jour de l'arme principale
