@@ -151,23 +151,31 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+let stopContextMenu = false;
+
 // Gestion des clics sur les boutons magiques
 document.addEventListener("contextmenu", function (event) {
-  if (event.target.classList.contains("level")) {
+  console.log("ContextMenu : event.target.classList", event.target.classList);
+  console.log("ContextMenu : stopContextMenu", stopContextMenu);
+
+  if (stopContextMenu) {
     event.preventDefault();    
-    event.stopPropagation(); 
+    event.stopPropagation();
+    stopContextMenu = false;
     return false;
   }
 });
 
 document.addEventListener("mousedown", function (event) {
+  console.log("MouseDown : event.target.classList", event.target.classList);
+
   if (event.target.classList.contains("magic-button")) {
-    event.preventDefault();
-    event.stopPropagation();
+    stopContextMenu = true;
     // Ouvrir la liste voulue si le bouton associé est cliqué
     createListeModal(shortName[event.target.id]);
+    
     return false;
-  }
+    }
 });
 
 // Fonction pour créer dynamiquement une modale de liste de magie
