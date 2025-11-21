@@ -456,6 +456,8 @@ function createListeModal(Nom_liste) {
     }
   });
 
+
+  
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
       // Si Ctrl est pressé, ne pas ouvrir les informations du sort
@@ -465,9 +467,11 @@ function createListeModal(Nom_liste) {
         if (e.target.style.backgroundColor === "green") {
           // Si déjà vert, remettre en blanc (ou supprimer le style pour revenir à la couleur par défaut)
           e.target.style.backgroundColor = "";
+          e.target.style.color = "";
         } else {
           // Sinon, mettre en vert
           e.target.style.backgroundColor = "green";
+          e.target.style.color = "white";
         }
         return; // Empêcher l'ouverture du panneau d'information
       }
