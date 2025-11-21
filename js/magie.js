@@ -460,9 +460,7 @@ function createListeModal(Nom_liste) {
       }
     }
   });
-
-
-  
+ 
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
       // Si Ctrl est pressé, ne pas ouvrir les informations du sort
