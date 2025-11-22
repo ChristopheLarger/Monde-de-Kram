@@ -151,13 +151,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// Gestion du menu contextuel
 let stopContextMenu = false;
 
-// Gestion des clics sur les boutons magiques
+// Gestion du menu contextuel sur les boutons magiques
 document.addEventListener("contextmenu", function (event) {
-  console.log("ContextMenu : event.target.classList", event.target.classList);
-  console.log("ContextMenu : stopContextMenu", stopContextMenu);
-
   if (stopContextMenu) {
     event.preventDefault();    
     event.stopPropagation();
@@ -166,9 +164,8 @@ document.addEventListener("contextmenu", function (event) {
   }
 });
 
+// Gestion du clic sur les boutons magiques pour ouvrir la liste voulue
 document.addEventListener("mousedown", function (event) {
-  console.log("MouseDown : event.target.classList", event.target.classList);
-
   if (event.target.classList.contains("magic-button")) {
     stopContextMenu = true;
     // Ouvrir la liste voulue si le bouton associé est cliqué
@@ -461,12 +458,12 @@ function createListeModal(Nom_liste) {
         m_selected.Nom_sort = sort.Nom_sort;
 
         // Mettre à jour l'affichage dans le dialogue de détails
-        const sortilege = dialog_details_2.querySelector(".sortilege");
+        const sortilege = dialog_details_2.querySelector(".titre_sortilege");
         if (sort.Nom_sort && sort.Nom_sort !== "" && sort.Nom_sort !== "0" &&
             sort.Nom_liste && sort.Nom_liste !== "" && sort.Nom_liste !== "0") {
-          sortilege.textContent = capitalizeFirstLetter(sort.Nom_liste) + " / " + sort.Nom_sort;
+          sortilege.innerHTML = "Liste : " + capitalizeFirstLetter(sort.Nom_liste) + "<br>Sort : " + sort.Nom_sort;
         } else {
-          sortilege.textContent = "--";
+          sortilege.innerHTML = "--";
         }
 
         // Fermer la modale

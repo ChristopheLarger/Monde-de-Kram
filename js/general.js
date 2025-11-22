@@ -338,7 +338,7 @@ class Messages {
 
         document.getElementById(("titre_" + joueur).toLowerCase()).addEventListener("contextmenu", function (event) {
             event.preventDefault(); // Empêche l'affichage du menu contextuel par défaut
-            afficher_Details(joueur);
+            afficher_Details_pion(joueur);
         });
 
         if (joueur === "MJ") return;

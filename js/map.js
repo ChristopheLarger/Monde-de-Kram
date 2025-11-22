@@ -112,6 +112,179 @@ class Map {
         return is_find;
     }
 
+    static get_ColRow(x, y) {
+        // Calculer la colonne approximative
+        // Utiliser Math.floor au lieu de Math.round pour les valeurs négatives pour éviter les arrondis incorrects
+        let col;
+        if (x >= 0) {
+            col = Math.round(x / hexHSpacing);
+        } else {
+            // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
+            col = Math.ceil(x / hexHSpacing);
+        }
+        
+        // Pour la ligne, on doit tenir compte du décalage des colonnes impaires
+        // La formule inverse de get_XY : y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0)
+        // Donc : row = (y - ((col % 2 != 0) ? hexVSpacing / 2 : 0)) / hexVSpacing
+        const yAdjusted = y - ((col % 2 != 0) ? hexVSpacing / 2 : 0);
+        let row;
+        if (yAdjusted >= 0) {
+            row = Math.round(yAdjusted / hexVSpacing);
+        } else {
+            // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
+            row = Math.ceil(yAdjusted / hexVSpacing);
+        }
+        
+        return { col: col, row: row };
+    }
+
+
+    /**
+     * Vérifie si un point (px, py) est à l'intérieur d'un hexagone centré en (cx, cy)
+     * @param {number} px - Coordonnée X du point à tester
+     * @param {number} py - Coordonnée Y du point à tester
+     * @param {number} cx - Coordonnée X du centre de l'hexagone
+     * @param {number} cy - Coordonnée Y du centre de l'hexagone
+     * @returns {boolean} - true si le point est à l'intérieur de l'hexagone
+     */
+    static isPointInHexagon(px, py, cx, cy) {
+        // Calculer les 6 sommets de l'hexagone (même orientation que drawHexagon)
+        let points = [];
+        for (let i = 0; i < 6; i++) {
+            let angle = (Math.PI / 3) * i;
+            let dx = cx + hexSize * Math.cos(angle);
+            let dy = cy + hexSize * Math.sin(angle);
+            points.push({ x: dx, y: dy });
+        }
+
+        // Pour les points entre les deux rayons, utiliser le ray casting
+        // Ray casting : tirer un rayon horizontal vers la droite et compter les intersections
+        let inside = false;
+        const epsilon = 0.0001; // Tolérance pour les comparaisons flottantes
+        
+        for (let i = 0, j = 5; i < 6; j = i++) {
+            const xi = points[i].x, yi = points[i].y;
+            const xj = points[j].x, yj = points[j].y;
+            
+            // Ignorer les arêtes horizontales (pas d'intersection avec un rayon horizontal)
+            if (Math.abs(yi - yj) < epsilon) continue;
+            
+            // Vérifier si le rayon horizontal du point intersecte cette arête
+            // L'arête doit chevaucher la ligne y = py (un sommet strictement au-dessus, l'autre strictement en-dessous)
+            const yiAbove = yi > py + epsilon;
+            const yjAbove = yj > py + epsilon;
+            const yOverlap = (yiAbove !== yjAbove);
+            
+            if (yOverlap) {
+                // Calculer l'intersection x de l'arête avec la ligne y = py
+                const t = (py - yi) / (yj - yi);
+                const xIntersect = xi + t * (xj - xi);
+                
+                // Le rayon part de (px, py) vers la droite, donc on vérifie si px < xIntersect
+                if (px < xIntersect - epsilon) inside = !inside;
+            }
+        }
+        
+        return inside;
+    }
+
+    /**
+     * Convertit les coordonnées hexagonales (col, row) en coordonnées pixels (x, y)
+     * @param {number} col - Colonne de l'hexagone
+     * @param {number} row - Ligne de l'hexagone
+     * @returns {Object} - {x, y} coordonnées en pixels
+     */
+    static get_XY(col, row) {
+        const x = col * hexHSpacing;
+        const y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0);
+        return { x: x, y: y };
+    }
+
+    /**
+     * Calcule la position de la souris sur le canvas en tenant compte du border et de l'échelle
+     * @param {MouseEvent} event - Événement de souris
+     * @returns {Object} - {x, y} coordonnées ajustées
+     */
+    static getMousePosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        // Prendre en compte le border du canvas (1px de chaque côté)
+        const borderWidth = 1; // canvas.style.borderWidth;
+        let mouseX = event.clientX - rect.left - borderWidth;
+        let mouseY = event.clientY - rect.top - borderWidth;
+        
+        // Vérifier si le canvas a une échelle différente (si width/height CSS != width/height canvas)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        // Ajuster les coordonnées si nécessaire
+        return {
+            x: mouseX * scaleX,
+            y: mouseY * scaleY
+        };
+    }
+
+    /**
+     * Trouve l'hexagone contenant le point (px, py) en tenant compte de l'offset
+     * @param {number} px - Coordonnée X du point (en pixels, relative au canvas)
+     * @param {number} py - Coordonnée Y du point (en pixels, relative au canvas)
+     * @returns {Object} - {col, row} de l'hexagone trouvé
+     */
+    static getHexagonAtPoint(px, py) {
+        // Convertir les coordonnées en tenant compte de l'offset
+        const x = px - offsetX;
+        const y = py - offsetY;
+
+        // Trouver l'hexagone le plus proche en utilisant get_ColRow pour être cohérent
+        const colRow = Map.get_ColRow(x, y);
+        const col = colRow.col;
+        const row = colRow.row;
+        
+        // Tester une zone de 3x3 hexagones autour du point calculé
+        // pour s'assurer de ne pas manquer l'hexagone correct à cause d'arrondis
+        const candidates = [];
+        
+        // Ajouter l'hexagone principal et tous les hexagones dans un rayon de 1
+        for (let dcol = -1; dcol <= 1; dcol++) {
+            for (let drow = -1; drow <= 1; drow++) {
+                candidates.push({ col: col + dcol, row: row + drow });
+            }
+        }
+        
+        // Trier les candidats par distance au centre de l'hexagone pour tester le plus proche en premier
+        candidates.sort((a, b) => {
+            const aXY = Map.get_XY(a.col, a.row);
+            const bXY = Map.get_XY(b.col, b.row);
+            const dist1 = Math.sqrt((aXY.x - x) ** 2 + (aXY.y - y) ** 2);
+            const dist2 = Math.sqrt((bXY.x - x) ** 2 + (bXY.y - y) ** 2);
+            return dist1 - dist2;
+        });
+
+        // Tester les candidats triés par distance
+        let bestCandidate = null;
+        let bestDistance = Infinity;
+        
+        for (const candidate of candidates) {
+            const hexXY = Map.get_XY(candidate.col, candidate.row);
+            const hexCenterX = hexXY.x + offsetX;
+            const hexCenterY = hexXY.y + offsetY;
+            
+            const isIn = Map.isPointInHexagon(px, py, hexCenterX, hexCenterY);
+            const dist = Math.sqrt((px - hexCenterX) ** 2 + (py - hexCenterY) ** 2);
+            
+            if (isIn && dist < bestDistance) {
+                bestDistance = dist;
+                bestCandidate = candidate;
+            }
+        }
+        
+        if (bestCandidate) {
+            return bestCandidate;
+        }
+
+        // Si aucun hexagone ne contient le point, retourner l'hexagone initial
+        return { col: col, row: row };
+    }
+
     /**
      * Calcule la distance entre deux hexagones
      * @param {number} col1 - Colonne du premier hexagone
@@ -122,6 +295,7 @@ class Map {
      */
     static distance(col1, row1, col2, row2) {
         // Conversion des coordonnées hexagonales en coordonnées cartésiennes
+        // Le pas est de 3 mètres entre les hexagones.
         const x1 = col1 * (3 / 2);
         const y1 = row1 * (Math.sqrt(3)) + (Math.abs(col1) % 2) * (Math.sqrt(3) / 2);
         const x2 = col2 * (3 / 2);
@@ -178,6 +352,14 @@ class Map {
     static drawHexagon(x, y, color, strie, text, brouillard, selected = false) {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
+
+            // Utiliser les mêmes dimensions que le canvas principal
+            // canvas_selected.width = canvas.width;
+            // canvas_selected.height = canvas.height;
+
+            // Repositionner le canvas_selected pour qu'il se superpose exactement au canvas principal
+            // canvas_selected.style.left = "0px";
+            // canvas_selected.style.top = "0px";
 
             // On dessine l'image au centre de l'hexagone
             const imgSize = hexSize * 1.2;
@@ -294,15 +476,31 @@ class Map {
             let h = window.innerHeight;
             h -= document.getElementById("div_cartouche").offsetHeight;
             h -= document.getElementById("table_dialogue").offsetHeight;
-            h -= 8;
+            h -= document.getElementById("div_tools").offsetHeight;
+            h -= 28;
             return h;
         }
 
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
-            canvas_selected.width = window.innerWidth;
-            canvas_selected.height = get_height();
+            // Utiliser les mêmes dimensions que le canvas principal
+            canvas_selected.width = canvas.width;
+            canvas_selected.height = canvas.height;
+
+            // Repositionner le canvas_selected pour qu'il se superpose exactement au canvas principal
+            const combatDiv = document.getElementById("combat");
+            if (combatDiv) {
+                const combatRect = combatDiv.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+                
+                // Position relative du canvas par rapport au conteneur #combat
+                const relativeLeft = canvasRect.left - combatRect.left;
+                const relativeTop = canvasRect.top - combatRect.top;
+                
+                canvas_selected.style.left = relativeLeft + "px";
+                canvas_selected.style.top = relativeTop + "px";
+            }
 
             ctx.clearRect(0, 0, canvas_selected.width, canvas_selected.height);
             hexMap.forEach(hex => {
@@ -1007,7 +1205,7 @@ class Pion extends Map {
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
-           if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
+            if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
                 is_visible = false;
             }
         });
@@ -1103,21 +1301,25 @@ canvas.addEventListener("contextmenu", function (event) {
     event.preventDefault();
 });
 
+let isMoving_map = false;
+
 // Bouton de la souris abaissé
 canvas.addEventListener("mousedown", (event) => {
     const myself = document.getElementById("joueur").value;
 
     canvas.focus({ preventScroll: true });
 
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    const mousePos = Map.getMousePosition(event);
+    const mouseX = mousePos.x;
+    const mouseY = mousePos.y;
 
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 
     // Convertir en coordonnées de grille
-    const col = Math.round((mouseX - offsetX) / hexHSpacing);
-    const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
+    const hex = Map.getHexagonAtPoint(mouseX, mouseY);
+    const col = hex.col;
+    const row = hex.row;
 
     const p = Pions.find(x => x.Position === col + "," + row);
     const t = Terrains.find(x => x.Position === col + "," + row);
@@ -1403,10 +1605,8 @@ canvas.addEventListener("mousedown", (event) => {
         event.preventDefault();
         p.afficher_Details();
     }
-    else if (event.button === 2 && myself === "MJ") {
-        // Clic droit : on ouvre la fenetre de création d'un pion
-        event.preventDefault();
-        afficher_Details(col, row);
+    else if (event.button === 2) {
+        isMoving_map = false;
     }
 
     // Mise à jour du tooltip (sans que la souris ait bougé)
@@ -1418,8 +1618,9 @@ canvas.addEventListener("mousedown", (event) => {
 
 // Déplacement de la souris
 canvas.addEventListener("mousemove", (event) => {
-    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    const mousePos = Map.getMousePosition(event);
+    let mouseX = mousePos.x;
+    let mouseY = mousePos.y;
 
     if (isDragging_left && isMode_terrain && type_terrain != "gomme") {
         // Le bouton gauche de la souris est enfoncé : on dessine des tas de terrains
@@ -1663,11 +1864,26 @@ canvas.addEventListener("mousemove", (event) => {
     }
     else if (isDragging_left) {
         // On déplace le(s) pion(s) sélectionné(s)
-        const deltaX = mouseX - lastMouseX;
-        const deltaY = mouseY - lastMouseY;
-        const rect = canvas.getBoundingClientRect();
-        canvas_selected.style.left = (rect.left + deltaX) + "px";
-        canvas_selected.style.top = (rect.top + deltaY) + "px";
+        const deltaX = mouseX - lastMouseX; // - offsetX;
+        const deltaY = mouseY - lastMouseY; // - offsetY;
+
+        // Calculer la position relative du canvas par rapport au conteneur parent
+        const combatDiv = document.getElementById("combat");
+        const combatRect = combatDiv.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        
+        // Position relative du canvas par rapport au conteneur #combat
+        const relativeLeft = canvasRect.left - combatRect.left;
+        const relativeTop = canvasRect.top - combatRect.top;
+        
+        // Positionner le canvas_selected pour qu'il se superpose exactement au canvas
+        canvas_selected.style.left = (relativeLeft + deltaX)+ "px";
+        canvas_selected.style.top = (relativeTop + deltaY) + "px";
+        
+        // S'assurer que les dimensions correspondent
+        if (canvas_selected.width != canvas.width) canvas_selected.width = canvas.width;
+        if (canvas_selected.height != canvas.height) canvas_selected.height = canvas.height;
+        
         canvas_selected.style.display = "";
     }
     else if (isDragging_right && isMode_forme && index_forme_move != null) {
@@ -1693,6 +1909,26 @@ canvas.addEventListener("mousemove", (event) => {
         // Calcul de l'angle en radians
         if (vectoriel > 0) f.theta = Math.acos(scalaire / (normeOM * normeOP));
         else f.theta = -Math.acos(scalaire / (normeOM * normeOP));
+
+        Map.drawHexMap();
+    }
+    else if (isDragging_right) {
+        // Bouton droit enfoncé : on déplace la carte
+        const deltaX = mouseX - lastMouseX;
+        const deltaY = mouseY - lastMouseY;
+
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+
+        isMoving_map = true;
+
+        offsetX += deltaX;
+        Formes.forEach(r => { r.x += deltaX; });
+        if (image_fond != null) forme_fond.x += deltaX;
+
+        offsetY += deltaY;
+        Formes.forEach(r => { r.y += deltaY; });
+        if (image_fond != null) forme_fond.y += deltaY;
 
         Map.drawHexMap();
     }
@@ -1772,8 +2008,9 @@ canvas.addEventListener("mouseup", (event) => {
         // On déplace le(s) pion(s) de la sélection d'autant que la souris bouge.
         const joueur = document.getElementById("joueur").value;
 
-        const deltaX = event.clientX - canvas.getBoundingClientRect().left - lastMouseX;
-        const deltaY = event.clientY - canvas.getBoundingClientRect().top - lastMouseY;
+        const mousePos = Map.getMousePosition(event);
+        const deltaX = mousePos.x - lastMouseX;
+        const deltaY = mousePos.y - lastMouseY;
 
         Pions.filter(x => x.Selected && [x.Model, x.Control, "MJ"].includes(joueur)).forEach(p => {
             const pos = p.Position.split(",");
@@ -1803,6 +2040,22 @@ canvas.addEventListener("mouseup", (event) => {
             p.deplace_a(col, row);
         });
     }
+    else if (isDragging_right && !isMoving_map) {
+        // Clic droit : on ouvre la fenetre de création d'un pion
+        event.preventDefault();
+
+        const mousePos = Map.getMousePosition(event);
+        let mouseX = mousePos.x;
+        let mouseY = mousePos.y;
+
+        // Convertir en coordonnées de grille
+        const col = Math.round((mouseX - offsetX) / hexHSpacing);
+        const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
+
+        afficher_Details(col, row);
+    }
+
+    isMoving_map = false;
 
     SelectRectangle.width = 0;
     SelectRectangle.height = 0;
@@ -1846,7 +2099,9 @@ document.addEventListener("keydown", function (event) {
             break;
         case " ":
         case "Spacebar":
-            next_attaque();
+            if (event.target.tagName !== "TEXTAREA" && event.target.tagName !== "INPUT") {
+                next_attaque();
+            }
             break;
         case "Delete":
             // On supprime le(s) pion(s) de la sélection
@@ -1884,7 +2139,6 @@ document.addEventListener("keydown", function (event) {
                 forme_fond.width = ratio * forme_fond.width;
                 forme_fond.height = ratio * forme_fond.height;
             }
-
             break;
         case "ArrowUp":
             offsetY += 10;
@@ -1919,6 +2173,71 @@ canvas.addEventListener("mouseleave", () => {
     isDragging_left = false;
     isDragging_right = false;
     tooltip.style.display = "none";
+});
+
+// === GESTION DU ZOOM DE LA CARTE ===
+canvas.addEventListener("wheel", function (event) {
+    event.preventDefault();
+
+    // Calculer la position de la souris
+    const mousePos = Map.getMousePosition(event);
+    const mouseX = mousePos.x;
+    const mouseY = mousePos.y;
+
+    // Trouver la case sous la souris avant le zoom
+    const hex = Map.getHexagonAtPoint(mouseX, mouseY);
+    const col = hex.col;
+    const row = hex.row;
+    
+    // Calculer la position de cette case avant le zoom
+    const hexXY_before = Map.get_XY(col, row);
+    const caseX_before = hexXY_before.x + offsetX;
+    const caseY_before = hexXY_before.y + offsetY;
+    
+    // Calculer la distance relative entre la souris et la case avant le zoom
+    const relX_before = mouseX - caseX_before;
+    const relY_before = mouseY - caseY_before;
+
+    // Appliquer le zoom
+    let ratio = 1;
+    if (event.deltaY > 0) {
+        // Zoom out (molette vers le bas)
+        if (hexSize < 10) return;
+        d = -hexSize / 10;
+    } else {
+        // Zoom in (molette vers le haut)
+        d = hexSize / 10;
+    }
+    ratio = (hexSize + d) / hexSize;
+    hexSize += d;
+    hexWidth = Math.sqrt(3) * hexSize;
+    hexHeight = 2 * hexSize;
+    hexHSpacing = hexSize * 1.5;
+    hexVSpacing = hexHeight * Math.sqrt(3) / 2;
+    
+    // Calculer la position de la case après le zoom
+    const hexXY_after = Map.get_XY(col, row);
+    
+    // Ajuster offsetX et offsetY pour que la case reste sous la souris
+    offsetX = mouseX - relX_before * ratio - hexXY_after.x;
+    offsetY = mouseY - relY_before * ratio - hexXY_after.y;
+
+    Formes.forEach(r => {
+        r.x = ratio * (r.x - offsetX) + offsetX;
+        r.y = ratio * (r.y - offsetY) + offsetY;
+        r.width = ratio * r.width;
+        r.height = ratio * r.height;
+    });
+
+    if (image_fond != null) {
+        forme_fond.x = ratio * (forme_fond.x - offsetX) + offsetX;
+        forme_fond.y = ratio * (forme_fond.y - offsetY) + offsetY;
+        forme_fond.width = ratio * forme_fond.width;
+        forme_fond.height = ratio * forme_fond.height;
+    }
+
+    Map.generateHexMap();
+    Map.drawHexMap();
 });
 
 // === SYNCHRONISATION DE LA CARTE ===

@@ -13,24 +13,23 @@
 
     <!-- Champ pour lancer des dés personnalisés (format: XdY+Z) -->
     <input type="text" id="personnalisation" style="width: 80px;" placeholder="prompt...">
-    <hr>
 </div>
 
 <!-- === ZONE DE DIALOGUE === -->
 <!-- Table pour afficher les conversations entre joueurs -->
-<table id="table_dialogue" style="width: 100%; border: 0; margin: 0;">
+<table id="table_dialogue" style="width: 98%; border: 0; margin: 0;">
     <tr id="titre_dialogue"></tr> <!-- En-têtes des colonnes de dialogue -->
     <tr id="dialogue"></tr> <!-- Contenu des dialogues -->
 </table>
 <!-- === ZONE DE COMBAT === -->
 <!-- Interface de combat (masquée par défaut) -->
-<div id="combat" style="display: none;">
+<div id="combat" style="width: 97.8%; display: none; position: relative;">
     <!-- Barre d'outils pour la gestion de la carte -->
     <div id="div_tools" class="titre_dialogue"
-        style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
+        style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between;">
 
         <!-- Outils de terrain et formes -->
-        <div style="width: auto; display: flex; align-items: center; margin: 4px; background-color: white;">
+        <div style="display: flex; align-items: center; margin: 4px; background-color: white;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -69,11 +68,11 @@
 
     <!-- Canvas principal pour la carte hexagonale -->
     <canvas id="hexCanvas" tabindex="0"
-        style="width: 100%; height: 100%; margin: 0; border: 1px solid black; cursor: default;"></canvas>
+        style="position: absolute; width: 100%; height: auto; margin: 0; border: 1px solid black; cursor: default;"></canvas>
 
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
-        style="position: absolute; display: none; border: 0; opacity: 0.5; pointer-events: none;"></canvas>
+        style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none;"></canvas>
 </div>
 
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
@@ -208,7 +207,7 @@
     <table style="width: 1100px; margin: 0; font-size: x-large;">
         <tr>
             <td>Nom :</td>
-            <td colspan="8"><input type="text" style="width: 100%;" class="titre"></td>
+            <td colspan="8"><input type="text" style="width: 99.5%;" class="titre"></td>
         </tr>
         <tr>
             <td>Modèle :</td>
@@ -243,15 +242,18 @@
         </tr>
     </table>
     <hr>
-    <textarea class="note" rows="3" style="width: 100%; resize: vertical; font-size: x-large;"></textarea>
+    <textarea class="note" rows="3" style="width: 99.5%; resize: vertical; font-size: x-large;" placeholder="Note..."></textarea>
     <hr>
-    <table style="margin: 0; font-size: x-large;">
+    <table style="width: 1100px; margin: 0; font-size: x-large;">
         <tr>
             <td></td>
             <td>Vie</td>
             <td></td>
             <td>Armure</td>
             <td style="width: auto;"></td>
+            <td></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>
@@ -353,12 +355,11 @@
             <td><span class="titre_sortilege">Sortilège :</span>
                 <span class="titre_arme2">Arme secondaire :</span>
             </td>
-            <td rowspan="2" colspan="4" style="vertical-align: top; width: 40%;">
+            <td rowspan="2" colspan="4" style="vertical-align: top;">
                 <select class="arme2" style="font-size: x-large;">
                     <option value="">--</option>
                 </select>
                 <span class="info_secondaire"></span>
-                <span class="sortilege"></span>
             </td>
         </tr>
         <tr>
@@ -367,7 +368,6 @@
             <td>&nbsp;<span class="jambed"></span></td>
             <td style="text-align: center;"><input type="text" class="armure_jambed"></td>
             <td>&nbsp;&nbsp;</td>
-            <td>&nbsp;</td>
         </tr>
     </table>
     <div style="width: 100%; text-align: right;">

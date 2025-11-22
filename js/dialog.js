@@ -79,6 +79,20 @@ function afficher_dim_ellipse() {
 }
 
 /**
+ * Affiche les détails d'un pion de titre donné
+ * @param {string} titre - Titre du pion
+ */
+function afficher_Details_pion(titre) {
+  const p = Pions.find((x) => x.Titre === titre);
+  if (p === null || typeof p === "undefined") return;
+
+  const col = p.Position.split(",")[0];
+  const row = p.Position.split(",")[1];
+  
+  afficher_Details(col, row);
+}
+
+/**
  * Affiche les détails d'un personnage à une position donnée
  * @param {number} col - Colonne de la position
  * @param {number} row - Ligne de la position
@@ -125,17 +139,22 @@ function afficher_Details(col, row) {
     // Gestion des permissions selon le type de personnage
     if (p_selected.Is_joueur) {
       // Masquage de l'indice pour les joueurs
-      dialog_details_2.querySelector("#indice").style.visibility = "hidden";
-      indice.closest("td").style.visibility = "hidden";
+      dialog_details_2.querySelector("#indice").innerHTML = "";
+      indice.innerHTML = "";
       dialog_details_2.querySelector("#Dupliquer").disabled = true;
-    } else {
+    }
+    else {
       // Affichage de l'indice pour les PNJ
-      dialog_details_2.querySelector("#indice").style.visibility = "";
-      indice.closest("td").style.visibility = "";
+      dialog_details_2.querySelector("#indice").innerHTML = "Indice :";
+      indice.innerHTML = m_selected.Indice.toString().padStart(2, "0");
+
       // Désactivation de la duplication si ce n'est pas le MJ
-      if (document.getElementById("joueur").value != "MJ")
+      if (document.getElementById("joueur").value != "MJ") {
         dialog_details_2.querySelector("#Dupliquer").disabled = true;
-      else dialog_details_2.querySelector("#Dupliquer").disabled = false;
+      }
+      else {
+        dialog_details_2.querySelector("#Dupliquer").disabled = false;
+      }
     }
 
     // Mise à jour de l'armure calculée
@@ -196,6 +215,24 @@ function afficher_Details(col, row) {
     // Sélection de l'arme actuelle
     arme1.value = m_selected.Arme1;
 
+    // Gestion de l'affichage des titres et des informations relatives à l'arme 1 sélectionnée
+    if (arme1.value === "Lancement de sort") {
+      dialog_details_2.querySelector(".titre_arme2").style.display = "none";
+      dialog_details_2.querySelector(".arme2").closest("td").style.display = "none";
+
+      dialog_details_2.querySelector(".titre_sortilege").style.display = "";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "5";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "2";
+    }
+    else {
+      dialog_details_2.querySelector(".titre_arme2").style.display = "";
+      dialog_details_2.querySelector(".arme2").closest("td").style.display = "";
+
+      dialog_details_2.querySelector(".titre_sortilege").style.display = "none";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "1";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "1";
+    }
+
     // Déclenchement de l'événement change pour mettre à jour l'arme secondaire
     const event = new Event("change", { bubbles: true, cancelable: true });
     arme1.dispatchEvent(event);
@@ -235,8 +272,9 @@ function afficher_Details(col, row) {
       else inputs[i].style.backgroundColor = "rgb(192, 64, 64)";
     }
 
-    // Mise à jour du titre
+    // Mise à jour du titre et de la note
     titre.value = m_selected.Titre;
+    note.value = m_selected.Note;
 
     // Configuration des spans affichant les valeurs maximales
     const spans = dialog_details_2.getElementsByTagName("span");
@@ -252,7 +290,6 @@ function afficher_Details(col, row) {
 
     // Mise à jour des informations affichées
     model.innerHTML = m_selected.Model;
-    indice.innerHTML = m_selected.Indice.toString().padStart(2, "0");
     note.innerHTML = m_selected.Note;
 
     // Mise à jour de l'information affichée
@@ -260,20 +297,20 @@ function afficher_Details(col, row) {
     dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
 
     // Mise à jour du sortilège sélectionné
-    const sortilege = dialog_details_2.querySelector(".sortilege");
+    const sortilege = dialog_details_2.querySelector(".titre_sortilege");
     if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
-        m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-      sortilege.textContent = capitalizeFirstLetter(m_selected.Nom_liste) + " / " + m_selected.Nom_sort;
+      m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
+      sortilege.innerHTML = "Liste : " + capitalizeFirstLetter(m_selected.Nom_liste) + "<br>Sort : " + m_selected.Nom_sort;
     } else {
-      sortilege.textContent = "--";
+      sortilege.innerHTML = "--";
     }
 
     // Affichage du dialogue
-    dialog_details_2.style.zIndex = "100";
     dialog_details_2.style.position = "absolute";
     dialog_details_2.style.top = "50%";
     dialog_details_2.style.left = "50%";
     dialog_details_2.style.transform = "translate(-50%, -50%)";
+    dialog_details_2.style.zIndex = "100";
     dialog_details_2.show();
 
     // Ajustement de la largeur du sélecteur de type
@@ -877,35 +914,33 @@ function new_loc() {
 // Gestion des dialogues de création de formes géométriques
 
 // Validation des dimensions de carte
-dialog_dim_carte
-  .querySelector("#Valider")
-  .addEventListener("click", function (event) {
-    // Récupération des dimensions saisies
-    const w = dialog_dim_carte.querySelector(".largeur").value;
-    const h = dialog_dim_carte.querySelector(".hauteur").value;
+dialog_dim_carte.querySelector("#Valider").addEventListener("click", function (event) {
+  // Récupération des dimensions saisies
+  const w = dialog_dim_carte.querySelector(".largeur").value;
+  const h = dialog_dim_carte.querySelector(".hauteur").value;
 
-    // Calcul des dimensions hexagonales
-    hexDimensionsX = Math.round((((w - 1) / 2 / 3) * Math.sqrt(3)) / 1.5);
-    hexDimensionsY = Math.round((h - 1) / 2 / 3);
+  // Calcul des dimensions hexagonales
+  hexDimensionsX = Math.round((((w - 1) / 2 / 3) * Math.sqrt(3)) / 1.5);
+  hexDimensionsY = Math.round((h - 1) / 2 / 3);
 
-    // Création de la forme de fond si une image est définie
-    if (image_fond != null) {
-      const hexHS = hexSize * 1.5;
-      const hexVS = hexSize * Math.sqrt(3);
+  // Création de la forme de fond si une image est définie
+  if (image_fond != null) {
+    const hexHS = hexSize * 1.5;
+    const hexVS = hexSize * Math.sqrt(3);
 
-      forme_fond = new Forme("Rectangle");
-      forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
-      forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
-      forme_fond.x = offsetX - forme_fond.width / 2;
-      forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
-    }
+    forme_fond = new Forme("Rectangle");
+    forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
+    forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
+    forme_fond.x = offsetX - forme_fond.width / 2;
+    forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
+  }
 
-    // Régénération et redessin de la carte
-    Map.generateHexMap();
-    Map.drawHexMap();
+  // Régénération et redessin de la carte
+  Map.generateHexMap();
+  Map.drawHexMap();
 
-    dialog_dim_carte.close();
-  });
+  dialog_dim_carte.close();
+});
 
 // Gestion de la touche Entrée pour valider
 dialog_dim_carte.addEventListener("keydown", function (event) {
@@ -915,58 +950,50 @@ dialog_dim_carte.addEventListener("keydown", function (event) {
 });
 
 // Calcul automatique de la hauteur selon la largeur
-dialog_dim_carte
-  .querySelector(".largeur")
-  .addEventListener("input", function (event) {
-    if (image_fond === null) return;
-    dialog_dim_carte.querySelector(".hauteur").value = Math.round(
-      (event.target.value * image_fond.height) / image_fond.width
-    );
-  });
+dialog_dim_carte.querySelector(".largeur").addEventListener("input", function (event) {
+  if (image_fond === null) return;
+  dialog_dim_carte.querySelector(".hauteur").value = Math.round(
+    (event.target.value * image_fond.height) / image_fond.width
+  );
+});
 
 // Calcul automatique de la largeur selon la hauteur
-dialog_dim_carte
-  .querySelector(".hauteur")
-  .addEventListener("input", function (event) {
-    if (image_fond === null) return;
-    dialog_dim_carte.querySelector(".largeur").value = Math.round(
-      (event.target.value * image_fond.width) / image_fond.height
-    );
-  });
+dialog_dim_carte.querySelector(".hauteur").addEventListener("input", function (event) {
+  if (image_fond === null) return;
+  dialog_dim_carte.querySelector(".largeur").value = Math.round(
+    (event.target.value * image_fond.width) / image_fond.height
+  );
+});
 
 // Fermeture du dialogue de création de rectangle
-dialog_dim_rectangle
-  .querySelector("#Fermer")
-  .addEventListener("click", function (event) {
-    dialog_dim_rectangle.close();
-  });
+dialog_dim_rectangle.querySelector("#Fermer").addEventListener("click", function (event) {
+  dialog_dim_rectangle.close();
+});
 
 // Création d'un rectangle avec les dimensions spécifiées
-dialog_dim_rectangle
-  .querySelector("#Creer")
-  .addEventListener("click", function (event) {
-    // Récupération des dimensions saisies
-    const w = dialog_dim_rectangle.querySelector(".largeur").value;
-    const h = dialog_dim_rectangle.querySelector(".hauteur").value;
+dialog_dim_rectangle.querySelector("#Creer").addEventListener("click", function (event) {
+  // Récupération des dimensions saisies
+  const w = dialog_dim_rectangle.querySelector(".largeur").value;
+  const h = dialog_dim_rectangle.querySelector(".hauteur").value;
 
-    // Création de la nouvelle forme rectangle
-    Formes[Formes.length] = new Forme("Rectangle");
-    const r = Formes[Formes.length - 1];
+  // Création de la nouvelle forme rectangle
+  Formes[Formes.length] = new Forme("Rectangle");
+  const r = Formes[Formes.length - 1];
 
-    // Calcul des dimensions en pixels selon le système hexagonal
-    r.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
-    r.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
+  // Calcul des dimensions en pixels selon le système hexagonal
+  r.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
+  r.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
 
-    // Positionnement au centre du canvas
-    r.x = canvas.width / 2 - r.width / 2;
-    r.y = canvas.height / 2 - r.height / 2;
+  // Positionnement au centre du canvas
+  r.x = canvas.width / 2 - r.width / 2;
+  r.y = canvas.height / 2 - r.height / 2;
 
-    // Application de la couleur sélectionnée
-    r.color = document.getElementById("forme_color").value;
+  // Application de la couleur sélectionnée
+  r.color = document.getElementById("forme_color").value;
 
-    dialog_dim_rectangle.close();
-    Map.drawHexMap();
-  });
+  dialog_dim_rectangle.close();
+  Map.drawHexMap();
+});
 
 // Gestion de la touche Entrée pour créer le rectangle
 dialog_dim_rectangle.addEventListener("keydown", function (event) {
@@ -1077,30 +1104,35 @@ dialog_details_1
 
 // Création d'un nouveau personnage
 dialog_details_1.querySelector("#model").addEventListener("change", function (event) {
-    // Récupération des informations du dialogue
-    const model = dialog_details_1.querySelector("#model");
-    const col = dialog_details_1.querySelector("#col");
-    const row = dialog_details_1.querySelector("#row");
+  // Récupération des informations du dialogue
+  const model = dialog_details_1.querySelector("#model");
+  const col = dialog_details_1.querySelector("#col");
+  const row = dialog_details_1.querySelector("#row");
 
-    // Création du nouveau pion
-    const p = new Pion("ennemis", model.value);
+  // Création du nouveau pion
+  const p = new Pion("ennemis", model.value);
 
-    // Positionnement du pion
-    p.Position = col.value + "," + row.value;
-    Pions[Pions.length] = p;
+  // Positionnement du pion
+  p.Position = col.value + "," + row.value;
+  Pions[Pions.length] = p;
 
-    // Synchronisation avec le serveur
-    p.sendMessage("setall");
+  // Synchronisation avec le serveur
+  p.sendMessage("setall");
 
-    dialog_details_1.close();
+  dialog_details_1.close();
 
-    // Affichage des détails du personnage créé
-    afficher_Details(col.value, row.value);
+  // Affichage des détails du personnage créé
+  afficher_Details(col.value, row.value);
 
-    // Mise à jour de l'affichage
-    Map.generateHexMap();
-    Map.drawHexMap();
-  });
+  // Mise à jour de l'affichage
+  Map.generateHexMap();
+  Map.drawHexMap();
+});
+
+dialog_details_2.querySelector(".note").addEventListener("input", function (event) {
+  m_selected.Note = event.target.value;
+  sendMessage("Map_Note", m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value);
+});
 
 // Gestion des modifications des champs de personnage
 for (let i = 0; i < inputs.length; i++) {
@@ -1197,28 +1229,35 @@ function info_arme(arme) {
 }
 
 // Gestion du changement d'arme principale
-dialog_details_2.querySelector(".arme1").addEventListener("change", function (event) {
+const arme1 = dialog_details_2.querySelector(".arme1");
+arme1.addEventListener("change", function (event) { return arme1.click(); });
+arme1.addEventListener("click", function (event) {
+  // Vérifier si la souris est au-dessus du select au moment du clic
+  const rect = arme1.getBoundingClientRect();
+  const isClickInside = event.clientX >= rect.left && event.clientX <= rect.right &&
+    event.clientY >= rect.top && event.clientY <= rect.bottom;
+
+  // Attendre que la sélection soit effectuée pour lire la valeur
+  setTimeout(() => {
+    const selectedValue = arme1.value;
     const p_selected = Models.find((p) => p.Nom === m_selected.Model);
     const arme2 = dialog_details_2.querySelector(".arme2");
-    let w1 = Armes.find((x) => x.Nom === event.target.value);
+    let w1 = Armes.find((x) => x.Nom === selectedValue);
     let nouvelleOption = null;
 
-    console.log("Arme1", event.target.value);
-
     // Ouvrir la modale de magie si "Lancement de sort" est sélectionné
-    if (event.target.value === "Lancement de sort") {
+    if (selectedValue === "Lancement de sort") {
       dialog_details_2.querySelector(".titre_arme2").style.display = "none";
-      dialog_details_2.querySelector(".arme2").style.display = "none";
-      dialog_details_2.querySelector(".info_secondaire").style.display = "none";
+      dialog_details_2.querySelector(".arme2").closest("td").style.display = "none";
 
       dialog_details_2.querySelector(".titre_sortilege").style.display = "";
-      dialog_details_2.querySelector(".titre_sortilege").textContent = "Sortilège :";
-      dialog_details_2.querySelector(".sortilege").style.display = "";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "5";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "2";
 
-      if (event.target.value !== m_selected.Arme1) {
+      if (!isClickInside) {
         document.getElementById("modal").style.display = "flex";
         dialog_details_2.style.zIndex = 0;
-  
+
         const joueurSelectionne = dialog_details_2.querySelector(".model").textContent;
         SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach((x) => {
           const element = document.getElementById(getShortName(x.Nom_liste));
@@ -1229,19 +1268,15 @@ dialog_details_2.querySelector(".arme1").addEventListener("change", function (ev
     }
     else {
       dialog_details_2.querySelector(".titre_arme2").style.display = "";
-      dialog_details_2.querySelector(".titre_arme2").textContent = "Arme secondaire :";
+      dialog_details_2.querySelector(".arme2").closest("td").style.display = "";
 
-      console.log("Titre arme2", dialog_details_2.querySelector(".titre_arme2").textContent);
-
-      dialog_details_2.querySelector(".arme2").style.display = "";
-      dialog_details_2.querySelector(".info_secondaire").style.display = "";
-  
       dialog_details_2.querySelector(".titre_sortilege").style.display = "none";
-      dialog_details_2.querySelector(".sortilege").style.display = "none";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "1";
+      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "1";
     }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
-    if ((event.target.value === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
+    if ((selectedValue === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
       // Nettoyage et ajout d'une option vide
       while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
       nouvelleOption = document.createElement("option");
@@ -1282,7 +1317,7 @@ dialog_details_2.querySelector(".arme1").addEventListener("change", function (ev
         nouvelleOption.textContent = p_selected.Arme_3;
         arme2.appendChild(nouvelleOption);
       }
-      if (event.target.value !== "Bouclier") {
+      if (selectedValue !== "Bouclier") {
         nouvelleOption = document.createElement("option");
         nouvelleOption.value = "Bouclier";
         nouvelleOption.textContent = "Bouclier";
@@ -1298,7 +1333,7 @@ dialog_details_2.querySelector(".arme1").addEventListener("change", function (ev
     }
 
     // Mise à jour de l'arme principale
-    m_selected.Arme1 = event.target.value;
+    m_selected.Arme1 = selectedValue;
 
     // Mise à jour de l'information affichée
     dialog_details_2.querySelector(".info_principale").textContent =
@@ -1315,49 +1350,49 @@ dialog_details_2.querySelector(".arme1").addEventListener("change", function (ev
     }
 
     // Ajustement de la largeur des sélecteurs
-    const arme1 = event.target;
     arme1.style.width = "auto";
     arme2.style.width = "auto";
     const width = Math.max(arme1.offsetWidth, arme2.offsetWidth);
     arme1.style.width = width + "px";
     arme2.style.width = width + "px";
-  });
+  }, 0);
+});
 
 // Gestion du changement d'arme secondaire
 dialog_details_2.querySelector(".arme2").addEventListener("change", function (event) {
-    m_selected.Arme2 = event.target.value;
+  m_selected.Arme2 = event.target.value;
 
-    // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent =
-      "(" + info_arme(1) + ")";
-    dialog_details_2.querySelector(".info_secondaire").textContent =
-      "(" + info_arme(2) + ")";
-  });
+  // Mise à jour de l'information affichée
+  dialog_details_2.querySelector(".info_principale").textContent =
+    "(" + info_arme(1) + ")";
+  dialog_details_2.querySelector(".info_secondaire").textContent =
+    "(" + info_arme(2) + ")";
+});
 
 // Gestion du changement de contrôleur
 dialog_details_2.querySelector(".control").addEventListener("change", function (event) {
-    m_selected.Control = event.target.value;
-  });
+  m_selected.Control = event.target.value;
+});
 
 // Gestion du changement de type (allié/ennemi)
 dialog_details_2.querySelector(".type").addEventListener("change", function (event) {
-    m_selected.Type = event.target.value;
+  m_selected.Type = event.target.value;
 
-    // Couleur selon le type
-    if (event.target.value === "allies")
-      event.target.style.backgroundColor = "rgb(192, 255, 192)";
-    else event.target.style.backgroundColor = "rgb(255, 192, 192)";
+  // Couleur selon le type
+  if (event.target.value === "allies")
+    event.target.style.backgroundColor = "rgb(192, 255, 192)";
+  else event.target.style.backgroundColor = "rgb(255, 192, 192)";
 
-    // Mise à jour de l'affichage
-    Map.generateHexMap();
-    Map.drawHexMap();
+  // Mise à jour de l'affichage
+  Map.generateHexMap();
+  Map.drawHexMap();
 
-    // Synchronisation avec le serveur
-    sendMessage(
-      "Map_Type",
-      m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value
-    );
-  });
+  // Synchronisation avec le serveur
+  sendMessage(
+    "Map_Type",
+    m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value
+  );
+});
 
 // Empêche le menu contextuel sur le dialogue de détails
 dialog_details_2.addEventListener("contextmenu", function (event) {
@@ -1366,16 +1401,16 @@ dialog_details_2.addEventListener("contextmenu", function (event) {
 
 // Fermeture du dialogue de détails
 dialog_details_2.querySelector("#Fermer").addEventListener("click", function (event) {
-    // Synchronisation finale avec le serveur
-    m_selected.sendMessage("setall");
+  // Synchronisation finale avec le serveur
+  m_selected.sendMessage("setall");
 
-    dialog_details_2.close();
-  });
+  dialog_details_2.close();
+});
 
 // Duplication du personnage
 dialog_details_2.querySelector("#Dupliquer").addEventListener("click", function (event) {
-    m_selected.dupliquer();
-  });
+  m_selected.dupliquer();
+});
 
 // === ÉVÉNEMENTS D'ATTAQUE ===
 // Gestion des interactions avec les dialogues d'attaque
