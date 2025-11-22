@@ -160,7 +160,7 @@ document.addEventListener("contextmenu", function (event) {
     event.preventDefault();    
     event.stopPropagation();
     stopContextMenu = false;
->>>>>>> e840b019db3220a670b03dbfda77a5a937e1003d
+
     return false;
   }
 });
