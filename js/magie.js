@@ -160,6 +160,7 @@ document.addEventListener("contextmenu", function (event) {
     event.preventDefault();    
     event.stopPropagation();
     stopContextMenu = false;
+>>>>>>> e840b019db3220a670b03dbfda77a5a937e1003d
     return false;
   }
 });
@@ -320,33 +321,86 @@ function createListeModal(Nom_liste) {
   const spellInfo = document.createElement("div");
   spellInfo.id = "spell-info";
   spellInfo.className = "spell-info";
-  spellInfo.innerHTML = `
-    <span class="close">&times;</span>
-    <h3><span id="spell-name"></span> (niv <span id="spell-level"></span>)</h3>
-    <table>
-      <tr>
-        <td><strong>Portée :</strong></td>
-        <td><span id="spell-portee"></span></td>
-      </tr>
-      <tr>
-        <td><strong>Incantation :</strong></td>
-        <td><span id="spell-incantation"></span></td>
-      </tr>
-      <tr>
-        <td><strong>Durée :</strong></td>
-        <td><span id="spell-duree"></span></td>
-      </tr>
-      <tr>
-        <td><strong>Sauvegarde :</strong></td>
-        <td><span id="spell-sauvegarde"></span></td>
-      </tr>
-      <tr>
-        <td><strong>Zone :</strong></td>
-        <td><span id="spell-zone"></span></td>
-      </tr>
-    </table>
-    <p id="spell-description" style="text-align: justify;"></p>
-  `;
+  const spanClose = document.createElement("span");
+  spanClose.className = "close";
+  spanClose.innerHTML = "&times;";
+  spellInfo.appendChild(spanClose);
+  const h3 = document.createElement("h3");
+  h3_span1 = document.createElement("span");
+  h3_span1.id = "spell-name";
+  h3_span2 = document.createElement("span");
+  h3_span2.id = "spell-level";
+  h3.appendChild(h3_span1);
+  h3.appendChild(document.createTextNode(" (niv "));
+  h3.appendChild(h3_span2);
+  h3.appendChild(document.createTextNode(")"));
+  spellInfo.appendChild(h3);
+  const table = document.createElement("table");
+
+  // Ligne 1 : Portée
+  const tr1 = document.createElement("tr");
+  const td1_label = document.createElement("td");
+  td1_label.innerHTML = "<strong>Portée :</strong>";
+  tr1.appendChild(td1_label);
+  const td1_value = document.createElement("td");
+  td_span_portee = document.createElement("span");
+  td_span_portee.id = "spell-portee";
+  td1_value.appendChild(td_span_portee);
+  tr1.appendChild(td1_value);
+  table.appendChild(tr1);
+
+  // Ligne 2 : Incantation
+  const tr2 = document.createElement("tr");
+  const td2_label = document.createElement("td");
+  td2_label.innerHTML = "<strong>Incantation :</strong>";
+  tr2.appendChild(td2_label);
+  const td2_value = document.createElement("td");
+  td_span_incantation = document.createElement("span");
+  td_span_incantation.id = "spell-incantation";
+  td2_value.appendChild(td_span_incantation);
+  tr2.appendChild(td2_value);
+  table.appendChild(tr2);
+
+  // Ligne 3 : Durée
+  const tr3 = document.createElement("tr");
+  const td3_label = document.createElement("td");
+  td3_label.innerHTML = "<strong>Durée :</strong>";
+  tr3.appendChild(td3_label);
+  const td3_value = document.createElement("td");
+  td_span_duree = document.createElement("span");
+  td_span_duree.id = "spell-duree";
+  td3_value.appendChild(td_span_duree);
+  tr3.appendChild(td3_value);
+  table.appendChild(tr3);
+
+  // Ligne 4 : Sauvegarde
+  const tr4 = document.createElement("tr");
+  const td4_label = document.createElement("td");
+  td4_label.innerHTML = "<strong>Sauvegarde :</strong>";
+  tr4.appendChild(td4_label);
+  const td4_value = document.createElement("td");
+  td_span_sauvegarde = document.createElement("span");
+  td_span_sauvegarde.id = "spell-sauvegarde";
+  td4_value.appendChild(td_span_sauvegarde);
+  tr4.appendChild(td4_value);
+  table.appendChild(tr4);
+
+  // Ligne 5 : Zone
+  const tr5 = document.createElement("tr");
+  const td5_label = document.createElement("td");
+  td5_label.innerHTML = "<strong>Zone :</strong>";
+  tr5.appendChild(td5_label);
+  const td5_value = document.createElement("td");
+  td_span_zone = document.createElement("span");
+  td_span_zone.id = "spell-zone";
+  td5_value.appendChild(td_span_zone);
+  tr5.appendChild(td5_value);
+  table.appendChild(tr5);
+  const p = document.createElement("p");
+  p.id = "spell-description";
+  p.style.textAlign = "justify";
+  spellInfo.appendChild(table);
+  spellInfo.appendChild(p);
 
   const spellInfoClose = spellInfo.querySelector(".close");
   if (spellInfoClose) {
@@ -476,7 +530,7 @@ function createListeModal(Nom_liste) {
       }
     }
   });
- 
+
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
       // Si Ctrl est pressé, ne pas ouvrir les informations du sort
