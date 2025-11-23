@@ -182,9 +182,7 @@ function createListeModal(Nom_liste) {
   const sortsListe = Sorts.filter((sort) => sort.Nom_liste === Nom_liste);
 
   // Filtrer les connecteurs pour cette liste
-  const connecteursListe = Connecteurs.filter(
-    (conn) => conn.Nom_liste === Nom_liste
-  );
+  const connecteursListe = Connecteurs.filter((conn) => conn.Nom_liste === Nom_liste);
 
   // Créer la modale
   const modal = document.createElement("div");
