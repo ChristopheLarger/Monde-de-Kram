@@ -5,6 +5,10 @@
  * Contient tous les styles pour l'interface utilisateur, les dialogues, et les éléments visuels
  */
 
+ /* td {
+    border: 1px solid red;
+ } */
+
 /* === STYLES DE BASE === */
 /* Configuration générale de la page */
 html,

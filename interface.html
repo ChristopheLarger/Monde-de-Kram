@@ -2,7 +2,7 @@
 <!-- Barre de contrôle en haut de l'écran -->
 <div id="div_cartouche" style="margin: 0;">
     <!-- Sélection du personnage/joueur -->
-    <label for="joueur">Perso :</label>
+    <label for="joueur">Perso :&nbsp;</label>
     <select id="joueur">
         <option value="">--</option>
         <option value="MJ">Maitre du Jeu</option>
@@ -33,35 +33,35 @@
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="arbre" src="images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="eau" src="images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;&nbsp;&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
 
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
-            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">&nbsp;&nbsp;
+            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;"> 
             <img id="rectangle" src="images/Rectangle.png" onclick="Forme.setFormeMode('rectangle');" alt="Rectangle"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="ellipse" src="images/Ellipse.png" onclick="Forme.setFormeMode('ellipse');" alt="Ellipse"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="mur" src="images/Mur.png" onclick="Forme.setFormeMode('mur');" alt="Mur"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Scission"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
             <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Gomme"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+                style="width: 30px; height: 30px; cursor: pointer;"> 
         </div>
 
         <!-- Outils de gestion de carte -->
         <div>
             <form id="upload_fond" enctype="multipart/form-data">
                 <label for="img_fond" id="fond">Fond de carte</label>
-                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">&nbsp;&nbsp;&nbsp;
-                <button id="synchroniser">Synchroniser</button>&nbsp;&nbsp;
+                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;"> 
+                <button id="synchroniser">Synchroniser</button> 
             </form>
         </div>
     </div>
@@ -80,13 +80,13 @@
 <dialog id="dialog_dim_carte">
     <table style="margin: 0; font-size: x-large;">
         <tr>
-            <td>Largeur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Largeur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
-            <td>Hauteur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Hauteur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
@@ -109,16 +109,20 @@
 <dialog id="dialog_dim_rectangle">
     <table style="margin: 0; font-size: x-large;">
         <tr>
-            <td>Largeur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Largeur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
-            <td>Hauteur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Hauteur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
         </tr>
-        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <hr>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
@@ -135,16 +139,20 @@
 <dialog id="dialog_dim_mur">
     <table style="margin: 0; font-size: x-large;">
         <tr>
-            <td>Largeur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Largeur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
-            <td>Hauteur (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Hauteur (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;" value="0.5"></td>
         </tr>
-        <tr><td colspan="3"><hr></td></tr>
+        <tr>
+            <td colspan="3">
+                <hr>
+            </td>
+        </tr>
         <tr>
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
@@ -161,13 +169,13 @@
 <dialog id="dialog_dim_ellipse">
     <table style="margin: 0; font-size: x-large;">
         <tr>
-            <td>Grand axe (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Grand axe (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="grand_axe" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
-            <td>Petit axe (en m) :</td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Petit axe (en m) :&nbsp;</td>
+            <td> </td>
             <td><input type="text" class="petit_axe" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
@@ -189,7 +197,7 @@
 <!-- === DIALOGUE DE SÉLECTION DE MODÈLE === -->
 <!-- Fenêtre pour choisir le modèle de personnage à placer sur la carte -->
 <dialog id="dialog_details_1">
-    <span style="font-size: x-large;">Modèle :</span>
+    <span style="font-size: x-large;">Modèle :&nbsp;</span>
     <select id="model" style="font-size: x-large;">
         <option value="">--</option>
     </select>
@@ -204,53 +212,72 @@
 <!-- === DIALOGUE DE DÉTAILS DE PERSONNAGE === -->
 <!-- Fenêtre complète pour modifier les propriétés d'un personnage -->
 <dialog id="dialog_details_2">
-    <table style="width: 1100px; margin: 0; font-size: x-large;">
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+        </colgroup>
         <tr>
-            <td>Nom :</td>
-            <td colspan="8"><input type="text" style="width: 99.5%;" class="titre"></td>
+            <td>Nom :&nbsp;</td>
+            <td colspan="12"><input type="text" style="width: 99.5%;" class="titre"></td>
         </tr>
         <tr>
-            <td>Modèle :</td>
-            <td><span class="model"></span></td>
-            <td>&nbsp;</td>
-            <td>Type :</td>
+            <td>Modèle :&nbsp;</td>
+            <td><span class="model"></span><span class="indice"></span></td>
+            <td> </td>
+            <td>Allié :&nbsp;</td>
             <td>
-                <select class="type" style="font-size: x-large;">
-                    <option value="allies">Allié</option>
-                    <option value="ennemis">Ennemi</option>
-                </select>
+                <label class="switch">
+                    <input type="checkbox" class="type">
+                    <span class="slider"></span>
+                </label>
             </td>
-            <td>&nbsp;</td>
-            <td>Fatigue :</td>
-            <td><input type="text" class="fatigue"></td>
+            <td> </td>
+            <td>Fatigue: </td>
+            <td><input type="text" class="fatigue" style="text-align: center;"></td>
             <td><span class="fatigue"></span></td>
-        </tr>
-        <tr>
-            <td id="indice">Indice :</td>
-            <td><span class="indice"></span></td>
-            <td>&nbsp;</td>
-            <td>Contrôle :</td>
-            <td>
-                <select class="control" style="font-size: x-large;">
-                    <option value="">--</option>
-                </select>
-            </td>
-            <td>&nbsp;</td>
-            <td>Concentration :</td>
-            <td><input type="text" class="concentration"></td>
+            <td> </td>
+            <td>Concentration :&nbsp;</td>
+            <td><input type="text" class="concentration" style="text-align: center;"></td>
             <td><span class="concentration"></span></td>
         </tr>
     </table>
     <hr>
-    <textarea class="note" rows="3" style="width: 99.5%; resize: vertical; font-size: x-large;" placeholder="Note..."></textarea>
+    <textarea class="note" rows="3" style="width: 99.5%; resize: vertical; font-size: x-large;"
+        placeholder="Note..."></textarea>
     <hr>
-    <table style="width: 1100px; margin: 0; font-size: x-large;">
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+        </colgroup>
         <tr>
             <td></td>
             <td>Vie</td>
             <td></td>
             <td>Armure</td>
-            <td style="width: auto;"></td>
+            <td></td>
+            <td></td>
             <td></td>
             <td></td>
             <td></td>
@@ -258,15 +285,15 @@
             <td></td>
         </tr>
         <tr>
-            <td>Général :</td>
-            <td><input type="text" class="pdv"></td>
-            <td>&nbsp;<span class="pdv"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure" disabled></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Bonus Feinte de corps :</td>
-            <td><input type="text" class="b_fdc"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Gestion automatique :</td>
+            <td>Général :&nbsp;</td>
+            <td><input type="text" class="pdv" style="text-align: center;"></td>
+            <td><span class="pdv"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure" style="text-align: center;" disabled></td>
+            <td></td>
+            <td colspan="2">Bonus Feinte de corps :&nbsp;</td>
+            <td><input type="text" class="b_fdc" style="text-align: center;">&nbsp;</td>
+            <td></td>
+            <td>Gestion automatique :&nbsp;</td>
             <td>
                 <label class="switch">
                     <input type="checkbox" class="auto">
@@ -275,15 +302,15 @@
             </td>
         </tr>
         <tr>
-            <td>Tête :</td>
-            <td><input type="text" class="tete"></td>
-            <td>&nbsp;<span class="tete"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_tete"></td>
+            <td>Tête :&nbsp;</td>
+            <td><input type="text" class="tete" style="text-align: center;"></td>
+            <td> <span class="tete"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_tete" style="text-align: center;"></td>
             <td></td>
-            <td>Bonus Initiative :</td>
-            <td><input type="text" class="b_ini"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Pratique la magie :</td>
+            <td colspan="2">Bonus Initiative :&nbsp;</td>
+            <td><input type="text" class="b_ini" style="text-align: center;">&nbsp;</td>
+            <td> </td>
+            <td>Pratique la magie :&nbsp;</td>
             <td>
                 <label class="switch">
                     <input type="checkbox" class="mage">
@@ -292,15 +319,15 @@
             </td>
         </tr>
         <tr>
-            <td>Bras Gauche :</td>
-            <td><input type="text" class="brasg"></td>
-            <td>&nbsp;<span class="brasg"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_brasg"></td>
+            <td>Bras Gauche :&nbsp;</td>
+            <td><input type="text" class="brasg" style="text-align: center;"></td>
+            <td> <span class="brasg"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasg" style="text-align: center;"></td>
             <td></td>
-            <td>Bonus Attaque :</td>
-            <td><input type="text" class="b_att"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Combattant à distance :</td>
+            <td colspan="2">Bonus Attaque :&nbsp;</td>
+            <td><input type="text" class="b_att" style="text-align: center;">&nbsp;</td>
+            <td> </td>
+            <td>Combattant à distance :&nbsp;</td>
             <td>
                 <label class="switch">
                     <input type="checkbox" class="dist">
@@ -309,15 +336,15 @@
             </td>
         </tr>
         <tr>
-            <td>Bras Droit :</td>
-            <td><input type="text" class="brasd"></td>
-            <td>&nbsp;<span class="brasd"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_brasd"></td>
+            <td>Bras Droit :&nbsp;</td>
+            <td><input type="text" class="brasd" style="text-align: center;"></td>
+            <td> <span class="brasd"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasd" style="text-align: center;"></td>
             <td></td>
-            <td>Bonus Dommage :</td>
-            <td><input type="text" class="b_dom"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Combattant corps-à-corps :</td>
+            <td colspan="2">Bonus Dommage :&nbsp;</td>
+            <td><input type="text" class="b_dom" style="text-align: center;">&nbsp;</td>
+            <td> </td>
+            <td>Combattant corps-à-corps :&nbsp;</td>
             <td>
                 <label class="switch">
                     <input type="checkbox" class="cac">
@@ -326,19 +353,19 @@
             </td>
         </tr>
         <tr>
-            <td>Poitrine :</td>
-            <td><input type="text" class="poitrine"></td>
-            <td>&nbsp;<span class="poitrine"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_poitrine"></td>
-            <td colspan="6"></td>
+            <td>Poitrine :&nbsp;</td>
+            <td><input type="text" class="poitrine" style="text-align: center;"></td>
+            <td> <span class="poitrine"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_poitrine" style="text-align: center;"></td>
+            <td colspan="7"></td>
         </tr>
         <tr>
-            <td>Abdomen :</td>
-            <td><input type="text" class="abdomen"></td>
-            <td>&nbsp;<span class="abdomen"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_abdomen"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td>Arme principale :</td>
+            <td>Abdomen :&nbsp;</td>
+            <td><input type="text" class="abdomen" style="text-align: center;"></td>
+            <td> <span class="abdomen"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_abdomen" style="text-align: center;"></td>
+            <td> </td>
+            <td colspan="2">Arme principale :&nbsp;</td>
             <td colspan="4">
                 <select class="arme1" style="font-size: x-large;">
                     <option value="Lancement de sort">Lancement de sort</option>
@@ -347,27 +374,31 @@
                 <span class="info_principale"></span>
         </tr>
         <tr>
-            <td>Jambe Gauche :</td>
-            <td><input type="text" class="jambeg"></td>
-            <td>&nbsp;<span class="jambeg"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_jambeg"></td>
-            <td>&nbsp;&nbsp;</td>
-            <td><span class="titre_sortilege">Sortilège :</span>
-                <span class="titre_arme2">Arme secondaire :</span>
+            <td>Jambe Gauche :&nbsp;</td>
+            <td><input type="text" class="jambeg" style="text-align: center;"></td>
+            <td> <span class="jambeg"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambeg" style="text-align: center;"></td>
+            <td> </td>
+            <td>
+                <span class="titre_liste">Liste :&nbsp;</span>
+                <span class="titre_arme2">Arme secondaire :&nbsp;</span>
             </td>
-            <td rowspan="2" colspan="4" style="vertical-align: top;">
+            <td colspan="5">
                 <select class="arme2" style="font-size: x-large;">
                     <option value="">--</option>
                 </select>
                 <span class="info_secondaire"></span>
+                <span class="liste"></span>
             </td>
         </tr>
         <tr>
-            <td>Jambe Droite :</td>
-            <td><input type="text" class="jambed"></td>
-            <td>&nbsp;<span class="jambed"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_jambed"></td>
-            <td>&nbsp;&nbsp;</td>
+            <td>Jambe Droite :&nbsp;</td>
+            <td><input type="text" class="jambed" style="text-align: center;"></td>
+            <td> <span class="jambed"></span></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambed" style="text-align: center;"></td>
+            <td> </td>
+            <td><span class="titre_sort">Sort :&nbsp;</span></td>
+            <td colspan="5"><span class="sort"></span></td>
         </tr>
     </table>
     <div style="width: 100%; text-align: right;">
@@ -384,7 +415,7 @@
     <table>
         <tr>
             <td rowspan="3">
-                <p style="font-size: x-large; text-align: center;">Arme à utiliser&nbsp;&nbsp;</p>
+                <p style="font-size: x-large; text-align: center;">Arme à utiliser </p>
             </td>
             <td>
                 <input type="radio" name="arme" value="1" class="arme_radio1">
@@ -423,17 +454,17 @@
 
         <tr>
             <td colspan="2" style="text-align: left;">
-                <span style="font-size: x-large;">Jet de dés :</span>
+                <span style="font-size: x-large;">Jet de dés :&nbsp;</span>
                 <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
             <td colspan="2" style="text-align: left;">
-                <span style="font-size: x-large;">Feinte de corps :</span>
+                <span style="font-size: x-large;">Feinte de corps :&nbsp;</span>
                 <input type="text" class="fdc_def" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
             <td colspan="2" style="text-align: right;">
-                <span style="font-size: x-large;">Score d'attaque :</span>
+                <span style="font-size: x-large;">Score d'attaque :&nbsp;</span>
                 <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
@@ -445,7 +476,7 @@
         </tr>
         <tr style="height: 30px;">
             <td colspan="2">
-                <span style="font-size: x-large;">Malus à la feinte de corps :</span>
+                <span style="font-size: x-large;">Malus à la feinte de corps :&nbsp;</span>
             </td>
             <td colspan="2">
                 <input type="checkbox" class="surprise_totale">
@@ -458,7 +489,7 @@
         </tr>
         <tr style="height: 30px;">
             <td colspan="2" rowspan="2">
-                <span style="font-size: x-large;">Variation MJ :</span>
+                <span style="font-size: x-large;">Variation MJ :&nbsp;</span>
                 <input type="text" class="var_mj" style="font-size: x-large; width: 35px; text-align: center;">
             </td>
             <td colspan="2">
@@ -487,7 +518,7 @@
         </tr>
         <tr style="height: 30px;">
             <td colspan="2">
-                <span style="font-size: x-large;">Ciblage des zones :</span>
+                <span style="font-size: x-large;">Ciblage des zones :&nbsp;</span>
             </td>
             <td colspan="2" style="text-align: center;">
                 <input type="checkbox" class="tete">
@@ -555,12 +586,12 @@
         </colgroup>
         <tr>
             <td style="text-align: left;">
-                <span style="font-size: x-large;">Jet de dés :</span>
+                <span style="font-size: x-large;">Jet de dés :&nbsp;</span>
                 <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
             <td style="text-align: right;">
-                <span style="font-size: x-large;">Score d'attaque :</span>
+                <span style="font-size: x-large;">Score d'attaque :&nbsp;</span>
                 <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
@@ -572,7 +603,7 @@
         </tr>
         <tr>
             <td rowspan="7" style="text-align: left;">
-                <span style="font-size: x-large;">Localisation :</span>
+                <span style="font-size: x-large;">Localisation :&nbsp;</span>
             </td>
             <td style="display: none;">
                 <input type="radio" name="loc" value="tête" class="tete_rd">
@@ -640,7 +671,7 @@
     <table>
         <tr>
             <td rowspan="4">
-                <p style="font-size: x-large; text-align: center;">Défense&nbsp;&nbsp;</p>
+                <p style="font-size: x-large; text-align: center;">Défense </p>
             </td>
             <td>
                 <input type="radio" name="defense" value="pr1" class="arme_radio1">
@@ -676,19 +707,19 @@
     <table style="width: 100%; border-collapse: collapse;">
         <tr>
             <td rowspan="2" style="text-align: left;">
-                <span style="font-size: x-large;">&nbsp;&nbsp;Jet de dés :</span>
+                <span style="font-size: x-large;"> Jet de dés :&nbsp;</span>
                 <input type="text" class="jet_des" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
             <td style="text-align: right;">
-                <span style="font-size: x-large;">Score d'attaque :</span>
+                <span style="font-size: x-large;">Score d'attaque :&nbsp;</span>
                 <input type="text" class="scr_att" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>
         </tr>
         <tr>
             <td style="text-align: right;">
-                <span style="font-size: x-large;">Score de défense :</span>
+                <span style="font-size: x-large;">Score de défense :&nbsp;</span>
                 <input type="text" class="scr_def" style="font-size: x-large; width: 35px; text-align: center;"
                     disabled>
             </td>

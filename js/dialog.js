@@ -88,8 +88,42 @@ function afficher_Details_pion(titre) {
 
   const col = p.Position.split(",")[0];
   const row = p.Position.split(",")[1];
-  
+
   afficher_Details(col, row);
+}
+
+/**
+ * Affiche les détails selon la sélection de l'arme1.
+ */
+function afficher_Details_arme1() {
+  const arme1 = dialog_details_2.querySelector(".arme1");
+  // Gestion de l'affichage des titres et des informations relatives à l'arme 1 sélectionnée
+  if (arme1.value === "Lancement de sort") {
+    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "1";
+    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "5";
+
+    dialog_details_2.querySelector(".titre_arme2").style.display = "none";
+    dialog_details_2.querySelector(".arme2").style.display = "none";
+    dialog_details_2.querySelector(".info_secondaire").style.display = "none";
+
+    dialog_details_2.querySelector(".titre_liste").style.display = "";
+    dialog_details_2.querySelector(".liste").style.display = "";
+    dialog_details_2.querySelector(".titre_sort").style.display = "";
+    dialog_details_2.querySelector(".sort").style.display = "";
+  }
+  else {
+    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "2";
+    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "4";
+
+    dialog_details_2.querySelector(".titre_arme2").style.display = "";
+    dialog_details_2.querySelector(".arme2").style.display = "";
+    dialog_details_2.querySelector(".info_secondaire").style.display = "";
+
+    dialog_details_2.querySelector(".titre_liste").style.display = "none";
+    dialog_details_2.querySelector(".liste").style.display = "none";
+    dialog_details_2.querySelector(".titre_sort").style.display = "none";
+    dialog_details_2.querySelector(".sort").style.display = "none";
+  }
 }
 
 /**
@@ -130,63 +164,24 @@ function afficher_Details(col, row) {
 
     dialog_details_1.showModal();
   } else {
-    const indice = dialog_details_2.querySelector(".indice");
     const model = dialog_details_2.querySelector(".model");
     const titre = dialog_details_2.querySelector(".titre");
     const note = dialog_details_2.querySelector(".note");
     const p_selected = Models.find((p) => p.Nom === m_selected.Model);
 
     // Gestion des permissions selon le type de personnage
-    if (p_selected.Is_joueur) {
-      // Masquage de l'indice pour les joueurs
-      dialog_details_2.querySelector("#indice").innerHTML = "";
-      indice.innerHTML = "";
+    if (p_selected.Is_joueur || document.getElementById("joueur").value != "MJ") {
       dialog_details_2.querySelector("#Dupliquer").disabled = true;
     }
     else {
-      // Affichage de l'indice pour les PNJ
-      dialog_details_2.querySelector("#indice").innerHTML = "Indice :";
-      indice.innerHTML = m_selected.Indice.toString().padStart(2, "0");
-
-      // Désactivation de la duplication si ce n'est pas le MJ
-      if (document.getElementById("joueur").value != "MJ") {
-        dialog_details_2.querySelector("#Dupliquer").disabled = true;
-      }
-      else {
-        dialog_details_2.querySelector("#Dupliquer").disabled = false;
-      }
+      dialog_details_2.querySelector("#Dupliquer").disabled = false;
     }
 
     // Mise à jour de l'armure calculée
     dialog_details_2.querySelector(".armure").value = m_selected.armure_generale();
 
-    // Configuration du sélecteur de contrôleur
-    const control = dialog_details_2.querySelector(".control");
-
-    // Nettoyage des options existantes
-    while (control.options.length > 1) control.removeChild(control.lastChild);
-
-    // Ajout des modèles de joueurs comme options de contrôle
-    for (let i = 0; i < Models.length; i++) {
-      if (Models[i].Is_joueur) {
-        let nouvelleOption = document.createElement("option");
-        nouvelleOption.value = Models[i].Nom;
-        nouvelleOption.textContent = Models[i].Nom;
-        control.appendChild(nouvelleOption);
-      }
-    }
-    control.value = m_selected.Control;
-
     // Configuration du type (allié/ennemi)
-    const type = dialog_details_2.querySelector(".type");
-    type.value = m_selected.Type;
-
-    // Couleur selon le type
-    if (type.value === "allies") {
-      type.style.backgroundColor = "rgb(192, 255, 192)"; // Vert pour alliés
-    } else {
-      type.style.backgroundColor = "rgb(255, 192, 192)"; // Rouge pour ennemis
-    }
+    dialog_details_2.querySelector(".type").checked = (m_selected.Type === "allies");
 
     // Configuration du sélecteur d'arme principale
     const arme1 = dialog_details_2.querySelector(".arme1");
@@ -216,22 +211,7 @@ function afficher_Details(col, row) {
     arme1.value = m_selected.Arme1;
 
     // Gestion de l'affichage des titres et des informations relatives à l'arme 1 sélectionnée
-    if (arme1.value === "Lancement de sort") {
-      dialog_details_2.querySelector(".titre_arme2").style.display = "none";
-      dialog_details_2.querySelector(".arme2").closest("td").style.display = "none";
-
-      dialog_details_2.querySelector(".titre_sortilege").style.display = "";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "5";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "2";
-    }
-    else {
-      dialog_details_2.querySelector(".titre_arme2").style.display = "";
-      dialog_details_2.querySelector(".arme2").closest("td").style.display = "";
-
-      dialog_details_2.querySelector(".titre_sortilege").style.display = "none";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "1";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "1";
-    }
+    afficher_Details_arme1();
 
     // Déclenchement de l'événement change pour mettre à jour l'arme secondaire
     const event = new Event("change", { bubbles: true, cancelable: true });
@@ -252,8 +232,10 @@ function afficher_Details(col, row) {
       inputs[i].style.fontSize = "x-large";
       inputs[i].style.backgroundColor = "";
 
-      // Gestion spéciale pour le champ Titre
-      if (["Titre"].includes(field)) continue;
+      // Gestion spéciale pour les champs Titre et Type
+      if (["Titre", "Type"].includes(field)) continue;
+
+      // Largeur par défaut des inputs
       inputs[i].style.width = "35px";
 
       // Gestion des cases à cocher
@@ -282,27 +264,42 @@ function afficher_Details(col, row) {
       const field =
         spans[i].className.charAt(0).toUpperCase() +
         spans[i].className.slice(1).toLowerCase();
-      if (["Model", "Indice", "Slider", "Titre_arme2", "Titre_sortilege"].includes(field)) continue;
+      if (["Model", "Slider", "Titre_arme2", "Titre_liste", "Titre_sort"].includes(field)) continue;
+
       let value = p_selected[field];
-      if (isNaN(value)) value = 0;
-      spans[i].innerHTML = " / " + value;
+      if (["Indice"].includes(field)) {
+        if (m_selected.Indice === 0) {
+          spans[i].innerHTML = "";
+        }
+        else {
+          spans[i].innerHTML = "&nbsp;(" + m_selected["Indice"].toString().padStart(2, "0") + ")";
+        }
+      }
+      else {
+        if (isNaN(value)) value = 0;
+        spans[i].innerHTML = "&nbsp;/&nbsp;" + value;
+      }
     }
 
     // Mise à jour des informations affichées
     model.innerHTML = m_selected.Model;
     note.innerHTML = m_selected.Note;
 
+    // Mise à jour de la carte
+    Map.drawHexMap();
+
     // Mise à jour de l'information affichée
     dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
     dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
 
     // Mise à jour du sortilège sélectionné
-    const sortilege = dialog_details_2.querySelector(".titre_sortilege");
     if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
       m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-      sortilege.innerHTML = "Liste : " + capitalizeFirstLetter(m_selected.Nom_liste) + "<br>Sort : " + m_selected.Nom_sort;
+      dialog_details_2.querySelector(".liste").innerHTML = capitalizeFirstLetter(m_selected.Nom_liste);
+      dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
     } else {
-      sortilege.innerHTML = "--";
+      dialog_details_2.querySelector(".liste").innerHTML = "--";
+      dialog_details_2.querySelector(".sort").innerHTML = "";
     }
 
     // Affichage du dialogue
@@ -312,9 +309,6 @@ function afficher_Details(col, row) {
     dialog_details_2.style.transform = "translate(-50%, -50%)";
     dialog_details_2.style.zIndex = "100";
     dialog_details_2.show();
-
-    // Ajustement de la largeur du sélecteur de type
-    type.style.width = control.offsetWidth + "px";
 
     // Ajustement de la largeur des sélecteurs d'armes
     const arme2 = dialog_details_2.querySelector(".arme2");
@@ -327,7 +321,6 @@ function afficher_Details(col, row) {
     // Désactivation des champs si ce n'est pas le MJ
     if (document.getElementById("joueur").value != "MJ") {
       type.disabled = true;
-      control.disabled = true;
       note.disabled = true;
       arme1.disabled = true;
       arme2.disabled = true;
@@ -1146,10 +1139,13 @@ for (let i = 0; i < inputs.length; i++) {
     if (["Titre"].includes(field)) {
       m_selected[field] = event.target.value;
     }
+    // Gestion spéciale pour le champ Type
+    else if (["Type"].includes(field)) {
+      m_selected[field] = (event.target.checked ? "allies" : "ennemis");
+    }
     // Gestion des cases à cocher
     else if (event.target.type === "checkbox") {
       m_selected[field] = event.target.checked;
-      Map.drawHexMap();
     }
     // Gestion des champs numériques
     else {
@@ -1164,6 +1160,10 @@ for (let i = 0; i < inputs.length; i++) {
     // Mise à jour de l'armure calculée
     dialog_details_2.querySelector(".armure").value =
       m_selected.armure_generale();
+
+    // Mise à jour de la carte
+    Map.generateHexMap();
+    Map.drawHexMap();
 
     // Synchronisation avec le serveur
     sendMessage(
@@ -1246,14 +1246,8 @@ arme1.addEventListener("click", function (event) {
     let nouvelleOption = null;
 
     // Ouvrir la modale de magie si "Lancement de sort" est sélectionné
+    afficher_Details_arme1();
     if (selectedValue === "Lancement de sort") {
-      dialog_details_2.querySelector(".titre_arme2").style.display = "none";
-      dialog_details_2.querySelector(".arme2").closest("td").style.display = "none";
-
-      dialog_details_2.querySelector(".titre_sortilege").style.display = "";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "5";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "2";
-
       if (!isClickInside) {
         document.getElementById("modal").style.display = "flex";
         dialog_details_2.style.zIndex = 0;
@@ -1265,14 +1259,6 @@ arme1.addEventListener("click", function (event) {
           element.style.backgroundColor = "green";
         });
       }
-    }
-    else {
-      dialog_details_2.querySelector(".titre_arme2").style.display = "";
-      dialog_details_2.querySelector(".arme2").closest("td").style.display = "";
-
-      dialog_details_2.querySelector(".titre_sortilege").style.display = "none";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").colSpan = "1";
-      dialog_details_2.querySelector(".titre_sortilege").closest("td").rowSpan = "1";
     }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
@@ -1367,31 +1353,6 @@ dialog_details_2.querySelector(".arme2").addEventListener("change", function (ev
     "(" + info_arme(1) + ")";
   dialog_details_2.querySelector(".info_secondaire").textContent =
     "(" + info_arme(2) + ")";
-});
-
-// Gestion du changement de contrôleur
-dialog_details_2.querySelector(".control").addEventListener("change", function (event) {
-  m_selected.Control = event.target.value;
-});
-
-// Gestion du changement de type (allié/ennemi)
-dialog_details_2.querySelector(".type").addEventListener("change", function (event) {
-  m_selected.Type = event.target.value;
-
-  // Couleur selon le type
-  if (event.target.value === "allies")
-    event.target.style.backgroundColor = "rgb(192, 255, 192)";
-  else event.target.style.backgroundColor = "rgb(255, 192, 192)";
-
-  // Mise à jour de l'affichage
-  Map.generateHexMap();
-  Map.drawHexMap();
-
-  // Synchronisation avec le serveur
-  sendMessage(
-    "Map_Type",
-    m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value
-  );
 });
 
 // Empêche le menu contextuel sur le dialogue de détails

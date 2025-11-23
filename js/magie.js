@@ -157,7 +157,7 @@ let stopContextMenu = false;
 // Gestion du menu contextuel sur les boutons magiques
 document.addEventListener("contextmenu", function (event) {
   if (stopContextMenu) {
-    event.preventDefault();    
+    event.preventDefault();
     event.stopPropagation();
     stopContextMenu = false;
 
@@ -171,9 +171,9 @@ document.addEventListener("mousedown", function (event) {
     stopContextMenu = true;
     // Ouvrir la liste voulue si le bouton associé est cliqué
     createListeModal(shortName[event.target.id]);
-    
+
     return false;
-    }
+  }
 });
 
 // Fonction pour créer dynamiquement une modale de liste de magie
@@ -509,13 +509,14 @@ function createListeModal(Nom_liste) {
         m_selected.Nom_liste = sort.Nom_liste;
         m_selected.Nom_sort = sort.Nom_sort;
 
-        // Mettre à jour l'affichage dans le dialogue de détails
-        const sortilege = dialog_details_2.querySelector(".titre_sortilege");
-        if (sort.Nom_sort && sort.Nom_sort !== "" && sort.Nom_sort !== "0" &&
-            sort.Nom_liste && sort.Nom_liste !== "" && sort.Nom_liste !== "0") {
-          sortilege.innerHTML = "Liste : " + capitalizeFirstLetter(sort.Nom_liste) + "<br>Sort : " + sort.Nom_sort;
+        // Mise à jour du sortilège sélectionné
+        if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
+          m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
+          dialog_details_2.querySelector(".liste").innerHTML = capitalizeFirstLetter(m_selected.Nom_liste);
+          dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
         } else {
-          sortilege.innerHTML = "--";
+          dialog_details_2.querySelector(".liste").innerHTML = "--";
+          dialog_details_2.querySelector(".sort").innerHTML = "";
         }
 
         // Fermer la modale

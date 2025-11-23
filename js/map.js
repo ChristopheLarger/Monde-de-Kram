@@ -122,7 +122,7 @@ class Map {
             // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
             col = Math.ceil(x / hexHSpacing);
         }
-        
+
         // Pour la ligne, on doit tenir compte du décalage des colonnes impaires
         // La formule inverse de get_XY : y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0)
         // Donc : row = (y - ((col % 2 != 0) ? hexVSpacing / 2 : 0)) / hexVSpacing
@@ -134,7 +134,7 @@ class Map {
             // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
             row = Math.ceil(yAdjusted / hexVSpacing);
         }
-        
+
         return { col: col, row: row };
     }
 
@@ -161,30 +161,30 @@ class Map {
         // Ray casting : tirer un rayon horizontal vers la droite et compter les intersections
         let inside = false;
         const epsilon = 0.0001; // Tolérance pour les comparaisons flottantes
-        
+
         for (let i = 0, j = 5; i < 6; j = i++) {
             const xi = points[i].x, yi = points[i].y;
             const xj = points[j].x, yj = points[j].y;
-            
+
             // Ignorer les arêtes horizontales (pas d'intersection avec un rayon horizontal)
             if (Math.abs(yi - yj) < epsilon) continue;
-            
+
             // Vérifier si le rayon horizontal du point intersecte cette arête
             // L'arête doit chevaucher la ligne y = py (un sommet strictement au-dessus, l'autre strictement en-dessous)
             const yiAbove = yi > py + epsilon;
             const yjAbove = yj > py + epsilon;
             const yOverlap = (yiAbove !== yjAbove);
-            
+
             if (yOverlap) {
                 // Calculer l'intersection x de l'arête avec la ligne y = py
                 const t = (py - yi) / (yj - yi);
                 const xIntersect = xi + t * (xj - xi);
-                
+
                 // Le rayon part de (px, py) vers la droite, donc on vérifie si px < xIntersect
                 if (px < xIntersect - epsilon) inside = !inside;
             }
         }
-        
+
         return inside;
     }
 
@@ -211,11 +211,11 @@ class Map {
         const borderWidth = 1; // canvas.style.borderWidth;
         let mouseX = event.clientX - rect.left - borderWidth;
         let mouseY = event.clientY - rect.top - borderWidth;
-        
+
         // Vérifier si le canvas a une échelle différente (si width/height CSS != width/height canvas)
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
-        
+
         // Ajuster les coordonnées si nécessaire
         return {
             x: mouseX * scaleX,
@@ -238,18 +238,18 @@ class Map {
         const colRow = Map.get_ColRow(x, y);
         const col = colRow.col;
         const row = colRow.row;
-        
+
         // Tester une zone de 3x3 hexagones autour du point calculé
         // pour s'assurer de ne pas manquer l'hexagone correct à cause d'arrondis
         const candidates = [];
-        
+
         // Ajouter l'hexagone principal et tous les hexagones dans un rayon de 1
         for (let dcol = -1; dcol <= 1; dcol++) {
             for (let drow = -1; drow <= 1; drow++) {
                 candidates.push({ col: col + dcol, row: row + drow });
             }
         }
-        
+
         // Trier les candidats par distance au centre de l'hexagone pour tester le plus proche en premier
         candidates.sort((a, b) => {
             const aXY = Map.get_XY(a.col, a.row);
@@ -262,21 +262,21 @@ class Map {
         // Tester les candidats triés par distance
         let bestCandidate = null;
         let bestDistance = Infinity;
-        
+
         for (const candidate of candidates) {
             const hexXY = Map.get_XY(candidate.col, candidate.row);
             const hexCenterX = hexXY.x + offsetX;
             const hexCenterY = hexXY.y + offsetY;
-            
+
             const isIn = Map.isPointInHexagon(px, py, hexCenterX, hexCenterY);
             const dist = Math.sqrt((px - hexCenterX) ** 2 + (py - hexCenterY) ** 2);
-            
+
             if (isIn && dist < bestDistance) {
                 bestDistance = dist;
                 bestCandidate = candidate;
             }
         }
-        
+
         if (bestCandidate) {
             return bestCandidate;
         }
@@ -493,11 +493,11 @@ class Map {
             if (combatDiv) {
                 const combatRect = combatDiv.getBoundingClientRect();
                 const canvasRect = canvas.getBoundingClientRect();
-                
+
                 // Position relative du canvas par rapport au conteneur #combat
                 const relativeLeft = canvasRect.left - combatRect.left;
                 const relativeTop = canvasRect.top - combatRect.top;
-                
+
                 canvas_selected.style.left = relativeLeft + "px";
                 canvas_selected.style.top = relativeTop + "px";
             }
@@ -797,7 +797,6 @@ class Pion extends Map {
 
     // === PROPRIÉTÉS DE PERSONNAGE ===
     Titre = "";              // Titre affiché du personnage
-    Control = "";            // Contrôleur du personnage
     Arme1 = "";              // Arme principale
     Arme2 = "";              // Arme secondaire
     Nom_liste = "";          // Liste du sortilège sélectionnée
@@ -1871,19 +1870,19 @@ canvas.addEventListener("mousemove", (event) => {
         const combatDiv = document.getElementById("combat");
         const combatRect = combatDiv.getBoundingClientRect();
         const canvasRect = canvas.getBoundingClientRect();
-        
+
         // Position relative du canvas par rapport au conteneur #combat
         const relativeLeft = canvasRect.left - combatRect.left;
         const relativeTop = canvasRect.top - combatRect.top;
-        
+
         // Positionner le canvas_selected pour qu'il se superpose exactement au canvas
-        canvas_selected.style.left = (relativeLeft + deltaX)+ "px";
+        canvas_selected.style.left = (relativeLeft + deltaX) + "px";
         canvas_selected.style.top = (relativeTop + deltaY) + "px";
-        
+
         // S'assurer que les dimensions correspondent
         if (canvas_selected.width != canvas.width) canvas_selected.width = canvas.width;
         if (canvas_selected.height != canvas.height) canvas_selected.height = canvas.height;
-        
+
         canvas_selected.style.display = "";
     }
     else if (isDragging_right && isMode_forme && index_forme_move != null) {
@@ -2040,7 +2039,7 @@ canvas.addEventListener("mouseup", (event) => {
             p.deplace_a(col, row);
         });
     }
-    else if (isDragging_right && !isMoving_map) {
+    else if (isDragging_right && !isMode_forme && !isMoving_map) {
         // Clic droit : on ouvre la fenetre de création d'un pion
         event.preventDefault();
 
@@ -2075,18 +2074,18 @@ canvas.addEventListener("mouseup", (event) => {
 // Touches enfoncées dans la fenetre
 document.addEventListener("keydown", function (event) {
     let ratio = 1;
+
+    // Si la touche est enfoncée dans un champ de texte, on ne fait rien
+    if (event.target.tagName === "TEXTAREA" || event.target.tagName === "INPUT") {
+        return;
+    }
+
+    // On fait les actions correspondantes à la touche enfoncée
     switch (event.key) {
         case "Escape":
         case "Esc":
-            document.getElementById("rocher").style.border = "none";
-            document.getElementById("arbre").style.border = "none";
-            document.getElementById("eau").style.border = "none";
-            document.getElementById("gomme_t").style.border = "none";
-            document.getElementById("rectangle").style.border = "none";
-            document.getElementById("ellipse").style.border = "none";
-            document.getElementById("mur").style.border = "none";
-            document.getElementById("scission").style.border = "none";
-            document.getElementById("gomme_f").style.border = "none";
+            const elements = document.querySelectorAll("#rocher, #arbre, #eau, #gomme_t, #rectangle, #ellipse, #mur, #scission, #gomme_f");
+            elements.forEach(element => { element.style.border = "none"; });
             isMode_terrain = false;
             type_terrain = "";
             isMode_forme = false;
@@ -2099,9 +2098,7 @@ document.addEventListener("keydown", function (event) {
             break;
         case " ":
         case "Spacebar":
-            if (event.target.tagName !== "TEXTAREA" && event.target.tagName !== "INPUT") {
-                next_attaque();
-            }
+            next_attaque();
             break;
         case "Delete":
             // On supprime le(s) pion(s) de la sélection
@@ -2188,12 +2185,12 @@ canvas.addEventListener("wheel", function (event) {
     const hex = Map.getHexagonAtPoint(mouseX, mouseY);
     const col = hex.col;
     const row = hex.row;
-    
+
     // Calculer la position de cette case avant le zoom
     const hexXY_before = Map.get_XY(col, row);
     const caseX_before = hexXY_before.x + offsetX;
     const caseY_before = hexXY_before.y + offsetY;
-    
+
     // Calculer la distance relative entre la souris et la case avant le zoom
     const relX_before = mouseX - caseX_before;
     const relY_before = mouseY - caseY_before;
@@ -2214,10 +2211,10 @@ canvas.addEventListener("wheel", function (event) {
     hexHeight = 2 * hexSize;
     hexHSpacing = hexSize * 1.5;
     hexVSpacing = hexHeight * Math.sqrt(3) / 2;
-    
+
     // Calculer la position de la case après le zoom
     const hexXY_after = Map.get_XY(col, row);
-    
+
     // Ajuster offsetX et offsetY pour que la case reste sous la souris
     offsetX = mouseX - relX_before * ratio - hexXY_after.x;
     offsetY = mouseY - relY_before * ratio - hexXY_after.y;
