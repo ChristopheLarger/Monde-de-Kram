@@ -147,17 +147,17 @@ function afficher_Details(col, row) {
     // Ajout des modèles de joueurs comme options de contrôle
     for (let i = 0; i < Models.length; i++) {
       if (Models[i].Is_joueur) {
-        const p = Pions.find((x) => x.Model === Models[i].Nom);
+        const p = Pions.find((x) => x.Model === Models[i].Nom_model);
         if (p != null && typeof p != "undefined") continue;
         let nouvelleOption = document.createElement("option");
-        nouvelleOption.value = Models[i].Nom;
-        nouvelleOption.textContent = Models[i].Nom;
+        nouvelleOption.value = Models[i].Nom_model;
+        nouvelleOption.textContent = Models[i].Nom_model;
         model.appendChild(nouvelleOption);
       }
       else {
         let nouvelleOption = document.createElement("option");
-        nouvelleOption.value = Models[i].Nom;
-        nouvelleOption.textContent = Models[i].Nom;
+        nouvelleOption.value = Models[i].Nom_model;
+        nouvelleOption.textContent = Models[i].Nom_model;
         model.appendChild(nouvelleOption);
       }
     }
@@ -167,7 +167,7 @@ function afficher_Details(col, row) {
     const model = dialog_details_2.querySelector(".model");
     const titre = dialog_details_2.querySelector(".titre");
     const note = dialog_details_2.querySelector(".note");
-    const p_selected = Models.find((p) => p.Nom === m_selected.Model);
+    const p_selected = Models.find((p) => p.Nom_model === m_selected.Model);
 
     // Gestion des permissions selon le type de personnage
     if (p_selected.Is_joueur || document.getElementById("joueur").value != "MJ") {
@@ -190,22 +190,32 @@ function afficher_Details(col, row) {
     while (arme1.options.length > 2) arme1.removeChild(arme1.lastChild);
 
     // Ajout des armes du modèle
-    let nouvelleOption = document.createElement("option");
+    let nouvelleOption = null;
+    if (p_selected.Arme_1 !== null) {
+    nouvelleOption = document.createElement("option");
     nouvelleOption.value = p_selected.Arme_1;
     nouvelleOption.textContent = p_selected.Arme_1;
     arme1.appendChild(nouvelleOption);
+    }
+    if (p_selected.Arme_2 !== null) {
     nouvelleOption = document.createElement("option");
     nouvelleOption.value = p_selected.Arme_2;
     nouvelleOption.textContent = p_selected.Arme_2;
     arme1.appendChild(nouvelleOption);
+    }
+    if (p_selected.Arme_3 !== null) {
     nouvelleOption = document.createElement("option");
     nouvelleOption.value = p_selected.Arme_3;
     nouvelleOption.textContent = p_selected.Arme_3;
     arme1.appendChild(nouvelleOption);
-    nouvelleOption = document.createElement("option");
-    nouvelleOption.value = "Bouclier";
-    nouvelleOption.textContent = "Bouclier";
-    arme1.appendChild(nouvelleOption);
+    }
+    // Ajout du bouclier si le modèle n'est pas un monstre
+    if (p_selected.Arme_1 !== m_selected.Model) {
+      nouvelleOption = document.createElement("option");
+      nouvelleOption.value = "Bouclier";
+      nouvelleOption.textContent = "Bouclier";
+      arme1.appendChild(nouvelleOption);
+    }
 
     // Sélection de l'arme actuelle
     arme1.value = m_selected.Arme1;
@@ -272,7 +282,7 @@ function afficher_Details(col, row) {
           spans[i].innerHTML = "";
         }
         else {
-          spans[i].innerHTML = "&nbsp;(" + m_selected["Indice"].toString().padStart(2, "0") + ")";
+          spans[i].innerHTML = " (" + m_selected["Indice"].toString().padStart(2, "0") + ")";
         }
       }
       else {
@@ -282,8 +292,8 @@ function afficher_Details(col, row) {
     }
 
     // Mise à jour des informations affichées
-    model.innerHTML = m_selected.Model;
     note.innerHTML = m_selected.Note;
+    model.innerHTML = m_selected.Model;
 
     // Mise à jour de la carte
     Map.drawHexMap();
@@ -295,7 +305,7 @@ function afficher_Details(col, row) {
     // Mise à jour du sortilège sélectionné
     if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
       m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-      dialog_details_2.querySelector(".liste").innerHTML = capitalizeFirstLetter(m_selected.Nom_liste);
+      dialog_details_2.querySelector(".liste").innerHTML = m_selected.Nom_liste;
       dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
     } else {
       dialog_details_2.querySelector(".liste").innerHTML = "--";
@@ -349,7 +359,7 @@ function afficher_attaque(phase) {
   }
 
   // === PHASE 1 : CHOIX DE L'ARME ===
-  const model_att = Models.find((p) => p.Nom === attaquant.Model);
+  const model_att = Models.find((p) => p.Nom_model === attaquant.Model);
   if (phase === 1) {
     // Gestion de l'arme principale
     if (attaquant.Arme1 === "" || model_att.Att_1 === null) {
@@ -573,11 +583,11 @@ function affiche_def() {
   const defenseur = Pions.find((m) => m.Defenseur);
 
   // Récupération des modèles et armes
-  // const model_att = Models.find(p => p.Nom === attaquant.Model);
-  const model_def = Models.find((p) => p.Nom === defenseur.Model);
+  // const model_att = Models.find(p => p.Nom_model === attaquant.Model);
+  const model_def = Models.find((p) => p.Nom_model === defenseur.Model);
 
-  const w1_att = Armes.find((w) => w.Nom === attaquant.Arme1);
-  const w2_att = Armes.find((w) => w.Nom === attaquant.Arme2);
+  const w1_att = Armes.find((w) => w.Nom_arme === attaquant.Arme1);
+  const w2_att = Armes.find((w) => w.Nom_arme === attaquant.Arme2);
 
   // Détermination si l'attaque est à distance
   const is_distant =
@@ -712,8 +722,8 @@ function afficher_defense(phase) {
   const defenseur = Pions.find((m) => m.Defenseur);
 
   // Récupération des informations sur l'arme et le modèle de l'attaquant
-  const w1_att = Armes.find((w) => w.Nom === attaquant.Arme1);
-  const w2_att = Armes.find((w) => w.Nom === attaquant.Arme2);
+  const w1_att = Armes.find((w) => w.Nom_arme === attaquant.Arme1);
+  const w2_att = Armes.find((w) => w.Nom_arme === attaquant.Arme2);
 
   // Détermination si l'attaque est à distance
   const is_distant =
@@ -734,7 +744,7 @@ function afficher_defense(phase) {
     dialog_defense_1.querySelector(".nom").innerHTML = entete;
 
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (1ère main)
-    const model_def = Models.find((p) => p.Nom === defenseur.Model);
+    const model_def = Models.find((p) => p.Nom_model === defenseur.Model);
     let par_def_1 = null;
     if (defenseur.Arme1 === model_def.Arme_1) {
       par_def_1 = model_def.Par_1;
@@ -837,9 +847,9 @@ function new_loc() {
   // Détermination du type d'arme (à distance ou corps à corps)
   let A_distance = null;
   if (attaquant.at1_att)
-    A_distance = Armes.find((w) => w.Nom === attaquant.Arme1).A_distance;
+    A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme1).A_distance;
   if (attaquant.at2_att)
-    A_distance = Armes.find((w) => w.Nom === attaquant.Arme2).A_distance;
+    A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme2).A_distance;
 
   let loc_att = "";
 
@@ -1174,7 +1184,7 @@ for (let i = 0; i < inputs.length; i++) {
 }
 
 function info_arme(arme) {
-  const model = Models.find((m) => m.Nom === m_selected.Model);
+  const model = Models.find((m) => m.Nom_model === m_selected.Model);
   let score = 0;
 
   // Si l'arme principale ou secondaire est nulle ou est un lancement de sort, on affiche "-"
@@ -1239,21 +1249,20 @@ arme1.addEventListener("click", function (event) {
 
   // Attendre que la sélection soit effectuée pour lire la valeur
   setTimeout(() => {
-    const selectedValue = arme1.value;
-    const p_selected = Models.find((p) => p.Nom === m_selected.Model);
+    const p_selected = Models.find((p) => p.Nom_model === m_selected.Model);
     const arme2 = dialog_details_2.querySelector(".arme2");
-    let w1 = Armes.find((x) => x.Nom === selectedValue);
+    let w1 = Armes.find((x) => x.Nom_arme === arme1.value);
     let nouvelleOption = null;
 
     // Ouvrir la modale de magie si "Lancement de sort" est sélectionné
     afficher_Details_arme1();
-    if (selectedValue === "Lancement de sort") {
+    if (arme1.value === "Lancement de sort") {
       if (!isClickInside) {
         document.getElementById("modal").style.display = "flex";
         dialog_details_2.style.zIndex = 0;
 
-        const joueurSelectionne = dialog_details_2.querySelector(".model").textContent;
-        SortsConnus.filter((s) => s.Nom_perso === joueurSelectionne).forEach((x) => {
+        const joueurSelectionne = m_selected.Model;
+        SortsConnus.filter((s) => s.Nom_model === joueurSelectionne).forEach((x) => {
           const element = document.getElementById(getShortName(x.Nom_liste));
           element.style.color = "white";
           element.style.backgroundColor = "green";
@@ -1262,7 +1271,7 @@ arme1.addEventListener("click", function (event) {
     }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
-    if ((selectedValue === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
+    if ((arme1.value === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
       // Nettoyage et ajout d'une option vide
       while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
       nouvelleOption = document.createElement("option");
@@ -1282,28 +1291,28 @@ arme1.addEventListener("click", function (event) {
       arme2.appendChild(nouvelleOption);
 
       // Ajout des armes disponibles du modèle
-      let w2 = Armes.find((x) => x.Nom === p_selected.Arme_1);
+      let w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_1);
       if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
         nouvelleOption = document.createElement("option");
         nouvelleOption.value = p_selected.Arme_1;
         nouvelleOption.textContent = p_selected.Arme_1;
         arme2.appendChild(nouvelleOption);
       }
-      w2 = Armes.find((x) => x.Nom === p_selected.Arme_2);
+      w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_2);
       if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
         nouvelleOption = document.createElement("option");
         nouvelleOption.value = p_selected.Arme_2;
         nouvelleOption.textContent = p_selected.Arme_2;
         arme2.appendChild(nouvelleOption);
       }
-      w2 = Armes.find((x) => x.Nom === p_selected.Arme_3);
+      w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_3);
       if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
         nouvelleOption = document.createElement("option");
         nouvelleOption.value = p_selected.Arme_3;
         nouvelleOption.textContent = p_selected.Arme_3;
         arme2.appendChild(nouvelleOption);
       }
-      if (selectedValue !== "Bouclier") {
+      if (arme1.value !== "Bouclier" && p_selected.Arme_1 !== m_selected.Model) {
         nouvelleOption = document.createElement("option");
         nouvelleOption.value = "Bouclier";
         nouvelleOption.textContent = "Bouclier";
@@ -1319,7 +1328,7 @@ arme1.addEventListener("click", function (event) {
     }
 
     // Mise à jour de l'arme principale
-    m_selected.Arme1 = selectedValue;
+    m_selected.Arme1 = arme1.value;
 
     // Mise à jour de l'information affichée
     dialog_details_2.querySelector(".info_principale").textContent =

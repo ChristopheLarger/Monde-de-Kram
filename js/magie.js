@@ -68,31 +68,31 @@ class SortConnu {
   constructor(data = {}) {
     this.Nom_liste = data.Nom_liste || "";
     this.Nom_sort = data.Nom_sort || "";
-    this.Nom_perso = data.Nom_perso || "";
+    this.Nom_model = data.Nom_model || "";
   }
 }
 
 // Tableau global contenant toutes les sorts connus disponibles
 let SortsConnus = [];
 
-shortName = {
-  Air: "liste de l'air",
-  Controle: "liste du contrôle de soi",
-  Surnaturelles: "liste des créatures surnaturelles",
-  Magie: "liste de la magie pure",
-  Metamorphoses: "liste de la métamorphose",
-  Nature: "liste de la nature",
-  Terre: "liste de la terre",
-  Lumiere: "liste de la lumière et de l'électricité",
-  Detections: "liste des détections",
-  Illusions: "liste de l'illusion",
-  Esprits: "liste de la maîtrise des esprits",
-  Isolement: "liste de l'isolement",
-  Feu: "liste du feu",
-  Froid: "liste du froid",
-  Eau: "liste de l'eau",
-  Harmonie: "liste de l'harmonie",
-};
+const shortName = Object.freeze({
+  Air: "Liste de l'air",
+  Controle: "Liste du contrôle de soi",
+  Surnaturelles: "Liste des créatures surnaturelles",
+  Magie: "Liste de la magie pure",
+  Metamorphoses: "Liste de la métamorphose",
+  Nature: "Liste de la nature",
+  Terre: "Liste de la terre",
+  Lumiere: "Liste de la lumière et de l'électricité",
+  Detections: "Liste des détections",
+  Illusions: "Liste de l'illusion",
+  Esprits: "Liste de la maîtrise des esprits",
+  Isolement: "Liste de l'isolement",
+  Feu: "Liste du feu",
+  Froid: "Liste du froid",
+  Eau: "Liste de l'eau",
+  Harmonie: "Liste de l'harmonie",
+});
 
 function getShortName(Nom_liste) {
   for (const [key, value] of Object.entries(shortName)) {
@@ -110,16 +110,6 @@ function getMaxSize(Nom_liste) {
     if (s.Col > maxSize) maxSize = s.Col;
   });
   return maxSize;
-}
-
-/**
- * Met en majuscule la première lettre d'une chaîne
- * @param {string} str - Chaîne à capitaliser
- * @returns {string} Chaîne avec la première lettre en majuscule
- */
-function capitalizeFirstLetter(str) {
-  if (!str) return str;
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 // Initialisation quand le DOM est prêt
@@ -205,7 +195,7 @@ function createListeModal(Nom_liste) {
   const title = document.createElement("h1");
   title.id = "title";
   title.className = "title";
-  title.textContent = capitalizeFirstLetter(Nom_liste);
+  title.textContent = Nom_liste;
 
   // Conteneur des niveaux et sorts
   const conteneur = document.createElement("div");
@@ -261,7 +251,7 @@ function createListeModal(Nom_liste) {
       ) {
         const isKnown = SortsConnus.some(
           (sc) =>
-            sc.Nom_perso === m_selected.Model &&
+            sc.Nom_model === m_selected.Model &&
             sc.Nom_liste === Nom_liste &&
             sc.Nom_sort === sort.Nom_sort
         );
@@ -512,7 +502,7 @@ function createListeModal(Nom_liste) {
         // Mise à jour du sortilège sélectionné
         if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
           m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-          dialog_details_2.querySelector(".liste").innerHTML = capitalizeFirstLetter(m_selected.Nom_liste);
+          dialog_details_2.querySelector(".liste").innerHTML = m_selected.Nom_liste;
           dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
         } else {
           dialog_details_2.querySelector(".liste").innerHTML = "--";

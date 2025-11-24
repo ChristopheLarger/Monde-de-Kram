@@ -37,7 +37,7 @@
                 case 'bool':
                     return ($value === '1' || $value === 1 || $value === true || strtolower($value) === 'true') ? "true" : "false";
                 case 'null':
-                    return is_null($value) ? "null" : "parseInt('0" . $value . "', 10)";
+                    return is_null($value) ? "null" : "`" . addslashes($value) . "`";
                 default:
                     return "`" . addslashes($value) . "`";
             }
@@ -49,30 +49,30 @@
         function generateModelJS($row, $index)
         {
             $js = "Models[$index] = new Model({\n";
-            $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
+            $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
             // $js .= "    Image: new Image(\"Images/" . $row['Nom'] . ".png\"),\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
             $js .= "    Etat: " . toJS($row['Etat']) . ",\n";
-            $js .= "    Pm: " . toJS($row['PM'], 'null') . ",\n";
-            $js .= "    Pp: " . toJS($row['PP'], 'null') . ",\n";
+            $js .= "    Pm: " . toJS($row['PM'], 'int') . ",\n";
+            $js .= "    Pp: " . toJS($row['PP'], 'int') . ",\n";
             $js .= "    Vp: " . toJS($row['VP'], 'int') . ",\n";
             $js .= "    Fdc: " . toJS($row['FdC'], 'int') . ",\n";
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
             $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
             $js .= "    Escrime: " . toJS($row['Escrime'], 'int') . ",\n";
-            $js .= "    Coordination: " . toJS($row['Coordination'], 'null') . ",\n";
-            $js .= "    Force: " . toJS($row['Force'], 'null') . ",\n";
-            $js .= "    Arme_1: " . toJS($row['Arme_1']) . ",\n";
-            $js .= "    Att_1: " . toJS($row['Att_1'], 'null') . ",\n";
-            $js .= "    Par_1: " . toJS($row['Par_1'], 'null') . ",\n";
-            $js .= "    Arme_2: " . toJS($row['Arme_2']) . ",\n";
-            $js .= "    Att_2: " . toJS($row['Att_2'], 'null') . ",\n";
-            $js .= "    Par_2: " . toJS($row['Par_2'], 'null') . ",\n";
-            $js .= "    Arme_3: " . toJS($row['Arme_3']) . ",\n";
-            $js .= "    Att_3: " . toJS($row['Att_3'], 'null') . ",\n";
-            $js .= "    Par_3: " . toJS($row['Par_3'], 'null') . ",\n";
+            $js .= "    Coordination: " . toJS($row['Coordination'], 'int') . ",\n";
+            $js .= "    Force: " . toJS($row['Force'], 'int') . ",\n";
+            $js .= "    Arme_1: " . toJS($row['Arme_1'], 'null') . ",\n";
+            $js .= "    Att_1: " . toJS($row['Att_1'], 'int') . ",\n";
+            $js .= "    Par_1: " . toJS($row['Par_1'], 'int') . ",\n";
+            $js .= "    Arme_2: " . toJS($row['Arme_2'], 'null') . ",\n";
+            $js .= "    Att_2: " . toJS($row['Att_2'], 'int') . ",\n";
+            $js .= "    Par_2: " . toJS($row['Par_2'], 'int') . ",\n";
+            $js .= "    Arme_3: " . toJS($row['Arme_3'], 'null') . ",\n";
+            $js .= "    Att_3: " . toJS($row['Att_3'], 'int') . ",\n";
+            $js .= "    Par_3: " . toJS($row['Par_3'], 'int') . ",\n";
             $js .= "    Par_Bouclier: " . toJS($row['Par_Bouclier'], 'int') . ",\n";
             $js .= "    Esquive: " . toJS($row['Esquive'], 'int') . ",\n";
             $js .= "    Armure_tete: " . toJS($row['Armure_Tete'], 'int') . ",\n";
@@ -100,7 +100,7 @@
         function generateArmeJS($row, $index)
         {
             $js = "Armes[$index] = new Arme({\n";
-            $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
+            $js .= "    Nom_arme: " . toJS($row['Nom_arme']) . ",\n";
             $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Deux_mains: " . toJS($row['Deux_mains'], 'bool') . ",\n";
             $js .= "    A_projectile: " . toJS($row['A_projectile'], 'bool') . ",\n";
@@ -121,7 +121,7 @@
         function generateListeMagieJS($row, $index)
         {
             $js = "Listes[$index] = new Liste({\n";
-            $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . "\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -131,16 +131,16 @@
         function generateSortJS($row, $index)
         {
             $js = "Sorts[$index] = new Sort({\n";
-            $js .= "    Nom_sort: " . toJS($row['NOM_SORT']) . ",\n";
-            $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
-            $js .= "    Niveau: " . toJS($row['NIVEAU'], 'int') . ",\n";
-            $js .= "    Portee: " . toJS($row['PORTEE']) . ",\n";
-            $js .= "    Incantation: " . toJS($row['INCANTATION']) . ",\n";
-            $js .= "    Duree: " . toJS($row['DUREE']) . ",\n";
-            $js .= "    Sauvegarde: " . toJS($row['SAUVEGARDE']) . ",\n";
-            $js .= "    Zone: " . toJS($row['ZONE']) . ",\n";
-            $js .= "    Description: " . toJS($row['DESCRIPTION']) . ",\n";
-            $js .= "    Col: " . toJS($row['COL'], 'int') . "\n";
+            $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
+            $js .= "    Niveau: " . toJS($row['Niveau'], 'int') . ",\n";
+            $js .= "    Portee: " . toJS($row['Portee']) . ",\n";
+            $js .= "    Incantation: " . toJS($row['Incantation']) . ",\n";
+            $js .= "    Duree: " . toJS($row['Duree']) . ",\n";
+            $js .= "    Sauvegarde: " . toJS($row['Sauvegarde']) . ",\n";
+            $js .= "    Zone: " . toJS($row['Zone']) . ",\n";
+            $js .= "    Description: " . toJS($row['Description']) . ",\n";
+            $js .= "    Col: " . toJS($row['Col'], 'int') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -150,9 +150,9 @@
         function generateConnecteurJS($row, $index)
         {
             $js = "Connecteurs[$index] = new Connecteur({\n";
-            $js .= "    Nom_liste: " . toJS($row['NOM_LISTE']) . ",\n";
-            $js .= "    Pred_sort: " . toJS($row['PRED_SORT']) . ",\n";
-            $js .= "    Suc_sort: " . toJS($row['SUC_SORT']) . "\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
+            $js .= "    Pred_sort: " . toJS($row['Pred_sort']) . ",\n";
+            $js .= "    Suc_sort: " . toJS($row['Suc_sort']) . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -164,7 +164,7 @@
             $js = "SortsConnus[$index] = new SortConnu({\n";
             $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
             $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
-            $js .= "    Nom_perso: " . toJS($row['Nom_perso']) . "\n";
+            $js .= "    Nom_model: " . toJS($row['Nom_model']) . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -181,7 +181,7 @@
         $conn->set_charset("utf8");
 
         // === CHARGEMENT DES MODÈLES DE PERSONNAGES (SIMPLIFIÉ) ===
-        $query = "SELECT * FROM perso ORDER BY Is_joueur DESC, Nom ASC";
+        $query = "SELECT * FROM model ORDER BY Is_joueur DESC, Nom_model ASC";
         $result = $conn->query($query);
 
         if ($result->num_rows > 0) {
@@ -194,7 +194,7 @@
         }
 
         // === CHARGEMENT DES ARMES (SIMPLIFIÉ) ===
-        $query = "SELECT * FROM arme ORDER BY Nom ASC";
+        $query = "SELECT * FROM arme ORDER BY Nom_arme ASC";
         $result = $conn->query($query);
 
         if ($result->num_rows > 0) {
@@ -205,7 +205,7 @@
             }
         }
         // === CHARGEMENT DES LISTES DE MAGIE ===
-        $query = "SELECT * FROM liste";
+        $query = "SELECT * FROM liste ORDER BY Nom_liste ASC";
         $result = $conn->query($query);
 
         if ($result->num_rows > 0) {
@@ -227,7 +227,7 @@
                 }
             }
             // === CHARGEMENT DES CONNECTEURS ===
-            $query = "SELECT * FROM connecteur";
+            $query = "SELECT * FROM connecteur ORDER BY Nom_liste ASC, Pred_sort ASC, Suc_sort ASC";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
@@ -240,7 +240,7 @@
 
 
             // === CHARGEMENT DES SORTS CONNUS ===
-            $query = "SELECT * FROM sort_connu";
+            $query = "SELECT * FROM sort_connu ORDER BY Nom_model ASC, Nom_liste ASC, Nom_sort ASC";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
@@ -259,9 +259,9 @@
         // Chargement des images pour tous les modèles
         for (let i = 0; i < Models.length; i++) {
             Models[i].Image = new Image();
-            Models[i].Image.src = "Images/" + Models[i].Nom + ".png";
+            Models[i].Image.src = "Images/" + Models[i].Nom_model + ".png";
             Models[i].Image.onerror = function() {
-                console.warn("Image non trouvée pour " + Models[i].Nom + ": images/" + Models[i].Nom + ".png");
+                console.warn("Image non trouvée pour " + Models[i].Nom_model + ": images/" + Models[i].Nom_model + ".png");
             };
         }
 
@@ -270,8 +270,8 @@
         for (let i = 0; i < Models.length; i++) {
             if (Models[i].Is_joueur) {
                 let nouvelleOption = document.createElement("option");
-                nouvelleOption.value = Models[i].Nom;
-                nouvelleOption.textContent = Models[i].Nom;
+                nouvelleOption.value = Models[i].Nom_model;
+                nouvelleOption.textContent = Models[i].Nom_model;
                 document.getElementById("joueur").appendChild(nouvelleOption);
             }
         }
@@ -293,24 +293,15 @@
         setTimeout(function() {
             // Créer un pion de modèle "Christophe" de type "allié"
             const christophe = Pion.add("allies", "Christophe");
-            if (christophe) {
-                christophe.Control = "MJ";
-            }
+
             // Créer un pion de modèle "Elémental d'air" de type "ennemi"
             const elemental_eau = Pion.add("allies", "Elémental d'eau");
-            if (elemental_eau) {
-                elemental_eau.Control = "MJ";
-            }
             // Créer un pion de modèle "Guilhem" de type "ennemi"
+
             const guilhem = Pion.add("ennemis", "Guilhem");
-            if (guilhem) {
-                guilhem.Control = "MJ";
-            }
             // Créer un pion de modèle "Elémental d'air" de type "ennemi"
+
             const elemental_air = Pion.add("ennemis", "Elémental d'air");
-            if (elemental_air) {
-                elemental_air.Control = "MJ";
-            }
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();

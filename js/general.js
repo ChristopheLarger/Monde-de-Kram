@@ -343,7 +343,7 @@ class Messages {
 
         if (joueur === "MJ") return;
 
-        const m = Models.find(x => x.Nom === joueur);
+        const m = Models.find(x => x.Nom_model === joueur);
         document.getElementById(("fat_" + joueur).toLowerCase()).value = m.Fatigue;
         document.getElementById(("con_" + joueur).toLowerCase()).value = m.Concentration;
 

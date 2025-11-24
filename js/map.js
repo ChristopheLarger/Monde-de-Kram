@@ -365,7 +365,7 @@ class Map {
             const imgSize = hexSize * 1.2;
             const p = Pions.find(q => q.Selected && q.Position === text);
             if (p != null && typeof p != "undefined") {
-                const m = Models.find(x => x.Nom === p.Model);
+                const m = Models.find(x => x.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
             }
             return;
@@ -439,7 +439,7 @@ class Map {
             const p = Pions.find(q => q.Position === text);
             const t = Terrains.find(r => r.Position === text)
             if (p != null && typeof p != "undefined") {
-                const m = Models.find(n => n.Nom === p.Model);
+                const m = Models.find(n => n.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
                 if (p.Cac) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
                 if (p.Dist) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
@@ -866,7 +866,7 @@ class Pion extends Map {
         this.Type = type;
         this.Model = model;
 
-        const m = Models.find(x => x.Nom === this.Model);
+        const m = Models.find(x => x.Nom_model === this.Model);
 
         if (indice != -1) this.Indice = indice;
         else if (m.Is_joueur) this.Indice = 0;
@@ -1005,7 +1005,7 @@ class Pion extends Map {
     // On duplique un pion de la carte.
     dupliquer() {
         const p = new Pion(this.Type, this.Model);
-        const m = Models.find(x => x.Nom === this.Model);
+        const m = Models.find(x => x.Nom_model === this.Model);
 
         if (m.Is_joueur) return null;
 

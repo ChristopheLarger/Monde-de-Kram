@@ -14,7 +14,7 @@ class Model {
      */
     constructor(data = {}) {
         // Propriétés de base
-        this.Nom = data.Nom || "";
+        this.Nom_model = data.Nom_model || "";
         this.Image = data.Image || null;
         this.Is_joueur = data.Is_joueur || false;
         this.Capacites = data.Capacites || "";
@@ -37,13 +37,13 @@ class Model {
         this.Force = data.Force || null;
         
         // Armes et compétences
-        this.Arme_1 = data.Arme_1 || "";
+        this.Arme_1 = data.Arme_1 || null;
         this.Att_1 = data.Att_1 || null;
         this.Par_1 = data.Par_1 || null;
-        this.Arme_2 = data.Arme_2 || "";
+        this.Arme_2 = data.Arme_2 || null;
         this.Att_2 = data.Att_2 || null;
         this.Par_2 = data.Par_2 || null;
-        this.Arme_3 = data.Arme_3 || "";
+        this.Arme_3 = data.Arme_3 || null;
         this.Att_3 = data.Att_3 || null;
         this.Par_3 = data.Par_3 || null;
         this.Par_Bouclier = data.Par_Bouclier || 0;
