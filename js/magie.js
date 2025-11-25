@@ -271,11 +271,58 @@ function createSpellInfo() {
 
 // Fonction pour créer dynamiquement une modale de liste de magie
 function createListeModal(Nom_liste) {
+  // Fonction pour créer les flèches
+  function createAllArrows() {
+    setTimeout(() => {
+      const container = conteneur;
+      const containerRect = container.getBoundingClientRect();
+      const connecteursListe = Connecteurs.filter((conn) => conn.Nom_liste === Nom_liste);
+
+      connecteursListe.forEach((conn) => {
+        const fromElement = container.querySelector(`[data-spell="${conn.Pred_sort}"]`);
+        const toElement = container.querySelector(`[data-spell="${conn.Suc_sort}"]`);
+
+        if (fromElement && toElement) {
+          const fromRect = fromElement.getBoundingClientRect();
+          const toRect = toElement.getBoundingClientRect();
+
+          const fromSort = sortsListe.find((s) => s.Nom_sort === conn.Pred_sort);
+          const toSort = sortsListe.find((s) => s.Nom_sort === conn.Suc_sort);
+
+          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+
+          if (fromSort.Niveau === toSort.Niveau) {
+            if (fromSort.Col < toSort.Col) {
+              line.setAttribute("x1", fromRect.right - containerRect.left);
+              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute("x2", toRect.left - containerRect.left);
+              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+            } else {
+              line.setAttribute("x1", fromRect.left - containerRect.left);
+              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute("x2", toRect.right - containerRect.left);
+              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+            }
+          } else {
+            line.setAttribute("x1", fromRect.left + fromRect.width / 2 - containerRect.left);
+            line.setAttribute("y1", fromRect.bottom - containerRect.top);
+            line.setAttribute("x2", toRect.left + toRect.width / 2 - containerRect.left);
+            line.setAttribute("y2", toRect.top - containerRect.top);
+          }
+
+          line.setAttribute("stroke", "#666");
+          line.setAttribute("stroke-width", "2.5");
+          line.setAttribute("marker-end", `url(#arrowhead)`);
+          line.setAttribute("opacity", "0.75");
+
+          svg.appendChild(line);
+        }
+      });
+    }, 500);
+  }
+
   // Filtrer les sorts pour cette liste
   const sortsListe = Sorts.filter((sort) => sort.Nom_liste === Nom_liste);
-
-  // Filtrer les connecteurs pour cette liste
-  const connecteursListe = Connecteurs.filter((conn) => conn.Nom_liste === Nom_liste);
 
   // Créer la modale
   const modal = document.createElement("div");
@@ -315,9 +362,7 @@ function createListeModal(Nom_liste) {
   });
 
   // Trier les niveaux
-  const niveauxTries = Object.keys(niveaux)
-    .map(Number)
-    .sort((a, b) => a - b);
+  const niveauxTries = Object.keys(niveaux).map(Number).sort((a, b) => a - b);
 
   // Créer les niveaux HTML
   niveauxTries.forEach((niveau) => {
@@ -347,17 +392,11 @@ function createListeModal(Nom_liste) {
       spellNode.classList.add(`col-${sort.Col + 1}`);
 
       // Vérifier si le sort est connu par le joueur sélectionné
-      if (
-        typeof m_selected !== "undefined" &&
-        m_selected !== null &&
-        m_selected.Model
-      ) {
-        const isKnown = SortsConnus.some(
-          (sc) =>
-            sc.Nom_model === m_selected.Model &&
-            sc.Nom_liste === Nom_liste &&
-            sc.Nom_sort === sort.Nom_sort
-        );
+      if (typeof m_selected !== "undefined" && m_selected !== null && m_selected.Model) {
+        const isKnown = SortsConnus.some((sc) =>
+          sc.Nom_model === m_selected.Model &&
+          sc.Nom_liste === Nom_liste &&
+          sc.Nom_sort === sort.Nom_sort);
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
@@ -382,10 +421,7 @@ function createListeModal(Nom_liste) {
   // Créer le marqueur de flèche
   const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
-  const marker = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "marker"
-  );
+  const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
   marker.id = "marker";
   marker.setAttribute("id", "arrowhead");
   marker.setAttribute("markerWidth", "6");
@@ -394,10 +430,7 @@ function createListeModal(Nom_liste) {
   marker.setAttribute("refY", "2");
   marker.setAttribute("orient", "auto");
 
-  const polygon = document.createElementNS(
-    "http://www.w3.org/2000/svg",
-    "polygon"
-  );
+  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
   polygon.id = "polygon";
   polygon.setAttribute("points", "0 0, 6 2, 0 4");
   polygon.setAttribute("fill", "#666");
@@ -418,82 +451,6 @@ function createListeModal(Nom_liste) {
 
   // Ajouter la modale au body
   document.body.appendChild(modal);
-
-  // Fonction pour créer les flèches
-  function createAllArrows() {
-    setTimeout(() => {
-      const container = conteneur;
-      const containerRect = container.getBoundingClientRect();
-
-      connecteursListe.forEach((conn) => {
-        const fromElement = container.querySelector(
-          `[data-spell="${conn.Pred_sort}"]`
-        );
-        const toElement = container.querySelector(
-          `[data-spell="${conn.Suc_sort}"]`
-        );
-
-        if (fromElement && toElement) {
-          const fromRect = fromElement.getBoundingClientRect();
-          const toRect = toElement.getBoundingClientRect();
-
-          const fromSort = sortsListe.find(
-            (s) => s.Nom_sort === conn.Pred_sort
-          );
-          const toSort = sortsListe.find((s) => s.Nom_sort === conn.Suc_sort);
-
-          const line = document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
-          );
-
-          if (fromSort.Niveau === toSort.Niveau) {
-            if (fromSort.Col < toSort.Col) {
-              line.setAttribute("x1", fromRect.right - containerRect.left);
-              line.setAttribute(
-                "y1",
-                fromRect.top + fromRect.height / 2 - containerRect.top
-              );
-              line.setAttribute("x2", toRect.left - containerRect.left);
-              line.setAttribute(
-                "y2",
-                fromRect.top + fromRect.height / 2 - containerRect.top
-              );
-            } else {
-              line.setAttribute("x1", fromRect.left - containerRect.left);
-              line.setAttribute(
-                "y1",
-                fromRect.top + fromRect.height / 2 - containerRect.top
-              );
-              line.setAttribute("x2", toRect.right - containerRect.left);
-              line.setAttribute(
-                "y2",
-                fromRect.top + fromRect.height / 2 - containerRect.top
-              );
-            }
-          } else {
-            line.setAttribute(
-              "x1",
-              fromRect.left + fromRect.width / 2 - containerRect.left
-            );
-            line.setAttribute("y1", fromRect.bottom - containerRect.top);
-            line.setAttribute(
-              "x2",
-              toRect.left + toRect.width / 2 - containerRect.left
-            );
-            line.setAttribute("y2", toRect.top - containerRect.top);
-          }
-
-          line.setAttribute("stroke", "#666");
-          line.setAttribute("stroke-width", "2.5");
-          line.setAttribute("marker-end", `url(#arrowhead)`);
-          line.setAttribute("opacity", "0.75");
-
-          svg.appendChild(line);
-        }
-      });
-    }, 500);
-  }
 
   // Créer les flèches après le rendu
   createAllArrows();
@@ -564,9 +521,7 @@ function createListeModal(Nom_liste) {
 
         // Animation du sort cliqué
         e.target.classList.add("clicked");
-        setTimeout(() => {
-          e.target.classList.remove("clicked");
-        }, 500);
+        setTimeout(() => { e.target.classList.remove("clicked"); }, 500);
       }
     }
   });
