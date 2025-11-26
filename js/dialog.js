@@ -22,6 +22,10 @@ const dialog_attaque_1 = document.getElementById("dialog_attaque_1");
 const dialog_attaque_2 = document.getElementById("dialog_attaque_2");
 const dialog_attaque_3 = document.getElementById("dialog_attaque_3");
 
+// Dialogues pour les sorts
+const dialog_sort_1 = document.getElementById("dialog_sort_1");
+const dialog_sort_2 = document.getElementById("dialog_sort_2");
+
 // Dialogues pour la défense
 const dialog_defense_1 = document.getElementById("dialog_defense_1");
 const dialog_defense_2 = document.getElementById("dialog_defense_2");
@@ -123,6 +127,11 @@ function afficher_Details_arme1() {
     dialog_details_2.querySelector(".liste").style.display = "none";
     dialog_details_2.querySelector(".titre_sort").style.display = "none";
     dialog_details_2.querySelector(".sort").style.display = "none";
+
+    // Réinitialisation des informations du sort
+    m_selected.Nom_liste = "";
+    m_selected.Nom_sort = "";
+    m_selected.Incantation = 0;
   }
 }
 
@@ -192,22 +201,22 @@ function afficher_Details(col, row) {
     // Ajout des armes du modèle
     let nouvelleOption = null;
     if (p_selected.Arme_1 !== null) {
-    nouvelleOption = document.createElement("option");
-    nouvelleOption.value = p_selected.Arme_1;
-    nouvelleOption.textContent = p_selected.Arme_1;
-    arme1.appendChild(nouvelleOption);
+      nouvelleOption = document.createElement("option");
+      nouvelleOption.value = p_selected.Arme_1;
+      nouvelleOption.textContent = p_selected.Arme_1;
+      arme1.appendChild(nouvelleOption);
     }
     if (p_selected.Arme_2 !== null) {
-    nouvelleOption = document.createElement("option");
-    nouvelleOption.value = p_selected.Arme_2;
-    nouvelleOption.textContent = p_selected.Arme_2;
-    arme1.appendChild(nouvelleOption);
+      nouvelleOption = document.createElement("option");
+      nouvelleOption.value = p_selected.Arme_2;
+      nouvelleOption.textContent = p_selected.Arme_2;
+      arme1.appendChild(nouvelleOption);
     }
     if (p_selected.Arme_3 !== null) {
-    nouvelleOption = document.createElement("option");
-    nouvelleOption.value = p_selected.Arme_3;
-    nouvelleOption.textContent = p_selected.Arme_3;
-    arme1.appendChild(nouvelleOption);
+      nouvelleOption = document.createElement("option");
+      nouvelleOption.value = p_selected.Arme_3;
+      nouvelleOption.textContent = p_selected.Arme_3;
+      arme1.appendChild(nouvelleOption);
     }
     // Ajout du bouclier si le modèle n'est pas un monstre
     if (p_selected.Arme_1 !== m_selected.Model) {
@@ -230,8 +239,7 @@ function afficher_Details(col, row) {
     // Configuration de tous les champs de saisie
     for (let i = 0; i < inputs.length; i++) {
       // Désactivation des champs si ce n'est pas le MJ
-      if (document.getElementById("joueur").value != "MJ")
-        inputs[i].disabled = true;
+      if (document.getElementById("joueur").value != "MJ") inputs[i].disabled = true;
 
       // Conversion du nom de classe en nom de propriété
       const field =
@@ -274,6 +282,7 @@ function afficher_Details(col, row) {
       const field =
         spans[i].className.charAt(0).toUpperCase() +
         spans[i].className.slice(1).toLowerCase();
+
       if (["Model", "Slider", "Titre_arme2", "Titre_liste", "Titre_sort"].includes(field)) continue;
 
       let value = p_selected[field];
@@ -305,11 +314,13 @@ function afficher_Details(col, row) {
     // Mise à jour du sortilège sélectionné
     if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
       m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-      dialog_details_2.querySelector(".liste").innerHTML = m_selected.Nom_liste;
-      dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
+      dialog_details_2.querySelector(".liste").textContent = m_selected.Nom_liste;
+      dialog_details_2.querySelector(".sort").textContent = m_selected.Nom_sort;
+      dialog_details_2.querySelector(".info_principale").textContent = " (" + m_selected.Incantation + " s)";
     } else {
-      dialog_details_2.querySelector(".liste").innerHTML = "--";
-      dialog_details_2.querySelector(".sort").innerHTML = "";
+      dialog_details_2.querySelector(".liste").textContent = "--";
+      dialog_details_2.querySelector(".sort").textContent = "--";
+      dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
     }
 
     // Affichage du dialogue
@@ -363,24 +374,16 @@ function afficher_attaque(phase) {
   if (phase === 1) {
     // Gestion de l'arme principale
     if (attaquant.Arme1 === "" || model_att.Att_1 === null) {
-      dialog_attaque_1
-        .querySelector(".arme_radio1")
-        .closest("tr").style.display = "none";
+      dialog_attaque_1.querySelector(".arme_radio1").closest("tr").style.display = "none";
     } else {
-      dialog_attaque_1
-        .querySelector(".arme_radio1")
-        .closest("tr").style.display = "";
+      dialog_attaque_1.querySelector(".arme_radio1").closest("tr").style.display = "";
     }
 
     // Gestion de l'arme secondaire
     if (attaquant.Arme2 === "" || model_att.Att_2 === null) {
-      dialog_attaque_1
-        .querySelector(".arme_radio2")
-        .closest("tr").style.display = "none";
+      dialog_attaque_1.querySelector(".arme_radio2").closest("tr").style.display = "none";
     } else {
-      dialog_attaque_1
-        .querySelector(".arme_radio2")
-        .closest("tr").style.display = "";
+      dialog_attaque_1.querySelector(".arme_radio2").closest("tr").style.display = "";
     }
 
     // Réinitialisation des sélections
@@ -389,21 +392,17 @@ function afficher_attaque(phase) {
     dialog_attaque_1.querySelector(".arme_radio2").checked = false;
 
     // Mise à jour des labels des armes
-    dialog_attaque_1.querySelector(".main1").innerHTML =
-      "1ère main (" + attaquant.Arme1 + ")";
-    dialog_attaque_1.querySelector(".main2").innerHTML =
-      "2nde main (" + attaquant.Arme2 + ")";
+    dialog_attaque_1.querySelector(".main1").innerHTML = "1ère main (" + attaquant.Arme1 + ")";
+    dialog_attaque_1.querySelector(".main2").innerHTML = "2nde main (" + attaquant.Arme2 + ")";
 
     // Activation/désactivation des options d'accès aux armes pour l'attaque courante
     const attaque = Attaques[order_combats];
     if (attaque.Main === 1) {
-      dialog_attaque_1.querySelector(".arme_radio1").disabled =
-        attaquant.Arme1_engagee || attaquant.Esquive;
+      dialog_attaque_1.querySelector(".arme_radio1").disabled = attaquant.Arme1_engagee || attaquant.Esquive;
       dialog_attaque_1.querySelector(".arme_radio2").disabled = true;
     } else if (attaque.Main === 2) {
       dialog_attaque_1.querySelector(".arme_radio1").disabled = true;
-      dialog_attaque_1.querySelector(".arme_radio2").disabled =
-        attaquant.Arme2_engagee || attaquant.Esquive;
+      dialog_attaque_1.querySelector(".arme_radio2").disabled = attaquant.Arme2_engagee || attaquant.Esquive;
     }
 
     dialog_attaque_1.showModal();
@@ -430,12 +429,9 @@ function afficher_attaque(phase) {
 
     // Lancement de 3D6 pour l'attaque
     attaquant.jet_att =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
+      Math.floor(Math.random() * 6) + 1 +
+      Math.floor(Math.random() * 6) + 1 +
+      Math.floor(Math.random() * 6) + 1;
 
     // Calcul de la feinte de corps du défenseur
     const fdc_def = calcul_fdc_def();
@@ -462,10 +458,7 @@ function afficher_attaque(phase) {
   // === PHASE 3 : LOCALISATION DE L'ATTAQUE ===
   else if (phase === 3) {
     // Récupération du score d'attaque depuis le dialogue précédent
-    const scr_att = parseInt(
-      dialog_attaque_2.querySelector(".scr_att").value,
-      10
-    );
+    const scr_att = parseInt(dialog_attaque_2.querySelector(".scr_att").value, 10);
 
     // Si l'attaque a échoué, pas de localisation nécessaire
     if (scr_att < 0) {
@@ -482,11 +475,9 @@ function afficher_attaque(phase) {
 
     // Couleur selon le succès/échec
     if (scr_att >= 0) {
-      dialog_attaque_3.querySelector(".scr_att").style.backgroundColor =
-        "rgb(128, 255, 128)"; // Vert pour succès
+      dialog_attaque_3.querySelector(".scr_att").style.backgroundColor = "rgb(128, 255, 128)"; // Vert pour succès
     } else {
-      dialog_attaque_3.querySelector(".scr_att").style.backgroundColor =
-        "rgb(255, 128, 128)"; // Rouge pour échec
+      dialog_attaque_3.querySelector(".scr_att").style.backgroundColor = "rgb(255, 128, 128)"; // Rouge pour échec
     }
 
     // Génération de la localisation aléatoire
@@ -498,30 +489,25 @@ function afficher_attaque(phase) {
       dialog_attaque_3.querySelector(".tete").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".tete_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".tete").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".tete").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".tete_rd").checked = false;
     }
 
     // Poitrine
     if (loc_att === "poitrine") {
-      dialog_attaque_3.querySelector(".poitrine").closest("td").style.display =
-        "";
+      dialog_attaque_3.querySelector(".poitrine").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".poitrine_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".poitrine").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".poitrine").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".poitrine_rd").checked = false;
     }
 
     // Abdomen
     if (loc_att === "abdomen") {
-      dialog_attaque_3.querySelector(".abdomen").closest("td").style.display =
-        "";
+      dialog_attaque_3.querySelector(".abdomen").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".abdomen_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".abdomen").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".abdomen").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".abdomen_rd").checked = false;
     }
 
@@ -530,8 +516,7 @@ function afficher_attaque(phase) {
       dialog_attaque_3.querySelector(".brasg").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".brasg_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".brasg").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".brasg").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".brasg_rd").checked = false;
     }
 
@@ -540,30 +525,25 @@ function afficher_attaque(phase) {
       dialog_attaque_3.querySelector(".brasd").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".brasd_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".brasd").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".brasd").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".brasd_rd").checked = false;
     }
 
     // Jambe gauche
     if (loc_att === "jambe gauche") {
-      dialog_attaque_3.querySelector(".jambeg").closest("td").style.display =
-        "";
+      dialog_attaque_3.querySelector(".jambeg").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".jambeg_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".jambeg").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".jambeg").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".jambeg_rd").checked = false;
     }
 
     // Jambe droite
     if (loc_att === "jambe droite") {
-      dialog_attaque_3.querySelector(".jambed").closest("td").style.display =
-        "";
+      dialog_attaque_3.querySelector(".jambed").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".jambed_rd").checked = true;
     } else {
-      dialog_attaque_3.querySelector(".jambed").closest("td").style.display =
-        "none";
+      dialog_attaque_3.querySelector(".jambed").closest("td").style.display = "none";
       dialog_attaque_3.querySelector(".jambed_rd").checked = false;
     }
 
@@ -601,10 +581,7 @@ function affiche_def() {
   let scr_def;
   if (is_distant || defenseur.Arme1 === "Lancement de sort") {
     // Esquive uniquement pour les attaques à distance ou les sorts
-    scr_def =
-      defenseur.jet_def -
-      10 +
-      (defenseur.esq_def ? model_def.Esquive - defenseur.Nb_action : 0);
+    scr_def = defenseur.jet_def - 10 + (defenseur.esq_def ? model_def.Esquive - defenseur.Nb_action : 0);
   } else {
     // Parade pour les attaques au corps à corps
     scr_def = calcul_scr_def();
@@ -625,21 +602,17 @@ function affiche_def() {
   if (marge === 0) {
     if (scr_def > 0) {
       // Match nul mais défense réussie
-      dialog_defense_2.querySelector(".scr_def").style.backgroundColor =
-        "rgb(128, 255, 128)";
+      dialog_defense_2.querySelector(".scr_def").style.backgroundColor = "rgb(128, 255, 128)";
     } else {
       // Match nul mais défense échouée
-      dialog_defense_2.querySelector(".scr_def").style.backgroundColor =
-        "rgb(255, 128, 128)";
+      dialog_defense_2.querySelector(".scr_def").style.backgroundColor = "rgb(255, 128, 128)";
     }
   } else if (marge < 0) {
     // Défense réussie : marge négative
-    dialog_defense_2.querySelector(".scr_def").style.backgroundColor =
-      "rgb(128, 255, 128)";
+    dialog_defense_2.querySelector(".scr_def").style.backgroundColor = "rgb(128, 255, 128)";
   } else {
     // Attaque réussie : marge positive
-    dialog_defense_2.querySelector(".scr_def").style.backgroundColor =
-      "rgb(255, 128, 128)";
+    dialog_defense_2.querySelector(".scr_def").style.backgroundColor = "rgb(255, 128, 128)";
   }
 
   // Calcul des dommages infligés par l'attaque
@@ -664,29 +637,19 @@ function affiche_def() {
   }
 
   // Déterminer si l'attaque est une contre-attaque (par rapport au dialogue d'attaque précédent)
-  const is_contre_attaque = dialog_attaque_1
-    .querySelector(".nom")
-    .innerHTML.includes("contre-attaq");
+  const is_contre_attaque = dialog_attaque_1.querySelector(".nom").innerHTML.includes("contre-attaq");
 
   // Affichage du résultat selon la marge et le type de défense
   // Case 1 : Défense échouée (scr_def négatif mais marge positive ou nulle)
   if (scr_def < 0 && marge >= 0) {
-    dialog_defense_2.querySelector(".dommages").innerHTML =
-      "Défense échouée.<br>L'attaque occasionne " +
-      dommages +
-      " points de vie " +
-      texte_loc +
-      ".";
+    dialog_defense_2.querySelector(".dommages").innerHTML = "Défense échouée.<br>L'attaque occasionne " +
+      dommages + " points de vie " + texte_loc + ".";
     dialog_defense_2.showModal();
   }
   // Case 2 : Attaque interceptée partiellement (marge positive)
   else if (marge > 0) {
-    dialog_defense_2.querySelector(".dommages").innerHTML =
-      "Attaque interceptée partiellement.<br>L'attaque occasionne " +
-      dommages +
-      " points de vie " +
-      texte_loc +
-      ".";
+    dialog_defense_2.querySelector(".dommages").innerHTML = "Attaque interceptée partiellement.<br>L'attaque occasionne " +
+      dommages + " points de vie " + texte_loc + ".";
     dialog_defense_2.showModal();
   }
   // Case 3 : Attaque interceptée mais attaquant garde l'avantage
@@ -696,17 +659,13 @@ function affiche_def() {
     (defenseur.pr2_def && marge > -2) ||
     (defenseur.esq_def && marge > -4)
   ) {
-    dialog_defense_2.querySelector(".dommages").innerHTML =
-      "Attaque interceptée entièrement." +
-      (is_contre_attaque || is_distant
-        ? ""
-        : "<br>Mais l'attaquant garde l'avantage.");
+    dialog_defense_2.querySelector(".dommages").innerHTML = "Attaque interceptée entièrement." +
+      (is_contre_attaque || is_distant ? "" : "<br>Mais l'attaquant garde l'avantage.");
     dialog_defense_2.showModal();
   }
   // Case 4 : Attaque interceptée complètement, défenseur prend l'avantage
   else {
-    dialog_defense_2.querySelector(".dommages").innerHTML =
-      "Attaque interceptée entièrement." +
+    dialog_defense_2.querySelector(".dommages").innerHTML = "Attaque interceptée entièrement." +
       (is_contre_attaque || is_distant ? "" : "<br>Vous prenez l'avantage.");
     dialog_defense_2.showModal();
   }
@@ -733,13 +692,9 @@ function afficher_defense(phase) {
   // === PHASE 1 : CHOIX DE LA DÉFENSE ===
   if (phase === 1) {
     // Création de l'en-tête du dialogue
-    const is_contre_attaque = dialog_attaque_1
-      .querySelector(".nom")
-      .innerHTML.includes("contre-attaq");
+    const is_contre_attaque = dialog_attaque_1.querySelector(".nom").innerHTML.includes("contre-attaq");
     entete = defenseur.Titre + "<br>";
-    entete += is_contre_attaque
-      ? "Vous êtes contre-attaqué(e) par "
-      : "Vous êtes attaqué(e) par ";
+    entete += is_contre_attaque ? "Vous êtes contre-attaqué(e) par " : "Vous êtes attaqué(e) par ";
     entete += attaquant.Titre + "<hr>";
     dialog_defense_1.querySelector(".nom").innerHTML = entete;
 
@@ -756,13 +711,9 @@ function afficher_defense(phase) {
       par_def_1 = model_def.Par_Bouclier;
     }
     if (defenseur.Arme1 === "" || par_def_1 === null) {
-      dialog_defense_1
-        .querySelector(".arme_radio1")
-        .closest("tr").style.display = "none";
+      dialog_defense_1.querySelector(".arme_radio1").closest("tr").style.display = "none";
     } else {
-      dialog_defense_1
-        .querySelector(".arme_radio1")
-        .closest("tr").style.display = "";
+      dialog_defense_1.querySelector(".arme_radio1").closest("tr").style.display = "";
     }
 
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (2nde main)
@@ -777,13 +728,9 @@ function afficher_defense(phase) {
       par_def_2 = model_def.Par_Bouclier;
     }
     if (defenseur.Arme2 === "" || par_def_2 === null) {
-      dialog_defense_1
-        .querySelector(".arme_radio2")
-        .closest("tr").style.display = "none";
+      dialog_defense_1.querySelector(".arme_radio2").closest("tr").style.display = "none";
     } else {
-      dialog_defense_1
-        .querySelector(".arme_radio2")
-        .closest("tr").style.display = "";
+      dialog_defense_1.querySelector(".arme_radio2").closest("tr").style.display = "";
     }
 
     // Réinitialisation des sélections
@@ -793,16 +740,12 @@ function afficher_defense(phase) {
     dialog_defense_1.querySelector(".arme_radio3").checked = false;
 
     // Mise à jour des labels des armes
-    dialog_defense_1.querySelector(".main1").innerHTML =
-      "Parade 1ère main (" + defenseur.Arme1 + ")";
-    dialog_defense_1.querySelector(".main2").innerHTML =
-      "Parade 2nde main (" + defenseur.Arme2 + ")";
+    dialog_defense_1.querySelector(".main1").innerHTML = "Parade 1ère main (" + defenseur.Arme1 + ")";
+    dialog_defense_1.querySelector(".main2").innerHTML = "Parade 2nde main (" + defenseur.Arme2 + ")";
 
     // Activation/désactivation des options selon les possibilités
-    dialog_defense_1.querySelector(".arme_radio1").disabled =
-      (defenseur.Arme1 && defenseur.Arme1_engagee) || defenseur.Esquive;
-    dialog_defense_1.querySelector(".arme_radio2").disabled =
-      (defenseur.Arme2 && defenseur.Arme2_engagee) || defenseur.Esquive;
+    dialog_defense_1.querySelector(".arme_radio1").disabled = (defenseur.Arme1 && defenseur.Arme1_engagee) || defenseur.Esquive;
+    dialog_defense_1.querySelector(".arme_radio2").disabled = (defenseur.Arme2 && defenseur.Arme2_engagee) || defenseur.Esquive;
 
     // Désactivation des parades pour les attaques à distance ou les sorts
     if (is_distant || defenseur.Arme1 === "Lancement de sort") {
@@ -823,12 +766,9 @@ function afficher_defense(phase) {
 
     // Lancement de 3D6 pour la défense
     defenseur.jet_def =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
+      Math.floor(Math.random() * 6) + 1 +
+      Math.floor(Math.random() * 6) + 1 +
+      Math.floor(Math.random() * 6) + 1;
 
     dialog_defense_2.querySelector(".jet_des").value = defenseur.jet_def;
 
@@ -878,39 +818,119 @@ function new_loc() {
 
     if (dialog_attaque_2.querySelector(".tete").checked && loc_att === "tête")
       break;
-    if (
-      dialog_attaque_2.querySelector(".poitrine").checked &&
-      loc_att === "poitrine"
-    )
+    if (dialog_attaque_2.querySelector(".poitrine").checked && loc_att === "poitrine")
       break;
-    if (
-      dialog_attaque_2.querySelector(".abdomen").checked &&
-      loc_att === "abdomen"
-    )
+    if (dialog_attaque_2.querySelector(".abdomen").checked && loc_att === "abdomen")
       break;
-    if (
-      dialog_attaque_2.querySelector(".brasg").checked &&
-      loc_att === "bras gauche"
-    )
+    if (dialog_attaque_2.querySelector(".brasg").checked && loc_att === "bras gauche")
       break;
-    if (
-      dialog_attaque_2.querySelector(".brasd").checked &&
-      loc_att === "bras droit"
-    )
+    if (dialog_attaque_2.querySelector(".brasd").checked && loc_att === "bras droit")
       break;
-    if (
-      dialog_attaque_2.querySelector(".jambeg").checked &&
-      loc_att === "jambe gauche"
-    )
+    if (dialog_attaque_2.querySelector(".jambeg").checked && loc_att === "jambe gauche")
       break;
-    if (
-      dialog_attaque_2.querySelector(".jambed").checked &&
-      loc_att === "jambe droite"
-    )
+    if (dialog_attaque_2.querySelector(".jambed").checked && loc_att === "jambe droite")
       break;
   }
 
   return loc_att;
+}
+
+/**
+ * Affiche le dialogue de paramètrage d'un sort
+ */
+function afficher_param_sort(sort) {
+  // Récupération du modèle du personnage lanceur de sort
+  const model = Models.find((m) => m.Nom_model === m_selected.Model);
+
+  // Initialisation des champs du dialogue
+  dialog_sort_1.querySelector(".nom_liste").textContent = sort.Nom_liste;
+  dialog_sort_1.querySelector(".nom_sort").textContent = sort.Nom_sort;
+  dialog_sort_1.querySelector(".fatigue_actuelle").value = m_selected.Fatigue;
+  dialog_sort_1.querySelector(".concentration_actuelle").value = m_selected.Concentration;
+  dialog_sort_1.querySelector(".fatigue_max").textContent = model.Fatigue;
+  dialog_sort_1.querySelector(".concentration_max").textContent = model.Concentration;
+  dialog_sort_1.querySelector(".fatigue_cout").value = sort.Niveau;
+  dialog_sort_1.querySelector(".concentration_cout").value = sort.Niveau;
+
+  // Réinitialisation des sélections
+  dialog_sort_1.querySelector(".sort_radio1").checked = true;
+  dialog_sort_1.querySelector(".sort_radio2").checked = false;
+  dialog_sort_1.querySelector(".sort_radio3").checked = false;
+  dialog_sort_1.querySelector(".sort_radio0").checked = false;
+
+  dialog_sort_1.querySelector(".fatigue_cout").disabled = true;
+  dialog_sort_1.querySelector(".concentration_cout").disabled = true;
+
+  // Activation/désactivation des options selon les possibilités
+  dialog_sort_1.querySelector(".sort_radio0").disabled = false;
+
+  if (sort.Niveau > m_selected.Concentration) {
+    dialog_sort_1.querySelector(".sort_radio1").disabled = true;
+  } else {
+    dialog_sort_1.querySelector(".sort_radio1").disabled = false;
+  }
+  if (2 * sort.Niveau > m_selected.Concentration) {
+    dialog_sort_1.querySelector(".sort_radio2").disabled = true;
+  } else {
+    dialog_sort_1.querySelector(".sort_radio2").disabled = false;
+  }
+  if (3 * sort.Niveau > m_selected.Concentration) {
+    dialog_sort_1.querySelector(".sort_radio3").disabled = true;
+  } else {
+    dialog_sort_1.querySelector(".sort_radio3").disabled = false;
+  }
+
+  dialog_sort_1.showModal();
+}
+
+/**
+ * Affiche le dialogue de paramètrage d'un sort
+ */
+function afficher_confirmation_sort() {
+  // Récupération du sort en cours de lancement
+  const sort = Sorts.find((s) =>
+    s.Nom_liste === sort_lance.split("@")[0] &&
+    s.Nom_sort === sort_lance.split("@")[1]);
+
+  // Initialisation des champs du dialogue
+  dialog_sort_2.querySelector(".nom_liste").textContent = sort.Nom_liste;
+  dialog_sort_2.querySelector(".nom_sort").textContent = sort.Nom_sort;
+  // dialog_sort_2.querySelector(".fatigue_actuelle").value = m_selected.Fatigue;
+  // dialog_sort_2.querySelector(".concentration_actuelle").value = m_selected.Concentration;
+  // dialog_sort_2.querySelector(".fatigue_max").textContent = model.Fatigue;
+  // dialog_sort_2.querySelector(".concentration_max").textContent = model.Concentration;
+  dialog_sort_2.querySelector(".fatigue_cout").value = sort.Niveau;
+  dialog_sort_2.querySelector(".concentration_cout").value = sort.Niveau;
+
+  // Réinitialisation des sélections
+  // dialog_sort_2.querySelector(".sort_radio1").checked = true;
+  // dialog_sort_2.querySelector(".sort_radio2").checked = false;
+  // dialog_sort_2.querySelector(".sort_radio3").checked = false;
+  // dialog_sort_2.querySelector(".sort_radio0").checked = false;
+
+  dialog_sort_2.querySelector(".fatigue_cout").disabled = true;
+  dialog_sort_2.querySelector(".concentration_cout").disabled = true;
+
+  // Activation/désactivation des options selon les possibilités
+  // dialog_sort_2.querySelector(".sort_radio0").disabled = false;
+
+  // if (sort.Niveau > m_selected.Concentration) {
+  //   dialog_sort_2.querySelector(".sort_radio1").disabled = true;
+  // } else {
+  //   dialog_sort_2.querySelector(".sort_radio1").disabled = false;
+  // }
+  // if (2 * sort.Niveau > m_selected.Concentration) {
+  //   dialog_sort_2.querySelector(".sort_radio2").disabled = true;
+  // } else {
+  //   dialog_sort_2.querySelector(".sort_radio2").disabled = false;
+  // }
+  // if (3 * sort.Niveau > m_selected.Concentration) {
+  //   dialog_sort_2.querySelector(".sort_radio3").disabled = true;
+  // } else {
+  //   dialog_sort_2.querySelector(".sort_radio3").disabled = false;
+  // }
+
+  dialog_sort_2.showModal();
 }
 
 // === ÉVÉNEMENTS POUR LES DIMENSIONS DE FORMES ===
@@ -1043,38 +1063,34 @@ dialog_dim_mur.addEventListener("keydown", function (event) {
 });
 
 // Fermeture du dialogue de création d'ellipse
-dialog_dim_ellipse
-  .querySelector("#Fermer")
-  .addEventListener("click", function (event) {
-    dialog_dim_ellipse.close();
-  });
+dialog_dim_ellipse.querySelector("#Fermer").addEventListener("click", function (event) {
+  dialog_dim_ellipse.close();
+});
 
 // Création d'une ellipse avec les dimensions spécifiées
-dialog_dim_ellipse
-  .querySelector("#Creer")
-  .addEventListener("click", function (event) {
-    // Récupération des dimensions saisies
-    const w = dialog_dim_ellipse.querySelector(".grand_axe").value;
-    const h = dialog_dim_ellipse.querySelector(".petit_axe").value;
+dialog_dim_ellipse.querySelector("#Creer").addEventListener("click", function (event) {
+  // Récupération des dimensions saisies
+  const w = dialog_dim_ellipse.querySelector(".grand_axe").value;
+  const h = dialog_dim_ellipse.querySelector(".petit_axe").value;
 
-    // Création de la nouvelle forme ellipse
-    Formes[Formes.length] = new Forme("Ellipse");
-    const e = Formes[Formes.length - 1];
+  // Création de la nouvelle forme ellipse
+  Formes[Formes.length] = new Forme("Ellipse");
+  const e = Formes[Formes.length - 1];
 
-    // Calcul des dimensions en pixels selon le système hexagonal
-    e.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
-    e.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
+  // Calcul des dimensions en pixels selon le système hexagonal
+  e.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
+  e.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
 
-    // Positionnement au centre du canvas
-    e.x = canvas.width / 2;
-    e.y = canvas.height / 2;
+  // Positionnement au centre du canvas
+  e.x = canvas.width / 2;
+  e.y = canvas.height / 2;
 
-    // Application de la couleur sélectionnée
-    e.color = document.getElementById("forme_color").value;
+  // Application de la couleur sélectionnée
+  e.color = document.getElementById("forme_color").value;
 
-    dialog_dim_ellipse.close();
-    Map.drawHexMap();
-  });
+  dialog_dim_ellipse.close();
+  Map.drawHexMap();
+});
 
 // Gestion de la touche Entrée pour créer l'ellipse
 dialog_dim_ellipse.addEventListener("keydown", function (event) {
@@ -1084,11 +1100,9 @@ dialog_dim_ellipse.addEventListener("keydown", function (event) {
 });
 
 // Synchronisation automatique du petit axe avec le grand axe
-dialog_dim_ellipse
-  .querySelector(".grand_axe")
-  .addEventListener("input", function (event) {
-    dialog_dim_ellipse.querySelector(".petit_axe").value = event.target.value;
-  });
+dialog_dim_ellipse.querySelector(".grand_axe").addEventListener("input", function (event) {
+  dialog_dim_ellipse.querySelector(".petit_axe").value = event.target.value;
+});
 
 // === ÉVÉNEMENTS POUR LES DÉTAILS DE PERSONNAGES ===
 // Gestion des dialogues de création et modification de personnages
@@ -1099,11 +1113,9 @@ dialog_details_1.addEventListener("contextmenu", function (event) {
 });
 
 // Fermeture du dialogue de création
-dialog_details_1
-  .querySelector("#Fermer")
-  .addEventListener("click", function (event) {
-    dialog_details_1.close();
-  });
+dialog_details_1.querySelector("#Fermer").addEventListener("click", function (event) {
+  dialog_details_1.close();
+});
 
 // Création d'un nouveau personnage
 dialog_details_1.querySelector("#model").addEventListener("change", function (event) {
@@ -1168,18 +1180,14 @@ for (let i = 0; i < inputs.length; i++) {
     }
 
     // Mise à jour de l'armure calculée
-    dialog_details_2.querySelector(".armure").value =
-      m_selected.armure_generale();
+    dialog_details_2.querySelector(".armure").value = m_selected.armure_generale();
 
     // Mise à jour de la carte
     Map.generateHexMap();
     Map.drawHexMap();
 
     // Synchronisation avec le serveur
-    sendMessage(
-      "Map_" + field,
-      m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value
-    );
+    sendMessage("Map_" + field, m_selected.Model + "@" + m_selected.Indice + "@" + event.target.value);
   });
 }
 
@@ -1188,20 +1196,16 @@ function info_arme(arme) {
   let score = 0;
 
   // Si l'arme principale ou secondaire est nulle ou est un lancement de sort, on affiche "-"
-  if (
-    arme === 1 &&
+  if (arme === 1 &&
     (!m_selected.Arme1 ||
       m_selected.Arme1 === "Lancement de sort" ||
-      m_selected.Arme1 === "Bouclier")
-  ) {
+      m_selected.Arme1 === "Bouclier")) {
     return "-";
   }
-  if (
-    arme === 2 &&
+  if (arme === 2 &&
     (!m_selected.Arme2 ||
       m_selected.Arme2 === "Lancement de sort" ||
-      m_selected.Arme2 === "Bouclier")
-  ) {
+      m_selected.Arme2 === "Bouclier")) {
     return "-";
   }
 
@@ -1220,12 +1224,10 @@ function info_arme(arme) {
   score += m_selected.B_att;
 
   // Malus d'escrime pour combat à deux armes
-  if (
-    m_selected.Arme1 &&
+  if (m_selected.Arme1 &&
     m_selected.Arme1 !== "" &&
     m_selected.Arme2 &&
-    m_selected.Arme2 !== ""
-  ) {
+    m_selected.Arme2 !== "") {
     if (m_selected.Arme1 !== "Bouclier" && m_selected.Arme2 !== "Bouclier") {
       if (m_selected.Arme1 === "Dague" || m_selected.Arme2 === "Dague") {
         score -= Math.max(2 - model.Escrime, 0);
@@ -1261,8 +1263,7 @@ arme1.addEventListener("click", function (event) {
         document.getElementById("modal").style.display = "flex";
         dialog_details_2.style.zIndex = 0;
 
-        const joueurSelectionne = m_selected.Model;
-        SortsConnus.filter((s) => s.Nom_model === joueurSelectionne).forEach((x) => {
+        SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
           const element = document.getElementById(getShortName(x.Nom_liste));
           element.style.color = "white";
           element.style.backgroundColor = "green";
@@ -1331,14 +1332,12 @@ arme1.addEventListener("click", function (event) {
     m_selected.Arme1 = arme1.value;
 
     // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent =
-      "(" + info_arme(1) + ")";
+    if (!isClickInside) dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
 
     // Activation/désactivation du sélecteur d'arme secondaire
     if (arme2.options.length > 1) {
       arme2.disabled = false;
-      dialog_details_2.querySelector(".info_secondaire").textContent =
-        "(" + info_arme(2) + ")";
+      dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
     } else {
       arme2.disabled = true;
       dialog_details_2.querySelector(".info_secondaire").textContent = "(-)";
@@ -1358,10 +1357,8 @@ dialog_details_2.querySelector(".arme2").addEventListener("change", function (ev
   m_selected.Arme2 = event.target.value;
 
   // Mise à jour de l'information affichée
-  dialog_details_2.querySelector(".info_principale").textContent =
-    "(" + info_arme(1) + ")";
-  dialog_details_2.querySelector(".info_secondaire").textContent =
-    "(" + info_arme(2) + ")";
+  dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
+  dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
 });
 
 // Empêche le menu contextuel sur le dialogue de détails
@@ -1388,9 +1385,7 @@ dialog_details_2.querySelector("#Dupliquer").addEventListener("click", function 
 // Gestion des clics sur les spans pour sélectionner les armes
 dialog_attaque_1.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
-    const radio = event.target
-      .closest("td")
-      .querySelector('input[type="radio"]');
+    const radio = event.target.closest("td").querySelector('input[type="radio"]');
     if (radio === null || typeof radio === "undefined") return;
     radio.click();
   });
@@ -1404,53 +1399,39 @@ dialog_attaque_1.addEventListener("keydown", function (event) {
     attaquant.at2_att = false;
     dialog_attaque_1.close();
     resoudre_attaque();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+    setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
   }
 });
 
 // Sélection "Aucune arme" - annule l'attaque
-dialog_attaque_1
-  .querySelector(".arme_radio0")
-  .addEventListener("change", function (event) {
-    const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = false;
-    attaquant.at2_att = false;
-    dialog_attaque_1.close();
-    resoudre_attaque();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-  });
+dialog_attaque_1.querySelector(".arme_radio0").addEventListener("change", function (event) {
+  const attaquant = Pions.find((m) => m.Attaquant);
+  attaquant.at1_att = false;
+  attaquant.at2_att = false;
+  dialog_attaque_1.close();
+  resoudre_attaque();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+});
 
 // Sélection de l'arme principale (1ère main)
-dialog_attaque_1
-  .querySelector(".arme_radio1")
-  .addEventListener("change", function (event) {
-    const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = true;
-    attaquant.at2_att = false;
-    dialog_attaque_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_attaque(2);
-  });
+dialog_attaque_1.querySelector(".arme_radio1").addEventListener("change", function (event) {
+  const attaquant = Pions.find((m) => m.Attaquant);
+  attaquant.at1_att = true;
+  attaquant.at2_att = false;
+  dialog_attaque_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_attaque(2);
+});
 
 // Sélection de l'arme secondaire (2nde main)
-dialog_attaque_1
-  .querySelector(".arme_radio2")
-  .addEventListener("change", function (event) {
-    const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = false;
-    attaquant.at2_att = true;
-    dialog_attaque_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_attaque(2);
-  });
+dialog_attaque_1.querySelector(".arme_radio2").addEventListener("change", function (event) {
+  const attaquant = Pions.find((m) => m.Attaquant);
+  attaquant.at1_att = false;
+  attaquant.at2_att = true;
+  dialog_attaque_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_attaque(2);
+});
 
 // Gestion de la touche Échap pour annuler l'attaque (dialogue 2)
 dialog_attaque_2.addEventListener("keydown", function (event) {
@@ -1459,76 +1440,54 @@ dialog_attaque_2.addEventListener("keydown", function (event) {
     attaquant.at1_att = false;
     attaquant.at2_att = false;
     dialog_attaque_2.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+    setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
     resoudre_attaque();
   }
 });
 
 // Bouton "Point de chance" - relance les dés d'attaque
-dialog_attaque_2
-  .querySelector(".pt_chance")
-  .addEventListener("click", function (event) {
-    const attaquant = Pions.find((m) => m.Attaquant);
+dialog_attaque_2.querySelector(".pt_chance").addEventListener("click", function (event) {
+  const attaquant = Pions.find((m) => m.Attaquant);
 
-    // Lancement de 3 jets de dés (3D6)
-    const jet_0 = parseInt(
-      dialog_attaque_2.querySelector(".jet_des").value,
-      10
-    );
-    const jet_1 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
-    const jet_2 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
-    const jet_3 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
+  // Lancement de 3 jets de dés (3D6)
+  const jet_0 = parseInt(dialog_attaque_2.querySelector(".jet_des").value, 10);
+  const jet_1 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
+  const jet_2 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
+  const jet_3 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
 
-    // Sélection du meilleur jet (minimum 13)
-    attaquant.jet_att = Math.max(13, jet_0, jet_1, jet_2, jet_3);
+  // Sélection du meilleur jet (minimum 13)
+  attaquant.jet_att = Math.max(13, jet_0, jet_1, jet_2, jet_3);
 
-    // Calcul du score d'attaque
-    const scr_att = calcul_scr_att();
+  // Calcul du score d'attaque
+  const scr_att = calcul_scr_att();
 
-    // Mise à jour de l'interface
-    dialog_attaque_2.querySelector(".jet_des").value = attaquant.jet_att;
-    dialog_attaque_2.querySelector(".scr_att").value = scr_att;
+  // Mise à jour de l'interface
+  dialog_attaque_2.querySelector(".jet_des").value = attaquant.jet_att;
+  dialog_attaque_2.querySelector(".scr_att").value = scr_att;
 
-    // Couleur selon le résultat
-    if (scr_att >= 0) {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(128, 255, 128)";
-    } else {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(255, 128, 128)";
-    }
-  });
+  // Couleur selon le résultat
+  if (scr_att >= 0) {
+    dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(128, 255, 128)";
+  } else {
+    dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(255, 128, 128)";
+  }
+});
 
 // Bouton d'acceptation du jet d'attaque
-dialog_attaque_2
-  .querySelector(".accepter")
-  .addEventListener("click", function (event) {
-    dialog_attaque_2.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_attaque(3);
-  });
+dialog_attaque_2.querySelector(".accepter").addEventListener("click", function (event) {
+  dialog_attaque_2.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_attaque(3);
+});
 
 // Gestion des cases à cocher pour les zones corporelles
 dialog_attaque_2.querySelectorAll('input[type="checkbox"]').forEach((chk) => {
@@ -1556,119 +1515,93 @@ dialog_attaque_2.querySelectorAll('input[type="checkbox"]').forEach((chk) => {
 
     // Couleur selon le succès/échec
     if (scr_att >= 0) {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(128, 255, 128)"; // Vert pour succès
+      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(128, 255, 128)"; // Vert pour succès
     } else {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(255, 128, 128)"; // Rouge pour échec
+      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(255, 128, 128)"; // Rouge pour échec
     }
   });
 });
 
 // Gestion des cases à cocher pour les zones corporelles
-dialog_attaque_2
-  .querySelector(".var_mj")
-  .addEventListener("input", function (event) {
-    // Mise à jour de la feinte de corps du défenseur
-    const fdc_def = calcul_fdc_def();
-    dialog_attaque_2.querySelector(".fdc_def").value = fdc_def;
+dialog_attaque_2.querySelector(".var_mj").addEventListener("input", function (event) {
+  // Mise à jour de la feinte de corps du défenseur
+  const fdc_def = calcul_fdc_def();
+  dialog_attaque_2.querySelector(".fdc_def").value = fdc_def;
 
-    // Mise à jour du score d'attaque
-    const scr_att = calcul_scr_att();
-    dialog_attaque_2.querySelector(".scr_att").value = scr_att;
+  // Mise à jour du score d'attaque
+  const scr_att = calcul_scr_att();
+  dialog_attaque_2.querySelector(".scr_att").value = scr_att;
 
-    // Couleur selon le succès/échec
-    if (scr_att >= 0) {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(128, 255, 128)"; // Vert pour succès
-    } else {
-      dialog_attaque_2.querySelector(".scr_att").style.backgroundColor =
-        "rgb(255, 128, 128)"; // Rouge pour échec
-    }
-  });
+  // Couleur selon le succès/échec
+  if (scr_att >= 0) {
+    dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(128, 255, 128)"; // Vert pour succès
+  } else {
+    dialog_attaque_2.querySelector(".scr_att").style.backgroundColor = "rgb(255, 128, 128)"; // Rouge pour échec
+  }
+});
 
 // Gestion des clics sur les spans pour sélectionner les zones corporelles
 dialog_attaque_2.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
-    const chk = event.target
-      .closest("td")
-      .querySelector('input[type="checkbox"]');
+    const chk = event.target.closest("td").querySelector('input[type="checkbox"]');
     if (chk === null || typeof chk === "undefined") return;
     chk.click();
   });
 });
 
 // Affichage du tooltip au survol du score d'attaque
-dialog_attaque_2
-  .querySelector(".scr_att")
-  .addEventListener("mouseover", function (event) {
-    const tooltip = dialog_attaque_2.querySelector(".tooltip");
-    const dialog = dialog_attaque_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
-    tooltip.style.top = event.clientY - dialog.top + 10 + "px";
-    tooltip.style.display = "block";
-    tooltip.innerHTML = explications_scr_att();
-  });
+dialog_attaque_2.querySelector(".scr_att").addEventListener("mouseover", function (event) {
+  const tooltip = dialog_attaque_2.querySelector(".tooltip");
+  const dialog = dialog_attaque_2.getBoundingClientRect();
+  tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+  tooltip.style.top = event.clientY - dialog.top + 10 + "px";
+  tooltip.style.display = "block";
+  tooltip.innerHTML = explications_scr_att();
+});
 
 // Masquage du tooltip quand la souris quitte le score d'attaque
-dialog_attaque_2
-  .querySelector(".scr_att")
-  .addEventListener("mouseout", function (event) {
-    const tooltip = dialog_attaque_2.querySelector(".tooltip");
-    tooltip.style.display = "none";
-  });
+dialog_attaque_2.querySelector(".scr_att").addEventListener("mouseout", function (event) {
+  const tooltip = dialog_attaque_2.querySelector(".tooltip");
+  tooltip.style.display = "none";
+});
 
 // Affichage du tooltip au survol du score d'attaque
-dialog_attaque_2
-  .querySelector(".fdc_def")
-  .addEventListener("mouseover", function (event) {
-    const tooltip = dialog_attaque_2.querySelector(".tooltip");
-    const dialog = dialog_attaque_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
-    tooltip.style.top = event.clientY - dialog.top + 10 + "px";
-    tooltip.style.display = "block";
-    tooltip.innerHTML = explications_fdc_def();
-  });
+dialog_attaque_2.querySelector(".fdc_def").addEventListener("mouseover", function (event) {
+  const tooltip = dialog_attaque_2.querySelector(".tooltip");
+  const dialog = dialog_attaque_2.getBoundingClientRect();
+  tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+  tooltip.style.top = event.clientY - dialog.top + 10 + "px";
+  tooltip.style.display = "block";
+  tooltip.innerHTML = explications_fdc_def();
+});
 
 // Masquage du tooltip quand la souris quitte le score d'attaque
-dialog_attaque_2
-  .querySelector(".fdc_def")
-  .addEventListener("mouseout", function (event) {
-    const tooltip = dialog_attaque_2.querySelector(".tooltip");
-    tooltip.style.display = "none";
-  });
+dialog_attaque_2.querySelector(".fdc_def").addEventListener("mouseout", function (event) {
+  const tooltip = dialog_attaque_2.querySelector(".tooltip");
+  tooltip.style.display = "none";
+});
 
 // Bouton "Point de chance" pour la localisation - relance la localisation
-dialog_attaque_3
-  .querySelector(".pt_chance")
-  .addEventListener("click", function (event) {
-    // Génération de 3 nouvelles localisations
-    for (let i = 0; i < 3; i++) {
-      const new_jet = new_loc();
-      if (new_jet === "tête")
-        dialog_attaque_3.querySelector(".tete").closest("td").style.display =
-          "";
-      if (new_jet === "poitrine")
-        dialog_attaque_3
-          .querySelector(".poitrine")
-          .closest("td").style.display = "";
-      if (new_jet === "abdomen")
-        dialog_attaque_3.querySelector(".abdomen").closest("td").style.display =
-          "";
-      if (new_jet === "bras gauche")
-        dialog_attaque_3.querySelector(".brasg").closest("td").style.display =
-          "";
-      if (new_jet === "bras droit")
-        dialog_attaque_3.querySelector(".brasd").closest("td").style.display =
-          "";
-      if (new_jet === "jambe gauche")
-        dialog_attaque_3.querySelector(".jambeg").closest("td").style.display =
-          "";
-      if (new_jet === "jambe droite")
-        dialog_attaque_3.querySelector(".jambed").closest("td").style.display =
-          "";
-    }
-  });
+dialog_attaque_3.querySelector(".pt_chance").addEventListener("click", function (event) {
+  // Génération de 3 nouvelles localisations
+  for (let i = 0; i < 3; i++) {
+    const new_jet = new_loc();
+    if (new_jet === "tête")
+      dialog_attaque_3.querySelector(".tete").closest("td").style.display = "";
+    if (new_jet === "poitrine")
+      dialog_attaque_3.querySelector(".poitrine").closest("td").style.display = "";
+    if (new_jet === "abdomen")
+      dialog_attaque_3.querySelector(".abdomen").closest("td").style.display = "";
+    if (new_jet === "bras gauche")
+      dialog_attaque_3.querySelector(".brasg").closest("td").style.display = "";
+    if (new_jet === "bras droit")
+      dialog_attaque_3.querySelector(".brasd").closest("td").style.display = "";
+    if (new_jet === "jambe gauche")
+      dialog_attaque_3.querySelector(".jambeg").closest("td").style.display = "";
+    if (new_jet === "jambe droite")
+      dialog_attaque_3.querySelector(".jambed").closest("td").style.display = "";
+  }
+});
 
 // Gestion des clics sur les spans pour sélectionner la localisation
 dialog_attaque_3.querySelectorAll("span").forEach((span) => {
@@ -1680,35 +1613,22 @@ dialog_attaque_3.querySelectorAll("span").forEach((span) => {
 });
 
 // Bouton d'acceptation de la localisation
-dialog_attaque_3
-  .querySelector(".accepter")
-  .addEventListener("click", function (event) {
-    const attaquant = Pions.find((m) => m.Attaquant);
-    const defenseur = Pions.find((m) => m.Defenseur);
+dialog_attaque_3.querySelector(".accepter").addEventListener("click", function (event) {
+  const attaquant = Pions.find((m) => m.Attaquant);
+  const defenseur = Pions.find((m) => m.Defenseur);
 
-    // Récupération de la localisation sélectionnée
-    attaquant.loc_att = dialog_attaque_3.querySelector(
-      'input[name="loc"]:checked'
-    ).value;
-    dialog_attaque_3.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+  // Récupération de la localisation sélectionnée
+  attaquant.loc_att = dialog_attaque_3.querySelector('input[name="loc"]:checked').value;
+  dialog_attaque_3.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
 
-    // Résolution selon le score d'attaque
-    const scr_att = parseInt(
-      dialog_attaque_3.querySelector(".scr_att").value,
-      10
-    );
-    if (
-      scr_att >= 0 &&
-      defenseur !== null &&
-      typeof defenseur !== "undefined"
-    ) {
-      // Afficher le dialogue de défense pour permettre au défenseur de choisir sa défense
-      afficher_defense(1);
-    } else resoudre_attaque();
-  });
+  // Résolution selon le score d'attaque
+  const scr_att = parseInt(dialog_attaque_3.querySelector(".scr_att").value, 10);
+  if (scr_att >= 0 && defenseur !== null && typeof defenseur !== "undefined") {
+    // Afficher le dialogue de défense pour permettre au défenseur de choisir sa défense
+    afficher_defense(1);
+  } else resoudre_attaque();
+});
 
 // Gestion de la touche Échap pour annuler l'attaque (dialogue 3)
 dialog_attaque_3.addEventListener("keydown", function (event) {
@@ -1717,32 +1637,26 @@ dialog_attaque_3.addEventListener("keydown", function (event) {
     attaquant.at1_att = false;
     attaquant.at2_att = false;
     dialog_attaque_3.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+    setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
     resoudre_attaque();
   }
 });
 
 // Affichage du tooltip au survol du score d'attaque (dialogue 3)
-dialog_attaque_3
-  .querySelector(".scr_att")
-  .addEventListener("mouseover", function (event) {
-    const tooltip = dialog_attaque_3.querySelector(".tooltip");
-    const dialog = dialog_attaque_3.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
-    tooltip.style.top = event.clientY - dialog.top + 10 + "px";
-    tooltip.style.display = "block";
-    tooltip.innerHTML = explications_scr_att();
-  });
+dialog_attaque_3.querySelector(".scr_att").addEventListener("mouseover", function (event) {
+  const tooltip = dialog_attaque_3.querySelector(".tooltip");
+  const dialog = dialog_attaque_3.getBoundingClientRect();
+  tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+  tooltip.style.top = event.clientY - dialog.top + 10 + "px";
+  tooltip.style.display = "block";
+  tooltip.innerHTML = explications_scr_att();
+});
 
 // Masquage du tooltip quand la souris quitte le score d'attaque (dialogue 3)
-dialog_attaque_3
-  .querySelector(".scr_att")
-  .addEventListener("mouseout", function (event) {
-    const tooltip = dialog_attaque_3.querySelector(".tooltip");
-    tooltip.style.display = "none";
-  });
+dialog_attaque_3.querySelector(".scr_att").addEventListener("mouseout", function (event) {
+  const tooltip = dialog_attaque_3.querySelector(".tooltip");
+  tooltip.style.display = "none";
+});
 
 // === ÉVÉNEMENTS DE DÉFENSE ===
 // Gestion des interactions avec les dialogues de défense
@@ -1750,9 +1664,7 @@ dialog_attaque_3
 // Gestion des clics sur les spans pour sélectionner le type de défense
 dialog_defense_1.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
-    const radio = event.target
-      .closest("td")
-      .querySelector('input[type="radio"]');
+    const radio = event.target.closest("td").querySelector('input[type="radio"]');
     if (radio === null || typeof radio === "undefined") return;
     radio.click();
   });
@@ -1766,123 +1678,87 @@ dialog_defense_1.addEventListener("keydown", function (event) {
     defenseur.pr2_def = false;
     defenseur.esq_def = false;
     dialog_defense_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+    setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
     resoudre_attaque();
   }
 });
 
 // Sélection "Aucune défense" - annule la défense
-dialog_defense_1
-  .querySelector(".arme_radio0")
-  .addEventListener("change", function (event) {
-    const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = false;
-    dialog_defense_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    resoudre_attaque();
-  });
+dialog_defense_1.querySelector(".arme_radio0").addEventListener("change", function (event) {
+  const defenseur = Pions.find((m) => m.Defenseur);
+  defenseur.pr1_def = false;
+  defenseur.pr2_def = false;
+  defenseur.esq_def = false;
+  dialog_defense_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  resoudre_attaque();
+});
 
 // Sélection de la parade avec arme principale
-dialog_defense_1
-  .querySelector(".arme_radio1")
-  .addEventListener("change", function (event) {
-    const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = true;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = false;
-    dialog_defense_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_defense(2);
-  });
+dialog_defense_1.querySelector(".arme_radio1").addEventListener("change", function (event) {
+  const defenseur = Pions.find((m) => m.Defenseur);
+  defenseur.pr1_def = true;
+  defenseur.pr2_def = false;
+  defenseur.esq_def = false;
+  dialog_defense_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_defense(2);
+});
 
 // Sélection de la parade avec arme secondaire
-dialog_defense_1
-  .querySelector(".arme_radio2")
-  .addEventListener("change", function (event) {
-    const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = true;
-    defenseur.esq_def = false;
-    dialog_defense_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_defense(2);
-  });
+dialog_defense_1.querySelector(".arme_radio2").addEventListener("change", function (event) {
+  const defenseur = Pions.find((m) => m.Defenseur);
+  defenseur.pr1_def = false;
+  defenseur.pr2_def = true;
+  defenseur.esq_def = false;
+  dialog_defense_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_defense(2);
+});
 
 // Sélection de l'esquive
-dialog_defense_1
-  .querySelector(".arme_radio3")
-  .addEventListener("change", function (event) {
-    const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = true;
-    dialog_defense_1.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    afficher_defense(2);
-  });
+dialog_defense_1.querySelector(".arme_radio3").addEventListener("change", function (event) {
+  const defenseur = Pions.find((m) => m.Defenseur);
+  defenseur.pr1_def = false;
+  defenseur.pr2_def = false;
+  defenseur.esq_def = true;
+  dialog_defense_1.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  afficher_defense(2);
+});
 
 // Bouton "Point de chance" - relance les dés de défense
-dialog_defense_2
-  .querySelector(".pt_chance")
-  .addEventListener("click", function (event) {
-    const defenseur = Pions.find((m) => m.Defenseur);
+dialog_defense_2.querySelector(".pt_chance").addEventListener("click", function (event) {
+  const defenseur = Pions.find((m) => m.Defenseur);
 
-    // Lancement de 3 jets de dés (3D6)
-    const jet_0 = parseInt(
-      dialog_defense_2.querySelector(".jet_des").value,
-      10
-    );
-    const jet_1 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
-    const jet_2 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
-    const jet_3 =
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1 +
-      Math.floor(Math.random() * 6) +
-      1;
+  // Lancement de 3 jets de dés (3D6)
+  const jet_0 = parseInt(dialog_defense_2.querySelector(".jet_des").value, 10);
+  const jet_1 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
+  const jet_2 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
+  const jet_3 =
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1 +
+    Math.floor(Math.random() * 6) + 1;
 
-    // Sélection du meilleur jet (minimum 13)
-    defenseur.jet_def = Math.max(13, jet_0, jet_1, jet_2, jet_3);
-    dialog_defense_2.querySelector(".jet_des").value = defenseur.jet_def;
+  // Sélection du meilleur jet (minimum 13)
+  defenseur.jet_def = Math.max(13, jet_0, jet_1, jet_2, jet_3);
+  dialog_defense_2.querySelector(".jet_des").value = defenseur.jet_def;
 
-    affiche_def();
-  });
+  affiche_def();
+});
 
 // Bouton d'acceptation de la défense
-dialog_defense_2
-  .querySelector(".accepter")
-  .addEventListener("click", function (event) {
-    dialog_defense_2.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
-    resoudre_attaque();
-  });
+dialog_defense_2.querySelector(".accepter").addEventListener("click", function (event) {
+  dialog_defense_2.close();
+  setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
+  resoudre_attaque();
+});
 
 // Gestion de la touche Échap pour annuler la défense
 dialog_defense_2.addEventListener("keydown", function (event) {
@@ -1892,49 +1768,170 @@ dialog_defense_2.addEventListener("keydown", function (event) {
     defenseur.pr2_def = false;
     defenseur.esq_def = false;
     dialog_defense_2.close();
-    setTimeout(function () {
-      canvas.focus({ preventScroll: true });
-    }, 50);
+    setTimeout(function () { canvas.focus({ preventScroll: true }); }, 50);
     resoudre_attaque();
   }
 });
 
 // Affichage du tooltip au survol du score d'attaque (dialogue 3)
-dialog_defense_2
-  .querySelector(".scr_att")
-  .addEventListener("mouseover", function (event) {
-    const tooltip = dialog_defense_2.querySelector(".tooltip");
-    const dialog = dialog_defense_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
-    tooltip.style.top = event.clientY - dialog.top + 10 + "px";
-    tooltip.style.display = "block";
-    tooltip.innerHTML = explications_scr_att();
-  });
+dialog_defense_2.querySelector(".scr_att").addEventListener("mouseover", function (event) {
+  const tooltip = dialog_defense_2.querySelector(".tooltip");
+  const dialog = dialog_defense_2.getBoundingClientRect();
+  tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+  tooltip.style.top = event.clientY - dialog.top + 10 + "px";
+  tooltip.style.display = "block";
+  tooltip.innerHTML = explications_scr_att();
+});
 
 // Masquage du tooltip quand la souris quitte le score d'attaque (dialogue 3)
-dialog_defense_2
-  .querySelector(".scr_att")
-  .addEventListener("mouseout", function (event) {
-    const tooltip = dialog_defense_2.querySelector(".tooltip");
-    tooltip.style.display = "none";
-  });
+dialog_defense_2.querySelector(".scr_att").addEventListener("mouseout", function (event) {
+  const tooltip = dialog_defense_2.querySelector(".tooltip");
+  tooltip.style.display = "none";
+});
 
 // Affichage du tooltip au survol de la marge
-dialog_defense_2
-  .querySelector(".scr_def")
-  .addEventListener("mouseover", function (event) {
-    const tooltip = dialog_defense_2.querySelector(".tooltip");
-    const dialog = dialog_defense_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
-    tooltip.style.top = event.clientY - dialog.top + 10 + "px";
-    tooltip.style.display = "block";
-    tooltip.innerHTML = explications_scr_def();
-  });
+dialog_defense_2.querySelector(".scr_def").addEventListener("mouseover", function (event) {
+  const tooltip = dialog_defense_2.querySelector(".tooltip");
+  const dialog = dialog_defense_2.getBoundingClientRect();
+  tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+  tooltip.style.top = event.clientY - dialog.top + 10 + "px";
+  tooltip.style.display = "block";
+  tooltip.innerHTML = explications_scr_def();
+});
 
 // Masquage du tooltip quand la souris quitte la marge
-dialog_defense_2
-  .querySelector(".scr_def")
-  .addEventListener("mouseout", function (event) {
-    const tooltip = dialog_defense_2.querySelector(".tooltip");
-    tooltip.style.display = "none";
+dialog_defense_2.querySelector(".scr_def").addEventListener("mouseout", function (event) {
+  const tooltip = dialog_defense_2.querySelector(".tooltip");
+  tooltip.style.display = "none";
+});
+
+// === ÉVÉNEMENTS POUR LE PARAMÉTRAGE DE SORT ===
+// Gestion des clics sur les spans pour sélectionner le paramétrage de sort
+dialog_sort_1.querySelectorAll("span").forEach((span) => {
+  span.addEventListener("mousedown", function (event) {
+    const radio = event.target.closest("td").querySelector('input[type="radio"]');
+    if (radio === null || typeof radio === "undefined") return;
+    radio.click();
   });
+});
+
+// Sélection de l'amplification 1
+dialog_sort_1.querySelector(".sort_radio1").addEventListener("change", function (event) {
+  const sort = Sorts.find((s) =>
+    s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
+    s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
+  m_selected.Fatigue -= sort.Niveau;
+  m_selected.Concentration -= sort.Niveau;
+  dialog_sort_1.close();
+});
+
+// Sélection de l'amplification 2
+dialog_sort_1.querySelector(".sort_radio2").addEventListener("change", function (event) {
+  const sort = Sorts.find((s) =>
+    s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
+    s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
+  m_selected.Fatigue -= 2 * sort.Niveau;
+  m_selected.Concentration -= 2 * sort.Niveau;
+  dialog_sort_1.close();
+});
+
+// Sélection de l'amplification 3
+dialog_sort_1.querySelector(".sort_radio3").addEventListener("change", function (event) {
+  const sort = Sorts.find((s) =>
+    s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
+    s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
+  m_selected.Fatigue -= 3 * sort.Niveau;
+  m_selected.Concentration -= 3 * sort.Niveau;
+  dialog_sort_1.close();
+});
+
+// Sélection de l'amplification 0 (spécifique)
+dialog_sort_1.querySelector(".sort_radio0").addEventListener("change", function (event) {
+  dialog_sort_1.querySelector(".fatigue_cout").disabled = false;
+  dialog_sort_1.querySelector(".concentration_cout").disabled = false;
+  if (dialog_sort_1.querySelector(".concentration_cout").value <= m_selected.Concentration) {
+    dialog_sort_1.querySelector(".acter").disabled = false;
+  }
+  else {
+    dialog_sort_1.querySelector(".acter").disabled = true;
+  }
+});
+
+// Gestion du changement de la concentration spécifique
+dialog_sort_1.querySelector(".concentration_cout").addEventListener("input", function (event) {
+  if (event.target.value <= m_selected.Concentration) {
+    dialog_sort_1.querySelector(".acter").disabled = false;
+  }
+  else {
+    dialog_sort_1.querySelector(".acter").disabled = true;
+  }
+});
+
+// Bouton "Acter" (Valide la sélection spécifique et ferme le dialogue)
+dialog_sort_1.querySelector(".acter").addEventListener("click", function (event) {
+  // Mise à jour des points de fatigue et de concentration
+  m_selected.Fatigue -= dialog_sort_1.querySelector(".fatigue_cout").value;
+  m_selected.Concentration -= dialog_sort_1.querySelector(".concentration_cout").value;
+  dialog_sort_1.close();
+});
+
+dialog_sort_1.addEventListener("close", function (event) {
+  dialog_details_2.querySelector(".fatigue").value = m_selected.Fatigue;
+  dialog_details_2.querySelector(".concentration").value = m_selected.Concentration;
+});
+
+dialog_sort_2.addEventListener("close", function (event) {
+  // Supprimer le panneau d'information existant s'il existe...
+  if (document.getElementById(`spell-info`)) document.getElementById(`spell-info`).remove();
+});
+
+// Gestion du changement de la concentration spécifique
+dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (event) {
+  if (event.target.value === "-" || event.target.value === "") {
+    dialog_sort_2.querySelector(".res_save").textContent = "Aucune";
+    return;
+  }
+
+  let formula = event.target.value.toLowerCase();
+
+  formula = formula.replace(/ /g, "");
+  formula = formula.replace(/^.*\(/g, "");
+  formula = formula.replace(/\).*$/g, "");
+
+  formula = formula.charAt(0).toUpperCase() + formula.slice(1);
+
+  formula = formula.replace(/C$/g, "Con");
+  formula = formula.replace(/C\+/g, "Con+");
+  formula = formula.replace(/C]\-/g, "Con-");
+
+  formula = formula.replace(/Co$/g, "Cor");
+  formula = formula.replace(/Co\+/g, "Cor+");
+  formula = formula.replace(/Co\-/g, "Cor-");
+
+  formula = formula.replace(/V$/g, "Vol");
+  formula = formula.replace(/V\+/g, "Vol+");
+  formula = formula.replace(/V\-/g, "Vol-");
+
+  formula = formula.replace(/Ab$/g, "Abs");
+  formula = formula.replace(/Ab\+/g, "Abs+");
+  formula = formula.replace(/Ab\-/g, "Abs-");
+
+  formula = formula.replace(/6esens/g, "6eS");
+
+  let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
+  if (!["Con", "Cor", "Vol", "Abs", "6eS"].includes(base)) {
+    dialog_sort_2.querySelector(".res_save").textContent = "Erreur de format";
+    return;
+  }
+
+  let operateur = formula.replace(/[^+-]/g, "").charAt(0);
+  if (operateur === "") operateur = "+";
+
+  let modificateur = parseInt(formula.replace(base, "").replace(/[+-]/g, ""), 10);
+  if (isNaN(modificateur)) modificateur = 0;
+
+  dialog_sort_2.querySelector(".res_save").textContent =
+    "Format valide (" + base + operateur + modificateur + ")";
+
+  console.log("Sauvegarde au sort :", m_selected.sauvegarde_au_sort(base + operateur + modificateur));
+});

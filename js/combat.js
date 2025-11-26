@@ -47,14 +47,8 @@ function calculateInitiative(pion, main = 0) {
     const res1 = init1 - ((arme1 && arme1.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
     const res2 = init2 - ((arme2 && arme2.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
 
-    if (main === 1) {
-        return res1;
-    }
-
-    if (main === 2) {
-        return res2;
-    }
-
+    if (main === 1) return res1;
+    if (main === 2) return res2;
     return Math.min(res1, res2);
 }
 
@@ -197,12 +191,8 @@ function start_attaques() {
     else {
         Cacs = [];
 
-        Pions.forEach(pion1 => {
-            if (pion1.Type !== "allies") return;
-
-            Pions.forEach(pion2 => {
-                if (pion2.Type !== "ennemis") return;
-
+        Pions.filter(pion1 => pion1.Type === "allies").forEach(pion1 => {
+            Pions.filter(pion2 => pion2.Type === "ennemis").forEach(pion2 => {
                 // Si les pions sont en combat au corps à corps, on crée un combat au corps à corps
                 if (isInMeleeCombat(pion1, pion2)) {
                     const c = new Cac();
@@ -221,9 +211,10 @@ function start_attaques() {
         Cacs_save = cloneCacs(Cacs);
     }
 
-    // Réinitialisation
+    // Réinitialisation des attaques 
     Attaques = [];
 
+    // Réinitialisation des états des pions
     Pions.forEach(pion => {
         pion.Attaquant = false;
         pion.Defenseur = false;
@@ -246,9 +237,14 @@ function start_attaques() {
             const attaque1 = new Attaque();
             attaque1.Model = pion.Model;
             attaque1.Indice = pion.Indice;
-            attaque1.Timing = 5;
             attaque1.Main = 1;
-            Attaques.push(attaque1);
+            if (pion.Incantation <= 5) {
+                attaque1.Timing = pion.Incantation;
+                Attaques.push(attaque1);
+            }
+            else {
+                pion.Incantation -= 5;
+            }
             return;
         }
 
@@ -285,9 +281,6 @@ function start_attaques() {
     contre_attaque = null;
 
     Messages.ecriture_directe("Phase de combat initialisée");
-
-    console.log("Attaques :", Attaques);
-    console.log("Cacs :", Cacs);
 }
 
 /**
@@ -364,23 +357,32 @@ function next_attaque() {
         Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${attaque.Timing.toFixed(2)}s)...`);
 
         // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort)
-        attaquant.Fatigue -= 7;
-        attaquant.Fatigue_down = 7;
+        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
+        attaquant.Fatigue -= sort.Niveau;
+        attaquant.Fatigue_down = sort.Niveau;
 
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
 
-        // Identification des défenseurs
-        Pions.forEach(pion => {
-            if (pion.Type === attaquant.Type) return;
-            // if (pion === attaquant) return;
-            pion.Defenseur = true;
-        });
+        // Sélection du sort en cours de lancement
+        sort_lance = sort.Nom_liste + "@" + sort.Nom_sort;
+
+        // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
+        Pions.forEach(pion => { pion.Cible_sort = false; });
+
+        // Affichage du panneau d'information du sort
+        createSpellInfo(document.body, sort);
+
+        // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
+        document.removeEventListener("click", closeSpellInfo);
+
+        // Réinitialisation de la contre-attaque
+        contre_attaque = null;
 
         // Mise à jour de la carte
         Map.generateHexMap();
         Map.drawHexMap();
-        contre_attaque = null;
+
         return;
     }
 

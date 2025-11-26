@@ -33,35 +33,35 @@
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="arbre" src="images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="eau" src="images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
 
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
-            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;"> 
+            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">
             <img id="rectangle" src="images/Rectangle.png" onclick="Forme.setFormeMode('rectangle');" alt="Rectangle"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="ellipse" src="images/Ellipse.png" onclick="Forme.setFormeMode('ellipse');" alt="Ellipse"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="mur" src="images/Mur.png" onclick="Forme.setFormeMode('mur');" alt="Mur"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Scission"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
             <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Gomme"
-                style="width: 30px; height: 30px; cursor: pointer;"> 
+                style="width: 30px; height: 30px; cursor: pointer;">
         </div>
 
         <!-- Outils de gestion de carte -->
         <div>
             <form id="upload_fond" enctype="multipart/form-data">
                 <label for="img_fond" id="fond">Fond de carte</label>
-                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;"> 
-                <button id="synchroniser">Synchroniser</button> 
+                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">
+                <button id="synchroniser">Synchroniser</button>
             </form>
         </div>
     </div>
@@ -244,7 +244,7 @@
                 </label>
             </td>
             <td> </td>
-            <td>Fatigue: </td>
+            <td>Fatigue :&nbsp;</td>
             <td><input type="text" class="fatigue" style="text-align: center;"></td>
             <td><span class="fatigue"></span></td>
             <td> </td>
@@ -293,7 +293,7 @@
             <td colspan="2">Bonus Feinte de corps :&nbsp;</td>
             <td><input type="text" class="b_fdc" style="text-align: center;">&nbsp;</td>
             <td></td>
-            <td>Gestion automatique :&nbsp;</td>
+            <td>Auto :&nbsp;</td>
             <td>
                 <label class="switch">
                     <input type="checkbox" class="auto">
@@ -310,13 +310,8 @@
             <td colspan="2">Bonus Initiative :&nbsp;</td>
             <td><input type="text" class="b_ini" style="text-align: center;">&nbsp;</td>
             <td> </td>
-            <td>Pratique la magie :&nbsp;</td>
-            <td>
-                <label class="switch">
-                    <input type="checkbox" class="mage">
-                    <span class="slider"></span>
-                </label>
-            </td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Bras Gauche :&nbsp;</td>
@@ -327,13 +322,8 @@
             <td colspan="2">Bonus Attaque :&nbsp;</td>
             <td><input type="text" class="b_att" style="text-align: center;">&nbsp;</td>
             <td> </td>
-            <td>Combattant à distance :&nbsp;</td>
-            <td>
-                <label class="switch">
-                    <input type="checkbox" class="dist">
-                    <span class="slider"></span>
-                </label>
-            </td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Bras Droit :&nbsp;</td>
@@ -344,13 +334,8 @@
             <td colspan="2">Bonus Dommage :&nbsp;</td>
             <td><input type="text" class="b_dom" style="text-align: center;">&nbsp;</td>
             <td> </td>
-            <td>Combattant corps-à-corps :&nbsp;</td>
-            <td>
-                <label class="switch">
-                    <input type="checkbox" class="cac">
-                    <span class="slider"></span>
-                </label>
-            </td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Poitrine :&nbsp;</td>
@@ -801,3 +786,218 @@
         </div>
     </div>
 </div>
+
+<!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
+<!-- Fenêtre pour choisir les paramètres d'un sort (fatigue, concentration) -->
+<dialog id="dialog_sort_1" style="font-size: x-large; white-space: nowrap;">
+    <h1 class="nom_liste"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
+    <h1 class="nom_sort"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
+    <hr>
+    <div style="width: 100%; display: flex; justify-content: space-between;">
+        <div>
+            Fatigue :&nbsp;
+            <input type="text" class="fatigue_actuelle" style="width: 35px; text-align: center; font-size: x-large;"
+                disabled>
+            / <span class="fatigue_max">00</span>
+        </div>
+        <div>
+            Concentration :&nbsp;
+            <input type="text" class="concentration_actuelle"
+                style="width: 35px; text-align: center; font-size: x-large;" disabled>
+            / <span class="concentration_max">00</span>
+        </div>
+    </div>
+    <hr>
+    <table style="width: 100%;">
+        <tr>
+            <td rowspan="5">Amplification :&nbsp;&nbsp;</td>
+            <td>
+                <input type="radio" name="sort" value="1" class="sort_radio1">
+                <span class="sort_normal">Sort normal</span>&nbsp;&nbsp;
+            </td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="sort" value="2" class="sort_radio2">
+                <span class="sort_double">Sort doublé</span>&nbsp;&nbsp;
+            </td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td>
+                <input type="radio" name="sort" value="3" class="sort_radio3">
+                <span class="sort_triple">Sort triplé</span>&nbsp;&nbsp;
+            </td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td rowspan="2">
+                <input type="radio" name="sort" value="0" class="sort_radio0">
+                <span class="sort_specifique">Spécifique :</span>&nbsp;&nbsp;
+            </td>
+            <td>
+                Fatigue :&nbsp;
+            </td>
+            <td>
+                <input type="text" class="fatigue_cout" style="width: 35px; text-align: center; font-size: x-large;">
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Concentration :&nbsp;
+            </td>
+            <td>
+                <input type="text" class="concentration_cout"
+                    style="width: 35px; text-align: center; font-size: x-large;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="4" style="text-align: right;">
+                <hr>
+                <button class="acter" style="font-size: x-large;">Acter</button>
+            </td>
+        </tr>
+    </table>
+</dialog>
+
+<!-- === DIALOGUE DE CONFIRMATION DE LANCEMENT D'UN SORT === -->
+<!-- Fenêtre pour confirmer le lancement d'un sort -->
+<dialog id="dialog_sort_2" style="font-size: x-large; white-space: nowrap;">
+    <h1 class="nom_liste"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
+    <h1 class="nom_sort"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
+    <!-- Coût du sort -->
+    <div style="display: flex; align-items: center;">
+        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+        <span>&nbsp;&nbsp;Coût&nbsp;&nbsp;</span>
+        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+    </div>
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 75px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+        </colgroup>
+        <tr>
+            <td></td>
+            <td>Fatigue :&nbsp;</td>
+            <td><input type="text" class="fatigue_cout" style="width: 35px; text-align: center; font-size: x-large;"
+                    disabled>
+            </td>
+            <td></td>
+            <td>Concentration :&nbsp;</td>
+            <td><input type="text" class="concentration_cout"
+                    style="width: 35px; text-align: center; font-size: x-large;" disabled>
+        </tr>
+    </table>
+    <!-- Sauvegarde contre le sort -->
+    <div style="display: flex; align-items: center;">
+        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+        <span>&nbsp;&nbsp;Sauvegarde&nbsp;&nbsp;</span>
+        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+    </div>
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 75px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+        </colgroup>
+        <tr>
+            <td></td>
+            <td>Prompt :&nbsp;</td>
+            <td>
+                <input type="text" class="prompt_save" style="width: 120px; font-size: x-large;">
+                <span class="res_save">(Validé)</span>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+    <!-- Dégâts occasionnés par le sort -->
+    <div style="display: flex; align-items: center;">
+        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+        <span>&nbsp;&nbsp;Dégâts&nbsp;&nbsp;</span>
+        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+    </div>
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 75px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+        </colgroup>
+        <tr>
+            <td></td>
+            <td rowspan="2">Prompt :&nbsp;</td>
+            <td rowspan="2">
+                <input type="text" class="prompt_degats" style="width: 120px; font-size: x-large;">
+                <span class="res_degats">(00)</span>
+            </td>
+            <td></td>
+            <td><input type="radio" name="radio_degats" value="0" class="degats_radio0" checked>
+                <span class="degats_gen">Dégâts généraux</span>
+            </td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td><input type="radio" name="radio_degats" value="1" class="degats_radio1">
+                <span class="degats_loc">Dégâts localisés</span>
+            </td>
+        </tr>
+    </table>
+    <!-- Bonus engendrés par le sort -->
+    <div style="display: flex; align-items: center;">
+        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+        <span>&nbsp;&nbsp;Bonus&nbsp;&nbsp;</span>
+        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+    </div>
+    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
+        <colgroup>
+            <col style="width: 75px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+        </colgroup>
+        <tr>
+            <td></td>
+            <td>Feinte :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="b_fdc"
+                    style="width: 35px; text-align: center; font-size: x-large;"></td>
+            <td>&nbsp;</td>
+            <td>Initiative :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="b_ini"
+                    style="width: 35px; text-align: center; font-size: x-large;"></td>
+            <td>&nbsp;</td>
+            <td>Attaque :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="b_att"
+                    style="width: 35px; text-align: center; font-size: x-large;"></td>
+            <td>&nbsp;</td>
+            <td>Dommage :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="b_dom"
+                    style="width: 35px; text-align: center; font-size: x-large;"></td>
+        </tr>
+    </table>
+    <!-- Bouton pour appliquer le sort -->
+    <hr>
+    <div style="width: 100%; text-align: right;">
+        <button id="Appliquer" style="font-size: x-large;">Appliquer</button>
+    </div>
+
+</dialog>

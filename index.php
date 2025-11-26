@@ -20,8 +20,8 @@
 <script src="js/forme.js"></script>     <!-- Gestion des formes géométriques -->
 <script src="js/general.js"></script>   <!-- Fonctions générales et communication WebSocket -->
 <script src="js/dialog.js"></script>    <!-- Gestion des dialogues et interfaces utilisateur -->
+<script src="js/magie.js"></script>     <!-- Système de magie -->
 <script src="js/combat.js"></script>    <!-- Système de combat simplifié -->
-<script src="js/magie.js"></script>    <!-- Système de magie -->
 
     <script>
         <?php
@@ -54,16 +54,27 @@
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
             $js .= "    Etat: " . toJS($row['Etat']) . ",\n";
+            $js .= "    Fdc: " . toJS($row['FdC'], 'int') . ",\n";
             $js .= "    Pm: " . toJS($row['PM'], 'int') . ",\n";
             $js .= "    Pp: " . toJS($row['PP'], 'int') . ",\n";
+
+            $js .= "    Force: " . toJS($row['Force'], 'int') . ",\n";
+            $js .= "    Constitution: " . toJS($row['Constitution'], 'int') . ",\n";
             $js .= "    Vp: " . toJS($row['VP'], 'int') . ",\n";
-            $js .= "    Fdc: " . toJS($row['FdC'], 'int') . ",\n";
+            $js .= "    Perception: " . toJS($row['Perception'], 'int') . ",\n";
+            $js .= "    Vm: " . toJS($row['VM'], 'int') . ",\n";
+            $js .= "    Abstraction: " . toJS($row['Abstraction'], 'int') . ",\n";
+            $js .= "    Volonte: " . toJS($row['Volonte'], 'int') . ",\n";
+            $js .= "    Foi: " . toJS($row['Foi'], 'int') . ",\n";
+            $js .= "    Magie: " . toJS($row['Magie'], 'int') . ",\n";
+            $js .= "    Adaptation: " . toJS($row['Adaptation'], 'int') . ",\n";
+            
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
+
             $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
             $js .= "    Escrime: " . toJS($row['Escrime'], 'int') . ",\n";
-            $js .= "    Coordination: " . toJS($row['Coordination'], 'int') . ",\n";
-            $js .= "    Force: " . toJS($row['Force'], 'int') . ",\n";
+
             $js .= "    Arme_1: " . toJS($row['Arme_1'], 'null') . ",\n";
             $js .= "    Att_1: " . toJS($row['Att_1'], 'int') . ",\n";
             $js .= "    Par_1: " . toJS($row['Par_1'], 'int') . ",\n";
@@ -75,6 +86,7 @@
             $js .= "    Par_3: " . toJS($row['Par_3'], 'int') . ",\n";
             $js .= "    Par_Bouclier: " . toJS($row['Par_Bouclier'], 'int') . ",\n";
             $js .= "    Esquive: " . toJS($row['Esquive'], 'int') . ",\n";
+
             $js .= "    Armure_tete: " . toJS($row['Armure_Tete'], 'int') . ",\n";
             $js .= "    Armure_poitrine: " . toJS($row['Armure_Poitrine'], 'int') . ",\n";
             $js .= "    Armure_abdomen: " . toJS($row['Armure_Abdomen'], 'int') . ",\n";
@@ -82,6 +94,7 @@
             $js .= "    Armure_brasd: " . toJS($row['Armure_BrasD'], 'int') . ",\n";
             $js .= "    Armure_jambeg: " . toJS($row['Armure_JambeG'], 'int') . ",\n";
             $js .= "    Armure_jambed: " . toJS($row['Armure_JambeD'], 'int') . ",\n";
+            
             $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
             $js .= "    Tete: " . toJS($row['Tete'], 'int') . ",\n";
             $js .= "    Poitrine: " . toJS($row['Poitrine'], 'int') . ",\n";
@@ -291,26 +304,24 @@
 
         // Attendre que l'interface soit complètement initialisée
         setTimeout(function() {
-            // Créer un pion de modèle "Christophe" de type "allié"
             const christophe = Pion.add("allies", "Christophe");
-
-            // Créer un pion de modèle "Elémental d'air" de type "ennemi"
             const elemental_eau = Pion.add("allies", "Elémental d'eau");
-            // Créer un pion de modèle "Guilhem" de type "ennemi"
-
             const guilhem = Pion.add("ennemis", "Guilhem");
-            // Créer un pion de modèle "Elémental d'air" de type "ennemi"
-
             const elemental_air = Pion.add("ennemis", "Elémental d'air");
+
+            guilhem.Arme1 = "Lancement de sort";
+            guilhem.Nom_liste = "Liste du contrôle de soi";
+            guilhem.Nom_sort = "Vivacité physique";
+            guilhem.Incantation = 2;
+
+            next_attaque();
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();
             Map.drawHexMap();
 
             // Donner le focus à la carte
-            canvas.focus({
-                preventScroll: true
-            });
+            canvas.focus({ preventScroll: true });
         }, 200);
     </script>
 </body>

@@ -75,6 +75,7 @@ class SortConnu {
 // Tableau global contenant toutes les sorts connus disponibles
 let SortsConnus = [];
 
+// Tableau global contenant les noms courts et longs des listes de magie
 const shortName = Object.freeze({
   Air: "Liste de l'air",
   Controle: "Liste du contrôle de soi",
@@ -94,6 +95,11 @@ const shortName = Object.freeze({
   Harmonie: "Liste de l'harmonie",
 });
 
+/**
+ * Récupère le nom court d'une liste de magie à partir de son nom complet
+ * @param {string} Nom_liste - Le nom de la liste de magie
+ * @returns {string} Le nom court de la liste de magie
+ */
 function getShortName(Nom_liste) {
   for (const [key, value] of Object.entries(shortName)) {
     if (value === Nom_liste) {
@@ -103,6 +109,11 @@ function getShortName(Nom_liste) {
   return null;
 }
 
+/**
+ * Récupère la taille maximale des colonnes d'un niveau pour une liste de magie
+ * @param {string} Nom_liste - Le nom de la liste de magie
+ * @returns {number} La taille maximale des colonnes
+ */
 function getMaxSize(Nom_liste) {
   let maxSize = 0;
   Sorts.forEach((s) => {
@@ -155,7 +166,10 @@ document.addEventListener("contextmenu", function (event) {
   }
 });
 
-// Gestion du clic sur les boutons magiques pour ouvrir la liste voulue
+/**
+ * Gère le clic sur les boutons magiques pour ouvrir la liste voulue
+ * @param {MouseEvent} event - L'événement de clic
+ */
 document.addEventListener("mousedown", function (event) {
   if (event.target.classList.contains("magic-button")) {
     stopContextMenu = true;
@@ -166,7 +180,15 @@ document.addEventListener("mousedown", function (event) {
   }
 });
 
-function createSpellInfo() {
+/**
+ * Crée dynamiquement le panneau d'information du sort
+ * @param {HTMLElement} modalContent - Le contenu de la modale
+ * @param {Object} sort - Le sort à afficher
+  */
+function createSpellInfo(modalContent, sort) {
+  // Supprimer le panneau d'information existant s'il existe...
+  if (document.getElementById(`spell-info`)) document.getElementById(`spell-info`).remove();
+
   // Créer le panneau d'information des sorts
   const spellInfo = document.createElement("div");
   spellInfo.id = "spell-info";
@@ -262,14 +284,46 @@ function createSpellInfo() {
   p.style.textAlign = "justify";
   spellInfo.appendChild(p);
 
-  spellInfo.querySelector(".close").addEventListener("click", () => {
-    spellInfo.style.display = "none";
-  });
+  // Ajouter le panneau d'information au contenu de la modale
+  modalContent.appendChild(spellInfo);
 
-  return spellInfo;
+  // Injecter les informations du sort dans le panneau d'information
+  document.getElementById(`spell-name`).textContent = sort.Nom_sort;
+  document.getElementById(`spell-level`).textContent = sort.Niveau;
+  document.getElementById(`spell-portee`).textContent = sort.Portee;
+  document.getElementById(`spell-incantation`).textContent = sort.Incantation;
+  document.getElementById(`spell-duree`).textContent = sort.Duree;
+  document.getElementById(`spell-sauvegarde`).textContent = sort.Sauvegarde;
+  document.getElementById(`spell-zone`).textContent = sort.Zone;
+  document.getElementById(`spell-description`).textContent = sort.Description;
+
+  // Afficher le panneau d'information
+  document.getElementById(`spell-info`).style.display = "block";
+
+  // Ajouter le gestionnaire de clic sur le bouton de fermeture
+  spellInfo.querySelector(".close").addEventListener("click", () => {
+    // Masquer le panneau d'information
+    document.getElementById(`spell-info`).style.display = "none";
+  });
 }
 
-// Fonction pour créer dynamiquement une modale de liste de magie
+/**
+ * Ferme le panneau d'information du sort en cliquant ailleurs
+ * @param {MouseEvent} event - L'événement de clic
+ */
+function closeSpellInfo(event) {
+  if (!event.target.classList.contains("spell-node") &&
+    document.getElementById(`spell-info`) &&
+    !event.target.closest(".spell-info")) {
+    document.getElementById(`spell-info`).style.display = "none";
+  }
+}
+
+/**
+ * Crée dynamiquement une modale de liste de magie
+ * @param {string} Nom_liste - Le nom de la liste de magie
+ * @returns {HTMLElement} La modale de la liste de magie
+ */
 function createListeModal(Nom_liste) {
   // Fonction pour créer les flèches
   function createAllArrows() {
@@ -446,7 +500,6 @@ function createListeModal(Nom_liste) {
   modalContent.appendChild(closeBtn);
   modalContent.appendChild(title);
   modalContent.appendChild(conteneur);
-  modalContent.appendChild(createSpellInfo());
   modal.appendChild(modalContent);
 
   // Ajouter la modale au body
@@ -465,15 +518,28 @@ function createListeModal(Nom_liste) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
         m_selected.Nom_liste = sort.Nom_liste;
         m_selected.Nom_sort = sort.Nom_sort;
+        let temps = "?";
+        if (sort.Incantation === "2 s (4s)") temps = 2;
+        if (sort.Incantation === "1/10 s") temps = 0.1;
+        if (sort.Incantation.endsWith(" s")) temps = parseInt(sort.Incantation.replace(" s", ""));
+        if (sort.Incantation.endsWith(" min")) temps = 60 * parseInt(sort.Incantation.replace(" min", ""));
+        if (sort.Incantation.endsWith(" minutes")) temps = 60 * parseInt(sort.Incantation.replace(" minutes", ""));
+        if (sort.Incantation.endsWith(" h")) temps = 3600 * parseInt(sort.Incantation.replace(" h", ""));
+        if (sort.Incantation.endsWith(" jour")) temps = 24 * 3600 * parseInt(sort.Incantation.replace(" jour", ""));
+        if (sort.Incantation.endsWith(" semaine")) temps = 7 * 24 * 3600 * parseInt(sort.Incantation.replace(" semaine", ""));
+        m_selected.Incantation = temps;
 
         // Mise à jour du sortilège sélectionné
         if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
           m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-          dialog_details_2.querySelector(".liste").innerHTML = m_selected.Nom_liste;
-          dialog_details_2.querySelector(".sort").innerHTML = m_selected.Nom_sort;
+          dialog_details_2.querySelector(".liste").textContent = m_selected.Nom_liste;
+          dialog_details_2.querySelector(".sort").textContent = m_selected.Nom_sort;
+          dialog_details_2.querySelector(".info_principale").textContent = " (" + m_selected.Incantation + " s)";
+          afficher_param_sort(sort);
         } else {
-          dialog_details_2.querySelector(".liste").innerHTML = "--";
-          dialog_details_2.querySelector(".sort").innerHTML = "";
+          dialog_details_2.querySelector(".liste").textContent = "--";
+          dialog_details_2.querySelector(".sort").textContent = "";
+          dialog_details_2.querySelector(".info_principale").textContent = "";
         }
 
         // Fermer la modale
@@ -508,30 +574,16 @@ function createListeModal(Nom_liste) {
       // Code normal pour ouvrir les informations du sort (sans Ctrl)
       const sort = sortsListe.find((s) => s.Nom_sort === e.target.getAttribute("data-spell"));
       if (sort) {
-        document.getElementById(`spell-name`).textContent = sort.Nom_sort;
-        document.getElementById(`spell-level`).textContent = sort.Niveau;
-        document.getElementById(`spell-portee`).textContent = sort.Portee;
-        document.getElementById(`spell-incantation`).textContent = sort.Incantation;
-        document.getElementById(`spell-duree`).textContent = sort.Duree;
-        document.getElementById(`spell-sauvegarde`).textContent = sort.Sauvegarde;
-        document.getElementById(`spell-zone`).textContent = sort.Zone;
-        document.getElementById(`spell-description`).textContent = sort.Description;
+        // Ajouter le panneau d'information du sort au contenu de la modale
+        createSpellInfo(modalContent, sort);
 
-        document.getElementById(`spell-info`).style.display = "block";
+        // Fermer le panneau d'information du sort en cliquant ailleurs
+        document.addEventListener("click", closeSpellInfo);
 
         // Animation du sort cliqué
         e.target.classList.add("clicked");
         setTimeout(() => { e.target.classList.remove("clicked"); }, 500);
       }
-    }
-  });
-
-  // Fermer les informations en cliquant ailleurs
-  document.addEventListener("click", function (e) {
-    if (!e.target.classList.contains("spell-node") &&
-      document.getElementById(`spell-info`) &&
-      !e.target.closest(".spell-info")) {
-      document.getElementById(`spell-info`).style.display = "none";
     }
   });
 

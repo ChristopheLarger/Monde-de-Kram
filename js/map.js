@@ -35,6 +35,7 @@ let isDragging_right = false;               // Glissement avec clic droit
 // Modes d'interaction
 let isMode_terrain = false;                 // Mode placement de terrain
 let isMode_forme = false;                   // Mode placement de formes
+let sort_lance = null;                      // Sort en cours de lancement (null si aucun sort en cours)
 let type_terrain = "";                      // Type de terrain sélectionné
 let type_forme = "";                        // Type de forme sélectionné
 let old_forme = "";                         // Ancien type de forme
@@ -336,8 +337,9 @@ class Map {
                     });
                     Pions.filter(p => p.Position === col + "," + row).forEach(p => {
                         if (p.Type === "ennemis") strie = true;
-                        if (p.Attaquant) color = "rgb(255, 0, 0)";
-                        else if (p.Defenseur) color = "rgb(0, 0, 255)";
+                        if (p.Attaquant && sort_lance === null) color = "rgb(255, 0, 0)";
+                        else if (p.Defenseur && sort_lance === null) color = "rgb(0, 0, 255)";
+                        else if (p.Cible_sort && sort_lance !== null) color = "rgb(0, 255, 0)";
                         else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
                         else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
                     });
@@ -441,9 +443,9 @@ class Map {
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(n => n.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-                if (p.Cac) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
-                if (p.Dist) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
-                if (p.Mage) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
+                if (p.is_cac()) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
+                if (p.is_dist()) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
+                if (p.Concentration > 0) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
                 if (p.Auto) ctx.drawImage(image_auto, x - hexSize + imgSize / 24, y - imgSize / 6, imgSize / 3, imgSize / 3);
             }
             else if (t != null && typeof t != "undefined" && t.Model === "Rocher") {
@@ -799,15 +801,14 @@ class Pion extends Map {
     Titre = "";              // Titre affiché du personnage
     Arme1 = "";              // Arme principale
     Arme2 = "";              // Arme secondaire
+    Note = "";               // Note personnalisée
     Nom_liste = "";          // Liste du sortilège sélectionnée
     Nom_sort = "";           // Sortilège sélectionné (dans la liste)
-    Note = "";               // Note personnalisée
+    Incantation = 0;         // Temps restant d'incantation du sortilège
+    Cible_sort = false;      // Booléen indiquant si le pion est cible d'un sortilège
 
     // === CAPACITÉS SPÉCIALES ===
     Auto = false;            // Mode automatique (booléen)
-    Mage = false;            // Magicien (booléen)
-    Cac = false;             // Combattant au corps à corps (booléen)
-    Dist = false;            // Combattant à distance (booléen)
 
     // === POINTS DE VIE & Co ===
     Fatigue = 0;             // Niveau de fatigue
@@ -905,6 +906,8 @@ class Pion extends Map {
         this.Armure_brasd = m.Armure_brasd;
         this.Armure_jambeg = m.Armure_jambeg;
         this.Armure_jambed = m.Armure_jambed;
+
+        if (this.Indice !== 0) this.Auto = true;
     }
 
     sendMessage(tag) {
@@ -959,6 +962,36 @@ class Pion extends Map {
         Map.generateHexMap();
         Map.drawHexMap();
         return true;
+    }
+
+    is_cac() {
+        const model = Models.find(x => x.Nom_model === this.Model);
+        if (model == null || typeof model == "undefined") return false;
+
+        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
+        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
+        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
+
+        if (w1 && typeof w1 !== "undefined" && !w1.A_distance) return true;
+        if (w2 && typeof w2 !== "undefined" && !w2.A_distance) return true;
+        if (w3 && typeof w3 !== "undefined" && !w3.A_distance) return true;
+
+        return false;
+    }
+
+    is_dist() {
+        const model = Models.find(x => x.Nom_model === this.Model);
+        if (model == null || typeof model == "undefined") return false;
+
+        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
+        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
+        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
+
+        if (w1 && typeof w1 !== "undefined" && w1.A_distance) return true;
+        if (w2 && typeof w2 !== "undefined" && w2.A_distance) return true;
+        if (w3 && typeof w3 !== "undefined" && w3.A_distance) return true;
+
+        return false;
     }
 
     #findClosestHexFree(pos) {
@@ -1066,116 +1099,6 @@ class Pion extends Map {
 
     // Renseigne sur le fait qu'un hexagone soit visible ou non du pion.
     ligne_de_vue(col, row) {
-        // Sous-fonction donnant la liste des hexagones sur une ligne
-        // function hexLine(start, end) {
-        //     // Convertit (col, row) en coordonnées cubiques (q, r, s)
-        //     function colRowToCube(col, row) {
-        //         let q = col;
-        //         let r = row - Math.floor(col / 2);
-        //         let s = -q - r;
-        //         return [q, r, s];
-        //     }
-
-        //     // Convertit (q, r, s) en coordonnées (col, row)
-        //     function cubeToColRow(q, r) {
-        //         let col = q;
-        //         let row = r + Math.floor(q / 2);
-        //         return [col, row];
-        //     }
-
-        //     // Interpolation linéaire entre a et b
-        //     function lerp(a, b, t) {
-        //         return a + (b - a) * t;
-        //     }
-
-        //     // Interpolation linéaire entre deux points cubiques
-        //     function cubeLerp(a, b, t) {
-        //         return [
-        //             lerp(a[0], b[0], t),
-        //             lerp(a[1], b[1], t),
-        //             lerp(a[2], b[2], t)
-        //         ];
-        //     }
-
-        //     // Arrondit les coordonnées cubiques vers l'hexagone le plus proche
-        //     function roundCube(cube) {
-        //         let [q, r, s] = cube;
-        //         let rq = Math.round(q);
-        //         let rr = Math.round(r);
-        //         let rs = Math.round(s);
-
-        //         let dq = Math.abs(rq - q);
-        //         let dr = Math.abs(rr - r);
-        //         let ds = Math.abs(rs - s);
-
-        //         if (dq > dr && dq > ds) {
-        //             rq = -rr - rs;
-        //         } else if (dr > ds) {
-        //             rr = -rq - rs;
-        //         } else {
-        //             rs = -rq - rr;
-        //         }
-
-        //         return [rq, rr, rs];
-        //     }
-
-        //     let startCube = colRowToCube(...start);
-        //     let endCube = colRowToCube(...end);
-
-        //     let n = Math.max(Math.abs(startCube[0] - endCube[0]),
-        //         Math.abs(startCube[1] - endCube[1]),
-        //         Math.abs(startCube[2] - endCube[2]));
-
-        //     let hexes = [];
-
-        //     for (let i = 0; i <= n; i++) {
-        //         let t = i / n;
-        //         let cube = cubeLerp(startCube, endCube, t);
-        //         let roundedCube = roundCube(cube);
-        //         let hex = cubeToColRow(...roundedCube);
-
-        //         // Ajouter uniquement si non déjà présent
-        //         if (!hexes.some(h => h[0] === hex[0] && h[1] === hex[1])) {
-        //             hexes.push(hex);
-        //         }
-        //     }
-
-        //     return hexes;
-        // }
-
-        // const start_col = parseInt(this.Position.split(",")[0], 10);
-        // const start_row = parseInt(this.Position.split(",")[1], 10);
-        // const startHex = [start_col, start_row];
-        // const endHex = [col, row];
-
-        // const results = hexLine(startHex, endHex);
-
-        // let visible = true;
-
-        // results.forEach(hex => {
-        //     if (!visible) return;
-
-        //     // Si le pion est sur la case de départ, on ne fait rien
-        //     if (hex[0] === start_col && hex[1] === start_row) return;
-
-        //     // Si le pion est sur la case d'arrivée, on ne fait rien
-        //     if (hex[0] === col && hex[1] === row) return;
-
-        //     // Vérification des terrains (si un terrain Rocher ou Arbre est sur le chemin, le pion ne voit pas la case)
-        //     const t = Terrains.find(x => x.Model != "Eau" && x.Position === hex[0] + "," + hex[1]);
-        //     if (t != null && typeof t != "undefined") visible = false;
-
-        //     const x = hex[0] * hexHSpacing + offsetX;
-        //     const y = hex[1] * hexVSpacing + ((hex[0] % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
-        //     const h = { x: x, y: y };
-
-        //     // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
-        //     const m = Formes.find(r => r.type === "Mur" && Forme.rectangleHexagonIntersect(r, h));
-        //     if (m != null && typeof m != "undefined") visible = false;
-        // });
-
-        // return visible;
-
         const start_col = this.Position.split(",")[0];
         const start_row = this.Position.split(",")[1];
         const start_x = start_col * hexHSpacing;
@@ -1288,6 +1211,30 @@ class Pion extends Map {
 
         this.sendMessage("Position");
     }
+
+    sauvegarde_au_sort(formula) {
+        const base = formula.replace(/[+-][0-9]*$/, "");
+        const modificateur = parseInt(formula.replace(base, ""), 10);
+        const model = Models.find(x => x.Nom_model === this.Model);
+        const jet =
+            Math.floor(Math.random() * 6) + 1 +
+            Math.floor(Math.random() * 6) + 1 +
+            Math.floor(Math.random() * 6) + 1;
+
+        switch (base) {
+            case "Con":
+                return model.Constitution + modificateur - jet;
+            case "Cor":
+                return model.coordination() + modificateur - jet;
+            case "Vol":
+                return model.Volonte + modificateur - jet;
+            case "Abs":
+                return model.Abstraction + modificateur - jet;
+            case "6eS":
+                return model.sixieme_sens() + modificateur - jet;
+        }
+        return null;
+    }
 }
 let Pions = new Array;
 
@@ -1333,6 +1280,10 @@ canvas.addEventListener("mousedown", (event) => {
         Pions.forEach(x => { x.Defenseur = false; });
         p.Defenseur = true;
         afficher_attaque(1);
+    }
+    else if (event.button === 0 && p != null && typeof p != "undefined" && sort_lance != null) {
+        // Clic gauche sur la cible de sort choisi => on le marque comme cible
+        p.Cible_sort = !p.Cible_sort;
     }
     else if (event.button === 0 && isMode_terrain && type_terrain != "gomme") {
         // Mode terrain : ajout d'un terrain à la position cliquée
@@ -2098,7 +2049,13 @@ document.addEventListener("keydown", function (event) {
             break;
         case " ":
         case "Spacebar":
-            next_attaque();
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (sort_lance !== null) {
+                afficher_confirmation_sort();
+            }
+            else next_attaque();
             break;
         case "Delete":
             // On supprime le(s) pion(s) de la sélection
