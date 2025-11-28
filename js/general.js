@@ -187,10 +187,14 @@ class LancerDes {
      * @param {string} formula - Formule de dés
      * @returns {number} Résultat du lancer
      */
-    static #rollDice(formula) {
-        const regex = /^(\d*)[dD](\d+)([+-]*\d*)$/;
-        const match = formula.match(regex);
-        if (!match) return 0;
+    static rollDice(formula) {
+        let regex = /^(\d*)$/;
+        let match = formula.match(regex);
+        if (match) return parseInt(formula, 10);
+
+        regex = /^(\d*)[dD](\d+)([+-]*\d*)$/;
+        match = formula.match(regex);
+        if (!match) return null;
 
         const numDice = parseInt(match[1]) || 1;
         const numFaces = parseInt(match[2]);
@@ -207,7 +211,7 @@ class LancerDes {
      * Lance 3 dés à 6 faces (3D6)
      */
     static sendMessage_3D6() {
-        const result = LancerDes.#rollDice("3D6");
+        const result = LancerDes.rollDice("3D6");
         send("3D6", result.toString().padStart(2, '0'), true);
     }
 
@@ -216,7 +220,7 @@ class LancerDes {
      */
     static sendMessage_DX() {
         const formula = document.getElementById("personnalisation").value;
-        const result = LancerDes.#rollDice(formula);
+        const result = LancerDes.rollDice(formula);
 
         if (result === 0) {
             alert("Format non compris, utilisez le format tel 5D12+3, etc.");

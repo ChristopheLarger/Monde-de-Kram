@@ -35,7 +35,6 @@ let isDragging_right = false;               // Glissement avec clic droit
 // Modes d'interaction
 let isMode_terrain = false;                 // Mode placement de terrain
 let isMode_forme = false;                   // Mode placement de formes
-let sort_lance = null;                      // Sort en cours de lancement (null si aucun sort en cours)
 let type_terrain = "";                      // Type de terrain sélectionné
 let type_forme = "";                        // Type de forme sélectionné
 let old_forme = "";                         // Ancien type de forme
@@ -335,11 +334,14 @@ class Map {
                         else if (t.Model === "Arbre") color = "rgb(128, 255, 128)";
                         else if (t.Model === "Eau") color = "rgb(0, 255, 255)";
                     });
+
+                    // Définition de la couleur de l'hexagone en fonction du type de pion
+                    const magicien = Pions.find(p => p.Attaquant && p.Nom_liste != null);
                     Pions.filter(p => p.Position === col + "," + row).forEach(p => {
                         if (p.Type === "ennemis") strie = true;
-                        if (p.Attaquant && sort_lance === null) color = "rgb(255, 0, 0)";
-                        else if (p.Defenseur && sort_lance === null) color = "rgb(0, 0, 255)";
-                        else if (p.Cible_sort && sort_lance !== null) color = "rgb(0, 255, 0)";
+                        if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
+                        else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
+                        else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
                         else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
                         else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
                     });
@@ -802,9 +804,13 @@ class Pion extends Map {
     Arme1 = "";              // Arme principale
     Arme2 = "";              // Arme secondaire
     Note = "";               // Note personnalisée
+
     Nom_liste = "";          // Liste du sortilège sélectionnée
     Nom_sort = "";           // Sortilège sélectionné (dans la liste)
     Incantation = 0;         // Temps restant d'incantation du sortilège
+    Fatigue_sort = 0;        // Nombre de points de fatigue lié au sortilège
+    Concentration_sort = 0;  // Nombre de points de concentration lié au sortilège
+
     Cible_sort = false;      // Booléen indiquant si le pion est cible d'un sortilège
 
     // === CAPACITÉS SPÉCIALES ===
@@ -838,6 +844,7 @@ class Pion extends Map {
     B_ini = 0;               // Bonus d'initiative
     B_att = 0;               // Bonus d'attaque
     B_dom = 0;               // Bonus de dommages
+    B_def = 0;               // Bonus de défense (esquive & parade)
     Vue = 30;                // Portée de vision
 
     // === VARIABLES D'ATTAQUE ===
@@ -1212,26 +1219,28 @@ class Pion extends Map {
         this.sendMessage("Position");
     }
 
-    sauvegarde_au_sort(formula) {
-        const base = formula.replace(/[+-][0-9]*$/, "");
-        const modificateur = parseInt(formula.replace(base, ""), 10);
+    sauvegarde_au_sort(attribut, modificateur) {
         const model = Models.find(x => x.Nom_model === this.Model);
         const jet =
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1;
 
-        switch (base) {
+        switch (attribut) {
             case "Con":
-                return model.Constitution + modificateur - jet;
+                return model.Constitution + parseInt(modificateur, 10) - jet;
             case "Cor":
-                return model.coordination() + modificateur - jet;
+                return model.coordination() + parseInt(modificateur, 10) - jet;
             case "Vol":
-                return model.Volonte + modificateur - jet;
+                return model.Volonte + parseInt(modificateur, 10) - jet;
             case "Abs":
-                return model.Abstraction + modificateur - jet;
+                return model.Abstraction + parseInt(modificateur, 10) - jet;
+            case "Foi":
+                return model.Foi + parseInt(modificateur, 10) - jet;
+            case "Mag":
+                return model.Magie + parseInt(modificateur, 10) - jet;
             case "6eS":
-                return model.sixieme_sens() + modificateur - jet;
+                return model.sixieme_sens() + parseInt(modificateur, 10) - jet;
         }
         return null;
     }
@@ -1269,6 +1278,7 @@ canvas.addEventListener("mousedown", (event) => {
 
     const p = Pions.find(x => x.Position === col + "," + row);
     const t = Terrains.find(x => x.Position === col + "," + row);
+    const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
 
     // Glisser gauche ou sinon droit en cours
     if (event.button === 0) isDragging_left = true;
@@ -1281,7 +1291,7 @@ canvas.addEventListener("mousedown", (event) => {
         p.Defenseur = true;
         afficher_attaque(1);
     }
-    else if (event.button === 0 && p != null && typeof p != "undefined" && sort_lance != null) {
+    else if (event.button === 0 && p != null && typeof p != "undefined" && magicien != null) {
         // Clic gauche sur la cible de sort choisi => on le marque comme cible
         p.Cible_sort = !p.Cible_sort;
     }
@@ -2052,7 +2062,8 @@ document.addEventListener("keydown", function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-            if (sort_lance !== null) {
+            const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+            if (magicien != null) {
                 afficher_confirmation_sort();
             }
             else next_attaque();

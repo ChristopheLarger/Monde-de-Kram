@@ -320,6 +320,25 @@ function closeSpellInfo(event) {
 }
 
 /**
+ * Expurgue le temps d'incantation d'un sort pour obtenir le nombre de secondes
+ * @param {string} Incantation - Le temps d'incantation du sort
+ * @returns {number} Le nombre de secondes
+ */
+function expurger_incantation(Incantation) {
+  let temps = 0;
+  if (Incantation === "2 s (4s)") temps = 2;
+  if (Incantation === "1/10 s") temps = 0.1;
+  if (Incantation.endsWith(" s")) temps = parseInt(Incantation.replace(" s", ""));
+  if (Incantation.endsWith(" min")) temps = 60 * parseInt(Incantation.replace(" min", ""));
+  if (Incantation.endsWith(" minutes")) temps = 60 * parseInt(Incantation.replace(" minutes", ""));
+  if (Incantation.endsWith(" h")) temps = 3600 * parseInt(Incantation.replace(" h", ""));
+  if (Incantation.endsWith(" jour")) temps = 24 * 3600 * parseInt(Incantation.replace(" jour", ""));
+  if (Incantation.endsWith(" semaine")) temps = 7 * 24 * 3600 * parseInt(Incantation.replace(" semaine", ""));
+
+  return temps;
+}
+
+/**
  * Crée dynamiquement une modale de liste de magie
  * @param {string} Nom_liste - Le nom de la liste de magie
  * @returns {HTMLElement} La modale de la liste de magie
@@ -518,23 +537,15 @@ function createListeModal(Nom_liste) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
         m_selected.Nom_liste = sort.Nom_liste;
         m_selected.Nom_sort = sort.Nom_sort;
-        let temps = "?";
-        if (sort.Incantation === "2 s (4s)") temps = 2;
-        if (sort.Incantation === "1/10 s") temps = 0.1;
-        if (sort.Incantation.endsWith(" s")) temps = parseInt(sort.Incantation.replace(" s", ""));
-        if (sort.Incantation.endsWith(" min")) temps = 60 * parseInt(sort.Incantation.replace(" min", ""));
-        if (sort.Incantation.endsWith(" minutes")) temps = 60 * parseInt(sort.Incantation.replace(" minutes", ""));
-        if (sort.Incantation.endsWith(" h")) temps = 3600 * parseInt(sort.Incantation.replace(" h", ""));
-        if (sort.Incantation.endsWith(" jour")) temps = 24 * 3600 * parseInt(sort.Incantation.replace(" jour", ""));
-        if (sort.Incantation.endsWith(" semaine")) temps = 7 * 24 * 3600 * parseInt(sort.Incantation.replace(" semaine", ""));
-        m_selected.Incantation = temps;
+        m_selected.Incantation = expurger_incantation(sort.Incantation);
 
         // Mise à jour du sortilège sélectionné
         if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
           m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
           dialog_details_2.querySelector(".liste").textContent = m_selected.Nom_liste;
           dialog_details_2.querySelector(".sort").textContent = m_selected.Nom_sort;
-          dialog_details_2.querySelector(".info_principale").textContent = " (" + m_selected.Incantation + " s)";
+          dialog_details_2.querySelector(".info_principale").textContent =
+          " (" + m_selected.Incantation + " s / " + expurger_incantation(sort.Incantation) + ")";
           afficher_param_sort(sort);
         } else {
           dialog_details_2.querySelector(".liste").textContent = "--";

@@ -357,20 +357,17 @@ function next_attaque() {
         Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${attaque.Timing.toFixed(2)}s)...`);
 
         // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort)
-        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
-        attaquant.Fatigue -= sort.Niveau;
-        attaquant.Fatigue_down = sort.Niveau;
+        attaquant.Fatigue -= attaquant.Fatigue_sort;
+        attaquant.Fatigue_down = attaquant.Fatigue_sort;
 
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
-
-        // Sélection du sort en cours de lancement
-        sort_lance = sort.Nom_liste + "@" + sort.Nom_sort;
 
         // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
         Pions.forEach(pion => { pion.Cible_sort = false; });
 
         // Affichage du panneau d'information du sort
+        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
         createSpellInfo(document.body, sort);
 
         // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
@@ -595,8 +592,7 @@ function calcul_scr_att() {
     score -= 10;
 
     // Malus de feinte de corps du défenseur
-    const fdc_def = calcul_fdc_def();
-    if (fdc_def > 0) score -= fdc_def;
+    score -= calcul_fdc_def();
 
     // Bonus de compétence d'arme
     if (attaquant.at1_att && attaquant.Arme1) {
@@ -648,9 +644,6 @@ function explications_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
     const model_att = Models.find(m => m.Nom_model === attaquant.Model);
 
-    let fdc = calcul_fdc_def();
-    if (!(fdc > 0)) fdc = 0;
-
     let explication = `<strong>Calcul du score d'attaque :</strong><br>`;
     explication += `Jet de dés : ${attaquant.jet_att || 0}<br>`;
     explication += `Moins la Base : -10<br>`;
@@ -666,6 +659,8 @@ function explications_scr_att() {
         else if (attaquant.Arme2 === model_att.Arme_3) competence = model_att.Att_3 || 0;
     }
     explication += `Plus la Compétence de l'arme : ${competence}<br>`;
+    
+    let fdc = calcul_fdc_def();
     explication += `Moins la Feinte de corps : ${-fdc}<br>`;
     if ((attaquant.B_att || 0) !== 0) explication += `Bonus d'attaque : ${attaquant.B_att || 0}<br>`;
 
@@ -754,6 +749,9 @@ function calcul_scr_def() {
         }
     }
 
+    // Bonus d'attaque
+    score += defenseur.B_def;
+
     return score;
 }
 
@@ -809,6 +807,10 @@ function explications_scr_def() {
             }
         }
     }
+
+    // Bonus de défense
+    if ((defenseur.B_def || 0) !== 0) explication += `Bonus de défense : ${defenseur.B_def || 0}<br>`;
+    scoreFinal += (defenseur.B_def || 0);
 
     explication += `Score final : ${scoreFinal}<br>`;
 

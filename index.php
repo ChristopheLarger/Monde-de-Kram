@@ -296,10 +296,7 @@
         document.getElementById("joueur").value = "MJ";
 
         // Déclencher l'événement change pour initialiser l'interface
-        const changeEvent = new Event('change', {
-            bubbles: true,
-            cancelable: true
-        });
+        const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
         // Attendre que l'interface soit complètement initialisée
@@ -309,12 +306,13 @@
             const guilhem = Pion.add("ennemis", "Guilhem");
             const elemental_air = Pion.add("ennemis", "Elémental d'air");
 
-            guilhem.Arme1 = "Lancement de sort";
-            guilhem.Nom_liste = "Liste du contrôle de soi";
-            guilhem.Nom_sort = "Vivacité physique";
-            guilhem.Incantation = 2;
+            // Simuler un lancement de sort pour le personnage Guilhem
+            // guilhem.Arme1 = "Lancement de sort";
+            // guilhem.Nom_liste = "Liste du contrôle de soi";
+            // guilhem.Nom_sort = "Vivacité physique";
+            // guilhem.Incantation = 2;
 
-            next_attaque();
+            // next_attaque();
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();

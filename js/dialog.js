@@ -146,6 +146,7 @@ function afficher_Details(col, row) {
 
   // Si aucun pion trouvé, afficher le dialogue de création
   if (m_selected === null || typeof m_selected === "undefined") {
+    // Affichage du dialogue de création de pion
     const model = dialog_details_1.querySelector("#model");
 
     dialog_details_1.querySelector("#col").value = col;
@@ -173,6 +174,7 @@ function afficher_Details(col, row) {
 
     dialog_details_1.showModal();
   } else {
+    // Affichage du dialogue d'édition des détails du pion
     const model = dialog_details_2.querySelector(".model");
     const titre = dialog_details_2.querySelector(".titre");
     const note = dialog_details_2.querySelector(".note");
@@ -308,19 +310,22 @@ function afficher_Details(col, row) {
     Map.drawHexMap();
 
     // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
-    dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
+    dialog_details_2.querySelector(".info_principale").textContent = " (" + info_arme(1) + ")";
+    dialog_details_2.querySelector(".info_secondaire").textContent = " (" + info_arme(2) + ")";
 
     // Mise à jour du sortilège sélectionné
     if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
       m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-      dialog_details_2.querySelector(".liste").textContent = m_selected.Nom_liste;
-      dialog_details_2.querySelector(".sort").textContent = m_selected.Nom_sort;
-      dialog_details_2.querySelector(".info_principale").textContent = " (" + m_selected.Incantation + " s)";
+      const sort = Sorts.find(s => s.Nom_liste === m_selected.Nom_liste && s.Nom_sort === m_selected.Nom_sort);
+
+      dialog_details_2.querySelector(".liste").textContent = sort.Nom_liste;
+      dialog_details_2.querySelector(".sort").textContent = sort.Nom_sort;
+      dialog_details_2.querySelector(".info_principale").textContent =
+        " (" + m_selected.Incantation + " s / " + expurger_incantation(sort.Incantation) + ")";
     } else {
       dialog_details_2.querySelector(".liste").textContent = "--";
       dialog_details_2.querySelector(".sort").textContent = "--";
-      dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
+      dialog_details_2.querySelector(".info_principale").textContent = " (" + info_arme(1) + ")";
     }
 
     // Affichage du dialogue
@@ -339,12 +344,14 @@ function afficher_Details(col, row) {
     arme1.style.width = width + "px";
     arme2.style.width = width + "px";
 
-    // Désactivation des champs si ce n'est pas le MJ
-    if (document.getElementById("joueur").value != "MJ") {
-      type.disabled = true;
-      note.disabled = true;
+    // Désactivation des champs armes si on est en phase de combat
+    if (order_combats !== -2) {
       arme1.disabled = true;
       arme2.disabled = true;
+    }
+    else {
+      arme1.disabled = false;
+      arme2.disabled = false;
     }
   }
 }
@@ -887,20 +894,18 @@ function afficher_param_sort(sort) {
  * Affiche le dialogue de paramètrage d'un sort
  */
 function afficher_confirmation_sort() {
+  const magicien = Pions.find((p) => p.Attaquant);
+
   // Récupération du sort en cours de lancement
-  const sort = Sorts.find((s) =>
-    s.Nom_liste === sort_lance.split("@")[0] &&
-    s.Nom_sort === sort_lance.split("@")[1]);
+  // const sort = Sorts.find((s) =>
+  //   s.Nom_liste === magicien.Nom_liste &&
+  //   s.Nom_sort === magicien.Nom_sort);
 
   // Initialisation des champs du dialogue
-  dialog_sort_2.querySelector(".nom_liste").textContent = sort.Nom_liste;
-  dialog_sort_2.querySelector(".nom_sort").textContent = sort.Nom_sort;
-  // dialog_sort_2.querySelector(".fatigue_actuelle").value = m_selected.Fatigue;
-  // dialog_sort_2.querySelector(".concentration_actuelle").value = m_selected.Concentration;
-  // dialog_sort_2.querySelector(".fatigue_max").textContent = model.Fatigue;
-  // dialog_sort_2.querySelector(".concentration_max").textContent = model.Concentration;
-  dialog_sort_2.querySelector(".fatigue_cout").value = sort.Niveau;
-  dialog_sort_2.querySelector(".concentration_cout").value = sort.Niveau;
+  dialog_sort_2.querySelector(".nom_liste").textContent = magicien.Nom_liste;
+  dialog_sort_2.querySelector(".nom_sort").textContent = magicien.Nom_sort;
+  dialog_sort_2.querySelector(".fatigue_cout").value = magicien.Fatigue_sort;
+  dialog_sort_2.querySelector(".concentration_cout").value = magicien.Concentration_sort;
 
   // Réinitialisation des sélections
   // dialog_sort_2.querySelector(".sort_radio1").checked = true;
@@ -908,27 +913,9 @@ function afficher_confirmation_sort() {
   // dialog_sort_2.querySelector(".sort_radio3").checked = false;
   // dialog_sort_2.querySelector(".sort_radio0").checked = false;
 
+  // Activation/désactivation des options selon les possibilités
   dialog_sort_2.querySelector(".fatigue_cout").disabled = true;
   dialog_sort_2.querySelector(".concentration_cout").disabled = true;
-
-  // Activation/désactivation des options selon les possibilités
-  // dialog_sort_2.querySelector(".sort_radio0").disabled = false;
-
-  // if (sort.Niveau > m_selected.Concentration) {
-  //   dialog_sort_2.querySelector(".sort_radio1").disabled = true;
-  // } else {
-  //   dialog_sort_2.querySelector(".sort_radio1").disabled = false;
-  // }
-  // if (2 * sort.Niveau > m_selected.Concentration) {
-  //   dialog_sort_2.querySelector(".sort_radio2").disabled = true;
-  // } else {
-  //   dialog_sort_2.querySelector(".sort_radio2").disabled = false;
-  // }
-  // if (3 * sort.Niveau > m_selected.Concentration) {
-  //   dialog_sort_2.querySelector(".sort_radio3").disabled = true;
-  // } else {
-  //   dialog_sort_2.querySelector(".sort_radio3").disabled = false;
-  // }
 
   dialog_sort_2.showModal();
 }
@@ -1270,6 +1257,13 @@ arme1.addEventListener("click", function (event) {
         });
       }
     }
+    else {
+      m_selected.Nom_liste = null;
+      m_selected.Nom_sort = null;
+      m_selected.Incantation = 0;
+      m_selected.Fatigue_sort = 0;
+      m_selected.Concentration_sort = 0;
+    }
 
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
     if ((arme1.value === "Lancement de sort") || (w1 && (typeof w1 !== "undefined") && w1.Deux_mains)) {
@@ -1332,15 +1326,15 @@ arme1.addEventListener("click", function (event) {
     m_selected.Arme1 = arme1.value;
 
     // Mise à jour de l'information affichée
-    if (!isClickInside) dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
+    if (!isClickInside) dialog_details_2.querySelector(".info_principale").textContent = " (" + info_arme(1) + ")";
 
     // Activation/désactivation du sélecteur d'arme secondaire
     if (arme2.options.length > 1) {
       arme2.disabled = false;
-      dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
+      dialog_details_2.querySelector(".info_secondaire").textContent = " (" + info_arme(2) + ")";
     } else {
       arme2.disabled = true;
-      dialog_details_2.querySelector(".info_secondaire").textContent = "(-)";
+      dialog_details_2.querySelector(".info_secondaire").textContent = "";
     }
 
     // Ajustement de la largeur des sélecteurs
@@ -1357,8 +1351,8 @@ dialog_details_2.querySelector(".arme2").addEventListener("change", function (ev
   m_selected.Arme2 = event.target.value;
 
   // Mise à jour de l'information affichée
-  dialog_details_2.querySelector(".info_principale").textContent = "(" + info_arme(1) + ")";
-  dialog_details_2.querySelector(".info_secondaire").textContent = "(" + info_arme(2) + ")";
+  dialog_details_2.querySelector(".info_principale").textContent = " (" + info_arme(1) + ")";
+  dialog_details_2.querySelector(".info_secondaire").textContent = " (" + info_arme(2) + ")";
 });
 
 // Empêche le menu contextuel sur le dialogue de détails
@@ -1822,6 +1816,8 @@ dialog_sort_1.querySelector(".sort_radio1").addEventListener("change", function 
     s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
   m_selected.Fatigue -= sort.Niveau;
   m_selected.Concentration -= sort.Niveau;
+  m_selected.Fatigue_sort = sort.Niveau;
+  m_selected.Concentration_sort = sort.Niveau;
   dialog_sort_1.close();
 });
 
@@ -1832,6 +1828,8 @@ dialog_sort_1.querySelector(".sort_radio2").addEventListener("change", function 
     s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
   m_selected.Fatigue -= 2 * sort.Niveau;
   m_selected.Concentration -= 2 * sort.Niveau;
+  m_selected.Fatigue_sort = 2 * sort.Niveau;
+  m_selected.Concentration_sort = 2 * sort.Niveau;
   dialog_sort_1.close();
 });
 
@@ -1842,6 +1840,8 @@ dialog_sort_1.querySelector(".sort_radio3").addEventListener("change", function 
     s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
   m_selected.Fatigue -= 3 * sort.Niveau;
   m_selected.Concentration -= 3 * sort.Niveau;
+  m_selected.Fatigue_sort = 3 * sort.Niveau;
+  m_selected.Concentration_sort = 3 * sort.Niveau;
   dialog_sort_1.close();
 });
 
@@ -1849,22 +1849,7 @@ dialog_sort_1.querySelector(".sort_radio3").addEventListener("change", function 
 dialog_sort_1.querySelector(".sort_radio0").addEventListener("change", function (event) {
   dialog_sort_1.querySelector(".fatigue_cout").disabled = false;
   dialog_sort_1.querySelector(".concentration_cout").disabled = false;
-  if (dialog_sort_1.querySelector(".concentration_cout").value <= m_selected.Concentration) {
-    dialog_sort_1.querySelector(".acter").disabled = false;
-  }
-  else {
-    dialog_sort_1.querySelector(".acter").disabled = true;
-  }
-});
-
-// Gestion du changement de la concentration spécifique
-dialog_sort_1.querySelector(".concentration_cout").addEventListener("input", function (event) {
-  if (event.target.value <= m_selected.Concentration) {
-    dialog_sort_1.querySelector(".acter").disabled = false;
-  }
-  else {
-    dialog_sort_1.querySelector(".acter").disabled = true;
-  }
+  dialog_sort_1.querySelector(".acter").disabled = false;
 });
 
 // Bouton "Acter" (Valide la sélection spécifique et ferme le dialogue)
@@ -1872,6 +1857,8 @@ dialog_sort_1.querySelector(".acter").addEventListener("click", function (event)
   // Mise à jour des points de fatigue et de concentration
   m_selected.Fatigue -= dialog_sort_1.querySelector(".fatigue_cout").value;
   m_selected.Concentration -= dialog_sort_1.querySelector(".concentration_cout").value;
+  m_selected.Fatigue_sort = dialog_sort_1.querySelector(".fatigue_cout").value;
+  m_selected.Concentration_sort = dialog_sort_1.querySelector(".concentration_cout").value;
   dialog_sort_1.close();
 });
 
@@ -1902,7 +1889,7 @@ dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (
 
   formula = formula.replace(/C$/g, "Con");
   formula = formula.replace(/C\+/g, "Con+");
-  formula = formula.replace(/C]\-/g, "Con-");
+  formula = formula.replace(/C\-/g, "Con-");
 
   formula = formula.replace(/Co$/g, "Cor");
   formula = formula.replace(/Co\+/g, "Cor+");
@@ -1916,13 +1903,17 @@ dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (
   formula = formula.replace(/Ab\+/g, "Abs+");
   formula = formula.replace(/Ab\-/g, "Abs-");
 
+  formula = formula.replace(/Foi$/g, "Foi");
+  formula = formula.replace(/Foi\+/g, "Foi+");
+  formula = formula.replace(/Foi\-/g, "Foi-");
+
+  formula = formula.replace(/Mag$/g, "Mag");
+  formula = formula.replace(/Mag\+/g, "Mag+");
+  formula = formula.replace(/Mag\-/g, "Mag-");
+
   formula = formula.replace(/6esens/g, "6eS");
 
   let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
-  if (!["Con", "Cor", "Vol", "Abs", "6eS"].includes(base)) {
-    dialog_sort_2.querySelector(".res_save").textContent = "Erreur de format";
-    return;
-  }
 
   let operateur = formula.replace(/[^+-]/g, "").charAt(0);
   if (operateur === "") operateur = "+";
@@ -1930,8 +1921,48 @@ dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (
   let modificateur = parseInt(formula.replace(base, "").replace(/[+-]/g, ""), 10);
   if (isNaN(modificateur)) modificateur = 0;
 
-  dialog_sort_2.querySelector(".res_save").textContent =
-    "Format valide (" + base + operateur + modificateur + ")";
+  if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS"].includes(base)) {
+    dialog_sort_2.querySelector(".res_save").textContent = "(???)";
+  }
+  else {
+    dialog_sort_2.querySelector(".res_save").textContent =
+      "(" + base + operateur + modificateur + ")";
+  }
 
-  console.log("Sauvegarde au sort :", m_selected.sauvegarde_au_sort(base + operateur + modificateur));
+  // Application des sauvegardes au sort des cibles
+  Pions.filter(p => p.Cible_sort).forEach(p => {
+    console.log("Sauvegarde au sort :", p.Titre, p.sauvegarde_au_sort(base, operateur.toString() + modificateur.toString()));
+  });
+});
+
+// Gestion du changement de la concentration spécifique
+dialog_sort_2.querySelector(".prompt_degats").addEventListener("input", function (event) {
+  if (event.target.value === "-" || event.target.value === "") {
+    dialog_sort_2.querySelector(".res_degats").textContent = "Aucun";
+    return;
+  }
+
+  const degats = LancerDes.rollDice(event.target.value.toLowerCase());
+
+  if (degats > 0) {
+    dialog_sort_2.querySelector(".res_degats").textContent = "(" + degats + ")";
+  }
+  else {
+    dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
+  }
+
+  // Application des sauvegardes au sort des cibles
+  const type_degats = dialog_sort_2.querySelector(".degats_radio0").checked ? "généraux" : "localisés";
+  Pions.filter(p => p.Cible_sort).forEach(p => {
+    console.log("Dégâts du sort :", p.Titre, type_degats, degats);
+  });
+});
+
+// Gestion des clics sur les spans pour sélectionner le type de dégâts
+dialog_sort_2.querySelectorAll("span").forEach((span) => {
+  span.addEventListener("mousedown", function (event) {
+    const radio = event.target.closest("td").querySelector('input[type="radio"]');
+    if (radio === null || typeof radio === "undefined") return;
+    radio.click();
+  });
 });

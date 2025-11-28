@@ -29,7 +29,7 @@
         style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between;">
 
         <!-- Outils de terrain et formes -->
-        <div style="display: flex; align-items: center; margin: 4px; background-color: white;">
+        <div style="width: 500px; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -40,7 +40,7 @@
                 style="width: 30px; height: 30px; cursor: pointer;">
             <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
                 style="width: 30px; height: 30px; cursor: pointer;">
-
+            &nbsp;&nbsp;&nbsp;
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
             <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">
@@ -235,7 +235,7 @@
         <tr>
             <td>Modèle :&nbsp;</td>
             <td><span class="model"></span><span class="indice"></span></td>
-            <td> </td>
+            <td>&nbsp;</td>
             <td>Allié :&nbsp;</td>
             <td>
                 <label class="switch">
@@ -243,11 +243,11 @@
                     <span class="slider"></span>
                 </label>
             </td>
-            <td> </td>
+            <td>&nbsp;</td>
             <td>Fatigue :&nbsp;</td>
             <td><input type="text" class="fatigue" style="text-align: center;"></td>
             <td><span class="fatigue"></span></td>
-            <td> </td>
+            <td>&nbsp;</td>
             <td>Concentration :&nbsp;</td>
             <td><input type="text" class="concentration" style="text-align: center;"></td>
             <td><span class="concentration"></span></td>
@@ -342,7 +342,12 @@
             <td><input type="text" class="poitrine" style="text-align: center;"></td>
             <td> <span class="poitrine"></span></td>
             <td style="text-align: center;"><input type="text" class="armure_poitrine" style="text-align: center;"></td>
-            <td colspan="7"></td>
+            <td></td>
+            <td colspan="2">Bonus Défense :&nbsp;</td>
+            <td><input type="text" class="b_def" style="text-align: center;">&nbsp;</td>
+            <td> </td>
+            <td></td>
+            <td></td>
         </tr>
         <tr>
             <td>Abdomen :&nbsp;</td>
@@ -915,7 +920,7 @@
             <td>Prompt :&nbsp;</td>
             <td>
                 <input type="text" class="prompt_save" style="width: 120px; font-size: x-large;">
-                <span class="res_save">(Validé)</span>
+                <span class="res_save">Aucune</span>
             </td>
             <td></td>
         </tr>
@@ -933,21 +938,20 @@
             <col style="width: 1px;">
             <col style="width: auto;">
             <col style="width: 1px;">
+            <col style="width: auto;">
+            <col style="width: 1px;">
         </colgroup>
         <tr>
             <td></td>
-            <td rowspan="2">Prompt :&nbsp;</td>
-            <td rowspan="2">
+            <td>Prompt :&nbsp;</td>
+            <td>
                 <input type="text" class="prompt_degats" style="width: 120px; font-size: x-large;">
-                <span class="res_degats">(00)</span>
+                <span class="res_degats">Aucun</span>
             </td>
             <td></td>
             <td><input type="radio" name="radio_degats" value="0" class="degats_radio0" checked>
                 <span class="degats_gen">Dégâts généraux</span>
             </td>
-        </tr>
-        <tr>
-            <td></td>
             <td></td>
             <td><input type="radio" name="radio_degats" value="1" class="degats_radio1">
                 <span class="degats_loc">Dégâts localisés</span>
@@ -971,19 +975,36 @@
             <col style="width: auto;">
             <col style="width: 1px;">
             <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
         </colgroup>
         <tr>
             <td></td>
-            <td>Feinte :&nbsp;</td>
+            <td></td>
+            <td>Armure</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+        <tr>
+            <td></td>
+            <td>Tête :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_tete" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+            <td>Feinte de corps :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_fdc"
                     style="width: 35px; text-align: center; font-size: x-large;"></td>
             <td>&nbsp;</td>
             <td>Initiative :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_ini"
                     style="width: 35px; text-align: center; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Bras Gauche :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_brasg" style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
             <td>Attaque :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_att"
@@ -993,7 +1014,41 @@
             <td style="text-align: center;"><input type="text" class="b_dom"
                     style="width: 35px; text-align: center; font-size: x-large;"></td>
         </tr>
+        <tr>
+            <td></td>
+            <td>Bras Droit :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_brasd" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+            <td>Défense :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="b_def"
+                    style="width: 35px; text-align: center; font-size: x-large;"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Poitrine :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_poitrine" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Abdomen :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_abdomen" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Jambe Gauche :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_jambeg" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td>Jambe Droite :&nbsp;</td>
+            <td style="text-align: center;"><input type="text" class="armure_jambed" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td>&nbsp;</td>
+        </tr>
     </table>
+
     <!-- Bouton pour appliquer le sort -->
     <hr>
     <div style="width: 100%; text-align: right;">
