@@ -112,6 +112,179 @@ class Map {
         return is_find;
     }
 
+    static get_ColRow(x, y) {
+        // Calculer la colonne approximative
+        // Utiliser Math.floor au lieu de Math.round pour les valeurs négatives pour éviter les arrondis incorrects
+        let col;
+        if (x >= 0) {
+            col = Math.round(x / hexHSpacing);
+        } else {
+            // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
+            col = Math.ceil(x / hexHSpacing);
+        }
+
+        // Pour la ligne, on doit tenir compte du décalage des colonnes impaires
+        // La formule inverse de get_XY : y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0)
+        // Donc : row = (y - ((col % 2 != 0) ? hexVSpacing / 2 : 0)) / hexVSpacing
+        const yAdjusted = y - ((col % 2 != 0) ? hexVSpacing / 2 : 0);
+        let row;
+        if (yAdjusted >= 0) {
+            row = Math.round(yAdjusted / hexVSpacing);
+        } else {
+            // Pour les valeurs négatives, utiliser Math.ceil pour arrondir vers 0
+            row = Math.ceil(yAdjusted / hexVSpacing);
+        }
+
+        return { col: col, row: row };
+    }
+
+
+    /**
+     * Vérifie si un point (px, py) est à l'intérieur d'un hexagone centré en (cx, cy)
+     * @param {number} px - Coordonnée X du point à tester
+     * @param {number} py - Coordonnée Y du point à tester
+     * @param {number} cx - Coordonnée X du centre de l'hexagone
+     * @param {number} cy - Coordonnée Y du centre de l'hexagone
+     * @returns {boolean} - true si le point est à l'intérieur de l'hexagone
+     */
+    static isPointInHexagon(px, py, cx, cy) {
+        // Calculer les 6 sommets de l'hexagone (même orientation que drawHexagon)
+        let points = [];
+        for (let i = 0; i < 6; i++) {
+            let angle = (Math.PI / 3) * i;
+            let dx = cx + hexSize * Math.cos(angle);
+            let dy = cy + hexSize * Math.sin(angle);
+            points.push({ x: dx, y: dy });
+        }
+
+        // Pour les points entre les deux rayons, utiliser le ray casting
+        // Ray casting : tirer un rayon horizontal vers la droite et compter les intersections
+        let inside = false;
+        const epsilon = 0.0001; // Tolérance pour les comparaisons flottantes
+
+        for (let i = 0, j = 5; i < 6; j = i++) {
+            const xi = points[i].x, yi = points[i].y;
+            const xj = points[j].x, yj = points[j].y;
+
+            // Ignorer les arêtes horizontales (pas d'intersection avec un rayon horizontal)
+            if (Math.abs(yi - yj) < epsilon) continue;
+
+            // Vérifier si le rayon horizontal du point intersecte cette arête
+            // L'arête doit chevaucher la ligne y = py (un sommet strictement au-dessus, l'autre strictement en-dessous)
+            const yiAbove = yi > py + epsilon;
+            const yjAbove = yj > py + epsilon;
+            const yOverlap = (yiAbove !== yjAbove);
+
+            if (yOverlap) {
+                // Calculer l'intersection x de l'arête avec la ligne y = py
+                const t = (py - yi) / (yj - yi);
+                const xIntersect = xi + t * (xj - xi);
+
+                // Le rayon part de (px, py) vers la droite, donc on vérifie si px < xIntersect
+                if (px < xIntersect - epsilon) inside = !inside;
+            }
+        }
+
+        return inside;
+    }
+
+    /**
+     * Convertit les coordonnées hexagonales (col, row) en coordonnées pixels (x, y)
+     * @param {number} col - Colonne de l'hexagone
+     * @param {number} row - Ligne de l'hexagone
+     * @returns {Object} - {x, y} coordonnées en pixels
+     */
+    static get_XY(col, row) {
+        const x = col * hexHSpacing;
+        const y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0);
+        return { x: x, y: y };
+    }
+
+    /**
+     * Calcule la position de la souris sur le canvas en tenant compte du border et de l'échelle
+     * @param {MouseEvent} event - Événement de souris
+     * @returns {Object} - {x, y} coordonnées ajustées
+     */
+    static getMousePosition(event) {
+        const rect = canvas.getBoundingClientRect();
+        // Prendre en compte le border du canvas (1px de chaque côté)
+        const borderWidth = 1; // canvas.style.borderWidth;
+        let mouseX = event.clientX - rect.left - borderWidth;
+        let mouseY = event.clientY - rect.top - borderWidth;
+
+        // Vérifier si le canvas a une échelle différente (si width/height CSS != width/height canvas)
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        // Ajuster les coordonnées si nécessaire
+        return {
+            x: mouseX * scaleX,
+            y: mouseY * scaleY
+        };
+    }
+
+    /**
+     * Trouve l'hexagone contenant le point (px, py) en tenant compte de l'offset
+     * @param {number} px - Coordonnée X du point (en pixels, relative au canvas)
+     * @param {number} py - Coordonnée Y du point (en pixels, relative au canvas)
+     * @returns {Object} - {col, row} de l'hexagone trouvé
+     */
+    static getHexagonAtPoint(px, py) {
+        // Convertir les coordonnées en tenant compte de l'offset
+        const x = px - offsetX;
+        const y = py - offsetY;
+
+        // Trouver l'hexagone le plus proche en utilisant get_ColRow pour être cohérent
+        const colRow = Map.get_ColRow(x, y);
+        const col = colRow.col;
+        const row = colRow.row;
+
+        // Tester une zone de 3x3 hexagones autour du point calculé
+        // pour s'assurer de ne pas manquer l'hexagone correct à cause d'arrondis
+        const candidates = [];
+
+        // Ajouter l'hexagone principal et tous les hexagones dans un rayon de 1
+        for (let dcol = -1; dcol <= 1; dcol++) {
+            for (let drow = -1; drow <= 1; drow++) {
+                candidates.push({ col: col + dcol, row: row + drow });
+            }
+        }
+
+        // Trier les candidats par distance au centre de l'hexagone pour tester le plus proche en premier
+        candidates.sort((a, b) => {
+            const aXY = Map.get_XY(a.col, a.row);
+            const bXY = Map.get_XY(b.col, b.row);
+            const dist1 = Math.sqrt((aXY.x - x) ** 2 + (aXY.y - y) ** 2);
+            const dist2 = Math.sqrt((bXY.x - x) ** 2 + (bXY.y - y) ** 2);
+            return dist1 - dist2;
+        });
+
+        // Tester les candidats triés par distance
+        let bestCandidate = null;
+        let bestDistance = Infinity;
+
+        for (const candidate of candidates) {
+            const hexXY = Map.get_XY(candidate.col, candidate.row);
+            const hexCenterX = hexXY.x + offsetX;
+            const hexCenterY = hexXY.y + offsetY;
+
+            const isIn = Map.isPointInHexagon(px, py, hexCenterX, hexCenterY);
+            const dist = Math.sqrt((px - hexCenterX) ** 2 + (py - hexCenterY) ** 2);
+
+            if (isIn && dist < bestDistance) {
+                bestDistance = dist;
+                bestCandidate = candidate;
+            }
+        }
+
+        if (bestCandidate) {
+            return bestCandidate;
+        }
+
+        // Si aucun hexagone ne contient le point, retourner l'hexagone initial
+        return { col: col, row: row };
+    }
+
     /**
      * Calcule la distance entre deux hexagones
      * @param {number} col1 - Colonne du premier hexagone
@@ -122,6 +295,7 @@ class Map {
      */
     static distance(col1, row1, col2, row2) {
         // Conversion des coordonnées hexagonales en coordonnées cartésiennes
+        // Le pas est de 3 mètres entre les hexagones.
         const x1 = col1 * (3 / 2);
         const y1 = row1 * (Math.sqrt(3)) + (Math.abs(col1) % 2) * (Math.sqrt(3) / 2);
         const x2 = col2 * (3 / 2);
@@ -160,10 +334,14 @@ class Map {
                         else if (t.Model === "Arbre") color = "rgb(128, 255, 128)";
                         else if (t.Model === "Eau") color = "rgb(0, 255, 255)";
                     });
+
+                    // Définition de la couleur de l'hexagone en fonction du type de pion
+                    const magicien = Pions.find(p => p.Attaquant && p.Nom_liste != null);
                     Pions.filter(p => p.Position === col + "," + row).forEach(p => {
                         if (p.Type === "ennemis") strie = true;
-                        if (p.Attaquant) color = "rgb(255, 0, 0)";
-                        else if (p.Defenseur) color = "rgb(0, 0, 255)";
+                        if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
+                        else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
+                        else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
                         else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
                         else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
                     });
@@ -179,11 +357,19 @@ class Map {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
+            // Utiliser les mêmes dimensions que le canvas principal
+            // canvas_selected.width = canvas.width;
+            // canvas_selected.height = canvas.height;
+
+            // Repositionner le canvas_selected pour qu'il se superpose exactement au canvas principal
+            // canvas_selected.style.left = "0px";
+            // canvas_selected.style.top = "0px";
+
             // On dessine l'image au centre de l'hexagone
             const imgSize = hexSize * 1.2;
             const p = Pions.find(q => q.Selected && q.Position === text);
             if (p != null && typeof p != "undefined") {
-                const m = Models.find(x => x.Nom === p.Model);
+                const m = Models.find(x => x.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
             }
             return;
@@ -257,11 +443,11 @@ class Map {
             const p = Pions.find(q => q.Position === text);
             const t = Terrains.find(r => r.Position === text)
             if (p != null && typeof p != "undefined") {
-                const m = Models.find(n => n.Nom === p.Model);
+                const m = Models.find(n => n.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-                if (p.Cac) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
-                if (p.Dist) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
-                if (p.Mage) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
+                if (p.is_cac()) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
+                if (p.is_dist()) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
+                if (p.Concentration > 0) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
                 if (p.Auto) ctx.drawImage(image_auto, x - hexSize + imgSize / 24, y - imgSize / 6, imgSize / 3, imgSize / 3);
             }
             else if (t != null && typeof t != "undefined" && t.Model === "Rocher") {
@@ -294,15 +480,31 @@ class Map {
             let h = window.innerHeight;
             h -= document.getElementById("div_cartouche").offsetHeight;
             h -= document.getElementById("table_dialogue").offsetHeight;
-            h -= 8;
+            h -= document.getElementById("div_tools").offsetHeight;
+            h -= 28;
             return h;
         }
 
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
-            canvas_selected.width = window.innerWidth;
-            canvas_selected.height = get_height();
+            // Utiliser les mêmes dimensions que le canvas principal
+            canvas_selected.width = canvas.width;
+            canvas_selected.height = canvas.height;
+
+            // Repositionner le canvas_selected pour qu'il se superpose exactement au canvas principal
+            const combatDiv = document.getElementById("combat");
+            if (combatDiv) {
+                const combatRect = combatDiv.getBoundingClientRect();
+                const canvasRect = canvas.getBoundingClientRect();
+
+                // Position relative du canvas par rapport au conteneur #combat
+                const relativeLeft = canvasRect.left - combatRect.left;
+                const relativeTop = canvasRect.top - combatRect.top;
+
+                canvas_selected.style.left = relativeLeft + "px";
+                canvas_selected.style.top = relativeTop + "px";
+            }
 
             ctx.clearRect(0, 0, canvas_selected.width, canvas_selected.height);
             hexMap.forEach(hex => {
@@ -599,18 +801,20 @@ class Pion extends Map {
 
     // === PROPRIÉTÉS DE PERSONNAGE ===
     Titre = "";              // Titre affiché du personnage
-    Control = "";            // Contrôleur du personnage
     Arme1 = "";              // Arme principale
     Arme2 = "";              // Arme secondaire
+    Note = "";               // Note personnalisée
+
     Nom_liste = "";          // Liste du sortilège sélectionnée
     Nom_sort = "";           // Sortilège sélectionné (dans la liste)
-    Note = "";               // Note personnalisée
+    Incantation = 0;         // Temps restant d'incantation du sortilège
+    Fatigue_sort = 0;        // Nombre de points de fatigue lié au sortilège
+    Concentration_sort = 0;  // Nombre de points de concentration lié au sortilège
+
+    Cible_sort = false;      // Booléen indiquant si le pion est cible d'un sortilège
 
     // === CAPACITÉS SPÉCIALES ===
     Auto = false;            // Mode automatique (booléen)
-    Mage = false;            // Magicien (booléen)
-    Cac = false;             // Combattant au corps à corps (booléen)
-    Dist = false;            // Combattant à distance (booléen)
 
     // === POINTS DE VIE & Co ===
     Fatigue = 0;             // Niveau de fatigue
@@ -640,6 +844,7 @@ class Pion extends Map {
     B_ini = 0;               // Bonus d'initiative
     B_att = 0;               // Bonus d'attaque
     B_dom = 0;               // Bonus de dommages
+    B_def = 0;               // Bonus de défense (esquive & parade)
     Vue = 30;                // Portée de vision
 
     // === VARIABLES D'ATTAQUE ===
@@ -669,7 +874,7 @@ class Pion extends Map {
         this.Type = type;
         this.Model = model;
 
-        const m = Models.find(x => x.Nom === this.Model);
+        const m = Models.find(x => x.Nom_model === this.Model);
 
         if (indice != -1) this.Indice = indice;
         else if (m.Is_joueur) this.Indice = 0;
@@ -708,6 +913,8 @@ class Pion extends Map {
         this.Armure_brasd = m.Armure_brasd;
         this.Armure_jambeg = m.Armure_jambeg;
         this.Armure_jambed = m.Armure_jambed;
+
+        if (this.Indice !== 0) this.Auto = true;
     }
 
     sendMessage(tag) {
@@ -764,6 +971,36 @@ class Pion extends Map {
         return true;
     }
 
+    is_cac() {
+        const model = Models.find(x => x.Nom_model === this.Model);
+        if (model == null || typeof model == "undefined") return false;
+
+        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
+        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
+        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
+
+        if (w1 && typeof w1 !== "undefined" && !w1.A_distance) return true;
+        if (w2 && typeof w2 !== "undefined" && !w2.A_distance) return true;
+        if (w3 && typeof w3 !== "undefined" && !w3.A_distance) return true;
+
+        return false;
+    }
+
+    is_dist() {
+        const model = Models.find(x => x.Nom_model === this.Model);
+        if (model == null || typeof model == "undefined") return false;
+
+        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
+        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
+        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
+
+        if (w1 && typeof w1 !== "undefined" && w1.A_distance) return true;
+        if (w2 && typeof w2 !== "undefined" && w2.A_distance) return true;
+        if (w3 && typeof w3 !== "undefined" && w3.A_distance) return true;
+
+        return false;
+    }
+
     #findClosestHexFree(pos) {
         const col = pos.split(",")[0];
         const row = pos.split(",")[1];
@@ -808,7 +1045,7 @@ class Pion extends Map {
     // On duplique un pion de la carte.
     dupliquer() {
         const p = new Pion(this.Type, this.Model);
-        const m = Models.find(x => x.Nom === this.Model);
+        const m = Models.find(x => x.Nom_model === this.Model);
 
         if (m.Is_joueur) return null;
 
@@ -869,116 +1106,6 @@ class Pion extends Map {
 
     // Renseigne sur le fait qu'un hexagone soit visible ou non du pion.
     ligne_de_vue(col, row) {
-        // Sous-fonction donnant la liste des hexagones sur une ligne
-        // function hexLine(start, end) {
-        //     // Convertit (col, row) en coordonnées cubiques (q, r, s)
-        //     function colRowToCube(col, row) {
-        //         let q = col;
-        //         let r = row - Math.floor(col / 2);
-        //         let s = -q - r;
-        //         return [q, r, s];
-        //     }
-
-        //     // Convertit (q, r, s) en coordonnées (col, row)
-        //     function cubeToColRow(q, r) {
-        //         let col = q;
-        //         let row = r + Math.floor(q / 2);
-        //         return [col, row];
-        //     }
-
-        //     // Interpolation linéaire entre a et b
-        //     function lerp(a, b, t) {
-        //         return a + (b - a) * t;
-        //     }
-
-        //     // Interpolation linéaire entre deux points cubiques
-        //     function cubeLerp(a, b, t) {
-        //         return [
-        //             lerp(a[0], b[0], t),
-        //             lerp(a[1], b[1], t),
-        //             lerp(a[2], b[2], t)
-        //         ];
-        //     }
-
-        //     // Arrondit les coordonnées cubiques vers l'hexagone le plus proche
-        //     function roundCube(cube) {
-        //         let [q, r, s] = cube;
-        //         let rq = Math.round(q);
-        //         let rr = Math.round(r);
-        //         let rs = Math.round(s);
-
-        //         let dq = Math.abs(rq - q);
-        //         let dr = Math.abs(rr - r);
-        //         let ds = Math.abs(rs - s);
-
-        //         if (dq > dr && dq > ds) {
-        //             rq = -rr - rs;
-        //         } else if (dr > ds) {
-        //             rr = -rq - rs;
-        //         } else {
-        //             rs = -rq - rr;
-        //         }
-
-        //         return [rq, rr, rs];
-        //     }
-
-        //     let startCube = colRowToCube(...start);
-        //     let endCube = colRowToCube(...end);
-
-        //     let n = Math.max(Math.abs(startCube[0] - endCube[0]),
-        //         Math.abs(startCube[1] - endCube[1]),
-        //         Math.abs(startCube[2] - endCube[2]));
-
-        //     let hexes = [];
-
-        //     for (let i = 0; i <= n; i++) {
-        //         let t = i / n;
-        //         let cube = cubeLerp(startCube, endCube, t);
-        //         let roundedCube = roundCube(cube);
-        //         let hex = cubeToColRow(...roundedCube);
-
-        //         // Ajouter uniquement si non déjà présent
-        //         if (!hexes.some(h => h[0] === hex[0] && h[1] === hex[1])) {
-        //             hexes.push(hex);
-        //         }
-        //     }
-
-        //     return hexes;
-        // }
-
-        // const start_col = parseInt(this.Position.split(",")[0], 10);
-        // const start_row = parseInt(this.Position.split(",")[1], 10);
-        // const startHex = [start_col, start_row];
-        // const endHex = [col, row];
-
-        // const results = hexLine(startHex, endHex);
-
-        // let visible = true;
-
-        // results.forEach(hex => {
-        //     if (!visible) return;
-
-        //     // Si le pion est sur la case de départ, on ne fait rien
-        //     if (hex[0] === start_col && hex[1] === start_row) return;
-
-        //     // Si le pion est sur la case d'arrivée, on ne fait rien
-        //     if (hex[0] === col && hex[1] === row) return;
-
-        //     // Vérification des terrains (si un terrain Rocher ou Arbre est sur le chemin, le pion ne voit pas la case)
-        //     const t = Terrains.find(x => x.Model != "Eau" && x.Position === hex[0] + "," + hex[1]);
-        //     if (t != null && typeof t != "undefined") visible = false;
-
-        //     const x = hex[0] * hexHSpacing + offsetX;
-        //     const y = hex[1] * hexVSpacing + ((hex[0] % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
-        //     const h = { x: x, y: y };
-
-        //     // Vérification des murs (si un mur est sur le chemin, le pion ne voit pas la case)
-        //     const m = Formes.find(r => r.type === "Mur" && Forme.rectangleHexagonIntersect(r, h));
-        //     if (m != null && typeof m != "undefined") visible = false;
-        // });
-
-        // return visible;
-
         const start_col = this.Position.split(",")[0];
         const start_row = this.Position.split(",")[1];
         const start_x = start_col * hexHSpacing;
@@ -1007,7 +1134,7 @@ class Pion extends Map {
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
-           if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
+            if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
                 is_visible = false;
             }
         });
@@ -1091,6 +1218,32 @@ class Pion extends Map {
 
         this.sendMessage("Position");
     }
+
+    sauvegarde_au_sort(attribut, modificateur) {
+        const model = Models.find(x => x.Nom_model === this.Model);
+        const jet =
+            Math.floor(Math.random() * 6) + 1 +
+            Math.floor(Math.random() * 6) + 1 +
+            Math.floor(Math.random() * 6) + 1;
+
+        switch (attribut) {
+            case "Con":
+                return model.Constitution + parseInt(modificateur, 10) - jet;
+            case "Cor":
+                return model.coordination() + parseInt(modificateur, 10) - jet;
+            case "Vol":
+                return model.Volonte + parseInt(modificateur, 10) - jet;
+            case "Abs":
+                return model.Abstraction + parseInt(modificateur, 10) - jet;
+            case "Foi":
+                return model.Foi + parseInt(modificateur, 10) - jet;
+            case "Mag":
+                return model.Magie + parseInt(modificateur, 10) - jet;
+            case "6eS":
+                return model.sixieme_sens() + parseInt(modificateur, 10) - jet;
+        }
+        return null;
+    }
 }
 let Pions = new Array;
 
@@ -1103,24 +1256,29 @@ canvas.addEventListener("contextmenu", function (event) {
     event.preventDefault();
 });
 
+let isMoving_map = false;
+
 // Bouton de la souris abaissé
 canvas.addEventListener("mousedown", (event) => {
     const myself = document.getElementById("joueur").value;
 
     canvas.focus({ preventScroll: true });
 
-    const mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    const mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    const mousePos = Map.getMousePosition(event);
+    const mouseX = mousePos.x;
+    const mouseY = mousePos.y;
 
     lastMouseX = mouseX;
     lastMouseY = mouseY;
 
     // Convertir en coordonnées de grille
-    const col = Math.round((mouseX - offsetX) / hexHSpacing);
-    const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
+    const hex = Map.getHexagonAtPoint(mouseX, mouseY);
+    const col = hex.col;
+    const row = hex.row;
 
     const p = Pions.find(x => x.Position === col + "," + row);
     const t = Terrains.find(x => x.Position === col + "," + row);
+    const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
 
     // Glisser gauche ou sinon droit en cours
     if (event.button === 0) isDragging_left = true;
@@ -1132,6 +1290,10 @@ canvas.addEventListener("mousedown", (event) => {
         Pions.forEach(x => { x.Defenseur = false; });
         p.Defenseur = true;
         afficher_attaque(1);
+    }
+    else if (event.button === 0 && p != null && typeof p != "undefined" && magicien != null) {
+        // Clic gauche sur la cible de sort choisi => on le marque comme cible
+        p.Cible_sort = !p.Cible_sort;
     }
     else if (event.button === 0 && isMode_terrain && type_terrain != "gomme") {
         // Mode terrain : ajout d'un terrain à la position cliquée
@@ -1403,10 +1565,8 @@ canvas.addEventListener("mousedown", (event) => {
         event.preventDefault();
         p.afficher_Details();
     }
-    else if (event.button === 2 && myself === "MJ") {
-        // Clic droit : on ouvre la fenetre de création d'un pion
-        event.preventDefault();
-        afficher_Details(col, row);
+    else if (event.button === 2) {
+        isMoving_map = false;
     }
 
     // Mise à jour du tooltip (sans que la souris ait bougé)
@@ -1418,8 +1578,9 @@ canvas.addEventListener("mousedown", (event) => {
 
 // Déplacement de la souris
 canvas.addEventListener("mousemove", (event) => {
-    let mouseX = event.clientX - canvas.getBoundingClientRect().left;
-    let mouseY = event.clientY - canvas.getBoundingClientRect().top;
+    const mousePos = Map.getMousePosition(event);
+    let mouseX = mousePos.x;
+    let mouseY = mousePos.y;
 
     if (isDragging_left && isMode_terrain && type_terrain != "gomme") {
         // Le bouton gauche de la souris est enfoncé : on dessine des tas de terrains
@@ -1663,11 +1824,26 @@ canvas.addEventListener("mousemove", (event) => {
     }
     else if (isDragging_left) {
         // On déplace le(s) pion(s) sélectionné(s)
-        const deltaX = mouseX - lastMouseX;
-        const deltaY = mouseY - lastMouseY;
-        const rect = canvas.getBoundingClientRect();
-        canvas_selected.style.left = (rect.left + deltaX) + "px";
-        canvas_selected.style.top = (rect.top + deltaY) + "px";
+        const deltaX = mouseX - lastMouseX; // - offsetX;
+        const deltaY = mouseY - lastMouseY; // - offsetY;
+
+        // Calculer la position relative du canvas par rapport au conteneur parent
+        const combatDiv = document.getElementById("combat");
+        const combatRect = combatDiv.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+
+        // Position relative du canvas par rapport au conteneur #combat
+        const relativeLeft = canvasRect.left - combatRect.left;
+        const relativeTop = canvasRect.top - combatRect.top;
+
+        // Positionner le canvas_selected pour qu'il se superpose exactement au canvas
+        canvas_selected.style.left = (relativeLeft + deltaX) + "px";
+        canvas_selected.style.top = (relativeTop + deltaY) + "px";
+
+        // S'assurer que les dimensions correspondent
+        if (canvas_selected.width != canvas.width) canvas_selected.width = canvas.width;
+        if (canvas_selected.height != canvas.height) canvas_selected.height = canvas.height;
+
         canvas_selected.style.display = "";
     }
     else if (isDragging_right && isMode_forme && index_forme_move != null) {
@@ -1693,6 +1869,26 @@ canvas.addEventListener("mousemove", (event) => {
         // Calcul de l'angle en radians
         if (vectoriel > 0) f.theta = Math.acos(scalaire / (normeOM * normeOP));
         else f.theta = -Math.acos(scalaire / (normeOM * normeOP));
+
+        Map.drawHexMap();
+    }
+    else if (isDragging_right) {
+        // Bouton droit enfoncé : on déplace la carte
+        const deltaX = mouseX - lastMouseX;
+        const deltaY = mouseY - lastMouseY;
+
+        lastMouseX = mouseX;
+        lastMouseY = mouseY;
+
+        isMoving_map = true;
+
+        offsetX += deltaX;
+        Formes.forEach(r => { r.x += deltaX; });
+        if (image_fond != null) forme_fond.x += deltaX;
+
+        offsetY += deltaY;
+        Formes.forEach(r => { r.y += deltaY; });
+        if (image_fond != null) forme_fond.y += deltaY;
 
         Map.drawHexMap();
     }
@@ -1772,8 +1968,9 @@ canvas.addEventListener("mouseup", (event) => {
         // On déplace le(s) pion(s) de la sélection d'autant que la souris bouge.
         const joueur = document.getElementById("joueur").value;
 
-        const deltaX = event.clientX - canvas.getBoundingClientRect().left - lastMouseX;
-        const deltaY = event.clientY - canvas.getBoundingClientRect().top - lastMouseY;
+        const mousePos = Map.getMousePosition(event);
+        const deltaX = mousePos.x - lastMouseX;
+        const deltaY = mousePos.y - lastMouseY;
 
         Pions.filter(x => x.Selected && [x.Model, x.Control, "MJ"].includes(joueur)).forEach(p => {
             const pos = p.Position.split(",");
@@ -1803,6 +2000,22 @@ canvas.addEventListener("mouseup", (event) => {
             p.deplace_a(col, row);
         });
     }
+    else if (isDragging_right && !isMode_forme && !isMoving_map) {
+        // Clic droit : on ouvre la fenetre de création d'un pion
+        event.preventDefault();
+
+        const mousePos = Map.getMousePosition(event);
+        let mouseX = mousePos.x;
+        let mouseY = mousePos.y;
+
+        // Convertir en coordonnées de grille
+        const col = Math.round((mouseX - offsetX) / hexHSpacing);
+        const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
+
+        afficher_Details(col, row);
+    }
+
+    isMoving_map = false;
 
     SelectRectangle.width = 0;
     SelectRectangle.height = 0;
@@ -1822,18 +2035,18 @@ canvas.addEventListener("mouseup", (event) => {
 // Touches enfoncées dans la fenetre
 document.addEventListener("keydown", function (event) {
     let ratio = 1;
+
+    // Si la touche est enfoncée dans un champ de texte, on ne fait rien
+    if (event.target.tagName === "TEXTAREA" || event.target.tagName === "INPUT") {
+        return;
+    }
+
+    // On fait les actions correspondantes à la touche enfoncée
     switch (event.key) {
         case "Escape":
         case "Esc":
-            document.getElementById("rocher").style.border = "none";
-            document.getElementById("arbre").style.border = "none";
-            document.getElementById("eau").style.border = "none";
-            document.getElementById("gomme_t").style.border = "none";
-            document.getElementById("rectangle").style.border = "none";
-            document.getElementById("ellipse").style.border = "none";
-            document.getElementById("mur").style.border = "none";
-            document.getElementById("scission").style.border = "none";
-            document.getElementById("gomme_f").style.border = "none";
+            const elements = document.querySelectorAll("#rocher, #arbre, #eau, #gomme_t, #rectangle, #ellipse, #mur, #scission, #gomme_f");
+            elements.forEach(element => { element.style.border = "none"; });
             isMode_terrain = false;
             type_terrain = "";
             isMode_forme = false;
@@ -1846,7 +2059,14 @@ document.addEventListener("keydown", function (event) {
             break;
         case " ":
         case "Spacebar":
-            next_attaque();
+            event.preventDefault();
+            event.stopPropagation();
+
+            const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+            if (magicien != null) {
+                afficher_confirmation_sort();
+            }
+            else next_attaque();
             break;
         case "Delete":
             // On supprime le(s) pion(s) de la sélection
@@ -1884,7 +2104,6 @@ document.addEventListener("keydown", function (event) {
                 forme_fond.width = ratio * forme_fond.width;
                 forme_fond.height = ratio * forme_fond.height;
             }
-
             break;
         case "ArrowUp":
             offsetY += 10;
@@ -1919,6 +2138,71 @@ canvas.addEventListener("mouseleave", () => {
     isDragging_left = false;
     isDragging_right = false;
     tooltip.style.display = "none";
+});
+
+// === GESTION DU ZOOM DE LA CARTE ===
+canvas.addEventListener("wheel", function (event) {
+    event.preventDefault();
+
+    // Calculer la position de la souris
+    const mousePos = Map.getMousePosition(event);
+    const mouseX = mousePos.x;
+    const mouseY = mousePos.y;
+
+    // Trouver la case sous la souris avant le zoom
+    const hex = Map.getHexagonAtPoint(mouseX, mouseY);
+    const col = hex.col;
+    const row = hex.row;
+
+    // Calculer la position de cette case avant le zoom
+    const hexXY_before = Map.get_XY(col, row);
+    const caseX_before = hexXY_before.x + offsetX;
+    const caseY_before = hexXY_before.y + offsetY;
+
+    // Calculer la distance relative entre la souris et la case avant le zoom
+    const relX_before = mouseX - caseX_before;
+    const relY_before = mouseY - caseY_before;
+
+    // Appliquer le zoom
+    let ratio = 1;
+    if (event.deltaY > 0) {
+        // Zoom out (molette vers le bas)
+        if (hexSize < 10) return;
+        d = -hexSize / 10;
+    } else {
+        // Zoom in (molette vers le haut)
+        d = hexSize / 10;
+    }
+    ratio = (hexSize + d) / hexSize;
+    hexSize += d;
+    hexWidth = Math.sqrt(3) * hexSize;
+    hexHeight = 2 * hexSize;
+    hexHSpacing = hexSize * 1.5;
+    hexVSpacing = hexHeight * Math.sqrt(3) / 2;
+
+    // Calculer la position de la case après le zoom
+    const hexXY_after = Map.get_XY(col, row);
+
+    // Ajuster offsetX et offsetY pour que la case reste sous la souris
+    offsetX = mouseX - relX_before * ratio - hexXY_after.x;
+    offsetY = mouseY - relY_before * ratio - hexXY_after.y;
+
+    Formes.forEach(r => {
+        r.x = ratio * (r.x - offsetX) + offsetX;
+        r.y = ratio * (r.y - offsetY) + offsetY;
+        r.width = ratio * r.width;
+        r.height = ratio * r.height;
+    });
+
+    if (image_fond != null) {
+        forme_fond.x = ratio * (forme_fond.x - offsetX) + offsetX;
+        forme_fond.y = ratio * (forme_fond.y - offsetY) + offsetY;
+        forme_fond.width = ratio * forme_fond.width;
+        forme_fond.height = ratio * forme_fond.height;
+    }
+
+    Map.generateHexMap();
+    Map.drawHexMap();
 });
 
 // === SYNCHRONISATION DE LA CARTE ===

@@ -38,23 +38,17 @@ function hexDistance(col1, row1, col2, row2) {
  * @returns {number} Initiative calculée
  */
 function calculateInitiative(pion, main = 0) {
-    const arme1 = pion.Arme1 ? Armes.find(a => a.Nom === pion.Arme1) : null;
-    const arme2 = pion.Arme2 ? Armes.find(a => a.Nom === pion.Arme2) : null;
+    const arme1 = pion.Arme1 ? Armes.find(a => a.Nom_arme === pion.Arme1) : null;
+    const arme2 = pion.Arme2 ? Armes.find(a => a.Nom_arme === pion.Arme2) : null;
     const init1 = arme1 ? arme1.Init : 99;
     const init2 = arme2 ? arme2.Init : 99;
-    const model = Models.find(m => m.Nom === pion.Model);
+    const model = Models.find(m => m.Nom_model === pion.Model);
     const vitesseBonus = Math.floor((model.Vp - 10) / 2);
     const res1 = init1 - ((arme1 && arme1.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
     const res2 = init2 - ((arme2 && arme2.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
 
-    if (main === 1) {
-        return res1;
-    }
-
-    if (main === 2) {
-        return res2;
-    }
-
+    if (main === 1) return res1;
+    if (main === 2) return res2;
     return Math.min(res1, res2);
 }
 
@@ -162,8 +156,8 @@ class Cac {
         const init1 = calculateInitiative(pion1);
         const init2 = calculateInitiative(pion2);
 
-        const model1 = Models.find(m => m.Nom === pion1.Model);
-        const model2 = Models.find(m => m.Nom === pion2.Model);
+        const model1 = Models.find(m => m.Nom_model === pion1.Model);
+        const model2 = Models.find(m => m.Nom_model === pion2.Model);
 
         // Détermination de l'avantage selon l'initiative et la valeur de VP
         // Avantage 1 = allié (pion1), Avantage 2 = ennemi (pion2), 0 = aucun
@@ -197,12 +191,8 @@ function start_attaques() {
     else {
         Cacs = [];
 
-        Pions.forEach(pion1 => {
-            if (pion1.Type !== "allies") return;
-
-            Pions.forEach(pion2 => {
-                if (pion2.Type !== "ennemis") return;
-
+        Pions.filter(pion1 => pion1.Type === "allies").forEach(pion1 => {
+            Pions.filter(pion2 => pion2.Type === "ennemis").forEach(pion2 => {
                 // Si les pions sont en combat au corps à corps, on crée un combat au corps à corps
                 if (isInMeleeCombat(pion1, pion2)) {
                     const c = new Cac();
@@ -221,9 +211,10 @@ function start_attaques() {
         Cacs_save = cloneCacs(Cacs);
     }
 
-    // Réinitialisation
+    // Réinitialisation des attaques 
     Attaques = [];
 
+    // Réinitialisation des états des pions
     Pions.forEach(pion => {
         pion.Attaquant = false;
         pion.Defenseur = false;
@@ -246,9 +237,14 @@ function start_attaques() {
             const attaque1 = new Attaque();
             attaque1.Model = pion.Model;
             attaque1.Indice = pion.Indice;
-            attaque1.Timing = 5;
             attaque1.Main = 1;
-            Attaques.push(attaque1);
+            if (pion.Incantation <= 5) {
+                attaque1.Timing = pion.Incantation;
+                Attaques.push(attaque1);
+            }
+            else {
+                pion.Incantation -= 5;
+            }
             return;
         }
 
@@ -263,7 +259,7 @@ function start_attaques() {
 
         // Attaque de la 2nde main (si possible)
         if (pion.Arme2 && pion.Arme2 !== "") {
-            // const model = Models.find(m => m.Nom === pion.Model);
+            // const model = Models.find(m => m.Nom_model === pion.Model);
             // if (model && model.Escrime >= 6) {
             const init2 = calculateInitiative(pion, 2);
             const attaque2 = new Attaque();
@@ -285,9 +281,6 @@ function start_attaques() {
     contre_attaque = null;
 
     Messages.ecriture_directe("Phase de combat initialisée");
-
-    console.log("Attaques :", Attaques);
-    console.log("Cacs :", Cacs);
 }
 
 /**
@@ -364,30 +357,36 @@ function next_attaque() {
         Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${attaque.Timing.toFixed(2)}s)...`);
 
         // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort)
-        attaquant.Fatigue -= 7;
-        attaquant.Fatigue_down = 7;
+        attaquant.Fatigue -= attaquant.Fatigue_sort;
+        attaquant.Fatigue_down = attaquant.Fatigue_sort;
 
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
 
-        // Identification des défenseurs
-        Pions.forEach(pion => {
-            if (pion.Type === attaquant.Type) return;
-            // if (pion === attaquant) return;
-            pion.Defenseur = true;
-        });
+        // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
+        Pions.forEach(pion => { pion.Cible_sort = false; });
+
+        // Affichage du panneau d'information du sort
+        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
+        createSpellInfo(document.body, sort);
+
+        // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
+        document.removeEventListener("click", closeSpellInfo);
+
+        // Réinitialisation de la contre-attaque
+        contre_attaque = null;
 
         // Mise à jour de la carte
         Map.generateHexMap();
         Map.drawHexMap();
-        contre_attaque = null;
+
         return;
     }
 
     // Identification de l'arme
     let arme = null;
-    if (attaque.Main === 1) arme = attaquant.Arme1 ? Armes.find(a => a.Nom === attaquant.Arme1) : null;
-    else if (attaque.Main === 2) arme = attaquant.Arme2 ? Armes.find(a => a.Nom === attaquant.Arme2) : null;
+    if (attaque.Main === 1) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
+    else if (attaque.Main === 2) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
 
     // Initialisation des défenseurs
     if (contre_attaque) {
@@ -454,7 +453,7 @@ function next_attaque() {
  */
 function calcul_fdc_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom === defenseur.Model);
+    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
 
     if (dialog_attaque_2.querySelector(".surprise_totale").checked) return 0;
     if (dialog_attaque_2.querySelector(".immobile").checked) return 0;
@@ -500,7 +499,7 @@ function calcul_fdc_def() {
  */
 function explications_fdc_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom === defenseur.Model);
+    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
     let fdc = 0;
 
     let explication = `<strong>Calcul de la feinte de corps du défenseur :</strong><br>`;
@@ -586,15 +585,14 @@ function explications_fdc_def() {
  */
 function calcul_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
-    const model_att = Models.find(m => m.Nom === attaquant.Model);
+    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
     let score = attaquant.jet_att;
 
     // Malus de base de -10
     score -= 10;
 
     // Malus de feinte de corps du défenseur
-    const fdc_def = calcul_fdc_def();
-    if (fdc_def > 0) score -= fdc_def;
+    score -= calcul_fdc_def();
 
     // Bonus de compétence d'arme
     if (attaquant.at1_att && attaquant.Arme1) {
@@ -644,10 +642,7 @@ function calcul_scr_att() {
  */
 function explications_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
-    const model_att = Models.find(m => m.Nom === attaquant.Model);
-
-    let fdc = calcul_fdc_def();
-    if (!(fdc > 0)) fdc = 0;
+    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
 
     let explication = `<strong>Calcul du score d'attaque :</strong><br>`;
     explication += `Jet de dés : ${attaquant.jet_att || 0}<br>`;
@@ -664,6 +659,8 @@ function explications_scr_att() {
         else if (attaquant.Arme2 === model_att.Arme_3) competence = model_att.Att_3 || 0;
     }
     explication += `Plus la Compétence de l'arme : ${competence}<br>`;
+    
+    let fdc = calcul_fdc_def();
     explication += `Moins la Feinte de corps : ${-fdc}<br>`;
     if ((attaquant.B_att || 0) !== 0) explication += `Bonus d'attaque : ${attaquant.B_att || 0}<br>`;
 
@@ -711,7 +708,7 @@ function explications_scr_att() {
  */
 function calcul_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom === defenseur.Model);
+    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
     let score = defenseur.jet_def;
     score -= 10;
 
@@ -752,6 +749,9 @@ function calcul_scr_def() {
         }
     }
 
+    // Bonus d'attaque
+    score += defenseur.B_def;
+
     return score;
 }
 
@@ -761,7 +761,7 @@ function calcul_scr_def() {
  */
 function explications_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom === defenseur.Model);
+    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
 
     let explication = `<strong>Calcul du score de défense :</strong><br>`;
     explication += `Jet de dés : ${defenseur.jet_def || 0}<br>`;
@@ -808,6 +808,10 @@ function explications_scr_def() {
         }
     }
 
+    // Bonus de défense
+    if ((defenseur.B_def || 0) !== 0) explication += `Bonus de défense : ${defenseur.B_def || 0}<br>`;
+    scoreFinal += (defenseur.B_def || 0);
+
     explication += `Score final : ${scoreFinal}<br>`;
 
     if (scoreFinal >= 0) {
@@ -833,8 +837,8 @@ function calcul_dommages(margin) {
 
     // Détermination de l'arme utilisée (1ère ou 2nde main)
     let arme = null;
-    if (attaquant.at1_att) arme = attaquant.Arme1 ? Armes.find(a => a.Nom === attaquant.Arme1) : null;
-    if (attaquant.at2_att) arme = attaquant.Arme2 ? Armes.find(a => a.Nom === attaquant.Arme2) : null;
+    if (attaquant.at1_att) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
+    if (attaquant.at2_att) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
 
     // Dommages de base = marge × facteur de l'arme + bonus fixe de l'arme
     let damage = margin * arme.Facteur + arme.Bonus;
@@ -843,7 +847,7 @@ function calcul_dommages(margin) {
     if (damage > arme.Plafond) damage = arme.Plafond;
 
     // Le coefficient de force de l'arme multiplie le modificateur de force du personnage
-    const model_att = Models.find(m => m.Nom === attaquant.Model);
+    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
     damage += arme.Coeff_force * Math.floor((model_att.Force - 10) / 2);
 
     // Arrondi des dommages pour éviter les décimales
@@ -937,10 +941,10 @@ function contre_attaque_defenseur() {
 
     let arme = null;
     if (attaquant.at1_att) {
-        arme = (attaquant.Arme1 && attaquant.Arme1 !== "") ? Armes.find(a => a.Nom === attaquant.Arme1) : null;
+        arme = (attaquant.Arme1 && attaquant.Arme1 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
     }
     else if (attaquant.at2_att) {
-        arme = (attaquant.Arme2 && attaquant.Arme2 !== "") ? Armes.find(a => a.Nom === attaquant.Arme2) : null;
+        arme = (attaquant.Arme2 && attaquant.Arme2 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
     }
     if (arme && arme.A_distance) return;
 

@@ -112,7 +112,7 @@ class ChatServer implements MessageComponentInterface {
     //     else {
             
     //         // Préparation de la requête SQL de mise à jour
-    //         $sql = "UPDATE perso SET " . $param . " = ? WHERE perso.Nom = ?";
+    //         $sql = "UPDATE model SET " . $param . " = ? WHERE model.Nom_model = ?";
     //         $stmt = $conn->prepare($sql);
             
     //         if (! $stmt) {

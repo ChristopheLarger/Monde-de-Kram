@@ -14,36 +14,45 @@ class Model {
      */
     constructor(data = {}) {
         // Propriétés de base
-        this.Nom = data.Nom || "";
+        this.Nom_model = data.Nom_model || "";
         this.Image = data.Image || null;
         this.Is_joueur = data.Is_joueur || false;
         this.Capacites = data.Capacites || "";
         this.Etat = data.Etat || "";
         
         // Statistiques de base
+        this.Fdc = data.Fdc || null;
+        this.Escrime = data.Escrime || null;
+
         this.Pm = data.Pm || null;
         this.Pp = data.Pp || null;
+
+        this.Force = data.Force || null;
+        this.Constitution = data.Constitution || null;
         this.Vp = data.Vp || null;
-        this.Fdc = data.Fdc || null;
+        this.Perception = data.Perception || null;
+        this.Vm = data.Vm || null;
+        this.Abstraction = data.Abstraction || null;
+        this.Volonte = data.Volonte || null;
+        this.Foi = data.Foi || null;
+        this.Magie = data.Magie || null;
+        this.Adaptation = data.Adaptation || null;
         
-        // États temporaires
-        this.Fatigue = data.Fatigue || 0;
+        // États temporaires maximum
+        this.Fatigue = data.Fatigue || null;
         this.Concentration = data.Concentration || 0;
         
         // Capacités de combat
         this.Ambidextre = data.Ambidextre || false;
-        this.Escrime = data.Escrime || 0;
-        this.Coordination = data.Coordination || null;
-        this.Force = data.Force || null;
         
         // Armes et compétences
-        this.Arme_1 = data.Arme_1 || "";
+        this.Arme_1 = data.Arme_1 || null;
         this.Att_1 = data.Att_1 || null;
         this.Par_1 = data.Par_1 || null;
-        this.Arme_2 = data.Arme_2 || "";
+        this.Arme_2 = data.Arme_2 || null;
         this.Att_2 = data.Att_2 || null;
         this.Par_2 = data.Par_2 || null;
-        this.Arme_3 = data.Arme_3 || "";
+        this.Arme_3 = data.Arme_3 || null;
         this.Att_3 = data.Att_3 || null;
         this.Par_3 = data.Par_3 || null;
         this.Par_Bouclier = data.Par_Bouclier || 0;
@@ -67,6 +76,8 @@ class Model {
         this.Brasd = data.Brasd || 0;
         this.Jambeg = data.Jambeg || 0;
         this.Jambed = data.Jambed || 0;
+
+        if (this.Fatigue === null || this.Fatigue < 1) this.Fatigue = 2 * this.Constitution + 4;
     }
     
     /**
@@ -75,7 +86,15 @@ class Model {
      */
     malus_2nde_main() {
         if (this.Ambidextre) return 0;
-        return this.Coordination === null ? 0 : Math.floor((18 - this.Coordination) / 2);
+        return Math.floor((18 - this.coordination()) / 2);
+    }
+
+    coordination() {
+        return Math.round((this.Vp + this.Perception + this.Vm) / 3);
+    }
+
+    sixieme_sens() {
+        return Math.round((this.Perception + this.Adaptation) / 2);
     }
 }
 
