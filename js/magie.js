@@ -155,25 +155,16 @@ let stopContextMenu = false;
 
 // Gestion des clics sur les boutons magiques
 document.addEventListener("contextmenu", function (event) {
-<<<<<<< HEAD
-  if (event.target.classList.contains("level")) {
-    event.preventDefault();
-    event.stopPropagation();
-=======
-  console.log("ContextMenu : event.target.classList", event.target.classList);
-  console.log("ContextMenu : stopContextMenu", stopContextMenu);
 
   if (stopContextMenu) {
     event.preventDefault();    
     event.stopPropagation();
     stopContextMenu = false;
->>>>>>> e840b019db3220a670b03dbfda77a5a937e1003d
     return false;
   }
 });
 
 document.addEventListener("mousedown", function (event) {
-  console.log("MouseDown : event.target.classList", event.target.classList);
 
   if (event.target.classList.contains("magic-button")) {
     stopContextMenu = true;
