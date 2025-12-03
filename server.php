@@ -1,4 +1,5 @@
 <?php
+
 /**
  * FICHIER SERVER.PHP
  * ===================
@@ -24,7 +25,8 @@ require 'vendor/autoload.php';
  * Gère les connexions, messages et synchronisation entre joueurs
  * Implémente l'interface MessageComponentInterface de Ratchet
  */
-class ChatServer implements MessageComponentInterface {
+class ChatServer implements MessageComponentInterface
+{
     /**
      * @var \SplObjectStorage $clients - Stockage des connexions clients actives
      */
@@ -34,7 +36,8 @@ class ChatServer implements MessageComponentInterface {
      * Constructeur du serveur
      * Initialise le stockage des connexions clients
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->clients = new \SplObjectStorage;
     }
 
@@ -44,7 +47,8 @@ class ChatServer implements MessageComponentInterface {
      * 
      * @param ConnectionInterface $conn - Connexion du nouveau client
      */
-    public function onOpen(ConnectionInterface $conn) {
+    public function onOpen(ConnectionInterface $conn)
+    {
         // Ajouter le nouveau client à la liste des connexions actives
         $this->clients->attach($conn);
         echo "Nouvelle connexion ({$conn->resourceId})\n";
@@ -57,7 +61,8 @@ class ChatServer implements MessageComponentInterface {
      * @param ConnectionInterface $from - Connexion de l'expéditeur
      * @param string $msg - Message reçu
      */
-    public function onMessage(ConnectionInterface $from, $msg) {
+    public function onMessage(ConnectionInterface $from, $msg)
+    {
         // === FONCTIONNALITÉS DE BASE DE DONNÉES (COMMENTÉES) ===
         // Ces fonctions permettaient de sauvegarder automatiquement les changements
         // de statistiques des personnages en base de données
@@ -71,7 +76,8 @@ class ChatServer implements MessageComponentInterface {
         // $this->msgSet("BrasD", $msg);
         // $this->msgSet("JambeG", $msg);
         // $this->msgSet("JambeD", $msg);
-        
+        $this->msgSet($msg);
+
         // === DIFFUSION DU MESSAGE ===
         // Parcourir tous les clients connectés
         foreach ($this->clients as $client) {
@@ -94,42 +100,45 @@ class ChatServer implements MessageComponentInterface {
      * @param string $msg - Message contenant les données
      * @return bool - true si la sauvegarde a réussi
      */
-    // private function msgSet($param, $msg) {
-    //     // Expression régulière pour extraire les données du message
-    //     $regex = "/^MJ:\<p class='vip' title='" . $param . " .+\>(.+)@(.*)\<\/p\>$/";
-    //     if (! preg_match($regex, $msg, $result)) return false;
-    //     if ($result[2] === "") $result[2] = "0";
+    private function msgSet($msg)
+    {
+        // Expression régulière pour extraire les données du message
+        $regex = "/^MJ: Sort_connu ([^@]+)@([^@]+)@([^@]+)$/";
+        echo $msg . "\n";
+        if (! preg_match($regex, $msg, $result)) return false;
+        // if ($result[1] != "Sort_connu") return false;
+        // echo $param . " -- " . $result[1] . " -- " . $result[2] . "\n";
+        echo $result[1] . " -- " . $result[2] . " -- " . $result[3] . "\n";
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('192.168.1.242', 'kram_app', 'Titoon#01', 'Kram');
 
-    //     echo $param . " -- " . $result[1] . " -- " . $result[2] . "\n";
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
 
-    //     // Connexion à la base de données MySQL
-    //     $conn = new mysqli('localhost', 'root', 'Titoon#01', 'Kram');
+            // Préparation de la requête SQL de mise à jour
+            $query = "SELECT * FROM sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
 
-    //     if ($conn->connect_error) {
-    //         echo "Echec de connexion à la base de données.\n";
-    //         die("Échec de la connexion : " . $conn->connect_error);
-    //     }
-    //     else {
-            
-    //         // Préparation de la requête SQL de mise à jour
-    //         $sql = "UPDATE model SET " . $param . " = ? WHERE model.Nom_model = ?";
-    //         $stmt = $conn->prepare($sql);
-            
-    //         if (! $stmt) {
-    //             echo "Erreur de préparation de la requête : " . $conn->error . ".\n";
-    //         } else {
-    //             // Liaison des paramètres et exécution de la requête
-    //             $stmt->bind_param("ss", $result[2], $result[1]); // "ss" signifie 2 chaînes (string)
-    //             if (! $stmt->execute()) {
-    //                 echo "Erreur lors de la requête en base de données : " . $stmt->error . ".\n";
-    //             }
-    //             $stmt->close();
-    //         }
-    //         $conn->close();
-    //     }
-        
-    //     return true;
-    // }
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
+            $stmt->execute();
+            $resultMysql = $stmt->get_result();
+            echo $resultMysql->num_rows . "\n";
+
+            if ($resultMysql->num_rows > 0) {
+                $sql = "DELETE sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
+            } else {
+                $sql = "INSERT INTO sort_connu (Nom_model, Nom_liste, Nom_sort) VALUES (?, ?, ?)";
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        return true;
+    }
 
     /**
      * Gestionnaire de fermeture de connexion
@@ -137,7 +146,8 @@ class ChatServer implements MessageComponentInterface {
      * 
      * @param ConnectionInterface $conn - Connexion du client qui se déconnecte
      */
-    public function onClose(ConnectionInterface $conn) {
+    public function onClose(ConnectionInterface $conn)
+    {
         // Retirer le client de la liste des connexions actives
         $this->clients->detach($conn);
         echo "Connexion fermée ({$conn->resourceId})\n";
@@ -150,7 +160,8 @@ class ChatServer implements MessageComponentInterface {
      * @param ConnectionInterface $conn - Connexion en erreur
      * @param \Exception $e - Exception levée
      */
-    public function onError(ConnectionInterface $conn, \Exception $e) {
+    public function onError(ConnectionInterface $conn, \Exception $e)
+    {
         echo "Erreur : {$e->getMessage()}\n";
         // Fermer la connexion en erreur
         $conn->close();
@@ -175,4 +186,3 @@ echo "Serveur WebSocket Ratchet démarré sur ws://0.0.0.0:8080\n";
 // === DÉMARRAGE DU SERVEUR ===
 // Le serveur entre dans une boucle infinie pour traiter les connexions
 $server->run();
-?>

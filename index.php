@@ -13,15 +13,15 @@
 
     <?php include("interface.html"); ?>
 
-<!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
-<script src="js/model.js"></script>     <!-- Classes de base pour les modèles de personnages -->
-<script src="js/arme.js"></script>      <!-- Classes pour les armes -->
-<script src="js/map.js"></script>       <!-- Gestion de la carte hexagonale et des pions -->
-<script src="js/forme.js"></script>     <!-- Gestion des formes géométriques -->
-<script src="js/general.js"></script>   <!-- Fonctions générales et communication WebSocket -->
-<script src="js/dialog.js"></script>    <!-- Gestion des dialogues et interfaces utilisateur -->
-<script src="js/magie.js"></script>     <!-- Système de magie -->
-<script src="js/combat.js"></script>    <!-- Système de combat simplifié -->
+    <!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
+    <script src="js/model.js"></script> <!-- Classes de base pour les modèles de personnages -->
+    <script src="js/arme.js"></script> <!-- Classes pour les armes -->
+    <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
+    <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
+    <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
+    <script src="js/dialog.js"></script> <!-- Gestion des dialogues et interfaces utilisateur -->
+    <script src="js/magie.js"></script> <!-- Système de magie -->
+    <script src="js/combat.js"></script> <!-- Système de combat simplifié -->
 
     <script>
         <?php
@@ -68,12 +68,15 @@
             $js .= "    Foi: " . toJS($row['Foi'], 'int') . ",\n";
             $js .= "    Magie: " . toJS($row['Magie'], 'int') . ",\n";
             $js .= "    Adaptation: " . toJS($row['Adaptation'], 'int') . ",\n";
-            
+
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
 
             $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
             $js .= "    Escrime: " . toJS($row['Escrime'], 'int') . ",\n";
+
+            $js .= "    Theognosie: " . toJS($row['Theognosie'], 'int') . ",\n";
+            $js .= "    Liste_pretre: " . toJS($row['Liste_pretre'], 'null') . ",\n";
 
             $js .= "    Arme_1: " . toJS($row['Arme_1'], 'null') . ",\n";
             $js .= "    Att_1: " . toJS($row['Att_1'], 'int') . ",\n";
@@ -94,7 +97,7 @@
             $js .= "    Armure_brasd: " . toJS($row['Armure_BrasD'], 'int') . ",\n";
             $js .= "    Armure_jambeg: " . toJS($row['Armure_JambeG'], 'int') . ",\n";
             $js .= "    Armure_jambed: " . toJS($row['Armure_JambeD'], 'int') . ",\n";
-            
+
             $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
             $js .= "    Tete: " . toJS($row['Tete'], 'int') . ",\n";
             $js .= "    Poitrine: " . toJS($row['Poitrine'], 'int') . ",\n";
@@ -134,7 +137,8 @@
         function generateListeMagieJS($row, $index)
         {
             $js = "Listes[$index] = new Liste({\n";
-            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . "\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
+            $js .= "    Nom_jumelee: " . toJS($row['Nom_jumelee']) . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -277,7 +281,7 @@
                 console.warn("Image non trouvée pour " + Models[i].Nom_model + ": images/" + Models[i].Nom_model + ".png");
             };
         }
-
+        
         // === INITIALISATION DE L'INTERFACE ===
         // Ajout des joueurs dans le sélecteur
         for (let i = 0; i < Models.length; i++) {
@@ -296,7 +300,10 @@
         document.getElementById("joueur").value = "MJ";
 
         // Déclencher l'événement change pour initialiser l'interface
-        const changeEvent = new Event('change', { bubbles: true, cancelable: true });
+        const changeEvent = new Event('change', {
+            bubbles: true,
+            cancelable: true
+        });
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
         // Attendre que l'interface soit complètement initialisée
@@ -319,7 +326,9 @@
             Map.drawHexMap();
 
             // Donner le focus à la carte
-            canvas.focus({ preventScroll: true });
+            canvas.focus({
+                preventScroll: true
+            });
         }, 200);
     </script>
 </body>

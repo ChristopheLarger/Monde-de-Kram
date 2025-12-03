@@ -1252,9 +1252,41 @@ arme1.addEventListener("click", function (event) {
 
         SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
           const element = document.getElementById(getShortName(x.Nom_liste));
+          
           element.style.color = "white";
           element.style.backgroundColor = "green";
+          
         });
+
+      }
+      // Mettre en vert la liste de prêtre et sa liste jumelée si le personnage en a une
+      if (p_selected && p_selected.Liste_pretre) {
+        // Trouver la liste de prêtre dans le tableau Listes
+        const listePretre = Listes.find((l) => l.Nom_liste === p_selected.Liste_pretre);
+        
+        if (listePretre) {
+          // Mettre en vert le bouton de la liste de prêtre
+          const shortNamePretre = getShortName(p_selected.Liste_pretre);
+          if (shortNamePretre) {
+            const elementPretre = document.getElementById(shortNamePretre);
+            if (elementPretre) {
+              elementPretre.style.color = "white";
+              elementPretre.style.backgroundColor = "green";
+            }
+          }
+          
+          // Mettre en vert le bouton de la liste jumelée si elle existe
+          if (listePretre.Nom_jumelee && listePretre.Nom_jumelee !== "") {
+            const shortNameJumelee = getShortName(listePretre.Nom_jumelee);
+            if (shortNameJumelee) {
+              const elementJumelee = document.getElementById(shortNameJumelee);
+              if (elementJumelee) {
+                elementJumelee.style.color = "white";
+                elementJumelee.style.backgroundColor = "green";
+              }
+            }
+          }
+        }
       }
     }
     else {

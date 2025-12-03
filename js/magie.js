@@ -8,6 +8,7 @@ class Liste {
    */
   constructor(data = {}) {
     this.Nom_liste = data.Nom_liste || "";
+    this.Nom_jumelee = data.Nom_jumelee || "";
   }
 }
 
@@ -157,7 +158,6 @@ let stopContextMenu = false;
 
 // Gestion du menu contextuel sur les boutons magiques
 document.addEventListener("contextmenu", function (event) {
-
   if (stopContextMenu) {
     event.preventDefault();
     event.stopPropagation();
@@ -172,7 +172,6 @@ document.addEventListener("contextmenu", function (event) {
  * @param {MouseEvent} event - L'événement de clic
  */
 document.addEventListener("mousedown", function (event) {
-
   if (event.target.classList.contains("magic-button")) {
     stopContextMenu = true;
     // Ouvrir la liste voulue si le bouton associé est cliqué
@@ -186,10 +185,11 @@ document.addEventListener("mousedown", function (event) {
  * Crée dynamiquement le panneau d'information du sort
  * @param {HTMLElement} modalContent - Le contenu de la modale
  * @param {Object} sort - Le sort à afficher
-  */
+ */
 function createSpellInfo(modalContent, sort) {
   // Supprimer le panneau d'information existant s'il existe...
-  if (document.getElementById(`spell-info`)) document.getElementById(`spell-info`).remove();
+  if (document.getElementById(`spell-info`))
+    document.getElementById(`spell-info`).remove();
 
   // Créer le panneau d'information des sorts
   const spellInfo = document.createElement("div");
@@ -314,9 +314,11 @@ function createSpellInfo(modalContent, sort) {
  * @param {MouseEvent} event - L'événement de clic
  */
 function closeSpellInfo(event) {
-  if (!event.target.classList.contains("spell-node") &&
+  if (
+    !event.target.classList.contains("spell-node") &&
     document.getElementById(`spell-info`) &&
-    !event.target.closest(".spell-info")) {
+    !event.target.closest(".spell-info")
+  ) {
     document.getElementById(`spell-info`).style.display = "none";
   }
 }
@@ -330,12 +332,18 @@ function expurger_incantation(Incantation) {
   let temps = 0;
   if (Incantation === "2 s (4s)") temps = 2;
   if (Incantation === "1/10 s") temps = 0.1;
-  if (Incantation.endsWith(" s")) temps = parseInt(Incantation.replace(" s", ""));
-  if (Incantation.endsWith(" min")) temps = 60 * parseInt(Incantation.replace(" min", ""));
-  if (Incantation.endsWith(" minutes")) temps = 60 * parseInt(Incantation.replace(" minutes", ""));
-  if (Incantation.endsWith(" h")) temps = 3600 * parseInt(Incantation.replace(" h", ""));
-  if (Incantation.endsWith(" jour")) temps = 24 * 3600 * parseInt(Incantation.replace(" jour", ""));
-  if (Incantation.endsWith(" semaine")) temps = 7 * 24 * 3600 * parseInt(Incantation.replace(" semaine", ""));
+  if (Incantation.endsWith(" s"))
+    temps = parseInt(Incantation.replace(" s", ""));
+  if (Incantation.endsWith(" min"))
+    temps = 60 * parseInt(Incantation.replace(" min", ""));
+  if (Incantation.endsWith(" minutes"))
+    temps = 60 * parseInt(Incantation.replace(" minutes", ""));
+  if (Incantation.endsWith(" h"))
+    temps = 3600 * parseInt(Incantation.replace(" h", ""));
+  if (Incantation.endsWith(" jour"))
+    temps = 24 * 3600 * parseInt(Incantation.replace(" jour", ""));
+  if (Incantation.endsWith(" semaine"))
+    temps = 7 * 24 * 3600 * parseInt(Incantation.replace(" semaine", ""));
 
   return temps;
 }
@@ -351,37 +359,66 @@ function createListeModal(Nom_liste) {
     setTimeout(() => {
       const container = conteneur;
       const containerRect = container.getBoundingClientRect();
-      const connecteursListe = Connecteurs.filter((conn) => conn.Nom_liste === Nom_liste);
+      const connecteursListe = Connecteurs.filter(
+        (conn) => conn.Nom_liste === Nom_liste
+      );
 
       connecteursListe.forEach((conn) => {
-        const fromElement = container.querySelector(`[data-spell="${conn.Pred_sort}"]`);
-        const toElement = container.querySelector(`[data-spell="${conn.Suc_sort}"]`);
+        const fromElement = container.querySelector(
+          `[data-spell="${conn.Pred_sort}"]`
+        );
+        const toElement = container.querySelector(
+          `[data-spell="${conn.Suc_sort}"]`
+        );
 
         if (fromElement && toElement) {
           const fromRect = fromElement.getBoundingClientRect();
           const toRect = toElement.getBoundingClientRect();
 
-          const fromSort = sortsListe.find((s) => s.Nom_sort === conn.Pred_sort);
+          const fromSort = sortsListe.find(
+            (s) => s.Nom_sort === conn.Pred_sort
+          );
           const toSort = sortsListe.find((s) => s.Nom_sort === conn.Suc_sort);
 
-          const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+          const line = document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "line"
+          );
 
           if (fromSort.Niveau === toSort.Niveau) {
             if (fromSort.Col < toSort.Col) {
               line.setAttribute("x1", fromRect.right - containerRect.left);
-              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y1",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
               line.setAttribute("x2", toRect.left - containerRect.left);
-              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y2",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
             } else {
               line.setAttribute("x1", fromRect.left - containerRect.left);
-              line.setAttribute("y1", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y1",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
               line.setAttribute("x2", toRect.right - containerRect.left);
-              line.setAttribute("y2", fromRect.top + fromRect.height / 2 - containerRect.top);
+              line.setAttribute(
+                "y2",
+                fromRect.top + fromRect.height / 2 - containerRect.top
+              );
             }
           } else {
-            line.setAttribute("x1", fromRect.left + fromRect.width / 2 - containerRect.left);
+            line.setAttribute(
+              "x1",
+              fromRect.left + fromRect.width / 2 - containerRect.left
+            );
             line.setAttribute("y1", fromRect.bottom - containerRect.top);
-            line.setAttribute("x2", toRect.left + toRect.width / 2 - containerRect.left);
+            line.setAttribute(
+              "x2",
+              toRect.left + toRect.width / 2 - containerRect.left
+            );
             line.setAttribute("y2", toRect.top - containerRect.top);
           }
 
@@ -437,7 +474,9 @@ function createListeModal(Nom_liste) {
   });
 
   // Trier les niveaux
-  const niveauxTries = Object.keys(niveaux).map(Number).sort((a, b) => a - b);
+  const niveauxTries = Object.keys(niveaux)
+    .map(Number)
+    .sort((a, b) => a - b);
 
   // Créer les niveaux HTML
   niveauxTries.forEach((niveau) => {
@@ -467,11 +506,39 @@ function createListeModal(Nom_liste) {
       spellNode.classList.add(`col-${sort.Col + 1}`);
 
       // Vérifier si le sort est connu par le joueur sélectionné
-      if (typeof m_selected !== "undefined" && m_selected !== null && m_selected.Model) {
-        const isKnown = SortsConnus.some((sc) =>
-          sc.Nom_model === m_selected.Model &&
-          sc.Nom_liste === Nom_liste &&
-          sc.Nom_sort === sort.Nom_sort);
+      if (
+        typeof m_selected !== "undefined" &&
+        m_selected !== null &&
+        m_selected.Model
+      ) {
+        let isKnown = SortsConnus.some(
+          (sc) =>
+            sc.Nom_model === m_selected.Model &&
+            sc.Nom_liste === Nom_liste &&
+            sc.Nom_sort === sort.Nom_sort
+        );
+        const model = Models.find((m) => m.Nom_model === m_selected.Model);
+        if (
+          model &&
+          model.Liste_pretre === Nom_liste &&
+          model.Theognosie !== null &&
+          model.Theognosie !== undefined &&
+          sort.Niveau <= model.Theognosie
+        ) {
+          isKnown = true;
+        }
+        const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
+        const listeJumelee = Listes.find((l) => l.Nom_liste === listePretre.Nom_jumelee);
+        if (
+          model &&
+          listeJumelee.Nom_liste === Nom_liste &&
+          model.Theognosie !== null &&
+          model.Theognosie !== undefined &&
+          sort.Niveau <= Math.round(model.Theognosie * 2 / 3)
+        ) {
+          isKnown = true;
+        }
+
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
@@ -496,7 +563,10 @@ function createListeModal(Nom_liste) {
   // Créer le marqueur de flèche
   const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
 
-  const marker = document.createElementNS("http://www.w3.org/2000/svg", "marker");
+  const marker = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "marker"
+  );
   marker.id = "marker";
   marker.setAttribute("id", "arrowhead");
   marker.setAttribute("markerWidth", "6");
@@ -505,7 +575,10 @@ function createListeModal(Nom_liste) {
   marker.setAttribute("refY", "2");
   marker.setAttribute("orient", "auto");
 
-  const polygon = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  const polygon = document.createElementNS(
+    "http://www.w3.org/2000/svg",
+    "polygon"
+  );
   polygon.id = "polygon";
   polygon.setAttribute("points", "0 0, 6 2, 0 4");
   polygon.setAttribute("fill", "#666");
@@ -515,7 +588,6 @@ function createListeModal(Nom_liste) {
   defs.appendChild(marker);
   svg.appendChild(defs);
   conteneur.insertBefore(svg, conteneur.firstChild);
-
 
   // Assembler la modale
   modalContent.appendChild(closeBtn);
@@ -534,7 +606,9 @@ function createListeModal(Nom_liste) {
     if (e.target.classList.contains("spell-node")) {
       e.preventDefault();
 
-      const sort = sortsListe.find((s) => s.Nom_sort === e.target.getAttribute("data-spell"));
+      const sort = sortsListe.find(
+        (s) => s.Nom_sort === e.target.getAttribute("data-spell")
+      );
       if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
         m_selected.Nom_liste = sort.Nom_liste;
@@ -542,12 +616,24 @@ function createListeModal(Nom_liste) {
         m_selected.Incantation = expurger_incantation(sort.Incantation);
 
         // Mise à jour du sortilège sélectionné
-        if (m_selected.Nom_sort && m_selected.Nom_sort !== "" && m_selected.Nom_sort !== "0" &&
-          m_selected.Nom_liste && m_selected.Nom_liste !== "" && m_selected.Nom_liste !== "0") {
-          dialog_details_2.querySelector(".liste").textContent = m_selected.Nom_liste;
-          dialog_details_2.querySelector(".sort").textContent = m_selected.Nom_sort;
+        if (
+          m_selected.Nom_sort &&
+          m_selected.Nom_sort !== "" &&
+          m_selected.Nom_sort !== "0" &&
+          m_selected.Nom_liste &&
+          m_selected.Nom_liste !== "" &&
+          m_selected.Nom_liste !== "0"
+        ) {
+          dialog_details_2.querySelector(".liste").textContent =
+            m_selected.Nom_liste;
+          dialog_details_2.querySelector(".sort").textContent =
+            m_selected.Nom_sort;
           dialog_details_2.querySelector(".info_principale").textContent =
-          " (" + m_selected.Incantation + " s / " + expurger_incantation(sort.Incantation) + ")";
+            " (" +
+            m_selected.Incantation +
+            " s / " +
+            expurger_incantation(sort.Incantation) +
+            ")";
           afficher_param_sort(sort);
         } else {
           dialog_details_2.querySelector(".liste").textContent = "--";
@@ -581,11 +667,43 @@ function createListeModal(Nom_liste) {
           e.target.style.backgroundColor = "green";
           e.target.style.color = "white";
         }
+        const Nom_sort = e.target.id.slice(6);
+        console.log("Nom_sort :", Nom_sort);
+
+        const modal_content = document.getElementById("modal-content");
+        const title = modal_content.querySelector("#title");
+        const nom_liste = title.textContent;
+
+        console.log("nom_liste :", nom_liste);
+        console.log("m_selected.Model :", m_selected.Model);
+        sendMessage(
+          "Sort_connu",
+          m_selected.Model + "@" + nom_liste + "@" + Nom_sort
+        );
+        const sort = SortsConnus.find(
+          (s) =>
+            s.Nom_model === m_selected.Model &&
+            s.Nom_liste === Nom_liste &&
+            s.Nom_sort === Nom_sort
+        );
+        if (sort) {
+          SortsConnus.splice(SortsConnus.indexOf(sort), 1);
+        } else {
+          SortsConnus.push(
+            new SortConnu({
+              Nom_liste: nom_liste,
+              Nom_sort: Nom_sort,
+              Nom_model: m_selected.Model,
+            })
+          );
+        }
         return; // Empêcher l'ouverture du panneau d'information
       }
 
       // Code normal pour ouvrir les informations du sort (sans Ctrl)
-      const sort = sortsListe.find((s) => s.Nom_sort === e.target.getAttribute("data-spell"));
+      const sort = sortsListe.find(
+        (s) => s.Nom_sort === e.target.getAttribute("data-spell")
+      );
       if (sort) {
         // Ajouter le panneau d'information du sort au contenu de la modale
         createSpellInfo(modalContent, sort);
@@ -595,7 +713,9 @@ function createListeModal(Nom_liste) {
 
         // Animation du sort cliqué
         e.target.classList.add("clicked");
-        setTimeout(() => { e.target.classList.remove("clicked"); }, 500);
+        setTimeout(() => {
+          e.target.classList.remove("clicked");
+        }, 500);
       }
     }
   });

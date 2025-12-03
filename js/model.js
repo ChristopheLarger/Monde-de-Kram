@@ -23,6 +23,8 @@ class Model {
         // Statistiques de base
         this.Fdc = data.Fdc || null;
         this.Escrime = data.Escrime || null;
+        this.Theognosie = data.Theognosie || null;
+        this.Liste_pretre = data.Liste_pretre || null;
 
         this.Pm = data.Pm || null;
         this.Pp = data.Pp || null;
