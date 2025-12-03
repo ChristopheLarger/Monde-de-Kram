@@ -518,30 +518,31 @@ function createListeModal(Nom_liste) {
             sc.Nom_sort === sort.Nom_sort
         );
         const model = Models.find((m) => m.Nom_model === m_selected.Model);
-        if (
-          model &&
-          model.Liste_pretre === Nom_liste &&
-          model.Theognosie !== null &&
-          model.Theognosie !== undefined &&
-          sort.Niveau <= model.Theognosie
-        ) {
-          isKnown = true;
+        
+        if (model && model.Theognosie !== null && model.Theognosie !== undefined) {
+          // Vérifier si c'est la liste de prêtre du personnage
+          if (model.Liste_pretre === Nom_liste && sort.Niveau <= model.Theognosie) {
+            isKnown = true;
+          }
+          // Vérifier si c'est la liste jumelée de la liste de prêtre
+          else if (model.Liste_pretre) {
+            const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
+            if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
+              // Pour la liste jumelée, limite à 3/5 de Theognosie (arrondi)
+              const limiteJumelee = Math.floor((3 * model.Theognosie) / 5);
+              if (sort.Niveau <= limiteJumelee) {
+                isKnown = true;
+              }
+            }
+          }
         }
-        const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
-        const listeJumelee = Listes.find((l) => l.Nom_liste === listePretre.Nom_jumelee);
-        if (
-          model &&
-          listeJumelee.Nom_liste === Nom_liste &&
-          model.Theognosie !== null &&
-          model.Theognosie !== undefined &&
-          sort.Niveau <= Math.round(model.Theognosie * 2 / 3)
-        ) {
-          isKnown = true;
-        }
-
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
+        }
+        else  {
+          spellNode.style.color = "";
+          spellNode.style.backgroundColor = "";
         }
       }
 
