@@ -110,7 +110,7 @@ class ChatServer implements MessageComponentInterface
         // echo $param . " -- " . $result[1] . " -- " . $result[2] . "\n";
         echo $result[1] . " -- " . $result[2] . " -- " . $result[3] . "\n";
         // Connexion à la base de données MySQL
-        $conn = new mysqli('192.168.1.242', 'kram_app', 'Titoon#01', 'Kram');
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
         if ($conn->connect_error) {
             echo "Echec de connexion à la base de données.\n";

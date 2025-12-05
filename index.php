@@ -211,7 +211,7 @@
         }
 
         // === CONNEXION À LA BASE DE DONNÉES ===
-        $conn = new mysqli('192.168.1.242', 'kram_app', 'Titoon#01', 'Kram');
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
         $conn->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 
         if ($conn->connect_error) {
