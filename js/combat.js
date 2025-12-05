@@ -332,6 +332,7 @@ function next_attaque() {
         pion.Attaquant = false;
         pion.Defenseur = false;
         pion.Selected = false;
+        pion.Cible_sort = false;
     });
 
     // Sélection de l'attaquant actuel
@@ -344,8 +345,8 @@ function next_attaque() {
         attaquant.at2_att = false;
     }
     else if (attaque.Main === 2) {
-        attaquant.at2_att = true;
         attaquant.at1_att = false;
+        attaquant.at2_att = true;
     }
     else {
         attaquant.at1_att = false;
@@ -425,6 +426,7 @@ function next_attaque() {
 
     // Vérifier s'il y a des défenseurs
     if (!Pions.find(p => p.Defenseur)) {
+        console.log("Aucun défenseur trouvé");
         contre_attaque = null;
         next_attaque();
         return;
@@ -435,8 +437,9 @@ function next_attaque() {
 
     // Vérifier si des attaques sont possibles
     if ((!attaquant.Arme1 || attaquant.Arme1 === "" || attaquant.Arme1_engagee) &&
-        (!attaquant.Arme2 || attaquant.Arme2 === "" || attaquant.Arme2_engagee) &&
+        (!attaquant.Arme2 || attaquant.Arme2 === "" || attaquant.Arme2 === "Bouclier" || attaquant.Arme2_engagee) &&
         (!arme || arme.A_distance)) {
+        console.log("Aucune attaque possible");
         contre_attaque = null;
         next_attaque();
         return;
@@ -446,6 +449,7 @@ function next_attaque() {
     if (contre_attaque || Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
 
     contre_attaque = null;
+    console.log("Fin next_attaque");
 }
 
 /**

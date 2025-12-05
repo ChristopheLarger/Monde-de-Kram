@@ -336,7 +336,9 @@ class Map {
                     });
 
                     // Définition de la couleur de l'hexagone en fonction du type de pion
-                    const magicien = Pions.find(p => p.Attaquant && p.Nom_liste != null);
+                    let magicien = Pions.find(p => p.Attaquant && p.Nom_liste != "");
+                    if (typeof magicien === "undefined") magicien = null;
+
                     Pions.filter(p => p.Position === col + "," + row).forEach(p => {
                         if (p.Type === "ennemis") strie = true;
                         if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
@@ -1406,7 +1408,8 @@ canvas.addEventListener("mousedown", (event) => {
 
     const p = Pions.find(x => x.Position === col + "," + row);
     const t = Terrains.find(x => x.Position === col + "," + row);
-    const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+    let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
+    if (typeof magicien === "undefined") magicien = null;
 
     // Glisser gauche ou sinon droit en cours
     if (event.button === 0) isDragging_left = true;
@@ -1935,7 +1938,8 @@ canvas.addEventListener("mousemove", (event) => {
         if (h < 0) SelectRectangle.y = y2 + offsetY;
 
         // La présence du magicien indique que l'on selectionne les cibles du sortilège
-        const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+        let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
+        if (typeof magicien === "undefined") magicien = null;
 
         hexMap.forEach(hex => {
             let hexX = hex.col * hexHSpacing;
@@ -2202,7 +2206,9 @@ document.addEventListener("keydown", function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-            const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+            let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
+            if (typeof magicien === "undefined") magicien = null;
+
             if (magicien != null) {
                 afficher_confirmation_sort();
             }

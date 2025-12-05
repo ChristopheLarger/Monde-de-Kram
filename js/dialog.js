@@ -824,6 +824,8 @@ function afficher_defense(phase) {
     dialog_defense_1.querySelector(".main2").innerHTML =
       "Parade 2nde main (" + defenseur.Arme2 + ")";
 
+    console.log("defenseur.Arme2", defenseur.Arme2, "defenseur.Arme2_engagee", defenseur.Arme2_engagee);
+
     // Activation/désactivation des options selon les possibilités
     dialog_defense_1.querySelector(".arme_radio1").disabled =
       (defenseur.Arme1 && defenseur.Arme1_engagee) || defenseur.Esquive;
@@ -833,7 +835,7 @@ function afficher_defense(phase) {
     // Désactivation des parades pour les attaques à distance ou les sorts
     if (is_distant || defenseur.Arme1 === "Lancement de sort") {
       dialog_defense_1.querySelector(".arme_radio1").disabled = true;
-      dialog_defense_1.querySelector(".arme_radio2").disabled = true;
+      if (defenseur.Arme2 !== "Bouclier") dialog_defense_1.querySelector(".arme_radio2").disabled = true;
     }
 
     dialog_defense_1.showModal();
