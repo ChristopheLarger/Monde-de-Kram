@@ -35,12 +35,14 @@
             switch ($type) {
                 case 'int':
                     return is_null($value) ? "null" : "parseInt('0" . $value . "', 10)";
+                case 'int2':
+                    return is_null($value) ? "null" : "parseInt('" . $value . "', 10)";
                 case 'bool':
                     return ($value === '1' || $value === 1 || $value === true || strtolower($value) === 'true') ? "true" : "false";
                 case 'null':
-                    return is_null($value) ? "null" : "`" . addslashes($value) . "`";
+                    return is_null($value) ? "null" : json_encode($value);
                 default:
-                    return "`" . addslashes($value) . "`";
+                    return json_encode($value);
             }
         }
 
@@ -189,7 +191,7 @@
             $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
             $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
             $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
-            $js .= "    Base: " . toJS($row['Base'], 'int') . "\n";
+            $js .= "    Base: " . toJS($row['Base'], 'int2') . "\n";
             $js .= "});\n";
             return $js;
         }
