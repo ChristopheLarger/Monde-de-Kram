@@ -519,17 +519,17 @@ function createListeModal(Nom_liste) {
         );
         const model = Models.find((m) => m.Nom_model === m_selected.Model);
         
-        if (model && model.Theognosie !== null && model.Theognosie !== undefined) {
+        if (model && model.theognosie() !== null && model.theognosie() !== undefined) {
           // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= model.Theognosie) {
+          if (model.Liste_pretre === Nom_liste && sort.Niveau <= model.theognosie()) {
             isKnown = true;
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
           else if (model.Liste_pretre) {
             const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
-              // Pour la liste jumelée, limite à 3/5 de Theognosie (arrondi)
-              const limiteJumelee = Math.floor((3 * model.Theognosie) / 5);
+              // Pour la liste jumelée, limite à 2/3 de Theognosie (arrondi)
+              const limiteJumelee = Math.floor((2 * model.theognosie()) / 3);
               if (sort.Niveau <= limiteJumelee) {
                 isKnown = true;
               }
@@ -669,15 +669,11 @@ function createListeModal(Nom_liste) {
           e.target.style.color = "white";
         }
         const Nom_sort = e.target.id.slice(6);
-        console.log("Nom_sort :", Nom_sort);
-
         const modal_content = document.getElementById("modal-content");
         const title = modal_content.querySelector("#title");
         const nom_liste = title.textContent;
 
-        console.log("nom_liste :", nom_liste);
-        console.log("m_selected.Model :", m_selected.Model);
-        sendMessage(
+      sendMessage(
           "Sort_connu",
           m_selected.Model + "@" + nom_liste + "@" + Nom_sort
         );

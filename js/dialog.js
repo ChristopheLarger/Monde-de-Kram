@@ -51,7 +51,7 @@ function afficher_dim_carte() {
     image_fond.onload = function () {
       dialog_dim_carte.querySelector(".hauteur").value = Math.round(
         (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) /
-          image_fond.width
+        image_fond.width
       );
     };
   }
@@ -203,28 +203,22 @@ function afficher_Details(col, row) {
     while (arme1.options.length > 2) arme1.removeChild(arme1.lastChild);
 
     // Ajout des armes du modèle
-    let nouvelleOption = null;
-    if (p_selected.Arme_1 !== null) {
-      nouvelleOption = document.createElement("option");
-      nouvelleOption.value = p_selected.Arme_1;
-      nouvelleOption.textContent = p_selected.Arme_1;
+    const is_monster = Armes.some(arme => arme.Nom_arme === m_selected.Model)
+
+    if (is_monster) {
+      const arme = Armes.find(arme => arme.Nom_arme === m_selected.Model);
+      const nouvelleOption = document.createElement("option");
+      nouvelleOption.value = arme.Nom_arme;
+      nouvelleOption.textContent = arme.Nom_arme;
       arme1.appendChild(nouvelleOption);
-    }
-    if (p_selected.Arme_2 !== null) {
-      nouvelleOption = document.createElement("option");
-      nouvelleOption.value = p_selected.Arme_2;
-      nouvelleOption.textContent = p_selected.Arme_2;
-      arme1.appendChild(nouvelleOption);
-    }
-    if (p_selected.Arme_3 !== null) {
-      nouvelleOption = document.createElement("option");
-      nouvelleOption.value = p_selected.Arme_3;
-      nouvelleOption.textContent = p_selected.Arme_3;
-      arme1.appendChild(nouvelleOption);
-    }
-    // Ajout du bouclier si le modèle n'est pas un monstre
-    if (p_selected.Arme_1 !== m_selected.Model) {
-      nouvelleOption = document.createElement("option");
+    } else {
+      Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
+        const nouvelleOption = document.createElement("option");
+        nouvelleOption.value = arme.Nom_arme;
+        nouvelleOption.textContent = arme.Nom_arme;
+        arme1.appendChild(nouvelleOption);
+      });
+      const nouvelleOption = document.createElement("option");
       nouvelleOption.value = "Bouclier";
       nouvelleOption.textContent = "Bouclier";
       arme1.appendChild(nouvelleOption);
@@ -649,7 +643,7 @@ function affiche_def() {
     scr_def =
       defenseur.jet_def -
       10 +
-      (defenseur.esq_def ? model_def.Esquive - defenseur.Nb_action : 0);
+      (defenseur.esq_def ? model_def.esquive() - defenseur.Nb_action : 0);
   } else {
     // Parade pour les attaques au corps à corps
     scr_def = calcul_scr_def();
@@ -798,7 +792,7 @@ function afficher_defense(phase) {
     } else if (defenseur.Arme1 === model_def.Arme_3) {
       par_def_1 = model_def.Par_3;
     } else if (defenseur.Arme1 === "Bouclier") {
-      par_def_1 = model_def.Par_Bouclier;
+      par_def_1 = model_def.par_bouclier();
     }
     if (defenseur.Arme1 === "" || par_def_1 === null) {
       dialog_defense_1
@@ -819,7 +813,7 @@ function afficher_defense(phase) {
     } else if (defenseur.Arme2 === model_def.Arme_3) {
       par_def_2 = model_def.Par_3;
     } else if (defenseur.Arme2 === "Bouclier") {
-      par_def_2 = model_def.Par_Bouclier;
+      par_def_2 = model_def.par_bouclier();
     }
     if (defenseur.Arme2 === "" || par_def_2 === null) {
       dialog_defense_1
@@ -1335,33 +1329,18 @@ function info_arme(arme) {
   let score = 0;
 
   // Si l'arme principale ou secondaire est nulle ou est un lancement de sort, on affiche "-"
-  if (
-    arme === 1 &&
-    (!m_selected.Arme1 ||
-      m_selected.Arme1 === "Lancement de sort" ||
-      m_selected.Arme1 === "Bouclier")
-  ) {
+  if (arme === 1 && (!m_selected.Arme1 || m_selected.Arme1 === "Lancement de sort")) {
     return "-";
   }
-  if (
-    arme === 2 &&
-    (!m_selected.Arme2 ||
-      m_selected.Arme2 === "Lancement de sort" ||
-      m_selected.Arme2 === "Bouclier")
-  ) {
+  if (arme === 2 && (!m_selected.Arme2)) {
     return "-";
   }
 
   // Bonus de compétence d'arme
-  if (arme === 1 && m_selected.Arme1) {
-    if (m_selected.Arme1 === model.Arme_1) score += model.Att_1;
-    else if (m_selected.Arme1 === model.Arme_2) score += model.Att_2;
-    else if (m_selected.Arme1 === model.Arme_3) score += model.Att_3;
-  } else if (arme === 2 && m_selected.Arme2) {
-    if (m_selected.Arme2 === model.Arme_1) score += model.Att_1;
-    else if (m_selected.Arme2 === model.Arme_2) score += model.Att_2;
-    else if (m_selected.Arme2 === model.Arme_3) score += model.Att_3;
-  }
+  if (arme === 1 && m_selected.Arme1) score = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
+  if (arme === 2 && m_selected.Arme2) score = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
+
+  console.log("score: ", score);
 
   // Bonus d'attaque
   score += m_selected.B_att;
@@ -1375,9 +1354,9 @@ function info_arme(arme) {
   ) {
     if (m_selected.Arme1 !== "Bouclier" && m_selected.Arme2 !== "Bouclier") {
       if (m_selected.Arme1 === "Dague" || m_selected.Arme2 === "Dague") {
-        score -= Math.max(2 - model.Escrime, 0);
+        score -= Math.max(2 - model.escrime(), 0);
       } else {
-        score -= Math.max(6 - model.Escrime, 0);
+        score -= Math.max(6 - model.escrime(), 0);
       }
     }
   }
@@ -1483,6 +1462,9 @@ arme1.addEventListener("click", function (event) {
       m_selected.Concentration_sort = 0;
     }
 
+    // Vérification si le personnage est un monstre
+    const is_monster = Armes.some(arme => arme.Nom_arme === m_selected.Model)
+
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
     if (
       arme1.value === "Lancement de sort" ||
@@ -1507,50 +1489,43 @@ arme1.addEventListener("click", function (event) {
       arme2.appendChild(nouvelleOption);
 
       // Ajout des armes disponibles du modèle
-      let w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_1);
-      if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
-        nouvelleOption = document.createElement("option");
-        nouvelleOption.value = p_selected.Arme_1;
-        nouvelleOption.textContent = p_selected.Arme_1;
-        arme2.appendChild(nouvelleOption);
-      }
-      w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_2);
-      if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
-        nouvelleOption = document.createElement("option");
-        nouvelleOption.value = p_selected.Arme_2;
-        nouvelleOption.textContent = p_selected.Arme_2;
-        arme2.appendChild(nouvelleOption);
-      }
-      w2 = Armes.find((x) => x.Nom_arme === p_selected.Arme_3);
-      if ((w2 != null) & (typeof w2 != "undefined") && !w2.Deux_mains) {
-        nouvelleOption = document.createElement("option");
-        nouvelleOption.value = p_selected.Arme_3;
-        nouvelleOption.textContent = p_selected.Arme_3;
-        arme2.appendChild(nouvelleOption);
-      }
-      if (
-        arme1.value !== "Bouclier" &&
-        p_selected.Arme_1 !== m_selected.Model
-      ) {
-        nouvelleOption = document.createElement("option");
-        nouvelleOption.value = "Bouclier";
-        nouvelleOption.textContent = "Bouclier";
-        arme2.appendChild(nouvelleOption);
+      if (!is_monster) {
+        Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
+          if (!arme.Deux_mains) {
+            const nouvelleOption = document.createElement("option");
+            nouvelleOption.value = arme.Nom_arme;
+            nouvelleOption.textContent = arme.Nom_arme;
+            arme2.appendChild(nouvelleOption);
+          }
+        });
+        if (arme1.value !== "Bouclier") {
+          const nouvelleOption = document.createElement("option");
+          nouvelleOption.value = "Bouclier";
+          nouvelleOption.textContent = "Bouclier";
+          arme2.appendChild(nouvelleOption);
+        }
       }
 
       // Sélection de l'arme actuelle si disponible
-      if (
-        [
-          p_selected.Arme_1,
-          p_selected.Arme_2,
-          p_selected.Arme_3,
-          "Bouclier",
-        ].includes(m_selected.Arme2)
-      ) {
-        arme2.value = m_selected.Arme2;
-      } else {
-        arme2.value = "";
-      }
+      arme2.value = m_selected.Arme2;
+    }
+
+    // Sélection de l'arme par défaut si le personnage est un monstre
+    if (is_monster && arme1.value === "") arme1.value = m_selected.Model;
+    if (!is_monster && arme1.value === "") {
+      let comp_max = -99;
+      let arme_max = "";
+      Armes.forEach(arme => {
+        const comp = p_selected.get_competence(arme.Competence);
+        if (comp !== null && comp > comp_max) {
+          comp_max = comp;
+          arme_max = arme.Nom_arme;
+        }
+      });
+      arme1.value = arme_max;
+    }
+    if (!is_monster && arme2.value === "") {
+      arme2.value = "Bouclier";
     }
 
     // Mise à jour de l'arme principale
@@ -2279,39 +2254,73 @@ dialog_sort_2
       return;
     }
 
-    let formula = event.target.value.toLowerCase();
+    let formula = null;
+    let auto_save = false;
+
+    formula = event.target.value.toLowerCase().replace(/« (.+) »/g, "$1");
+    formula = formula.replace(/\[(.+)\]/g, "$1");
+
+    if (formula !== event.target.value.toLowerCase()) auto_save = true;
 
     formula = formula.replace(/ /g, "");
+    formula = formula.replace(/\t/g, "");
     formula = formula.replace(/^.*\(/g, "");
     formula = formula.replace(/\).*$/g, "");
+    formula = formula.replace(/\+n/g, "");
+    formula = formula.replace(/\-n/g, "");
+    formula = formula.replace(/\-var/g, "");
+    formula = formula.replace(/\+nbre/g, "");
+    formula = formula.replace(/spéciale/g, "");
 
-    formula = formula.charAt(0).toUpperCase() + formula.slice(1);
+    formula = formula.replace(/c$/g, "Con");
+    formula = formula.replace(/c\+/g, "Con+");
+    formula = formula.replace(/c\-/g, "Con-");
 
-    formula = formula.replace(/C$/g, "Con");
-    formula = formula.replace(/C\+/g, "Con+");
-    formula = formula.replace(/C\-/g, "Con-");
+    formula = formula.replace(/co$/g, "Cor");
+    formula = formula.replace(/co\+/g, "Cor+");
+    formula = formula.replace(/co\-/g, "Cor-");
 
-    formula = formula.replace(/Co$/g, "Cor");
-    formula = formula.replace(/Co\+/g, "Cor+");
-    formula = formula.replace(/Co\-/g, "Cor-");
+    formula = formula.replace(/v$/g, "Vol");
+    formula = formula.replace(/v\+/g, "Vol+");
+    formula = formula.replace(/v\-/g, "Vol-");
 
-    formula = formula.replace(/V$/g, "Vol");
-    formula = formula.replace(/V\+/g, "Vol+");
-    formula = formula.replace(/V\-/g, "Vol-");
+    formula = formula.replace(/ab$/g, "Abs");
+    formula = formula.replace(/ab\+/g, "Abs+");
+    formula = formula.replace(/ab\-/g, "Abs-");
 
-    formula = formula.replace(/Ab$/g, "Abs");
-    formula = formula.replace(/Ab\+/g, "Abs+");
-    formula = formula.replace(/Ab\-/g, "Abs-");
+    formula = formula.replace(/foi$/g, "Foi");
+    formula = formula.replace(/foi\+/g, "Foi+");
+    formula = formula.replace(/foi\-/g, "Foi-");
 
-    formula = formula.replace(/Foi$/g, "Foi");
-    formula = formula.replace(/Foi\+/g, "Foi+");
-    formula = formula.replace(/Foi\-/g, "Foi-");
-
-    formula = formula.replace(/Mag$/g, "Mag");
-    formula = formula.replace(/Mag\+/g, "Mag+");
-    formula = formula.replace(/Mag\-/g, "Mag-");
+    formula = formula.replace(/mag$/g, "Mag");
+    formula = formula.replace(/mag\+/g, "Mag+");
+    formula = formula.replace(/mag\-/g, "Mag-");
 
     formula = formula.replace(/6esens/g, "6eS");
+
+    formula = formula.replace(/mem$/g, "Mem");
+    formula = formula.replace(/mem\+/g, "Mem+");
+    formula = formula.replace(/mem\-/g, "Mem-");
+
+    formula = formula.replace(/nm$/g, "NM");
+    formula = formula.replace(/nm\+/g, "NM+");
+    formula = formula.replace(/nm\-/g, "NM-");
+
+    formula = formula.replace(/p$/g, "Per");
+    formula = formula.replace(/p\+/g, "Per+");
+    formula = formula.replace(/p\-/g, "Per-");
+
+    formula = formula.replace(/thp$/g, "Thp");
+    formula = formula.replace(/thp\+/g, "Thp+");
+    formula = formula.replace(/thp\-/g, "Thp-");
+
+    formula = formula.replace(/vm$/g, "VM");
+    formula = formula.replace(/vm\+/g, "VM+");
+    formula = formula.replace(/vm\-/g, "VM-");
+
+    formula = formula.replace(/ch$/g, "Cha");
+    formula = formula.replace(/ch\+/g, "Cha+");
+    formula = formula.replace(/ch\-/g, "Cha-");
 
     let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
 
@@ -2324,19 +2333,19 @@ dialog_sort_2
     );
     if (isNaN(modificateur)) modificateur = 0;
 
-    if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS"].includes(base)) {
+    if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
       dialog_sort_2.querySelector(".res_save").textContent = "(???)";
     } else {
       dialog_sort_2.querySelector(".res_save").textContent =
-        "(" + base + operateur + modificateur + ")";
+        "(" + (auto_save ? "[" : "") + base + (auto_save ? "]" : "") + operateur.toString() + modificateur.toString() + ")";
     }
 
     // Application des sauvegardes au sort des cibles
     Pions.filter((p) => p.Cible_sort).forEach((p) => {
-      console.log(
-        "Sauvegarde au sort :",
+      console.log("Sauvegarde au sort :",
         p.Titre,
         p.sauvegarde_au_sort(
+          auto_save,
           base,
           operateur.toString() + modificateur.toString()
         )

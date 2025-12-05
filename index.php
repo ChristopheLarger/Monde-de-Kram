@@ -16,6 +16,7 @@
     <!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
     <script src="js/model.js"></script> <!-- Classes de base pour les modèles de personnages -->
     <script src="js/arme.js"></script> <!-- Classes pour les armes -->
+    <script src="js/competence.js"></script> <!-- Classes pour les armes -->
     <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
     <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
@@ -54,7 +55,7 @@
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
             $js .= "    Etat: " . toJS($row['Etat']) . ",\n";
-            $js .= "    Fdc: " . toJS($row['FdC'], 'int') . ",\n";
+
             $js .= "    Pm: " . toJS($row['PM'], 'int') . ",\n";
             $js .= "    Pp: " . toJS($row['PP'], 'int') . ",\n";
 
@@ -62,33 +63,24 @@
             $js .= "    Constitution: " . toJS($row['Constitution'], 'int') . ",\n";
             $js .= "    Vp: " . toJS($row['VP'], 'int') . ",\n";
             $js .= "    Perception: " . toJS($row['Perception'], 'int') . ",\n";
+
             $js .= "    Vm: " . toJS($row['VM'], 'int') . ",\n";
-            $js .= "    Abstraction: " . toJS($row['Abstraction'], 'int') . ",\n";
             $js .= "    Volonte: " . toJS($row['Volonte'], 'int') . ",\n";
+            $js .= "    Abstraction: " . toJS($row['Abstraction'], 'int') . ",\n";
+            $js .= "    Charisme: " . toJS($row['Charisme'], 'int') . ",\n";
+
+            $js .= "    Adaptation: " . toJS($row['Adaptation'], 'int') . ",\n";
+            $js .= "    Combat: " . toJS($row['Combat'], 'int') . ",\n";
             $js .= "    Foi: " . toJS($row['Foi'], 'int') . ",\n";
             $js .= "    Magie: " . toJS($row['Magie'], 'int') . ",\n";
-            $js .= "    Adaptation: " . toJS($row['Adaptation'], 'int') . ",\n";
+            $js .= "    Memoire: " . toJS($row['Memoire'], 'int') . ",\n";
+            $js .= "    Telepathie: " . toJS($row['Telepathie'], 'int') . ",\n";
 
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
-
-            $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
-            $js .= "    Escrime: " . toJS($row['Escrime'], 'int') . ",\n";
-
-            $js .= "    Theognosie: " . toJS($row['Theognosie'], 'int') . ",\n";
             $js .= "    Liste_pretre: " . toJS($row['Liste_pretre'], 'null') . ",\n";
 
-            $js .= "    Arme_1: " . toJS($row['Arme_1'], 'null') . ",\n";
-            $js .= "    Att_1: " . toJS($row['Att_1'], 'int') . ",\n";
-            $js .= "    Par_1: " . toJS($row['Par_1'], 'int') . ",\n";
-            $js .= "    Arme_2: " . toJS($row['Arme_2'], 'null') . ",\n";
-            $js .= "    Att_2: " . toJS($row['Att_2'], 'int') . ",\n";
-            $js .= "    Par_2: " . toJS($row['Par_2'], 'int') . ",\n";
-            $js .= "    Arme_3: " . toJS($row['Arme_3'], 'null') . ",\n";
-            $js .= "    Att_3: " . toJS($row['Att_3'], 'int') . ",\n";
-            $js .= "    Par_3: " . toJS($row['Par_3'], 'int') . ",\n";
-            $js .= "    Par_Bouclier: " . toJS($row['Par_Bouclier'], 'int') . ",\n";
-            $js .= "    Esquive: " . toJS($row['Esquive'], 'int') . ",\n";
+            $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
 
             $js .= "    Armure_tete: " . toJS($row['Armure_Tete'], 'int') . ",\n";
             $js .= "    Armure_poitrine: " . toJS($row['Armure_Poitrine'], 'int') . ",\n";
@@ -117,6 +109,8 @@
         {
             $js = "Armes[$index] = new Arme({\n";
             $js .= "    Nom_arme: " . toJS($row['Nom_arme']) . ",\n";
+            $js .= "    Competence: " . toJS($row['Competence']) . ",\n";
+            $js .= "    Facteur_parade: " . toJS($row['Facteur_parade'], 'int') . ",\n";
             $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Deux_mains: " . toJS($row['Deux_mains'], 'bool') . ",\n";
             $js .= "    A_projectile: " . toJS($row['A_projectile'], 'bool') . ",\n";
@@ -182,6 +176,33 @@
             $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
             $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
+                /**
+         * Génère le code JavaScript pour initialiser les compétences
+         */
+        function generateCompetenceJS($row, $index)
+        {
+            $js = "Competences[$index] = new Competence({\n";
+            $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
+            $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
+            $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
+            $js .= "    Base: " . toJS($row['Base'], 'int') . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
+        /**
+         * Génère le code JavaScript pour initialiser les compétences connues
+         */
+        function generateCompetenceConnueJS($row, $index)
+        {
+            $js = "CompetencesConnues[$index] = new CompetenceConnue({\n";
+            $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
+            $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
+            $js .= "    Degres: " . toJS($row['Degres'], 'int') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -267,6 +288,30 @@
                     $ligne++;
                 }
             }
+
+            // === CHARGEMENT DES COMPÉTENCES ===
+            $query = "SELECT * FROM competence ORDER BY Nom_competence ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateCompetenceJS($row, $ligne);
+                    $ligne++;
+                }
+            }
+
+            // === CHARGEMENT DES COMPÉTENCES CONNUES ===
+            $query = "SELECT * FROM comp_connue ORDER BY Nom_model ASC, Nom_competence ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateCompetenceConnueJS($row, $ligne);
+                    $ligne++;
+                }
+            }
         }
 
         $conn->close();
@@ -326,9 +371,7 @@
             Map.drawHexMap();
 
             // Donner le focus à la carte
-            canvas.focus({
-                preventScroll: true
-            });
+            canvas.focus({ preventScroll: true });
         }, 200);
     </script>
 </body>
