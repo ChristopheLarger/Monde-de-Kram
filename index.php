@@ -190,6 +190,7 @@
             $js = "Competences[$index] = new Competence({\n";
             $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
             $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
+            $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
             $js .= "    Base: " . toJS($row['Base'], 'int2') . "\n";
             $js .= "});\n";

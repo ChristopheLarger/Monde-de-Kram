@@ -97,13 +97,8 @@ class Model {
     }
 
     #get_competence_sub(competence) {
-        console.log("---------- get_competence_sub ---------");
-        console.log("competence: ", competence);
-
         const comp = Competences.find(comp => comp.Nom_competence === competence);
         if (!comp) return null;
-
-        console.log("comp: ", comp);
 
         // Calcul de l'attribut
         let attribut = comp.Attribut;
@@ -153,53 +148,27 @@ class Model {
         }
         attribut = Math.round((attribut - 10) / 2);
 
-        console.log("attribut: ", attribut);
-
         // Calcul des degrés
-        let degres = 0;
         const comp_connue = CompetencesConnues.find(comp =>
             comp.Nom_model === this.Nom_model &&
             comp.Nom_competence === competence);
-        if (comp_connue) degres = comp_connue.Degres;
 
-        console.log("comp_connue: ", comp_connue);
-        console.log("degres: ", degres);
+        if (comp_connue) return comp.Base + attribut + comp_connue.Degres;
 
-        return comp.Base + attribut + degres;
+        return null;
     }
 
     get_competence(competence) {
-        console.log("---------- get_competence ---------");
-        console.log("competence: ", competence);
-
         const degres = this.#get_competence_sub(competence);
         if (degres === null) return null;
 
         const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
-        console.log("comp_majeure: ", comp_majeure);
         if (comp_majeure === null) return degres;
 
         const degres_majeurs = this.#get_competence_sub(comp_majeure);
-        console.log("degres_majeurs: ", degres_majeurs);
         if (degres_majeurs === null) return null;
 
         return degres + degres_majeurs;
-    }
-
-    fdc() {
-        return this.get_competence("Feinte de corps");
-    }
-    theognosie() {
-        return this.get_competence("Theognosie");
-    }
-    par_bouclier() {
-        return this.get_competence("Parade bouclier");
-    }
-    esquive() {
-        return this.get_competence("Esquive");
-    }
-    escrime() {
-        return this.get_competence("Escrime");
     }
 }
 

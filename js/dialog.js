@@ -132,6 +132,8 @@ function afficher_Details_arme1() {
     m_selected.Nom_sort = "";
     m_selected.Incantation = 0;
   }
+  // Mise à jour de l'information affichée
+  info_arme();
 }
 
 /**
@@ -211,17 +213,16 @@ function afficher_Details(col, row) {
       nouvelleOption.value = arme.Nom_arme;
       nouvelleOption.textContent = arme.Nom_arme;
       arme1.appendChild(nouvelleOption);
-    } else {
+    }
+    else {
       Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
+        if (arme.Nom_arme === "Bouclier") return;
+
         const nouvelleOption = document.createElement("option");
         nouvelleOption.value = arme.Nom_arme;
         nouvelleOption.textContent = arme.Nom_arme;
         arme1.appendChild(nouvelleOption);
       });
-      const nouvelleOption = document.createElement("option");
-      nouvelleOption.value = "Bouclier";
-      nouvelleOption.textContent = "Bouclier";
-      arme1.appendChild(nouvelleOption);
     }
 
     // Sélection de l'arme actuelle
@@ -315,11 +316,7 @@ function afficher_Details(col, row) {
     Map.drawHexMap();
 
     // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent =
-      " (" + info_arme(1) + ")";
-    dialog_details_2.querySelector(".info_secondaire").textContent =
-      " (" + info_arme(2) + ")";
-
+    info_arme();
     // Mise à jour du sortilège sélectionné
     if (
       m_selected.Nom_sort &&
@@ -346,8 +343,7 @@ function afficher_Details(col, row) {
     } else {
       dialog_details_2.querySelector(".liste").textContent = "--";
       dialog_details_2.querySelector(".sort").textContent = "--";
-      dialog_details_2.querySelector(".info_principale").textContent =
-        " (" + info_arme(1) + ")";
+      info_arme();
     }
 
     // Affichage du dialogue
@@ -401,7 +397,7 @@ function afficher_attaque(phase) {
   const model_att = Models.find((p) => p.Nom_model === attaquant.Model);
   if (phase === 1) {
     // Gestion de l'arme principale
-    if (attaquant.Arme1 === "" || model_att.Att_1 === null) {
+    if (attaquant.Arme1 === "" || attaquant.Arme1 === "Bouclier") {
       dialog_attaque_1
         .querySelector(".arme_radio1")
         .closest("tr").style.display = "none";
@@ -412,7 +408,7 @@ function afficher_attaque(phase) {
     }
 
     // Gestion de l'arme secondaire
-    if (attaquant.Arme2 === "" || model_att.Att_2 === null) {
+    if (attaquant.Arme2 === "" || attaquant.Arme2 === "Bouclier") {
       dialog_attaque_1
         .querySelector(".arme_radio2")
         .closest("tr").style.display = "none";
@@ -643,7 +639,7 @@ function affiche_def() {
     scr_def =
       defenseur.jet_def -
       10 +
-      (defenseur.esq_def ? model_def.esquive() - defenseur.Nb_action : 0);
+      (defenseur.esq_def ? model_def.get_competence("Esquive") - defenseur.Nb_action : 0);
   } else {
     // Parade pour les attaques au corps à corps
     scr_def = calcul_scr_def();
@@ -784,17 +780,13 @@ function afficher_defense(phase) {
 
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (1ère main)
     const model_def = Models.find((p) => p.Nom_model === defenseur.Model);
+
+    const Arme1 = Armes.find((a) => a.Nom_arme === defenseur.Arme1);
     let par_def_1 = null;
-    if (defenseur.Arme1 === model_def.Arme_1) {
-      par_def_1 = model_def.Par_1;
-    } else if (defenseur.Arme1 === model_def.Arme_2) {
-      par_def_1 = model_def.Par_2;
-    } else if (defenseur.Arme1 === model_def.Arme_3) {
-      par_def_1 = model_def.Par_3;
-    } else if (defenseur.Arme1 === "Bouclier") {
-      par_def_1 = model_def.par_bouclier();
+    if (Arme1 !== null && defenseur.Arme1 !== "") {
+      par_def_1 = Arme1.Facteur_parade * model_def.get_competence(Arme1.Competence);
     }
-    if (defenseur.Arme1 === "" || par_def_1 === null) {
+    if (defenseur.Arme1 === "" || Arme1.Facteur_parade === null || par_def_1 === null) {
       dialog_defense_1
         .querySelector(".arme_radio1")
         .closest("tr").style.display = "none";
@@ -805,17 +797,12 @@ function afficher_defense(phase) {
     }
 
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (2nde main)
+    const Arme2 = Armes.find((a) => a.Nom_arme === defenseur.Arme2);
     let par_def_2 = null;
-    if (defenseur.Arme2 === model_def.Arme_1) {
-      par_def_2 = model_def.Par_1;
-    } else if (defenseur.Arme2 === model_def.Arme_2) {
-      par_def_2 = model_def.Par_2;
-    } else if (defenseur.Arme2 === model_def.Arme_3) {
-      par_def_2 = model_def.Par_3;
-    } else if (defenseur.Arme2 === "Bouclier") {
-      par_def_2 = model_def.par_bouclier();
+    if (Arme2 !== null && defenseur.Arme2 !== "") {
+      par_def_2 = Arme2.Facteur_parade * model_def.get_competence(Arme2.Competence);
     }
-    if (defenseur.Arme2 === "" || par_def_2 === null) {
+    if (defenseur.Arme2 === "" || Arme2.Facteur_parade === null || par_def_2 === null) {
       dialog_defense_1
         .querySelector(".arme_radio2")
         .closest("tr").style.display = "none";
@@ -1324,44 +1311,46 @@ for (let i = 0; i < inputs.length; i++) {
   });
 }
 
-function info_arme(arme) {
+function info_arme() {
   const model = Models.find((m) => m.Nom_model === m_selected.Model);
-  let score = 0;
-
-  // Si l'arme principale ou secondaire est nulle ou est un lancement de sort, on affiche "-"
-  if (arme === 1 && (!m_selected.Arme1 || m_selected.Arme1 === "Lancement de sort")) {
-    return "-";
-  }
-  if (arme === 2 && (!m_selected.Arme2)) {
-    return "-";
-  }
+  let score1 = null;
+  let score2 = null;
 
   // Bonus de compétence d'arme
-  if (arme === 1 && m_selected.Arme1) score = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
-  if (arme === 2 && m_selected.Arme2) score = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
-
-  console.log("score: ", score);
+  if (m_selected.Arme1 !== "" && m_selected.Arme1 !== "Lancement de sort")
+    score1 = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
+  if (m_selected.Arme2 !== "" && m_selected.Arme2 !== "Lancement de sort")
+    score2 = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
 
   // Bonus d'attaque
-  score += m_selected.B_att;
+  if (score1 !== null) score1 += m_selected.B_att;
+  if (score2 !== null) score2 += m_selected.B_att;
 
   // Malus d'escrime pour combat à deux armes
   if (
+    score1 !== null &&
     m_selected.Arme1 &&
     m_selected.Arme1 !== "" &&
+    score2 !== null &&
     m_selected.Arme2 &&
     m_selected.Arme2 !== ""
   ) {
     if (m_selected.Arme1 !== "Bouclier" && m_selected.Arme2 !== "Bouclier") {
       if (m_selected.Arme1 === "Dague" || m_selected.Arme2 === "Dague") {
-        score -= Math.max(2 - model.escrime(), 0);
+        score1 -= Math.max(2 - model.get_competence("Escrime"), 0);
+        score2 -= Math.max(2 - model.get_competence("Escrime"), 0);
       } else {
-        score -= Math.max(6 - model.escrime(), 0);
+        score1 -= Math.max(6 - model.get_competence("Escrime"), 0);
+        score2 -= Math.max(6 - model.get_competence("Escrime"), 0);
       }
     }
   }
 
-  return score;
+  // Mise à jour de l'information affichée
+  dialog_details_2.querySelector(".info_principale").textContent =
+    score1 !== null ? " (" + score1 + ")" : "(-)";
+  dialog_details_2.querySelector(".info_secondaire").textContent =
+    score2 !== null ? " (" + score2 + ")" : "(-)";
 }
 
 // Gestion du changement d'arme principale
@@ -1465,85 +1454,44 @@ arme1.addEventListener("click", function (event) {
     // Vérification si le personnage est un monstre
     const is_monster = Armes.some(arme => arme.Nom_arme === m_selected.Model)
 
+    // Nettoyage et ajout d'une option vide
+    while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
+
+    nouvelleOption = document.createElement("option");
+    nouvelleOption.value = "";
+    nouvelleOption.textContent = "--";
+    arme2.appendChild(nouvelleOption);
+
     // Gestion spéciale pour le lancement de sort et les armes à deux mains
     if (
       arme1.value === "Lancement de sort" ||
       (w1 && typeof w1 !== "undefined" && w1.Deux_mains)
     ) {
-      // Nettoyage et ajout d'une option vide
-      while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
-      nouvelleOption = document.createElement("option");
-      nouvelleOption.value = "";
-      nouvelleOption.textContent = "--";
-      arme2.appendChild(nouvelleOption);
-
       arme2.value = "";
     }
     // Gestion des armes normales
     else {
-      // Nettoyage des options existantes
-      while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
-      nouvelleOption = document.createElement("option");
-      nouvelleOption.value = "";
-      nouvelleOption.textContent = "--";
-      arme2.appendChild(nouvelleOption);
-
       // Ajout des armes disponibles du modèle
       if (!is_monster) {
         Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
-          if (!arme.Deux_mains) {
-            const nouvelleOption = document.createElement("option");
-            nouvelleOption.value = arme.Nom_arme;
-            nouvelleOption.textContent = arme.Nom_arme;
-            arme2.appendChild(nouvelleOption);
-          }
-        });
-        if (arme1.value !== "Bouclier") {
+          if (arme.Deux_mains) return;
+
           const nouvelleOption = document.createElement("option");
-          nouvelleOption.value = "Bouclier";
-          nouvelleOption.textContent = "Bouclier";
+          nouvelleOption.value = arme.Nom_arme;
+          nouvelleOption.textContent = arme.Nom_arme;
           arme2.appendChild(nouvelleOption);
-        }
+        });
       }
 
       // Sélection de l'arme actuelle si disponible
       arme2.value = m_selected.Arme2;
     }
 
-    // Sélection de l'arme par défaut si le personnage est un monstre
-    if (is_monster && arme1.value === "") arme1.value = m_selected.Model;
-    if (!is_monster && arme1.value === "") {
-      let comp_max = -99;
-      let arme_max = "";
-      Armes.forEach(arme => {
-        const comp = p_selected.get_competence(arme.Competence);
-        if (comp !== null && comp > comp_max) {
-          comp_max = comp;
-          arme_max = arme.Nom_arme;
-        }
-      });
-      arme1.value = arme_max;
-    }
-    if (!is_monster && arme2.value === "") {
-      arme2.value = "Bouclier";
-    }
-
-    // Mise à jour de l'arme principale
-    m_selected.Arme1 = arme1.value;
-
-    // Mise à jour de l'information affichée
-    if (!isClickInside)
-      dialog_details_2.querySelector(".info_principale").textContent =
-        " (" + info_arme(1) + ")";
-
     // Activation/désactivation du sélecteur d'arme secondaire
     if (arme2.options.length > 1) {
       arme2.disabled = false;
-      dialog_details_2.querySelector(".info_secondaire").textContent =
-        " (" + info_arme(2) + ")";
     } else {
       arme2.disabled = true;
-      dialog_details_2.querySelector(".info_secondaire").textContent = "";
     }
 
     // Ajustement de la largeur des sélecteurs
@@ -1552,6 +1500,13 @@ arme1.addEventListener("click", function (event) {
     const width = Math.max(arme1.offsetWidth, arme2.offsetWidth);
     arme1.style.width = width + "px";
     arme2.style.width = width + "px";
+
+    // Mise à jour des armes sélectionnées
+    m_selected.Arme1 = arme1.value;
+    m_selected.Arme2 = arme2.value;
+
+    // Mise à jour de l'information affichée
+    info_arme();
   }, 0);
 });
 
@@ -1562,10 +1517,7 @@ dialog_details_2
     m_selected.Arme2 = event.target.value;
 
     // Mise à jour de l'information affichée
-    dialog_details_2.querySelector(".info_principale").textContent =
-      " (" + info_arme(1) + ")";
-    dialog_details_2.querySelector(".info_secondaire").textContent =
-      " (" + info_arme(2) + ")";
+    info_arme();
   });
 
 // Empêche le menu contextuel sur le dialogue de détails
@@ -1812,7 +1764,7 @@ dialog_attaque_2
   .addEventListener("mouseover", function (event) {
     const tooltip = dialog_attaque_2.querySelector(".tooltip");
     const dialog = dialog_attaque_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left + 10 + "px";
+    tooltip.style.left = event.clientX - dialog.left -250 + "px";
     tooltip.style.top = event.clientY - dialog.top + 10 + "px";
     tooltip.style.display = "block";
     tooltip.innerHTML = explications_scr_att();

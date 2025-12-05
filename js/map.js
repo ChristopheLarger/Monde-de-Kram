@@ -915,8 +915,44 @@ class Pion extends Map {
         this.Armure_jambed = m.Armure_jambed;
 
         if (this.Indice !== 0) this.Auto = true;
+
+        this.#setArmes();
     }
 
+    /**
+     * Définit les armes du pion
+     */
+    #setArmes() {
+        const model = Models.find(m => m.Nom_model === this.Model);
+
+        // Vérification si le personnage est un monstre
+        const is_monster = Armes.some(arme => arme.Nom_arme === this.Model)
+
+        if (is_monster) {
+        // Sélection de l'arme par défaut si le personnage est un monstre
+        this.Arme1 = this.Model;
+        }
+        else {
+        // Sélection des armes par défaut si le personnage n'est pas un monstre
+        let comp_max = -99;
+            let arme_max = "";
+            Armes.forEach(arme => {
+                if (arme.Nom_arme === "Bouclier") return;
+                const comp = model.get_competence(arme.Competence);
+                if (comp !== null && comp > comp_max) {
+                    comp_max = comp;
+                    arme_max = arme.Nom_arme;
+                }
+            });
+            this.Arme1 = arme_max;
+            this.Arme2 = "Bouclier";
+        }
+    }
+
+    /**
+     * Envoie un message à la carte
+     * @param {string} tag - Tag du message
+     */
     sendMessage(tag) {
         const champs = Object.keys(this).filter(key => typeof this[key] != "function");
         switch (tag.toLowerCase()) {
@@ -940,6 +976,10 @@ class Pion extends Map {
         }
     }
 
+    /**
+     * Reçoit un message de la carte
+     * @param {string} data - Message reçu
+     */
     static receiveMessage(data) {
         var regex = new RegExp("^.*: Map_([a-zA-Z0-9_]+) ([^@]+)@([0-9]+)@(.*)$");
         var result = data.match(regex);
@@ -971,6 +1011,10 @@ class Pion extends Map {
         return true;
     }
 
+    /**
+     * Vérifie si le pion est en combat au corps à corps
+     * @returns {boolean} - True si le pion est en combat au corps à corps, false sinon
+     */
     is_cac() {
         const model = Models.find(x => x.Nom_model === this.Model);
         if (model == null || typeof model == "undefined") return false;
@@ -986,6 +1030,10 @@ class Pion extends Map {
         return false;
     }
 
+    /**
+     * Vérifie si le pion est en combat à distance
+     * @returns {boolean} - True si le pion est en combat à distance, false sinon
+     */
     is_dist() {
         const model = Models.find(x => x.Nom_model === this.Model);
         if (model == null || typeof model == "undefined") return false;
@@ -1001,6 +1049,11 @@ class Pion extends Map {
         return false;
     }
 
+    /**
+     * Trouve le hexagone le plus proche libre
+     * @param {string} pos - Position en coordonnées hexagonales (Col, Row)
+     * @returns {string} - Position en coordonnées hexagonales (Col, Row)
+     */
     #findClosestHexFree(pos) {
         const col = pos.split(",")[0];
         const row = pos.split(",")[1];
@@ -1028,7 +1081,10 @@ class Pion extends Map {
         return closest.col + "," + closest.row;
     }
 
-    // On calcul l'armure générale (moyenne des différentes parties)
+    /**
+     * Calcul l'armure générale (moyenne des différentes parties)
+     * @returns {number} - Armure générale
+     */
     armure_generale() {
         let a = 0;
         a += this.Armure_tete;
@@ -1042,7 +1098,10 @@ class Pion extends Map {
         return Math.floor(a / 7);
     }
 
-    // On duplique un pion de la carte.
+    /**
+     * Duplique un pion de la carte
+     * @returns {Pion} - Pion dupliqué
+     */
     dupliquer() {
         const p = new Pion(this.Type, this.Model);
         const m = Models.find(x => x.Nom_model === this.Model);
@@ -1082,7 +1141,13 @@ class Pion extends Map {
         return p;
     }
 
-    // On ajoute un pion sur la carte.
+    /**
+     * Ajoute un pion sur la carte
+     * @param {string} type - Type du pion
+     * @param {string} model - Modèle du pion
+     * @param {number} indice - Indice du pion
+     * @returns {Pion} - Pion ajouté
+     */
     static add(type, model, indice = -1) {
         let p = Pions.find(x => x.Type === type && x.Model === model && x.Indice === indice);
         if (p === null || typeof p === "undefined") {
@@ -1096,7 +1161,9 @@ class Pion extends Map {
         return p;
     }
 
-    // On retire un pion de la carte.
+    /**
+     * Retire un pion de la carte
+     */
     rmv() {
         const index = Pions.indexOf(this);
         Pions.splice(index, 1);
@@ -1104,7 +1171,12 @@ class Pion extends Map {
         Map.drawHexMap();
     }
 
-    // Renseigne sur le fait qu'un hexagone soit visible ou non du pion.
+    /**
+     * Renseigne sur le fait qu'un hexagone soit visible ou non du pion
+     * @param {number} col - Colonne de l'hexagone
+     * @param {number} row - Ligne de l'hexagone
+     * @returns {boolean} - True si l'hexagone est visible, false sinon
+     */
     ligne_de_vue(col, row) {
         const start_col = this.Position.split(",")[0];
         const start_row = this.Position.split(",")[1];
@@ -1142,6 +1214,9 @@ class Pion extends Map {
         return is_visible;
     }
 
+    /**
+     * Centre le pion sur la carte
+     */
     centrer() {
         const col = this.Position.split(",")[0];
         const row = this.Position.split(",")[1];
@@ -1153,13 +1228,20 @@ class Pion extends Map {
         offsetY = canvas.height / 2 - y;
     }
 
-    // Ouvre la fenetre de dialogue de modification d'un pion
+    /**
+     * Ouvre la fenetre de dialogue de modification d'un pion
+     */
     afficher_Details() {
         const col = this.Position.split(",")[0];
         const row = this.Position.split(",")[1];
         afficher_Details(col, row);
     }
 
+    /**
+     * Déplace le pion sur la carte
+     * @param {number} col_end - Colonne de la position d'arrivée
+     * @param {number} row_end - Ligne de la position d'arrivée
+     */
     deplace_a(col_end, row_end) {
         const pos = this.Position.split(",");
         let col_start = parseInt(pos[0], 10);
@@ -1219,6 +1301,13 @@ class Pion extends Map {
         this.sendMessage("Position");
     }
 
+    /**
+     * Sauvegarde au sort
+     * @param {boolean} auto_save - True si la sauvegarde est automatique, false sinon
+     * @param {string} attribut - Attribut sauvegardé
+     * @param {number} modificateur - Modificateur
+     * @returns {number} - Résultat de la sauvegarde
+     */
     sauvegarde_au_sort(auto_save, attribut, modificateur) {
         const jet =
             Math.floor(Math.random() * 6) + 1 +
