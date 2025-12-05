@@ -259,8 +259,6 @@ function start_attaques() {
 
         // Attaque de la 2nde main (si possible)
         if (pion.Arme2 && pion.Arme2 !== "") {
-            // const model = Models.find(m => m.Nom_model === pion.Model);
-            // if (model && model.Escrime >= 6) {
             const init2 = calculateInitiative(pion, 2);
             const attaque2 = new Attaque();
             attaque2.Model = pion.Model;
@@ -459,7 +457,7 @@ function calcul_fdc_def() {
     if (dialog_attaque_2.querySelector(".immobile").checked) return 0;
     if (defenseur.Poitrine < 0) return 0;
 
-    let fdc = model_def.Fdc + (defenseur.B_fdc || 0);
+    let fdc = model_def.fdc() + (defenseur.B_fdc || 0);
 
     // On perd 2 en FdC pour chaque attaquant au corps-à-corps qui a l'avantage
     let malus_FdC = 0;
@@ -508,8 +506,8 @@ function explications_fdc_def() {
     else if (dialog_attaque_2.querySelector(".immobile").checked) explication += `Immobile : FdC = 0<br>`;
     else if (defenseur.Poitrine < 0) explication += `Poitrine gravement blessée : FdC = 0<br>`;
     else {
-        fdc = model_def.Fdc;
-        explication += `Base du modèle : ${model_def.Fdc || 0}<br>`;
+        fdc = model_def.fdc();
+        explication += `Base du modèle : ${model_def.fdc() || 0}<br>`;
 
         if (defenseur.B_fdc !== 0) {
             explication += `Bonus de feinte de corps : ${defenseur.B_fdc || 0}<br>`;
@@ -614,9 +612,9 @@ function calcul_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                score -= Math.max(2 - model_att.Escrime, 0);
+                score -= Math.max(2 - model_att.escrime(), 0);
             } else {
-                score -= Math.max(6 - model_att.Escrime, 0);
+                score -= Math.max(6 - model_att.escrime(), 0);
             }
         }
     }
@@ -670,11 +668,11 @@ function explications_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_att.Escrime, 0)}<br>`;
-                scoreFinal -= Math.max(2 - model_att.Escrime, 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_att.escrime(), 0)}<br>`;
+                scoreFinal -= Math.max(2 - model_att.escrime(), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_att.Escrime, 0)}<br>`;
-                scoreFinal -= Math.max(6 - model_att.Escrime, 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_att.escrime(), 0)}<br>`;
+                scoreFinal -= Math.max(6 - model_att.escrime(), 0);
             }
         }
     }
@@ -719,20 +717,20 @@ function calcul_scr_def() {
             if (defenseur.Arme1 === model_def.Arme_1) competenceArme += model_def.Par_1;
             else if (defenseur.Arme1 === model_def.Arme_2) competenceArme += model_def.Par_2;
             else if (defenseur.Arme1 === model_def.Arme_3) competenceArme += model_def.Par_3;
-            else if (defenseur.Arme1 === "Bouclier") competenceArme += model_def.Par_Bouclier;
+            else if (defenseur.Arme1 === "Bouclier") competenceArme += model_def.par_bouclier();
         }
         if (defenseur.pr2_def && defenseur.Arme2) {
             if (defenseur.Arme2 === model_def.Arme_1) competenceArme += model_def.Par_1;
             else if (defenseur.Arme2 === model_def.Arme_2) competenceArme += model_def.Par_2;
             else if (defenseur.Arme2 === model_def.Arme_3) competenceArme += model_def.Par_3;
-            else if (defenseur.Arme2 === "Bouclier") competenceArme += model_def.Par_Bouclier;
+            else if (defenseur.Arme2 === "Bouclier") competenceArme += model_def.par_bouclier();
         }
         score += competenceArme;
     }
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        score += model_def.Esquive;
+        score += model_def.esquive();
         if (defenseur.Nb_action > 0) {
             score -= defenseur.Nb_action;
         }
@@ -742,9 +740,9 @@ function calcul_scr_def() {
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                score -= Math.max(2 - model_def.Escrime, 0);
+                score -= Math.max(2 - model_def.escrime(), 0);
             } else {
-                score -= Math.max(6 - model_def.Escrime, 0);
+                score -= Math.max(6 - model_def.escrime(), 0);
             }
         }
     }
@@ -776,13 +774,13 @@ function explications_scr_def() {
             if (defenseur.Arme1 === model_def.Arme_1) competenceArme += model_def.Par_1;
             else if (defenseur.Arme1 === model_def.Arme_2) competenceArme += model_def.Par_2;
             else if (defenseur.Arme1 === model_def.Arme_3) competenceArme += model_def.Par_3;
-            else if (defenseur.Arme1 === "Bouclier") competenceArme += model_def.Par_Bouclier;
+            else if (defenseur.Arme1 === "Bouclier") competenceArme += model_def.par_bouclier();
         }
         if (defenseur.pr2_def && defenseur.Arme2) {
             if (defenseur.Arme2 === model_def.Arme_1) competenceArme += model_def.Par_1;
             else if (defenseur.Arme2 === model_def.Arme_2) competenceArme += model_def.Par_2;
             else if (defenseur.Arme2 === model_def.Arme_3) competenceArme += model_def.Par_3;
-            else if (defenseur.Arme2 === "Bouclier") competenceArme += model_def.Par_Bouclier;
+            else if (defenseur.Arme2 === "Bouclier") competenceArme += model_def.par_bouclier();
         }
         explication += `Plus la Compétence de parade : ${competenceArme}<br>`;
         scoreFinal = defenseur.jet_def - 10 + competenceArme;
@@ -790,20 +788,20 @@ function explications_scr_def() {
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        explication += `Plus la Compétence d'esquive : ${model_def.Esquive}<br>`;
+        explication += `Plus la Compétence d'esquive : ${model_def.esquive()}<br>`;
         if ((defenseur.Nb_action || 0) > 0) explication += `Moins le Nombre d'actions : ${-defenseur.Nb_action}<br>`;
-        scoreFinal = defenseur.jet_def - 10 + (model_def.Esquive || 0) - (defenseur.Nb_action || 0);
+        scoreFinal = defenseur.jet_def - 10 + (model_def.esquive() || 0) - (defenseur.Nb_action || 0);
     }
 
     // Malus d'escrime pour combat à deux armes
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_def.Escrime, 0)}<br>`;
-                scoreFinal -= Math.max(2 - model_def.Escrime, 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_def.escrime(), 0)}<br>`;
+                scoreFinal -= Math.max(2 - model_def.escrime(), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_def.Escrime, 0)}<br>`;
-                scoreFinal -= Math.max(6 - model_def.Escrime, 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_def.escrime(), 0)}<br>`;
+                scoreFinal -= Math.max(6 - model_def.escrime(), 0);
             }
         }
     }

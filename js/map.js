@@ -1219,30 +1219,69 @@ class Pion extends Map {
         this.sendMessage("Position");
     }
 
-    sauvegarde_au_sort(attribut, modificateur) {
-        const model = Models.find(x => x.Nom_model === this.Model);
+    sauvegarde_au_sort(auto_save, attribut, modificateur) {
         const jet =
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1;
+        const magicien = Pions.find((p) => p.Attaquant);
+        let model = null
 
+        if (auto_save) {
+            model = Models.find(x => x.Nom_model === magicien.Model);
+        }
+        else {
+            model = Models.find(x => x.Nom_model === this.Model);
+        }
+
+        let res = 0;
         switch (attribut) {
             case "Con":
-                return model.Constitution + parseInt(modificateur, 10) - jet;
+                res = model.Constitution;
+                break;
             case "Cor":
-                return model.coordination() + parseInt(modificateur, 10) - jet;
+                res = model.coordination();
+                break;
             case "Vol":
-                return model.Volonte + parseInt(modificateur, 10) - jet;
+                res = model.Volonte;
+                break;
             case "Abs":
-                return model.Abstraction + parseInt(modificateur, 10) - jet;
+                res = model.Abstraction;
+                break;
             case "Foi":
-                return model.Foi + parseInt(modificateur, 10) - jet;
+                res = model.Foi;
+                break;
             case "Mag":
-                return model.Magie + parseInt(modificateur, 10) - jet;
+                res = model.Magie;
+                break;
             case "6eS":
-                return model.sixieme_sens() + parseInt(modificateur, 10) - jet;
+                res = model.sixieme_sens();
+                break;
+            case "Mem":
+                res = model.Memoire;
+                break;
+            case "NM":
+                res = model.niveau_mental();
+                break;
+            case "Per":
+                res = model.Perception;
+                break;
+            case "Thp":
+                res = model.Telepathie;
+                break;
+            case "VM":
+                res = model.Vm;
+                break;
+            case "Cha":
+                res = model.Charisme;
+                break;
+            default:
+                return null;
         }
-        return null;
+
+        res += parseInt(modificateur, 10) - jet;
+
+        return (auto_save ? -res : res);
     }
 }
 let Pions = new Array;
@@ -1806,16 +1845,28 @@ canvas.addEventListener("mousemove", (event) => {
         if (w < 0) SelectRectangle.x = x2 + offsetX;
         if (h < 0) SelectRectangle.y = y2 + offsetY;
 
+        // La présence du magicien indique que l'on selectionne les cibles du sortilège
+        const magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null);
+
         hexMap.forEach(hex => {
             let hexX = hex.col * hexHSpacing;
             let hexY = hex.row * hexVSpacing + ((hex.col % 2 + 2) % 2) * (hexHeight / 2);
             const p = Pions.find(x => x.Position === hex.col + "," + hex.row);
             if (p != null && typeof p != "undefined") {
-                p.Selected =
-                    hexX >= Math.min(x1, x2) &&
-                    hexX <= Math.max(x1, x2) &&
-                    hexY >= Math.min(y1, y2) &&
-                    hexY <= Math.max(y1, y2);
+                if (magicien != null) {
+                    p.Cible_sort =
+                        hexX >= Math.min(x1, x2) &&
+                        hexX <= Math.max(x1, x2) &&
+                        hexY >= Math.min(y1, y2) &&
+                        hexY <= Math.max(y1, y2);
+                }
+                else {
+                    p.Selected =
+                        hexX >= Math.min(x1, x2) &&
+                        hexX <= Math.max(x1, x2) &&
+                        hexY >= Math.min(y1, y2) &&
+                        hexY <= Math.max(y1, y2);
+                }
             }
         });
         Map.generateHexMap();

@@ -14,7 +14,9 @@ class Arme {
      */
     constructor(data = {}) {
         // Propriétés de base
-        this.Nom_arme = data.Nom_arme || "";
+        this.Nom_arme = data.Nom_arme || null;
+        this.Competence = data.Competence || null;
+        this.Facteur_parade = data.Facteur_parade || null;
         this.Is_personnel = data.Is_personnel || false;
         this.Deux_mains = data.Deux_mains || false;
         this.A_projectile = data.A_projectile || false;

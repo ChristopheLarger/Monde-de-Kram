@@ -19,13 +19,8 @@ class Model {
         this.Is_joueur = data.Is_joueur || false;
         this.Capacites = data.Capacites || "";
         this.Etat = data.Etat || "";
-        
-        // Statistiques de base
-        this.Fdc = data.Fdc || null;
-        this.Escrime = data.Escrime || null;
-        this.Theognosie = data.Theognosie || null;
-        this.Liste_pretre = data.Liste_pretre || null;
 
+        // Statistiques
         this.Pm = data.Pm || null;
         this.Pp = data.Pp || null;
 
@@ -33,33 +28,27 @@ class Model {
         this.Constitution = data.Constitution || null;
         this.Vp = data.Vp || null;
         this.Perception = data.Perception || null;
+
         this.Vm = data.Vm || null;
-        this.Abstraction = data.Abstraction || null;
         this.Volonte = data.Volonte || null;
+        this.Abstraction = data.Abstraction || null;
+        this.Charisme = data.Charisme || null;
+
+        this.Adaptation = data.Adaptation || null;
+        this.Combat = data.Combat || null;
         this.Foi = data.Foi || null;
         this.Magie = data.Magie || null;
-        this.Adaptation = data.Adaptation || null;
-        
-        // États temporaires maximum
+        this.Memoire = data.Memoire || null;
+        this.Telepathie = data.Telepathie || null;
+
+        // États
         this.Fatigue = data.Fatigue || null;
         this.Concentration = data.Concentration || 0;
-        
+        this.Liste_pretre = data.Liste_pretre || null;
+
         // Capacités de combat
         this.Ambidextre = data.Ambidextre || false;
-        
-        // Armes et compétences
-        this.Arme_1 = data.Arme_1 || null;
-        this.Att_1 = data.Att_1 || null;
-        this.Par_1 = data.Par_1 || null;
-        this.Arme_2 = data.Arme_2 || null;
-        this.Att_2 = data.Att_2 || null;
-        this.Par_2 = data.Par_2 || null;
-        this.Arme_3 = data.Arme_3 || null;
-        this.Att_3 = data.Att_3 || null;
-        this.Par_3 = data.Par_3 || null;
-        this.Par_Bouclier = data.Par_Bouclier || 0;
-        this.Esquive = data.Esquive || 0;
-        
+
         // Protection par zone
         this.Armure_tete = data.Armure_tete || 0;
         this.Armure_poitrine = data.Armure_poitrine || 0;
@@ -68,7 +57,7 @@ class Model {
         this.Armure_brasd = data.Armure_brasd || 0;
         this.Armure_jambeg = data.Armure_jambeg || 0;
         this.Armure_jambed = data.Armure_jambed || 0;
-        
+
         // Points de vie par zone
         this.Pdv = data.Pdv || 0;
         this.Tete = data.Tete || 0;
@@ -81,7 +70,7 @@ class Model {
 
         if (this.Fatigue === null || this.Fatigue < 1) this.Fatigue = 2 * this.Constitution + 4;
     }
-    
+
     /**
      * Calcule le malus pour l'utilisation de la deuxième main
      * @returns {number} Le malus à appliquer
@@ -97,6 +86,120 @@ class Model {
 
     sixieme_sens() {
         return Math.round((this.Perception + this.Adaptation) / 2);
+    }
+
+    niveau_mental() {
+        return Math.round((this.Force + this.Constitution + this.Vp + this.Perception) / 4);
+    }
+
+    niveau_physique() {
+        return Math.round((this.Vm + this.Volonte + this.Abstraction + this.Charisme) / 4);
+    }
+
+    #get_competence_sub(competence) {
+        console.log("---------- get_competence_sub ---------");
+        console.log("competence: ", competence);
+
+        const comp = Competences.find(comp => comp.Nom_competence === competence);
+        if (!comp) return null;
+
+        console.log("comp: ", comp);
+
+        // Calcul de l'attribut
+        let attribut = comp.Attribut;
+        switch (attribut) {
+            case "Ab":
+                attribut = this.Abstraction;
+                break;
+            case "Ch":
+                attribut = this.Charisme;
+                break;
+            case "Co":
+                attribut = this.coordination();
+                break;
+            case "Co+Ch":
+                attribut = (this.coordination() + this.Charisme) / 2;
+                break;
+            case "Co+F":
+                attribut = (this.coordination() + this.Force) / 2;
+                break;
+            case "Co+P":
+                attribut = (this.coordination() + this.Perception) / 2;
+                break;
+            case "Co+V":
+                attribut = (this.coordination() + this.Volonte) / 2;
+                break;
+            case "Co+VM":
+                attribut = (this.coordination() + this.Vm) / 2;
+                break;
+            case "Co+VP":
+                attribut = (this.coordination() + this.Vp) / 2;
+                break;
+            case "NP":
+                attribut = this.niveau_physique();
+                break;
+            case "P+VM":
+                attribut = (this.Perception + this.Vm) / 2;
+                break;
+            case "V":
+                attribut = this.Volonte;
+                break;
+            case "VP":
+                attribut = this.Vp;
+                break;
+            default:
+                attribut = 10; // Attribut par défaut
+                break;
+        }
+        attribut = Math.round((attribut - 10) / 2);
+
+        console.log("attribut: ", attribut);
+
+        // Calcul des degrés
+        let degres = 0;
+        const comp_connue = CompetencesConnues.find(comp =>
+            comp.Nom_model === this.Nom_model &&
+            comp.Nom_competence === competence);
+        if (comp_connue) degres = comp_connue.Degres;
+
+        console.log("comp_connue: ", comp_connue);
+        console.log("degres: ", degres);
+
+        return comp.Base + attribut + degres;
+    }
+
+    get_competence(competence) {
+        console.log("---------- get_competence ---------");
+        console.log("competence: ", competence);
+
+        const degres = this.#get_competence_sub(competence);
+        if (degres === null) return null;
+
+        const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
+        console.log("comp_majeure: ", comp_majeure);
+        if (comp_majeure === null) return degres;
+
+        const degres_majeurs = this.#get_competence_sub(comp_majeure);
+        console.log("degres_majeurs: ", degres_majeurs);
+        if (degres_majeurs === null) return null;
+
+        return degres + degres_majeurs;
+    }
+
+    fdc() {
+        return this.get_competence("Feinte de corps");
+    }
+    theognosie() {
+        return this.get_competence("Theognosie");
+    }
+    par_bouclier() {
+        return this.get_competence("Parade bouclier");
+    }
+    esquive() {
+        return this.get_competence("Esquive");
+    }
+    escrime() {
+        return this.get_competence("Escrime");
     }
 }
 
