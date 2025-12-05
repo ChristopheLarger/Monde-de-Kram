@@ -526,7 +526,9 @@ function createListeModal(Nom_liste) {
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
           else if (model.Liste_pretre) {
-            const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
+            const listePretre = Listes.find(
+              (l) => l.Nom_liste === model.Liste_pretre
+            );
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
               // Pour la liste jumelée, limite à 2/3 de Theognosie (arrondi)
               const limiteJumelee = Math.floor((2 * model.get_competence("Theognosie")) / 3);
@@ -539,8 +541,7 @@ function createListeModal(Nom_liste) {
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
-        }
-        else  {
+        } else {
           spellNode.style.color = "";
           spellNode.style.backgroundColor = "";
         }
@@ -720,6 +721,22 @@ function createListeModal(Nom_liste) {
   // Gestion de la fermeture
   closeBtn.addEventListener("click", function () {
     document.body.removeChild(modal);
+    // Mettre en vert les listes des sorts connus du personnage sélectionné
+    // x = n'importe quel element de liste
+    Listes.forEach((x) => {
+      const element = document.getElementById(getShortName(x.Nom_liste));
+      if (element) {
+        element.style.color = "";
+        element.style.backgroundColor = "";
+      }
+    });
+    SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
+      const element = document.getElementById(getShortName(x.Nom_liste));
+      if (element) {
+        element.style.color = "white";
+        element.style.backgroundColor = "green";
+      }
+    });
   });
 
   modal.addEventListener("click", function (event) {

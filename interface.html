@@ -29,7 +29,8 @@
         style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between;">
 
         <!-- Outils de terrain et formes -->
-        <div style="width: 500px; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
+        <div
+            style="width: 500px; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -791,7 +792,110 @@
         </div>
     </div>
 </div>
-
+<!-- === MODALE DE DÉTAILS DU MODÈLE PJ === -->
+<dialog id="modal_model_pj" class="modal_model_pj" open
+    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div class="modal_model_pj_content">
+        <span class="close_model_pj">&times;</span>
+        <h2>Détails du Modèle</h2>
+        <div id="model_details_content_pj" style="width: auto; height: auto; font-size: x-large; padding: 20px;">
+            <p>Nom du modèle : <span class="nom_model_pj"></span></p>
+            <p>Description du modèle : <span class="description_model_pj"></span></p>
+            <p >Caractéristiques du modèle : <span class="caracteristiques_model_pj" ></span>
+                <table style="width: 100%; white-space: nowrap;">
+                    <tr>
+                        <td></td>
+                        <td>Race</td>
+                        <td><span class="race_model_pj"></span></td>
+                        <td></td>
+                        <td>Expérience</td>
+                        <td><span class="experience_model_pj"></span></td>
+                        <td></td>
+                        <td>Score</td>
+                        <td><span class="niveau_model_pj"></span></td>
+                        <td></td>
+                        <td>Ajustement</td>
+                        <td><span class="ajustement_model_pj"></span></td></tr>
+                    <tr>
+                        <td>Force :</td>
+                        <td><span class="force_model_pj"></span></td>
+                        
+                    </tr>
+                    <tr>
+                        <td>Constitution :</td>
+                        <td><span class="constitution_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Vivacité physique :</td>
+                        <td><span class="vitalite_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Perception :</td>
+                        <td><span class="perception_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Niveau physique :</td>
+                        <td><span class="niveau_physique_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Vivacité mentale :</td>
+                        <td><span class="vivacite_mentale_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Volonté :</td>
+                        <td><span class="volonte_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Abstraction :</td>
+                        <td><span class="abstraction_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Charisme :</td>
+                        <td><span class="charisme_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Niveau mental :</td>
+                        <td><span class="niveau_mental_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Adaptation :</td>
+                        <td><span class="adaptation_model_pj"></span></td>
+                    </tr>
+                            <tr>
+                        <td>Combat :</td>
+                        <td><span class="combat_model_pj"></span></td>
+                    </tr>
+                        <td>Foi :</td>
+                        <td><span class="foi_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Magie :</td>
+                        <td><span class="magie_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Memoire :</td>
+                        <td><span class="memoire_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Telepathie :</td>
+                        <td><span class="telepathie_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Sixieme sens :</td>
+                        <td><span class="sixieme_sens_model_pj"></span></td>
+                    </tr>
+                    <tr>
+                        <td>Coordination :</td>
+                        <td><span class="coordination_model_pj"></span></td>
+                </table>
+            </p>
+            <p>Compétences du modèle : <span class="competences_model_pj"></span></p>
+            <p>Equipement du modèle : <span class="equipement_model_pj"></span></p>
+            <p>Inventaire du modèle : <span class="inventaire_model_pj"></span></p>
+            <p>Objets du modèle : <span class="objets_model_pj"></span></p>
+        </div>
+    </div>
+</dialog>
 <!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
 <!-- Fenêtre pour choisir les paramètres d'un sort (fatigue, concentration) -->
 <dialog id="dialog_sort_1" style="font-size: x-large; white-space: nowrap;">
@@ -991,7 +1095,8 @@
         <tr>
             <td></td>
             <td>Tête :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_tete" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_tete"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
             <td>Feinte de corps :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_fdc"
@@ -1004,7 +1109,8 @@
         <tr>
             <td></td>
             <td>Bras Gauche :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_brasg" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasg"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
             <td>Attaque :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_att"
@@ -1017,7 +1123,8 @@
         <tr>
             <td></td>
             <td>Bras Droit :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_brasd" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_brasd"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
             <td>Défense :&nbsp;</td>
             <td style="text-align: center;"><input type="text" class="b_def"
@@ -1026,25 +1133,29 @@
         <tr>
             <td></td>
             <td>Poitrine :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_poitrine" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_poitrine"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td></td>
             <td>Abdomen :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_abdomen" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_abdomen"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td></td>
             <td>Jambe Gauche :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_jambeg" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambeg"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
         </tr>
         <tr>
             <td></td>
             <td>Jambe Droite :&nbsp;</td>
-            <td style="text-align: center;"><input type="text" class="armure_jambed" style="width: 35px; font-size: x-large; text-align: center;"></td>
+            <td style="text-align: center;"><input type="text" class="armure_jambed"
+                    style="width: 35px; font-size: x-large; text-align: center;"></td>
             <td>&nbsp;</td>
         </tr>
     </table>
