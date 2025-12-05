@@ -518,15 +518,24 @@ function createListeModal(Nom_liste) {
             sc.Nom_sort === sort.Nom_sort
         );
         const model = Models.find((m) => m.Nom_model === m_selected.Model);
-        
-        if (model && model.Theognosie !== null && model.Theognosie !== undefined) {
+
+        if (
+          model &&
+          model.Theognosie !== null &&
+          model.Theognosie !== undefined
+        ) {
           // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= model.Theognosie) {
+          if (
+            model.Liste_pretre === Nom_liste &&
+            sort.Niveau <= model.Theognosie
+          ) {
             isKnown = true;
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
           else if (model.Liste_pretre) {
-            const listePretre = Listes.find((l) => l.Nom_liste === model.Liste_pretre);
+            const listePretre = Listes.find(
+              (l) => l.Nom_liste === model.Liste_pretre
+            );
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
               // Pour la liste jumelée, limite à 3/5 de Theognosie (arrondi)
               const limiteJumelee = Math.floor((3 * model.Theognosie) / 5);
@@ -539,8 +548,7 @@ function createListeModal(Nom_liste) {
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
-        }
-        else  {
+        } else {
           spellNode.style.color = "";
           spellNode.style.backgroundColor = "";
         }
@@ -724,6 +732,22 @@ function createListeModal(Nom_liste) {
   // Gestion de la fermeture
   closeBtn.addEventListener("click", function () {
     document.body.removeChild(modal);
+    // Mettre en vert les listes des sorts connus du personnage sélectionné
+    // x = n'importe quel element de liste
+    Listes.forEach((x) => {
+      const element = document.getElementById(getShortName(x.Nom_liste));
+      if (element) {
+        element.style.color = "";
+        element.style.backgroundColor = "";
+      }
+    });
+    SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
+      const element = document.getElementById(getShortName(x.Nom_liste));
+      if (element) {
+        element.style.color = "white";
+        element.style.backgroundColor = "green";
+      }
+    });
   });
 
   modal.addEventListener("click", function (event) {

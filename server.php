@@ -118,16 +118,16 @@ class ChatServer implements MessageComponentInterface
         } else {
 
             // Préparation de la requête SQL de mise à jour
+        
             $query = "SELECT * FROM sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
 
             $stmt = $conn->prepare($query);
             $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
             $stmt->execute();
             $resultMysql = $stmt->get_result();
-            echo $resultMysql->num_rows . "\n";
 
             if ($resultMysql->num_rows > 0) {
-                $sql = "DELETE sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
+                $sql = "DELETE FROM sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
             } else {
                 $sql = "INSERT INTO sort_connu (Nom_model, Nom_liste, Nom_sort) VALUES (?, ?, ?)";
             }

@@ -2381,3 +2381,9 @@ dialog_sort_2.querySelectorAll("span").forEach((span) => {
     radio.click();
   });
 });
+
+function createModalDialog() {
+  const modal = document.querySelector(".model");
+  modal.style.display = "flex";
+
+}
