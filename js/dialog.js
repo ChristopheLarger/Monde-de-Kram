@@ -338,7 +338,7 @@ function afficher_Details(col, row) {
         " (" +
         m_selected.Incantation +
         " s / " +
-        expurger_incantation(sort.Incantation) +
+        expurger_temps_sort(sort.Incantation) +
         ")";
     } else {
       dialog_details_2.querySelector(".liste").textContent = "--";
@@ -969,25 +969,6 @@ function afficher_param_sort(sort) {
   dialog_sort_1.querySelector(".fatigue_cout").disabled = true;
   dialog_sort_1.querySelector(".concentration_cout").disabled = true;
 
-  // Activation/désactivation des options selon les possibilités
-  dialog_sort_1.querySelector(".sort_radio0").disabled = false;
-
-  if (sort.Niveau > m_selected.Concentration) {
-    dialog_sort_1.querySelector(".sort_radio1").disabled = true;
-  } else {
-    dialog_sort_1.querySelector(".sort_radio1").disabled = false;
-  }
-  if (2 * sort.Niveau > m_selected.Concentration) {
-    dialog_sort_1.querySelector(".sort_radio2").disabled = true;
-  } else {
-    dialog_sort_1.querySelector(".sort_radio2").disabled = false;
-  }
-  if (3 * sort.Niveau > m_selected.Concentration) {
-    dialog_sort_1.querySelector(".sort_radio3").disabled = true;
-  } else {
-    dialog_sort_1.querySelector(".sort_radio3").disabled = false;
-  }
-
   dialog_sort_1.showModal();
 }
 
@@ -1018,6 +999,60 @@ function afficher_confirmation_sort() {
   // Activation/désactivation des options selon les possibilités
   dialog_sort_2.querySelector(".fatigue_cout").disabled = true;
   dialog_sort_2.querySelector(".concentration_cout").disabled = true;
+
+  dialog_sort_2.querySelector("#armures").innerHTML = "";
+  dialog_sort_2.querySelector("#competences").innerHTML = "";
+  dialog_sort_2.querySelector("#attributs").innerHTML = "";
+  dialog_sort_2.querySelector("#etats").innerHTML = "";
+
+  ListeBonus.forEach(bonus => {
+      // Création du div pour le bonus armure
+      const div = document.createElement("div");
+      div.id = "div_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+      div.style.display = "flex";
+      div.style.alignItems = "center";
+      div.style.justifyContent = "space-between";
+
+      // Création du titre Armure
+      const titre = document.createElement("span");
+      titre.id = "titre_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+      titre.innerHTML = bonus.Nom_bonus + " :&nbsp;";
+      div.appendChild(titre);
+
+      // Récupération de la valeur du bonus
+      let valeur = "";
+      const bonus_sort = Bonus_sorts.find((b) =>
+        b.Nom_bonus === bonus.Nom_bonus &&
+        b.Nom_liste === magicien.Nom_liste &&
+        b.Nom_sort === magicien.Nom_sort);
+      if (bonus_sort !== null && typeof bonus_sort !== "undefined") valeur = bonus_sort.Valeur;
+
+        // Création du champ Armure
+      const champs = document.createElement("input");
+      champs.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+      champs.type = "text";
+      champs.style.width = "35px";
+      champs.style.textAlign = "center";
+      champs.style.fontSize = "x-large";
+      champs.value = valeur;
+      div.appendChild(champs);
+
+      switch (bonus.Nature) {
+        case "Armure":
+          dialog_sort_2.querySelector("#armures").appendChild(div);
+          break;
+        case "Compétence":
+        case "Divers":
+          dialog_sort_2.querySelector("#competences").appendChild(div);
+          break;
+        case "Attribut":
+          dialog_sort_2.querySelector("#attributs").appendChild(div);
+          break;
+        case "Etat":
+          dialog_sort_2.querySelector("#etats").appendChild(div);
+          break;
+      }
+  });
 
   dialog_sort_2.showModal();
 }
@@ -1766,7 +1801,7 @@ dialog_attaque_2
   .addEventListener("mouseover", function (event) {
     const tooltip = dialog_attaque_2.querySelector(".tooltip");
     const dialog = dialog_attaque_2.getBoundingClientRect();
-    tooltip.style.left = event.clientX - dialog.left -250 + "px";
+    tooltip.style.left = event.clientX - dialog.left - 250 + "px";
     tooltip.style.top = event.clientY - dialog.top + 10 + "px";
     tooltip.style.display = "block";
     tooltip.innerHTML = explications_scr_att();
@@ -2204,7 +2239,7 @@ dialog_sort_2
   .querySelector(".prompt_save")
   .addEventListener("input", function (event) {
     if (event.target.value === "-" || event.target.value === "") {
-      dialog_sort_2.querySelector(".res_save").textContent = "Aucune";
+      dialog_sort_2.querySelector(".res_save").textContent = "(Néant)";
       return;
     }
 
@@ -2251,6 +2286,7 @@ dialog_sort_2
     formula = formula.replace(/mag\-/g, "Mag-");
 
     formula = formula.replace(/6esens/g, "6eS");
+    formula = formula.replace(/6es/g, "6eS");
 
     formula = formula.replace(/mem$/g, "Mem");
     formula = formula.replace(/mem\+/g, "Mem+");
@@ -2287,6 +2323,11 @@ dialog_sort_2
     );
     if (isNaN(modificateur)) modificateur = 0;
 
+    console.log("Base :", base);
+    console.log("Operateur :", operateur);
+    console.log("Modificateur :", modificateur);
+    console.log("Auto_save :", auto_save);
+
     if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
       dialog_sort_2.querySelector(".res_save").textContent = "(???)";
     } else {
@@ -2312,7 +2353,7 @@ dialog_sort_2
   .querySelector(".prompt_degats")
   .addEventListener("input", function (event) {
     if (event.target.value === "-" || event.target.value === "") {
-      dialog_sort_2.querySelector(".res_degats").textContent = "Aucun";
+      dialog_sort_2.querySelector(".res_degats").textContent = "(Néant)";
       return;
     }
 
@@ -2334,7 +2375,7 @@ dialog_sort_2
     });
   });
 
-// Gestion des clics sur les spans pour sélectionner le type de dégâts
+// Gestion des clics sur les spans pour sélectionner le type de dégâts / durée
 dialog_sort_2.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
     const radio = event.target

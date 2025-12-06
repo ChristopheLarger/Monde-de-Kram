@@ -210,6 +210,33 @@
             return $js;
         }
 
+        /**
+         * Génère le code JavaScript pour initialiser les bonus
+         */
+        function generateBonusJS($row, $index)
+        {
+            $js = "ListeBonus[$index] = new Bonus({\n";
+            $js .= "    Nom_bonus: " . toJS($row['Nom_bonus']) . ",\n";
+            $js .= "    Nature: " . toJS($row['Nature']) . ",\n";
+            $js .= "    Ordre: " . toJS($row['Ordre'], 'int') . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
+        /**
+         * Génère le code JavaScript pour initialiser les bonus de sort
+         */
+        function generateBonusSortJS($row, $index)
+        {
+            $js = "Bonus_sorts[$index] = new Bonus_sort({\n";
+            $js .= "    Nom_bonus: " . toJS($row['Nom_bonus']) . ",\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
+            $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
+            $js .= "    Valeur: " . toJS($row['Valeur'], 'int') . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
         // === CONNEXION À LA BASE DE DONNÉES ===
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
         $conn->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
@@ -312,6 +339,30 @@
                 $ligne = 0;
                 while ($row = $result->fetch_assoc()) {
                     echo generateCompetenceConnueJS($row, $ligne);
+                    $ligne++;
+                }
+            }
+
+            // === CHARGEMENT DES BONUS ===
+            $query = "SELECT * FROM bonus ORDER BY Nature ASC, Ordre ASC, Nom_bonus ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateBonusJS($row, $ligne);
+                    $ligne++;
+                }
+            }
+
+            // === CHARGEMENT DES BONUS DE SORT ===
+            $query = "SELECT * FROM bonus_sort ORDER BY Nom_liste ASC, Nom_sort ASC, Nom_bonus ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateBonusSortJS($row, $ligne);
                     $ligne++;
                 }
             }

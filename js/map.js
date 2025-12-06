@@ -447,8 +447,8 @@ class Map {
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(n => n.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-                if (p.is_cac()) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
-                if (p.is_dist()) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
+                // if (p.is_cac()) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
+                // if (p.is_dist()) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
                 if (p.Concentration > 0) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
                 if (p.Auto) ctx.drawImage(image_auto, x - hexSize + imgSize / 24, y - imgSize / 6, imgSize / 3, imgSize / 3);
             }
@@ -896,8 +896,6 @@ class Pion extends Map {
 
         this.Titre = this.Model + (this.Indice === 0 ? "" : (" " + this.Indice.toString().padStart(2, "0")));
 
-        this.Arme1 = m.Arme_1;
-
         this.Fatigue = m.Fatigue;
         this.Concentration = m.Concentration;
         this.Pdv = m.Pdv;
@@ -931,12 +929,12 @@ class Pion extends Map {
         const is_monster = Armes.some(arme => arme.Nom_arme === this.Model)
 
         if (is_monster) {
-        // Sélection de l'arme par défaut si le personnage est un monstre
-        this.Arme1 = this.Model;
+            // Sélection de l'arme par défaut si le personnage est un monstre
+            this.Arme1 = this.Model;
         }
         else {
-        // Sélection des armes par défaut si le personnage n'est pas un monstre
-        let comp_max = -99;
+            // Sélection des armes par défaut si le personnage n'est pas un monstre
+            let comp_max = -99;
             let arme_max = "";
             Armes.forEach(arme => {
                 if (arme.Nom_arme === "Bouclier") return;
@@ -947,7 +945,10 @@ class Pion extends Map {
                 }
             });
             this.Arme1 = arme_max;
-            this.Arme2 = "Bouclier";
+            
+            const w = Armes.find(x => x.Nom_arme === this.Arme1);
+            if (w !== null && typeof w != "undefined" && w.Deux_main) this.Arme2 = "";
+            else this.Arme2 = "Bouclier";
         }
     }
 
@@ -1011,44 +1012,6 @@ class Pion extends Map {
         Map.generateHexMap();
         Map.drawHexMap();
         return true;
-    }
-
-    /**
-     * Vérifie si le pion est en combat au corps à corps
-     * @returns {boolean} - True si le pion est en combat au corps à corps, false sinon
-     */
-    is_cac() {
-        const model = Models.find(x => x.Nom_model === this.Model);
-        if (model == null || typeof model == "undefined") return false;
-
-        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
-        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
-        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
-
-        if (w1 && typeof w1 !== "undefined" && !w1.A_distance) return true;
-        if (w2 && typeof w2 !== "undefined" && !w2.A_distance) return true;
-        if (w3 && typeof w3 !== "undefined" && !w3.A_distance) return true;
-
-        return false;
-    }
-
-    /**
-     * Vérifie si le pion est en combat à distance
-     * @returns {boolean} - True si le pion est en combat à distance, false sinon
-     */
-    is_dist() {
-        const model = Models.find(x => x.Nom_model === this.Model);
-        if (model == null || typeof model == "undefined") return false;
-
-        const w1 = Armes.find(x => x.Nom_arme === model.Arme_1);
-        const w2 = Armes.find(x => x.Nom_arme === model.Arme_2);
-        const w3 = Armes.find(x => x.Nom_arme === model.Arme_3);
-
-        if (w1 && typeof w1 !== "undefined" && w1.A_distance) return true;
-        if (w2 && typeof w2 !== "undefined" && w2.A_distance) return true;
-        if (w3 && typeof w3 !== "undefined" && w3.A_distance) return true;
-
-        return false;
     }
 
     /**

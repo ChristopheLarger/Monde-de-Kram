@@ -364,12 +364,13 @@ function next_attaque() {
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
 
-        // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
-        Pions.forEach(pion => { pion.Cible_sort = false; });
-
         // Affichage du panneau d'information du sort
         const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
         createSpellInfo(document.body, sort);
+
+        // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
+        Pions.forEach(pion => { pion.Cible_sort = false; });
+        if (sort.zone === "le magicien") attaquant.Cible_sort = true;
 
         // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
         document.removeEventListener("click", closeSpellInfo);
@@ -724,12 +725,14 @@ function calcul_scr_def() {
     if (defenseur.pr1_def || defenseur.pr2_def) {
         let competenceArme = 0;
 
-        const Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
+        let Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
+        if (typeof Arme1 === "undefined") Arme1 = null;
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
             competenceArme += Arme1.Facteur_parade * model_def.get_competence(Arme1.Competence);
         }
 
-        const Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
+        let Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
+        if (typeof Arme2 === "undefined") Arme2 = null;
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
             competenceArme += Arme2.Facteur_parade * model_def.get_competence(Arme2.Competence);
         }

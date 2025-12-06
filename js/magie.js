@@ -328,22 +328,35 @@ function closeSpellInfo(event) {
  * @param {string} Incantation - Le temps d'incantation du sort
  * @returns {number} Le nombre de secondes
  */
-function expurger_incantation(Incantation) {
-  let temps = 0;
-  if (Incantation === "2 s (4s)") temps = 2;
-  if (Incantation === "1/10 s") temps = 0.1;
-  if (Incantation.endsWith(" s"))
-    temps = parseInt(Incantation.replace(" s", ""));
-  if (Incantation.endsWith(" min"))
-    temps = 60 * parseInt(Incantation.replace(" min", ""));
-  if (Incantation.endsWith(" minutes"))
-    temps = 60 * parseInt(Incantation.replace(" minutes", ""));
-  if (Incantation.endsWith(" h"))
-    temps = 3600 * parseInt(Incantation.replace(" h", ""));
-  if (Incantation.endsWith(" jour"))
-    temps = 24 * 3600 * parseInt(Incantation.replace(" jour", ""));
-  if (Incantation.endsWith(" semaine"))
-    temps = 7 * 24 * 3600 * parseInt(Incantation.replace(" semaine", ""));
+function expurger_temps_sort(temps_sort) {
+  let temps = -1;
+  if (temps_sort === "1 action") temps = 0;
+  if (temps_sort === "1/10 s") temps = 0.1;
+  if (temps_sort === "2 s (4s)") temps = 2;
+  if (temps_sort === "1 h (20min)") temps = 3600;
+
+  if (temps_sort.endsWith(" s"))
+    temps = parseInt(temps_sort.replace(" s", ""));
+  if (temps_sort.endsWith(" tours"))
+    temps = 5 *parseInt(temps_sort.replace(" tours", ""));
+  if (temps_sort.endsWith(" min"))
+    temps = 60 * parseInt(temps_sort.replace(" min", ""));
+  if (temps_sort.endsWith(" minutes"))
+    temps = 60 * parseInt(temps_sort.replace(" minutes", ""));
+  if (temps_sort.endsWith(" h"))
+    temps = 3600 * parseInt(temps_sort.replace(" h", ""));
+  if (temps_sort.endsWith(" heure"))
+    temps = 3600 * parseInt(temps_sort.replace(" heure", ""));
+  if (temps_sort.endsWith(" jour"))
+    temps = 24 * 3600 * parseInt(temps_sort.replace(" jour", ""));
+  if (temps_sort.endsWith(" semaine"))
+    temps = 7 * 24 * 3600 * parseInt(temps_sort.replace(" semaine", ""));
+  if (temps_sort.endsWith(" mois"))
+    temps = 365.25 * 7 * 24 * 3600 / 12 * parseInt(temps_sort.replace(" mois", ""));
+  if (temps_sort.endsWith(" an"))
+    temps = 365.25 * 7 * 24 * 3600 * parseInt(temps_sort.replace(" an", ""));
+  if (temps_sort.endsWith(" ans"))
+    temps = 365.25 * 7 * 24 * 3600 * parseInt(temps_sort.replace(" ans", ""));
 
   return temps;
 }
@@ -615,7 +628,7 @@ function createListeModal(Nom_liste) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
         m_selected.Nom_liste = sort.Nom_liste;
         m_selected.Nom_sort = sort.Nom_sort;
-        m_selected.Incantation = expurger_incantation(sort.Incantation);
+        m_selected.Incantation = expurger_temps_sort(sort.Incantation);
 
         // Mise à jour du sortilège sélectionné
         if (
@@ -634,7 +647,7 @@ function createListeModal(Nom_liste) {
             " (" +
             m_selected.Incantation +
             " s / " +
-            expurger_incantation(sort.Incantation) +
+            expurger_temps_sort(sort.Incantation) +
             ")";
           afficher_param_sort(sort);
         } else {

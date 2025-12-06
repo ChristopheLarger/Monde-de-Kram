@@ -51,7 +51,7 @@ function send(header, content, copyToChat = false) {
     const message = `${player}: ${header} ${content}`;
     ws.send(message);
     if (copyToChat) {
-        Messages.ecriture_directe(`${header} ${content}`);
+        Messages.ecriture_directe(`"${header}" --> ${content}`);
     }
 }
 
