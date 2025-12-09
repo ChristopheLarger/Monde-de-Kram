@@ -218,7 +218,7 @@
             $js = "ListeBonus[$index] = new Bonus({\n";
             $js .= "    Nom_bonus: " . toJS($row['Nom_bonus']) . ",\n";
             $js .= "    Nature: " . toJS($row['Nature']) . ",\n";
-            $js .= "    Ordre: " . toJS($row['Ordre'], 'int') . "\n";
+            $js .= "    Ordre: " . toJS($row['Ordre'], 'int2') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -232,7 +232,8 @@
             $js .= "    Nom_bonus: " . toJS($row['Nom_bonus']) . ",\n";
             $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
             $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
-            $js .= "    Valeur: " . toJS($row['Valeur'], 'int') . "\n";
+            $js .= "    Success: " . toJS($row['Success'], 'bool') . ",\n";
+            $js .= "    Valeur: " . toJS($row['Valeur'], 'null') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -413,12 +414,12 @@
             const elemental_air = Pion.add("ennemis", "Elémental d'air");
 
             // Simuler un lancement de sort pour le personnage Guilhem
-            // guilhem.Arme1 = "Lancement de sort";
-            // guilhem.Nom_liste = "Liste du contrôle de soi";
-            // guilhem.Nom_sort = "Vivacité physique";
-            // guilhem.Incantation = 2;
+            guilhem.Arme1 = "Lancement de sort";
+            guilhem.Nom_liste = "Liste du feu";
+            guilhem.Nom_sort = "Boule de feu";
+            guilhem.Incantation = 2;
 
-            // next_attaque();
+            next_attaque();
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();

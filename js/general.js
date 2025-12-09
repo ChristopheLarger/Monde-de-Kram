@@ -188,6 +188,13 @@ class LancerDes {
      * @returns {number} Résultat du lancer
      */
     static rollDice(formula) {
+        if (formula === null) return null;
+        
+        // Suppression des espaces
+        formula = formula.replace(/\s+/, ""); 
+
+        if (formula === "") return 0;
+        
         let regex = /^(\d*)$/;
         let match = formula.match(regex);
         if (match) return parseInt(formula, 10);

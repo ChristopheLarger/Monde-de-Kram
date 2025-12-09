@@ -824,8 +824,6 @@ function afficher_defense(phase) {
     dialog_defense_1.querySelector(".main2").innerHTML =
       "Parade 2nde main (" + defenseur.Arme2 + ")";
 
-    console.log("defenseur.Arme2", defenseur.Arme2, "defenseur.Arme2_engagee", defenseur.Arme2_engagee);
-
     // Activation/désactivation des options selon les possibilités
     dialog_defense_1.querySelector(".arme_radio1").disabled =
       (defenseur.Arme1 && defenseur.Arme1_engagee) || defenseur.Esquive;
@@ -977,81 +975,176 @@ function afficher_param_sort(sort) {
  */
 function afficher_confirmation_sort() {
   const magicien = Pions.find((p) => p.Attaquant);
+  const sel_etat_succes = dialog_sort_2.querySelector("#sel_etat_succes");
+  const sel_etat_echec = dialog_sort_2.querySelector("#sel_etat_echec");
 
   // Récupération du sort en cours de lancement
-  // const sort = Sorts.find((s) =>
-  //   s.Nom_liste === magicien.Nom_liste &&
-  //   s.Nom_sort === magicien.Nom_sort);
+  const sort = Sorts.find((s) =>
+    s.Nom_liste === magicien.Nom_liste &&
+    s.Nom_sort === magicien.Nom_sort);
 
   // Initialisation des champs du dialogue
   dialog_sort_2.querySelector(".nom_liste").textContent = magicien.Nom_liste;
   dialog_sort_2.querySelector(".nom_sort").textContent = magicien.Nom_sort;
   dialog_sort_2.querySelector(".fatigue_cout").value = magicien.Fatigue_sort;
-  dialog_sort_2.querySelector(".concentration_cout").value =
-    magicien.Concentration_sort;
+  dialog_sort_2.querySelector(".concentration_cout").value = magicien.Concentration_sort;
 
-  // Réinitialisation des sélections
-  // dialog_sort_2.querySelector(".sort_radio1").checked = true;
-  // dialog_sort_2.querySelector(".sort_radio2").checked = false;
-  // dialog_sort_2.querySelector(".sort_radio3").checked = false;
-  // dialog_sort_2.querySelector(".sort_radio0").checked = false;
+  // Définition des valeurs et simulation des événements input
+  const prompt_save = dialog_sort_2.querySelector(".prompt_save");
+  prompt_save.value = sort.Sauvegarde;
+  prompt_save.dispatchEvent(new Event('input', { bubbles: true }));
+
+  const bonus_sort = Bonus_sorts.find((b) =>
+    b.Nom_bonus === "Dégâts" &&
+    b.Nom_liste === magicien.Nom_liste &&
+    b.Nom_sort === magicien.Nom_sort);
+  const prompt_degats = dialog_sort_2.querySelector(".prompt_degats");
+  prompt_degats.value = bonus_sort.Valeur;
+  prompt_degats.dispatchEvent(new Event('input', { bubbles: true }));
+
+  const prompt_duree_succes = dialog_sort_2.querySelector(".prompt_duree_succes");
+  prompt_duree_succes.value = sort.Duree;
+  prompt_duree_succes.dispatchEvent(new Event('input', { bubbles: true }));
+
+  const prompt_duree_echec = dialog_sort_2.querySelector(".prompt_duree_echec");
+  prompt_duree_echec.value = sort.Duree;
+  prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
 
   // Activation/désactivation des options selon les possibilités
   dialog_sort_2.querySelector(".fatigue_cout").disabled = true;
   dialog_sort_2.querySelector(".concentration_cout").disabled = true;
 
+  // Nettoyage et ajout d'une option vide
   dialog_sort_2.querySelector("#armures").innerHTML = "";
   dialog_sort_2.querySelector("#competences").innerHTML = "";
   dialog_sort_2.querySelector("#attributs").innerHTML = "";
-  dialog_sort_2.querySelector("#etats").innerHTML = "";
+  dialog_sort_2.querySelector("#divers").innerHTML = "";
+  while (sel_etat_succes.options.length > 0) sel_etat_succes.removeChild(sel_etat_succes.lastChild);
+  while (sel_etat_echec.options.length > 0) sel_etat_echec.removeChild(sel_etat_echec.lastChild);
 
-  ListeBonus.forEach(bonus => {
-      // Création du div pour le bonus armure
-      const div = document.createElement("div");
-      div.id = "div_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
-      div.style.display = "flex";
-      div.style.alignItems = "center";
-      div.style.justifyContent = "space-between";
+  // Ajout d'une option vide dans les Etats de réussite et d'échec
+  let nouvelleOption = document.createElement("option");
+  nouvelleOption.value = "";
+  nouvelleOption.textContent = "";
+  sel_etat_succes.appendChild(nouvelleOption);
+  sel_etat_echec.appendChild(nouvelleOption.cloneNode(true));
 
-      // Création du titre Armure
-      const titre = document.createElement("span");
-      titre.id = "titre_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
-      titre.innerHTML = bonus.Nom_bonus + " :&nbsp;";
-      div.appendChild(titre);
+  // Ajout des options pour les Etats de réussite et d'échec
+  ListeBonus.filter(bonus => bonus.Nature === "Etat").forEach(bonus => {
+    nouvelleOption = document.createElement("option");
+    nouvelleOption.value = bonus.Nom_bonus;
+    nouvelleOption.textContent = bonus.Nom_bonus;
+    sel_etat_succes.appendChild(nouvelleOption);
+    sel_etat_echec.appendChild(nouvelleOption.cloneNode(true));
 
-      // Récupération de la valeur du bonus
-      let valeur = "";
-      const bonus_sort = Bonus_sorts.find((b) =>
-        b.Nom_bonus === bonus.Nom_bonus &&
-        b.Nom_liste === magicien.Nom_liste &&
-        b.Nom_sort === magicien.Nom_sort);
-      if (bonus_sort !== null && typeof bonus_sort !== "undefined") valeur = bonus_sort.Valeur;
+    // Récupération de la valeur du bonus en cas de réussite
+    let valeur_succes = "";
+    const bonus_sort_succes = Bonus_sorts.find((b) =>
+      b.Nom_bonus === bonus.Nom_bonus &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      b.Success);
+    if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") {
+      sel_etat_succes.value = bonus.Nom_bonus;
+      valeur_succes = bonus_sort_succes.Valeur;
+    }
+    if (valeur_succes != "") {
+      prompt_duree_succes.value = valeur_succes;
+      prompt_duree_succes.dispatchEvent(new Event('input', { bubbles: true }));
+    }
 
-        // Création du champ Armure
-      const champs = document.createElement("input");
-      champs.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
-      champs.type = "text";
-      champs.style.width = "35px";
-      champs.style.textAlign = "center";
-      champs.style.fontSize = "x-large";
-      champs.value = valeur;
-      div.appendChild(champs);
+    // Récupération de la valeur du bonus en cas d'échec
+    let valeur_echec = "";
+    const bonus_sort_echec = Bonus_sorts.find((b) =>
+      b.Nom_bonus === bonus.Nom_bonus &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      !b.Success);
+    if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") {
+      sel_etat_echec.value = bonus.Nom_bonus;
+      valeur_echec = bonus_sort_echec.Valeur;
+    }
+    if (valeur_echec != "") {
+      prompt_duree_echec.value = valeur_echec;
+      prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+  });
 
-      switch (bonus.Nature) {
-        case "Armure":
-          dialog_sort_2.querySelector("#armures").appendChild(div);
-          break;
-        case "Compétence":
-        case "Divers":
-          dialog_sort_2.querySelector("#competences").appendChild(div);
-          break;
-        case "Attribut":
-          dialog_sort_2.querySelector("#attributs").appendChild(div);
-          break;
-        case "Etat":
-          dialog_sort_2.querySelector("#etats").appendChild(div);
-          break;
-      }
+  // Ajout des options pour les autres types de bonus
+  ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
+    // Création du div pour le bonus
+    const div = document.createElement("div");
+    div.id = "div_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+    div.style.display = "flex";
+    div.style.alignItems = "center";
+    div.style.justifyContent = "space-between";
+
+    // Création du titre du bonus
+    const titre = document.createElement("span");
+    titre.id = "titre_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+    titre.innerHTML = bonus.Nom_bonus + " :&nbsp;";
+    div.appendChild(titre);
+
+    // Récupération de la valeur du bonus en cas de réussite
+    let valeur_succes = "";
+    const bonus_sort_succes = Bonus_sorts.find((b) =>
+      b.Nom_bonus === bonus.Nom_bonus &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      b.Success);
+    if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") valeur_succes = bonus_sort_succes.Valeur;
+
+    // Récupération de la valeur du bonus en cas d'échec
+    let valeur_echec = "";
+    const bonus_sort_echec = Bonus_sorts.find((b) =>
+      b.Nom_bonus === bonus.Nom_bonus &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      !b.Success);
+    if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") valeur_echec = bonus_sort_echec.Valeur;
+
+    // Création d'un conteneur pour les 2 champs (positionnés à droite)
+    const conteneurChamps = document.createElement("div");
+    conteneurChamps.style.display = "flex";
+    conteneurChamps.style.alignItems = "center";
+    conteneurChamps.style.gap = "10px";
+    conteneurChamps.style.marginLeft = "auto";
+
+    // Création du champ du Bonus en cas de réussite
+    const champs_succes = document.createElement("input");
+    champs_succes.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_") + "_succes";
+    champs_succes.type = "text";
+    champs_succes.style.width = "35px";
+    champs_succes.style.textAlign = "center";
+    champs_succes.style.fontSize = "x-large";
+    champs_succes.style.backgroundColor = "rgb(192, 255, 192)";
+    champs_succes.value = valeur_succes;
+    conteneurChamps.appendChild(champs_succes);
+
+    // Création du champ du Bonus en cas d'échec
+    const champs_echec = champs_succes.cloneNode(true);
+    champs_echec.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_") + "_echec";
+    champs_echec.style.backgroundColor = "rgb(255, 192, 192)";
+    champs_echec.value = valeur_echec;
+    conteneurChamps.appendChild(champs_echec);
+
+    // Ajout du conteneur à la div principale
+    div.appendChild(conteneurChamps);
+
+    switch (bonus.Nature) {
+      case "Armure":
+        dialog_sort_2.querySelector("#armures").appendChild(div);
+        break;
+      case "Compétence":
+        dialog_sort_2.querySelector("#competences").appendChild(div);
+        break;
+      case "Attribut":
+        dialog_sort_2.querySelector("#attributs").appendChild(div);
+        break;
+      case "Divers":
+        dialog_sort_2.querySelector("#divers").appendChild(div);
+        break;
+    }
   });
 
   dialog_sort_2.showModal();
@@ -2235,159 +2328,203 @@ dialog_sort_2.addEventListener("close", function (event) {
 });
 
 // Gestion du changement de la concentration spécifique
-dialog_sort_2
-  .querySelector(".prompt_save")
-  .addEventListener("input", function (event) {
-    if (event.target.value === "-" || event.target.value === "") {
-      dialog_sort_2.querySelector(".res_save").textContent = "(Néant)";
-      return;
-    }
+dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (event) {
+  if (event.target.value === "-" || event.target.value === "") {
+    dialog_sort_2.querySelector(".res_save").textContent = "(Néant)";
+    return;
+  }
+  let formula = null;
+  let auto_save = false;
 
-    let formula = null;
-    let auto_save = false;
+  formula = event.target.value.toLowerCase().replace(/« (.+) »/g, "$1");
+  formula = formula.replace(/\[(.+)\]/g, "$1");
 
-    formula = event.target.value.toLowerCase().replace(/« (.+) »/g, "$1");
-    formula = formula.replace(/\[(.+)\]/g, "$1");
+  if (formula !== event.target.value.toLowerCase()) auto_save = true;
 
-    if (formula !== event.target.value.toLowerCase()) auto_save = true;
+  formula = formula.replace(/ /g, "");
+  formula = formula.replace(/\t/g, "");
+  formula = formula.replace(/^.*\(/g, "");
+  formula = formula.replace(/\).*$/g, "");
+  formula = formula.replace(/\+n/g, "");
+  formula = formula.replace(/\-n/g, "");
+  formula = formula.replace(/\-var/g, "");
+  formula = formula.replace(/\+nbre/g, "");
+  formula = formula.replace(/spéciale/g, "");
 
-    formula = formula.replace(/ /g, "");
-    formula = formula.replace(/\t/g, "");
-    formula = formula.replace(/^.*\(/g, "");
-    formula = formula.replace(/\).*$/g, "");
-    formula = formula.replace(/\+n/g, "");
-    formula = formula.replace(/\-n/g, "");
-    formula = formula.replace(/\-var/g, "");
-    formula = formula.replace(/\+nbre/g, "");
-    formula = formula.replace(/spéciale/g, "");
+  formula = formula.replace(/c$/g, "Con");
+  formula = formula.replace(/c\+/g, "Con+");
+  formula = formula.replace(/c\-/g, "Con-");
 
-    formula = formula.replace(/c$/g, "Con");
-    formula = formula.replace(/c\+/g, "Con+");
-    formula = formula.replace(/c\-/g, "Con-");
+  formula = formula.replace(/co$/g, "Cor");
+  formula = formula.replace(/co\+/g, "Cor+");
+  formula = formula.replace(/co\-/g, "Cor-");
 
-    formula = formula.replace(/co$/g, "Cor");
-    formula = formula.replace(/co\+/g, "Cor+");
-    formula = formula.replace(/co\-/g, "Cor-");
+  formula = formula.replace(/v$/g, "Vol");
+  formula = formula.replace(/v\+/g, "Vol+");
+  formula = formula.replace(/v\-/g, "Vol-");
 
-    formula = formula.replace(/v$/g, "Vol");
-    formula = formula.replace(/v\+/g, "Vol+");
-    formula = formula.replace(/v\-/g, "Vol-");
+  formula = formula.replace(/ab$/g, "Abs");
+  formula = formula.replace(/ab\+/g, "Abs+");
+  formula = formula.replace(/ab\-/g, "Abs-");
 
-    formula = formula.replace(/ab$/g, "Abs");
-    formula = formula.replace(/ab\+/g, "Abs+");
-    formula = formula.replace(/ab\-/g, "Abs-");
+  formula = formula.replace(/foi$/g, "Foi");
+  formula = formula.replace(/foi\+/g, "Foi+");
+  formula = formula.replace(/foi\-/g, "Foi-");
 
-    formula = formula.replace(/foi$/g, "Foi");
-    formula = formula.replace(/foi\+/g, "Foi+");
-    formula = formula.replace(/foi\-/g, "Foi-");
+  formula = formula.replace(/mag$/g, "Mag");
+  formula = formula.replace(/mag\+/g, "Mag+");
+  formula = formula.replace(/mag\-/g, "Mag-");
 
-    formula = formula.replace(/mag$/g, "Mag");
-    formula = formula.replace(/mag\+/g, "Mag+");
-    formula = formula.replace(/mag\-/g, "Mag-");
+  formula = formula.replace(/6esens/g, "6eS");
+  formula = formula.replace(/6es/g, "6eS");
 
-    formula = formula.replace(/6esens/g, "6eS");
-    formula = formula.replace(/6es/g, "6eS");
+  formula = formula.replace(/mem$/g, "Mem");
+  formula = formula.replace(/mem\+/g, "Mem+");
+  formula = formula.replace(/mem\-/g, "Mem-");
 
-    formula = formula.replace(/mem$/g, "Mem");
-    formula = formula.replace(/mem\+/g, "Mem+");
-    formula = formula.replace(/mem\-/g, "Mem-");
+  formula = formula.replace(/nm$/g, "NM");
+  formula = formula.replace(/nm\+/g, "NM+");
+  formula = formula.replace(/nm\-/g, "NM-");
 
-    formula = formula.replace(/nm$/g, "NM");
-    formula = formula.replace(/nm\+/g, "NM+");
-    formula = formula.replace(/nm\-/g, "NM-");
+  formula = formula.replace(/p$/g, "Per");
+  formula = formula.replace(/p\+/g, "Per+");
+  formula = formula.replace(/p\-/g, "Per-");
 
-    formula = formula.replace(/p$/g, "Per");
-    formula = formula.replace(/p\+/g, "Per+");
-    formula = formula.replace(/p\-/g, "Per-");
+  formula = formula.replace(/thp$/g, "Thp");
+  formula = formula.replace(/thp\+/g, "Thp+");
+  formula = formula.replace(/thp\-/g, "Thp-");
 
-    formula = formula.replace(/thp$/g, "Thp");
-    formula = formula.replace(/thp\+/g, "Thp+");
-    formula = formula.replace(/thp\-/g, "Thp-");
+  formula = formula.replace(/vm$/g, "VM");
+  formula = formula.replace(/vm\+/g, "VM+");
+  formula = formula.replace(/vm\-/g, "VM-");
 
-    formula = formula.replace(/vm$/g, "VM");
-    formula = formula.replace(/vm\+/g, "VM+");
-    formula = formula.replace(/vm\-/g, "VM-");
+  formula = formula.replace(/ch$/g, "Cha");
+  formula = formula.replace(/ch\+/g, "Cha+");
+  formula = formula.replace(/ch\-/g, "Cha-");
 
-    formula = formula.replace(/ch$/g, "Cha");
-    formula = formula.replace(/ch\+/g, "Cha+");
-    formula = formula.replace(/ch\-/g, "Cha-");
+  let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
 
-    let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
+  let operateur = formula.replace(/[^+-]/g, "").charAt(0);
+  if (operateur === "") operateur = "+";
 
-    let operateur = formula.replace(/[^+-]/g, "").charAt(0);
-    if (operateur === "") operateur = "+";
+  let modificateur = parseInt(formula.replace(base, "").replace(/[+-]/g, ""), 10);
+  if (isNaN(modificateur)) modificateur = 0;
 
-    let modificateur = parseInt(
-      formula.replace(base, "").replace(/[+-]/g, ""),
-      10
+  base = (base[0] ?? "").toUpperCase() + (base.slice(1) ?? "").toLowerCase();
+
+  if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
+    dialog_sort_2.querySelector(".res_save").textContent = "(???)";
+  } else {
+    dialog_sort_2.querySelector(".res_save").textContent =
+      "(" + (auto_save ? "[" : "") + base + (auto_save ? "]" : "") + operateur.toString() + modificateur.toString() + ")";
+  }
+
+  // Application des sauvegardes au sort des cibles
+  Pions.filter((p) => p.Cible_sort).forEach((p) => {
+    console.log("Sauvegarde au sort :",
+      p.Titre,
+      p.sauvegarde_au_sort(
+        auto_save,
+        base,
+        operateur.toString() + modificateur.toString()
+      )
     );
-    if (isNaN(modificateur)) modificateur = 0;
-
-    console.log("Base :", base);
-    console.log("Operateur :", operateur);
-    console.log("Modificateur :", modificateur);
-    console.log("Auto_save :", auto_save);
-
-    if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
-      dialog_sort_2.querySelector(".res_save").textContent = "(???)";
-    } else {
-      dialog_sort_2.querySelector(".res_save").textContent =
-        "(" + (auto_save ? "[" : "") + base + (auto_save ? "]" : "") + operateur.toString() + modificateur.toString() + ")";
-    }
-
-    // Application des sauvegardes au sort des cibles
-    Pions.filter((p) => p.Cible_sort).forEach((p) => {
-      console.log("Sauvegarde au sort :",
-        p.Titre,
-        p.sauvegarde_au_sort(
-          auto_save,
-          base,
-          operateur.toString() + modificateur.toString()
-        )
-      );
-    });
   });
+});
 
-// Gestion du changement de la concentration spécifique
-dialog_sort_2
-  .querySelector(".prompt_degats")
-  .addEventListener("input", function (event) {
-    if (event.target.value === "-" || event.target.value === "") {
-      dialog_sort_2.querySelector(".res_degats").textContent = "(Néant)";
-      return;
-    }
+// Gestion du changement de la durée
+dialog_sort_2.addEventListener("input", function (event) {
+  // Récupération du champs résultat
+  let res = null;
+  if (event.target.classList.contains("prompt_duree_succes")) res = ".res_duree_succes";
+  else if (event.target.classList.contains("prompt_duree_echec")) res = ".res_duree_echec";
+  else return;
 
-    const degats = LancerDes.rollDice(event.target.value.toLowerCase());
+  // Si le champ est vide, on affiche "(Néant)"
+  if (event.target.value === "-" || event.target.value === "") {
+    dialog_sort_2.querySelector(res).textContent = "(Néant)";
+    return;
+  }
 
-    if (degats > 0) {
-      dialog_sort_2.querySelector(".res_degats").textContent =
-        "(" + degats + ")";
-    } else {
-      dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
-    }
+  // Récupération de la formule
+  let formula = event.target.value.toLowerCase();
 
-    // Application des sauvegardes au sort des cibles
-    const type_degats = dialog_sort_2.querySelector(".degats_radio0").checked
-      ? "généraux"
-      : "localisés";
-    Pions.filter((p) => p.Cible_sort).forEach((p) => {
-      console.log("Dégâts du sort :", p.Titre, type_degats, degats);
-    });
+  // Récupération du modificateur
+  let match = formula.match(/([+\-][0-9]*m[re])/);
+  let modificateur = match ? match[1] : null;
+  if (modificateur === null) {
+    match = formula.match(/^([0-9]*m[re])/);
+    modificateur = match ? "+" + match[1] : "";
+  }
+
+  // Récupération de la durée
+  formula = formula.replace(/[\+|\-]*[0-9]*m[re]/g, "");
+  let duree = expurger_temps_sort(formula);
+  if (duree === null) duree = 0;
+
+  // Affichage du résultat
+  modificateur = modificateur.toUpperCase();
+  if (duree !== null) {
+    dialog_sort_2.querySelector(res).textContent = "(" + duree + modificateur + ")";
+  }
+  else {
+    dialog_sort_2.querySelector(res).textContent = "(???)";
+  }
+
+  // Application des sauvegardes au sort des cibles
+  Pions.filter((p) => p.Cible_sort).forEach((p) => {
+    console.log("Durée du sort :", p.Titre, duree, modificateur);
   });
+});
+
+// Gestion du changement des dégâts
+dialog_sort_2.querySelector(".prompt_degats").addEventListener("input", function (event) {
+  // Si le champ est vide, on affiche "(Néant)"
+  if (event.target.value === "-" || event.target.value === "") {
+    dialog_sort_2.querySelector(".res_degats").textContent = "(Néant)";
+    return;
+  }
+
+  // Récupération de la formule
+  let formula = event.target.value.toLowerCase();
+
+  // Récupération du modificateur
+  let match = formula.match(/([+\-][0-9]*m[re])/);
+  let modificateur = match ? match[1] : null;
+  if (modificateur === null) {
+    match = formula.match(/^([0-9]*m[re])/);
+    modificateur = match ? "+" + match[1] : "";
+  }
+
+  // Récupération des dégâts
+  formula = formula.replace(/[\+|\-]*[0-9]*m[re]/g, "");
+  formula = formula.replace(/\s+/, ""); // Suppression des espaces
+  let degats = LancerDes.rollDice(formula);
+
+  // Affichage du résultat
+  modificateur = modificateur.toUpperCase();
+  if (degats !== null) {
+    dialog_sort_2.querySelector(".res_degats").textContent =
+      "(" + degats + modificateur + ")";
+  } else {
+    dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
+  }
+
+  // Application des sauvegardes au sort des cibles
+  Pions.filter((p) => p.Cible_sort).forEach((p) => {
+    console.log("Dégâts du sort :",
+      p.Titre,
+      dialog_sort_2.querySelector("#sel_degats").value === "0" ? "généraux" : "localisés",
+      degats,
+      modificateur);
+  });
+});
 
 // Gestion des clics sur les spans pour sélectionner le type de dégâts / durée
 dialog_sort_2.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
-    const radio = event.target
-      .closest("td")
-      .querySelector('input[type="radio"]');
+    const radio = event.target.closest("td").querySelector('input[type="radio"]');
     if (radio === null || typeof radio === "undefined") return;
     radio.click();
   });
 });
-
-function createModalDialog() {
-  const modal = document.querySelector(".model");
-  modal.style.display = "flex";
-
-}

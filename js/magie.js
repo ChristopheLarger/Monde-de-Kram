@@ -329,34 +329,42 @@ function closeSpellInfo(event) {
  * @returns {number} Le nombre de secondes
  */
 function expurger_temps_sort(temps_sort) {
-  let temps = -1;
-  if (temps_sort === "1 action") temps = 0;
-  if (temps_sort === "1/10 s") temps = 0.1;
-  if (temps_sort === "2 s (4s)") temps = 2;
-  if (temps_sort === "1 h (20min)") temps = 3600;
+  let temps = "???";
 
-  if (temps_sort.endsWith(" s"))
-    temps = parseInt(temps_sort.replace(" s", ""));
-  if (temps_sort.endsWith(" tours"))
-    temps = 5 *parseInt(temps_sort.replace(" tours", ""));
-  if (temps_sort.endsWith(" min"))
-    temps = 60 * parseInt(temps_sort.replace(" min", ""));
-  if (temps_sort.endsWith(" minutes"))
-    temps = 60 * parseInt(temps_sort.replace(" minutes", ""));
-  if (temps_sort.endsWith(" h"))
-    temps = 3600 * parseInt(temps_sort.replace(" h", ""));
-  if (temps_sort.endsWith(" heure"))
-    temps = 3600 * parseInt(temps_sort.replace(" heure", ""));
-  if (temps_sort.endsWith(" jour"))
-    temps = 24 * 3600 * parseInt(temps_sort.replace(" jour", ""));
-  if (temps_sort.endsWith(" semaine"))
-    temps = 7 * 24 * 3600 * parseInt(temps_sort.replace(" semaine", ""));
-  if (temps_sort.endsWith(" mois"))
-    temps = 365.25 * 7 * 24 * 3600 / 12 * parseInt(temps_sort.replace(" mois", ""));
-  if (temps_sort.endsWith(" an"))
-    temps = 365.25 * 7 * 24 * 3600 * parseInt(temps_sort.replace(" an", ""));
-  if (temps_sort.endsWith(" ans"))
-    temps = 365.25 * 7 * 24 * 3600 * parseInt(temps_sort.replace(" ans", ""));
+  temps_sort = temps_sort.replace(/\s+/, ""); // Suppression des espaces
+
+  if (temps_sort === "") temps = 0;
+  if (temps_sort === "1action") temps = 0.01;
+  if (temps_sort === "1/10s") temps = 0.1;
+  if (temps_sort === "2s(4s)") temps = 2;
+  if (temps_sort === "1h(20min)") temps = 3600;
+
+  if (temps_sort.match(/^\d+$/) !== null) return parseInt(temps_sort, 10);
+
+  // Utilisation de regex pour vérifier la fin de chaîne avec match()
+  let match;
+  if ((match = temps_sort.match(/^(\d+)s$/)))
+    temps = parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)tours$/)))
+    temps = 5 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)min$/)))
+    temps = 60 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)minutes$/)))
+    temps = 60 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)h$/)))
+    temps = 3600 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)heure$/)))
+    temps = 3600 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)jour$/)))
+    temps = 24 * 3600 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)semaine$/)))
+    temps = 7 * 24 * 3600 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)mois$/)))
+    temps = 365.25 * 7 * 24 * 3600 / 12 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)an$/)))
+    temps = 365.25 * 7 * 24 * 3600 * parseInt(match[1], 10);
+  else if ((match = temps_sort.match(/^(\d+)ans$/)))
+    temps = 365.25 * 7 * 24 * 3600 * parseInt(match[1], 10);
 
   return temps;
 }

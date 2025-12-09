@@ -76,7 +76,8 @@ class Bonus_sort {
         this.Nom_bonus = data.Nom_bonus || null;
         this.Nom_liste = data.Nom_liste || null;
         this.Nom_sort = data.Nom_sort || null;
-        this.Valeur = data.Valeur || 0;
+        this.Success = data.Success || null;
+        this.Valeur = data.Valeur || null;
     }
 }
 

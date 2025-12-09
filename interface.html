@@ -976,126 +976,131 @@
 <!-- === DIALOGUE DE CONFIRMATION DE LANCEMENT D'UN SORT === -->
 <!-- Fenêtre pour confirmer le lancement d'un sort -->
 <dialog id="dialog_sort_2" style="font-size: x-large; white-space: nowrap;">
-    <h1 class="nom_liste"
-        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
-    <h1 class="nom_sort"
-        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
-    <!-- Coût & Sauvegarde du sort -->
+    <!-- Titre & Coût du sort -->
     <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
         <colgroup>
-            <col style="width: 75px;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
             <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
             <col style="width: 1px;">
         </colgroup>
         <tr>
-            <td colspan="6">
-                <div style="display: flex; align-items: center;">
-                    <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-                    <span>&nbsp;&nbsp;Coût&nbsp;&nbsp;</span>
-                    <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-                </div>
+            <td>
+                <h1 class="nom_liste"
+                    style="text-align: center; padding: 0; margin: 0; line-height: 1.5; color: rgb(128, 192, 255);">
+                </h1>
             </td>
-            <td></td>
-            <td colspan="2">
-                <div style="display: flex; align-items: center;">
-                    <span>Sauvegarde&nbsp;&nbsp;</span>
-                    <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-                </div>
+            <td style="text-align: right;">Fatigue :&nbsp;<input type="text" class="fatigue_cout"
+                    style="width: 35px; text-align: center; font-size: x-large;" disabled>
             </td>
         </tr>
         <tr>
-            <td></td>
-            <td>Fatigue :&nbsp;</td>
-            <td><input type="text" class="fatigue_cout" style="width: 35px; text-align: center; font-size: x-large;"
-                    disabled>
+            <td rowspan="2">
+                <h1 class="nom_sort"
+                    style="text-align: center; padding: 0; margin: 0; line-height: 1.5; color: rgb(128, 192, 255);">
+                </h1>
             </td>
-            <td></td>
-            <td>Concentration :&nbsp;</td>
-            <td><input type="text" class="concentration_cout"
+            <td style="text-align: right;">Concentration :&nbsp;<input type="text" class="concentration_cout"
                     style="width: 35px; text-align: center; font-size: x-large;" disabled>
             </td>
-            <td></td>
-            <td>Prompt :&nbsp;<input type="text" class="prompt_save" style="width: 120px; font-size: x-large;">
+        </tr>
+        <tr>
+            <td style="text-align: right;">Sauvegarde :&nbsp;<input type="text" class="prompt_save"
+                    style="width: 120px; font-size: x-large; background-color: rgb(192, 192, 255);">
                 <span class="res_save">(Néant)</span>
             </td>
         </tr>
     </table>
-    <!-- Durée dusort -->
-    <div style="display: flex; align-items: center;">
-        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-        <span>&nbsp;&nbsp;Durée&nbsp;&nbsp;</span>
+    <!-- Bonus / Malus du sort -->
+    <div style="display: flex; align-items: center; padding-top: 10px; padding-bottom: 10px;">
         <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
     </div>
+    <!-- Paramètres du sort -->
     <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
         <colgroup>
-            <col style="width: 75px;">
+            <col style="width: 25px;">
             <col style="width: 1px;">
-            <col style="width: auto;">
             <col style="width: 1px;">
-            <col style="width: auto;">
+            <col style="width: 10%;">
             <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 10%;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 1px;">
+            <col style="width: 10%;">
         </colgroup>
         <tr>
-            <td></td>
-            <td><input type="radio" name="radio_duree" value="0" class="duree_radio0" checked>
-                <span class="duree_fixe">Fixe</span>
+            <td colspan="5">
+                <input type="text" style="width: 98%; font-size: x-large; text-align: center; font-style: italic;"
+                    value="" disabled>
             </td>
-            <td></td>
-            <td><input type="radio" name="radio_duree" value="1" class="duree_radio1">
-                <span class="duree_marge">Marge d'échec (m)</span>
+            <td colspan="5" style="border-left: 3px solid black;">
+                <input type="text"
+                    style="width: 98%; font-size: x-large; text-align: center; background-color: rgb(192, 255, 192); font-style: italic;"
+                    value="(MR : marge de réussite)" disabled>
             </td>
-            <td></td>
-            <td>Prompt :&nbsp;<input type="text" class="prompt_duree"
-                    style="width: 120px; font-size: x-large;">
-                <span class="res_duree">(Néant)</span>
+            <td colspan="4" style="border-left: 3px solid black;">
+                <input type="text"
+                    style="width: 98%; font-size: x-large; text-align: center; background-color: rgb(255, 192, 192); font-style: italic;"
+                    value="(ME : marge d'échec)" disabled>
             </td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>Dégats :&nbsp;</td>
+            <td><input type="text" class="prompt_degats" style="width: 124px; font-size: x-large;">
+            </td>
+            <td style="text-align: center;"><span class="res_degats">(Néant)</span></td>
+            <td>&nbsp;</td>
+            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td>Durée :&nbsp;</td>
+            <td><input type="text" class="prompt_duree_succes"
+                    style="width: 124px; font-size: x-large; background-color: rgb(192, 255, 192);">
+            </td>
+            <td style="text-align: center;"><span class="res_duree_succes">(Néant)</span></td>
+            <td>&nbsp;</td>
+            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td>Durée :&nbsp;</td>
+            <td><input type="text" class="prompt_duree_echec"
+                    style="width: 124px; font-size: x-large; background-color: rgb(255, 192, 192);">
+            </td>
+            <td style="text-align: center;"><span class="res_duree_echec">(Néant)</span></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td><select id="sel_degats" style="width: 130px; font-size: x-large;">
+                    <option value="0">Généraux</option>
+                    <option value="1">Localisés</option>
+                </select>
+            </td>
+            <td>&nbsp;</td><!-- res_degats -->
+            <td>&nbsp;</td>
+            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td>Etat :&nbsp;</td>
+            <td><select id="sel_etat_succes"
+                    style="width: 130px; font-size: x-large; background-color: rgb(192, 255, 192);"></select>
+            <td>&nbsp;</td><!-- res_duree_succes -->
+            <td>&nbsp;</td>
+            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td>Etat :&nbsp;</td>
+            <td><select id="sel_etat_echec"
+                    style="width: 130px; font-size: x-large; background-color: rgb(255, 192, 192);"></select>
+            <td>&nbsp;</td><!-- res_duree_echec -->
         </tr>
     </table>
-    <!-- Dégâts occasionnés par le sort -->
-    <div style="display: flex; align-items: center;">
+
+    <!-- Bonus / Malus du sort -->
+    <!-- <div style="display: flex; align-items: center; padding-top: 10px; padding-bottom: 10px;">
         <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-        <span>&nbsp;&nbsp;Dégâts&nbsp;&nbsp;</span>
+        <span>&nbsp;&nbsp;Bonus (+) / Malus (-)&nbsp;&nbsp;</span>
         <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-    </div>
+    </div> -->
     <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
         <colgroup>
-            <col style="width: 75px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-        </colgroup>
-        <tr>
-            <td></td>
-            <td><input type="radio" name="radio_degats" value="0" class="degats_radio0" checked>
-                <span class="degats_gen">Généraux</span>
-            </td>
-            <td></td>
-            <td><input type="radio" name="radio_degats" value="1" class="degats_radio1">
-                <span class="degats_loc">Localisés</span>
-            </td>
-            <td></td>
-            <td>Prompt :&nbsp;<input type="text" class="prompt_degats" style="width: 120px; font-size: x-large;">
-                <span class="res_degats">(Néant)</span>
-            </td>
-        </tr>
-    </table>
-    <!-- Bonus engendrés par le sort -->
-    <div style="display: flex; align-items: center;">
-        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-        <span>&nbsp;&nbsp;Bonus / Malus&nbsp;&nbsp;</span>
-        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-    </div>
-    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
-        <colgroup>
-            <col style="width: 75px;">
+            <col style="width: 25px;">
             <col style="width: 1px;">
             <col style="width: auto;">
             <col style="width: 1px;">
@@ -1106,15 +1111,38 @@
         </colgroup>
         <tr>
             <td>&nbsp;</td>
-            <td style="text-align: center;">Armures</td>
+            <td style="text-align: center;">
+                <div style="display: flex; align-items: center;">
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                    <span>&nbsp;&nbsp;Armures&nbsp;&nbsp;</span>
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                </div>
+            </td>
             <td>&nbsp;</td>
-            <td style="text-align: center;">Compétences</td>
+            <td style="text-align: center;">
+                <div style="display: flex; align-items: center;">
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                    <span>&nbsp;&nbsp;Compétences&nbsp;&nbsp;</span>
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                </div>
+            </td>
             <td>&nbsp;</td>
-            <td style="text-align: center;">Attributs</td>
+            <td style="text-align: center;">
+                <div style="display: flex; align-items: center;">
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                    <span>&nbsp;&nbsp;Attributs&nbsp;&nbsp;</span>
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                </div>
+            </td>
             <td>&nbsp;</td>
-            <td style="text-align: center;">Etats</td>
+            <td style="text-align: center;">
+                <div style="display: flex; align-items: center;">
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                    <span>&nbsp;&nbsp;Divers&nbsp;&nbsp;</span>
+                    <hr style="width: 50%; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
+                </div>
+            </td>
         </tr>
-        <tr>
         <tr>
             <td></td>
             <td id="armures" style="vertical-align: top;"></td>
@@ -1123,7 +1151,7 @@
             <td></td>
             <td id="attributs" style="vertical-align: top;"></td>
             <td></td>
-            <td id="etats" style="vertical-align: top;"></td>
+            <td id="divers" style="vertical-align: top;"></td>
         </tr>
     </table>
 
