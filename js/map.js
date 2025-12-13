@@ -916,15 +916,160 @@ class Pion extends Map {
 
         if (this.Indice !== 0) this.Auto = true;
 
-        this.#setArmes();
+        this.setArmes();
+    }
+
+    /**
+     * Calcul la valeur d'une compétence
+     * @param {string} competence - Nom de la compétence
+     * @returns {number} - Valeur de la compétence
+     */
+    getValue(competence) {
+        const model = Models.find(m => m.Nom_model === this.Model);
+        let bonus = model[competence];
+        if (bonus !== null && typeof bonus !== "undefined") Attaques.filter(a =>
+            a.Model === this.Model &&
+            a.Indice === this.Indice &&
+            a.Competence === competence &&
+            a.Timing > Nb_rounds * 5
+        ).forEach(a => {
+            bonus += a.Bonus;
+        });
+
+        return bonus;
+    }
+
+    /**
+     * Calcul le malus de la 2nde main
+     * @returns {number} - Malus de la 2nde main
+     */
+    malus_2nde_main() {
+        const model = Models.find(m => m.Nom_model === this.Model);
+        if (model.Ambidextre) return 0;
+        return Math.floor((18 - this.coordination()) / 2);
+    }
+
+    /**
+     * Calcul la coordination
+     * @returns {number} - Coordination
+     */
+    coordination() {
+        return Math.round((this.getValue("Vp") + this.getValue("Perception") + this.getValue("Vm")) / 3);
+    }
+
+    /**
+     * Calcul le sixième sens
+     * @returns {number} - Sixième sens
+     */
+    sixieme_sens() {
+        return Math.round((this.getValue("Perception") + this.getValue("Adaptation")) / 2);
+    }
+
+    /**
+     * Calcul le niveau mental
+     * @returns {number} - Niveau mental
+     */
+    niveau_mental() {
+        return Math.round((this.getValue("Force") + this.getValue("Constitution") + this.getValue("Vp") + this.getValue("Perception")) / 4);
+    }
+
+    /**
+     * Calcul le niveau physique
+     * @returns {number} - Niveau physique
+     */
+    niveau_physique() {
+        return Math.round((this.getValue("Vm") + this.getValue("Volonte") + this.getValue("Abstraction") + this.getValue("Charisme")) / 4);
+    }
+
+    /**
+     * Calcul la compétence
+     * @param {string} competence - Nom de la compétence
+     * @returns {number} - Compétence
+     */
+    #get_competence_sub(competence) {
+        const comp = Competences.find(comp => comp.Nom_competence === competence);
+        if (!comp) return null;
+
+        // Calcul de l'attribut
+        let attribut = comp.Attribut;
+        switch (attribut) {
+            case "Ab":
+                attribut = this.getValue("Abstraction");
+                break;
+            case "Ch":
+                attribut = this.getValue("Charisme");
+                break;
+            case "Co":
+                attribut = this.coordination();
+                break;
+            case "Co+Ch":
+                attribut = (this.coordination() + this.getValue("Charisme")) / 2;
+                break;
+            case "Co+F":
+                attribut = (this.coordination() + this.getValue("Force")) / 2;
+                break;
+            case "Co+P":
+                attribut = (this.coordination() + this.getValue("Perception")) / 2;
+                break;
+            case "Co+V":
+                attribut = (this.coordination() + this.getValue("Volonte")) / 2;
+                break;
+            case "Co+VM":
+                attribut = (this.coordination() + this.getValue("Vm")) / 2;
+                break;
+            case "Co+VP":
+                attribut = (this.coordination() + this.getValue("Vp")) / 2;
+                break;
+            case "NP":
+                attribut = this.niveau_physique();
+                break;
+            case "P+VM":
+                attribut = (this.getValue("Perception") + this.getValue("Vm")) / 2;
+                break;
+            case "V":
+                attribut = this.getValue("Volonte");
+                break;
+            case "VP":
+                attribut = this.getValue("Vp");
+                break;
+            default:
+                attribut = 10; // Attribut par défaut
+                break;
+        }
+        attribut = Math.round((attribut - 10) / 2);
+
+        // Calcul des degrés
+        const comp_connue = CompetencesConnues.find(comp =>
+            comp.Nom_model === this.Model &&
+            comp.Nom_competence === competence);
+
+        if (comp_connue !== null && typeof comp_connue !== "undefined") return comp.Base + attribut + comp_connue.Degres;
+
+        return comp.Base + attribut;
+    }
+
+    /**
+     * Calcul la compétence
+     * @param {string} competence - Nom de la compétence
+     * @returns {number} - Compétence
+     */
+    get_competence(competence) {
+        const degres = this.#get_competence_sub(competence);
+        if (degres === null) return null;
+
+        const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
+        if (comp_majeure === null) return degres;
+
+        const degres_majeurs = this.#get_competence_sub(comp_majeure);
+        if (degres_majeurs === null) return null;
+
+        return degres + degres_majeurs;
     }
 
     /**
      * Définit les armes du pion
      */
-    #setArmes() {
-        const model = Models.find(m => m.Nom_model === this.Model);
-
+    setArmes() {
         // Vérification si le personnage est un monstre
         const is_monster = Armes.some(arme => arme.Nom_arme === this.Model)
 
@@ -938,14 +1083,14 @@ class Pion extends Map {
             let arme_max = "";
             Armes.forEach(arme => {
                 if (arme.Nom_arme === "Bouclier") return;
-                const comp = model.get_competence(arme.Competence);
+                const comp = this.get_competence(arme.Competence);
                 if (comp !== null && comp > comp_max) {
                     comp_max = comp;
                     arme_max = arme.Nom_arme;
                 }
             });
             this.Arme1 = arme_max;
-            
+
             const w = Armes.find(x => x.Nom_arme === this.Arme1);
             if (w !== null && typeof w != "undefined" && w.Deux_main) this.Arme2 = "";
             else this.Arme2 = "Bouclier";
@@ -1216,7 +1361,7 @@ class Pion extends Map {
         if (col_start === col_end && row_start === row_end) return;
 
         // Si le pion est en combat, on ne peut pas se déplacer
-        if (order_combats > -2) {
+        if (init_round) {
             Messages.ecriture_directe("Le pion " + this.Titre + " est déjà en combat et ne peut pas se déplacer.");
             return;
         }
@@ -1268,74 +1413,147 @@ class Pion extends Map {
 
     /**
      * Sauvegarde au sort
-     * @param {boolean} auto_save - True si la sauvegarde est automatique, false sinon
-     * @param {string} attribut - Attribut sauvegardé
-     * @param {number} modificateur - Modificateur
+     * @param {string} save - Sauvegarde au sort
      * @returns {number} - Résultat de la sauvegarde
      */
-    sauvegarde_au_sort(auto_save, attribut, modificateur) {
+    sauvegarde_au_sort(save) {
+        if (save === "(Néant)") return null;
+        if (save === "Spéciale") return null;
+
         const jet =
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1 +
             Math.floor(Math.random() * 6) + 1;
-        const magicien = Pions.find((p) => p.Attaquant);
-        let model = null
 
+        save = save.replace("(", "").replace(")", "");
+
+        let auto_save = false;
+        let regex = /\[.*\]/;
+        let match = regex.exec(save);
+        if (match) auto_save = true;
+
+        let pion = this;
         if (auto_save) {
-            model = Models.find(x => x.Nom_model === magicien.Model);
+           pion = Pions.find((p) => p.Attaquant); // Le magicien
+        }
+
+        save = save.replace("Con", pion.getValue("Constitution"));
+        save = save.replace("Cor", pion.coordination());
+        save = save.replace("Vol", pion.getValue("Volonte"));
+        save = save.replace("Abs", pion.getValue("Abstraction"));
+        save = save.replace("Foi", pion.getValue("Foi"));
+        save = save.replace("Mag", pion.getValue("Magie"));
+        save = save.replace("6eS", pion.sixieme_sens());
+        save = save.replace("Mem", pion.getValue("Memoire"));
+        save = save.replace("NM", pion.niveau_mental());
+        save = save.replace("Per", pion.getValue("Perception"));
+        save = save.replace("Thp", pion.getValue("Telepathie"));
+        save = save.replace("VM", pion.getValue("Vm"));
+        save = save.replace("Cha", pion.getValue("Charisme"));
+
+        save = eval(save);
+
+        save -= jet;
+
+        return (auto_save ? -save : save);
+    }
+
+    /**
+     * Dégâts du sort
+     * @param {number} save - Sauvegarde au sort
+     * @param {string} degats - Dégâts du sort
+     * @param {string} type - Type de dégâts
+     * @returns {number} - Nombre de points de dégâts
+     */
+    degats_du_sort(save, degats, type) {
+        if (degats === "(Néant)") return 0;
+
+        const magicien = Pions.find((p) => p.Attaquant);
+
+        let MR = 0;
+        let ME = 0;
+        if (save >= 0) MR = save;
+        else ME = -save;
+
+        degats = degats.replace("(", "").replace(")", "");
+        degats = degats.replace(/(\d+)(M[R|E])/, "$1*$2");
+        degats = degats.replace(/MR/g, MR);
+        degats = degats.replace(/ME/g, ME);
+        degats = eval(degats);
+
+        if (degats > 0) this.Est_blesse = true;
+
+        // Localisation des dégâts (si le sort est localisé)
+        if (type === "localisés") {
+            let loc_att = "";
+            const jet_loc = Math.floor(Math.random() * 20) + 1;
+            if (jet_loc < 5) loc_att = "jambe gauche";
+            else if (jet_loc < 9) loc_att = "jambe droite";
+            else if (jet_loc < 13) loc_att = "abdomen";
+            else if (jet_loc < 16) loc_att = "poitrine";
+            else if (jet_loc < 18) loc_att = "bras gauche";
+            else if (jet_loc < 20) loc_att = "bras droit";
+            else loc_att = "tête";
+
+            let texte_loc = "";
+            switch (loc_att) {
+                case "abdomen":
+                    this.Abdomen -= degats;
+                    texte_loc = "à l'" + loc_att; // "à l'abdomen"
+                    break;
+                case "bras gauche":
+                    this.Brasg -= degats;
+                    texte_loc = "au " + loc_att; // "au bras gauche/droit"
+                    break;
+                case "bras droit":
+                    this.Brasd -= degats;
+                    texte_loc = "au " + loc_att; // "au bras gauche/droit"
+                    break;
+                case "jambe gauche":
+                    this.Jambeg -= degats;
+                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    break;
+                case "jambe droite":
+                    this.Jambed -= degats;
+                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    break;
+                case "poitrine":
+                    this.Poitrine -= degats;
+                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    break;
+                case "tête":
+                    this.Tete -= degats;
+                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    break;
+            }
+
+            Messages.ecriture_directe(`${magicien.Titre} occasionne ${degats} points de dégâts ${texte_loc} à ${this.Titre}`);
         }
         else {
-            model = Models.find(x => x.Nom_model === this.Model);
+            this.Pdv -= degats;
+            Messages.ecriture_directe(`${magicien.Titre} occasionne ${degats} points de dégâts généraux à ${this.Titre}`);
         }
 
-        let res = 0;
-        switch (attribut) {
-            case "Con":
-                res = model.Constitution;
-                break;
-            case "Cor":
-                res = model.coordination();
-                break;
-            case "Vol":
-                res = model.Volonte;
-                break;
-            case "Abs":
-                res = model.Abstraction;
-                break;
-            case "Foi":
-                res = model.Foi;
-                break;
-            case "Mag":
-                res = model.Magie;
-                break;
-            case "6eS":
-                res = model.sixieme_sens();
-                break;
-            case "Mem":
-                res = model.Memoire;
-                break;
-            case "NM":
-                res = model.niveau_mental();
-                break;
-            case "Per":
-                res = model.Perception;
-                break;
-            case "Thp":
-                res = model.Telepathie;
-                break;
-            case "VM":
-                res = model.Vm;
-                break;
-            case "Cha":
-                res = model.Charisme;
-                break;
-            default:
-                return null;
-        }
+        return degats;
+    }
 
-        res += parseInt(modificateur, 10) - jet;
+    /**
+     * Durée du sort
+     * @param {number} save - Sauvegarde au sort
+     * @param {string} duree - Durée du sort
+     * @returns {number} - Durée du sort
+     */
+    duree_du_sort(save, duree) {
+        if (duree === "(Néant)") return 0;
 
-        return (auto_save ? -res : res);
+        duree = duree.replace("(", "").replace(")", "");
+        duree = duree.replace(/(\d+)(M[R|E])/, "$1*$2");
+
+        duree = duree.replace(/MR/g, save);
+        duree = duree.replace(/ME/g, save);
+        duree = eval(duree);
+
+        return duree;
     }
 }
 let Pions = new Array;
@@ -2169,10 +2387,9 @@ document.addEventListener("keydown", function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-            let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
-            if (typeof magicien === "undefined") magicien = null;
 
-            if (magicien != null) {
+            let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null && x.Nom_liste != "" && x.Incantation <= 5);
+            if (magicien !== null && typeof magicien !== "undefined") {
                 afficher_confirmation_sort();
             }
             else next_attaque();

@@ -540,9 +540,9 @@ function createListeModal(Nom_liste) {
         );
         const model = Models.find((m) => m.Nom_model === m_selected.Model);
         
-        if (model && model.get_competence("Theognosie") !== null && model.get_competence("Theognosie") !== undefined) {
+        if (m_selected.get_competence("Theognosie") !== null && m_selected.get_competence("Theognosie") !== undefined) {
           // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= model.get_competence("Theognosie")) {
+          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_selected.get_competence("Theognosie")) {
             isKnown = true;
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
@@ -552,7 +552,7 @@ function createListeModal(Nom_liste) {
             );
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
               // Pour la liste jumelée, limite à 2/3 de Theognosie (arrondi)
-              const limiteJumelee = Math.floor((2 * model.get_competence("Theognosie")) / 3);
+              const limiteJumelee = Math.floor((2 * m_selected.get_competence("Theognosie")) / 3);
               if (sort.Niveau <= limiteJumelee) {
                 isKnown = true;
               }
@@ -723,7 +723,7 @@ function createListeModal(Nom_liste) {
       const sort = sortsListe.find(
         (s) => s.Nom_sort === e.target.getAttribute("data-spell")
       );
-      if (sort) {
+      if (sort !== null && typeof sort !== "undefined") {
         // Ajouter le panneau d'information du sort au contenu de la modale
         createSpellInfo(modalContent, sort);
 

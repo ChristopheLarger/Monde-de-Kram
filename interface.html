@@ -900,6 +900,8 @@
 <!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
 <!-- Fenêtre pour choisir les paramètres d'un sort (fatigue, concentration) -->
 <dialog id="dialog_sort_1" style="font-size: x-large; white-space: nowrap;">
+    <h1 class="nom"
+        style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
     <h1 class="nom_liste"
         style="text-align: center; padding: 0; margin: 0; line-height: 1.5; background-color: rgb(64, 255, 64);"></h1>
     <h1 class="nom_sort"
@@ -984,12 +986,24 @@
         </colgroup>
         <tr>
             <td>
-                <h1 class="nom_liste"
+                <h1 class="nom"
                     style="text-align: center; padding: 0; margin: 0; line-height: 1.5; color: rgb(128, 192, 255);">
                 </h1>
             </td>
             <td style="text-align: right;">Fatigue :&nbsp;<input type="text" class="fatigue_cout"
-                    style="width: 35px; text-align: center; font-size: x-large;" disabled>
+                    style="width: 35px; text-align: center; font-size: x-large;" disabled><span class="fatigue_base"> /
+                    4</span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <h1 class="nom_liste"
+                    style="text-align: center; padding: 0; margin: 0; line-height: 1.5; color: rgb(128, 192, 255);">
+                </h1>
+            </td>
+            <td style="text-align: right;">Concentration :&nbsp;<input type="text" class="concentration_cout"
+                    style="width: 35px; text-align: center; font-size: x-large;" disabled><span
+                    class="concentration_base"> / 4</span>
             </td>
         </tr>
         <tr>
@@ -998,11 +1012,6 @@
                     style="text-align: center; padding: 0; margin: 0; line-height: 1.5; color: rgb(128, 192, 255);">
                 </h1>
             </td>
-            <td style="text-align: right;">Concentration :&nbsp;<input type="text" class="concentration_cout"
-                    style="width: 35px; text-align: center; font-size: x-large;" disabled>
-            </td>
-        </tr>
-        <tr>
             <td style="text-align: right;">Sauvegarde :&nbsp;<input type="text" class="prompt_save"
                     style="width: 120px; font-size: x-large; background-color: rgb(192, 192, 255);">
                 <span class="res_save">(Néant)</span>
@@ -1071,7 +1080,7 @@
         <tr>
             <td>&nbsp;</td>
             <td>&nbsp;</td>
-            <td><select id="sel_degats" style="width: 130px; font-size: x-large;">
+            <td><select class="sel_degats" style="width: 130px; font-size: x-large;">
                     <option value="0">Généraux</option>
                     <option value="1">Localisés</option>
                 </select>
@@ -1093,11 +1102,6 @@
     </table>
 
     <!-- Bonus / Malus du sort -->
-    <!-- <div style="display: flex; align-items: center; padding-top: 10px; padding-bottom: 10px;">
-        <hr style="width: 15px; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-        <span>&nbsp;&nbsp;Bonus (+) / Malus (-)&nbsp;&nbsp;</span>
-        <hr style="flex: 1; margin: 0; border: none; border-top: 1px solid; vertical-align: middle;">
-    </div> -->
     <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
         <colgroup>
             <col style="width: 25px;">
@@ -1158,7 +1162,7 @@
     <!-- Bouton pour appliquer le sort -->
     <hr>
     <div style="width: 100%; text-align: right;">
-        <button id="Appliquer" style="font-size: x-large;">Appliquer</button>
+        <button class="appliquer" style="font-size: x-large;">Appliquer</button>
     </div>
 
 </dialog>

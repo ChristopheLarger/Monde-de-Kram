@@ -128,12 +128,12 @@ function afficher_Details_arme1() {
     dialog_details_2.querySelector(".sort").style.display = "none";
 
     // Réinitialisation des informations du sort
-    m_selected.Nom_liste = "";
-    m_selected.Nom_sort = "";
+    m_selected.Nom_liste = null;
+    m_selected.Nom_sort = null;
     m_selected.Incantation = 0;
+    // Mise à jour de l'information affichée
+    info_arme();
   }
-  // Mise à jour de l'information affichée
-  info_arme();
 }
 
 /**
@@ -315,8 +315,6 @@ function afficher_Details(col, row) {
     // Mise à jour de la carte
     Map.drawHexMap();
 
-    // Mise à jour de l'information affichée
-    info_arme();
     // Mise à jour du sortilège sélectionné
     if (
       m_selected.Nom_sort &&
@@ -326,11 +324,9 @@ function afficher_Details(col, row) {
       m_selected.Nom_liste !== "" &&
       m_selected.Nom_liste !== "0"
     ) {
-      const sort = Sorts.find(
-        (s) =>
-          s.Nom_liste === m_selected.Nom_liste &&
-          s.Nom_sort === m_selected.Nom_sort
-      );
+      const sort = Sorts.find((s) =>
+        s.Nom_liste === m_selected.Nom_liste &&
+        s.Nom_sort === m_selected.Nom_sort);
 
       dialog_details_2.querySelector(".liste").textContent = sort.Nom_liste;
       dialog_details_2.querySelector(".sort").textContent = sort.Nom_sort;
@@ -363,7 +359,7 @@ function afficher_Details(col, row) {
     arme2.style.width = width + "px";
 
     // Désactivation des champs armes si on est en phase de combat
-    if (order_combats !== -2) {
+    if (init_round) {
       arme1.disabled = true;
       arme2.disabled = true;
     } else {
@@ -394,7 +390,6 @@ function afficher_attaque(phase) {
   }
 
   // === PHASE 1 : CHOIX DE L'ARME ===
-  const model_att = Models.find((p) => p.Nom_model === attaquant.Model);
   if (phase === 1) {
     // Gestion de l'arme principale
     if (attaquant.Arme1 === "" || attaquant.Arme1 === "Bouclier") {
@@ -430,15 +425,12 @@ function afficher_attaque(phase) {
       "2nde main (" + attaquant.Arme2 + ")";
 
     // Activation/désactivation des options d'accès aux armes pour l'attaque courante
-    const attaque = Attaques[order_combats];
-    if (attaque.Main === 1) {
-      dialog_attaque_1.querySelector(".arme_radio1").disabled =
-        attaquant.Arme1_engagee || attaquant.Esquive;
+    if (current_attaque && current_attaque.Main === 1) {
+      dialog_attaque_1.querySelector(".arme_radio1").disabled = attaquant.Arme1_engagee || attaquant.Esquive;
       dialog_attaque_1.querySelector(".arme_radio2").disabled = true;
-    } else if (attaque.Main === 2) {
+    } else if (current_attaque && current_attaque.Main === 2) {
       dialog_attaque_1.querySelector(".arme_radio1").disabled = true;
-      dialog_attaque_1.querySelector(".arme_radio2").disabled =
-        attaquant.Arme2_engagee || attaquant.Esquive;
+      dialog_attaque_1.querySelector(".arme_radio2").disabled = attaquant.Arme2_engagee || attaquant.Esquive;
     }
 
     dialog_attaque_1.showModal();
@@ -617,10 +609,7 @@ function affiche_def() {
   const attaquant = Pions.find((m) => m.Attaquant);
   const defenseur = Pions.find((m) => m.Defenseur);
 
-  // Récupération des modèles et armes
-  // const model_att = Models.find(p => p.Nom_model === attaquant.Model);
-  const model_def = Models.find((p) => p.Nom_model === defenseur.Model);
-
+  // Récupération des armes
   const w1_att = Armes.find((w) => w.Nom_arme === attaquant.Arme1);
   const w2_att = Armes.find((w) => w.Nom_arme === attaquant.Arme2);
 
@@ -639,7 +628,7 @@ function affiche_def() {
     scr_def =
       defenseur.jet_def -
       10 +
-      (defenseur.esq_def ? model_def.get_competence("Esquive") - defenseur.Nb_action : 0);
+      (defenseur.esq_def ? defenseur.get_competence("Esquive") - defenseur.Nb_action : 0);
   } else {
     // Parade pour les attaques au corps à corps
     scr_def = calcul_scr_def();
@@ -779,14 +768,12 @@ function afficher_defense(phase) {
     dialog_defense_1.querySelector(".nom").innerHTML = entete;
 
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (1ère main)
-    const model_def = Models.find((p) => p.Nom_model === defenseur.Model);
-
     const Arme1 = Armes.find((a) => a.Nom_arme === defenseur.Arme1);
     let par_def_1 = null;
-    if (Arme1 !== null && defenseur.Arme1 !== "") {
-      par_def_1 = Arme1.Facteur_parade * model_def.get_competence(Arme1.Competence);
+    if (Arme1 !== null && typeof Arme1 !== "undefined") {
+      par_def_1 = Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
     }
-    if (defenseur.Arme1 === "" || Arme1.Facteur_parade === null || par_def_1 === null) {
+    if (Arme1 === null || typeof Arme1 === "undefined" || Arme1.Facteur_parade === null || par_def_1 === null) {
       dialog_defense_1
         .querySelector(".arme_radio1")
         .closest("tr").style.display = "none";
@@ -799,10 +786,10 @@ function afficher_defense(phase) {
     // Masquage des options d'armes si elles sont vides ou si la parade est nulle (2nde main)
     const Arme2 = Armes.find((a) => a.Nom_arme === defenseur.Arme2);
     let par_def_2 = null;
-    if (Arme2 !== null && defenseur.Arme2 !== "") {
-      par_def_2 = Arme2.Facteur_parade * model_def.get_competence(Arme2.Competence);
+    if (Arme2 !== null && typeof Arme2 !== "undefined") {
+      par_def_2 = Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
     }
-    if (defenseur.Arme2 === "" || Arme2.Facteur_parade === null || par_def_2 === null) {
+    if (Arme2 === null || typeof Arme2 === "undefined" || Arme2.Facteur_parade === null || par_def_2 === null) {
       dialog_defense_1
         .querySelector(".arme_radio2")
         .closest("tr").style.display = "none";
@@ -947,6 +934,7 @@ function afficher_param_sort(sort) {
   const model = Models.find((m) => m.Nom_model === m_selected.Model);
 
   // Initialisation des champs du dialogue
+  dialog_sort_1.querySelector(".nom").textContent = m_selected.Titre;
   dialog_sort_1.querySelector(".nom_liste").textContent = sort.Nom_liste;
   dialog_sort_1.querySelector(".nom_sort").textContent = sort.Nom_sort;
   dialog_sort_1.querySelector(".fatigue_actuelle").value = m_selected.Fatigue;
@@ -984,30 +972,75 @@ function afficher_confirmation_sort() {
     s.Nom_sort === magicien.Nom_sort);
 
   // Initialisation des champs du dialogue
+  dialog_sort_2.querySelector(".nom").textContent = magicien.Titre;
   dialog_sort_2.querySelector(".nom_liste").textContent = magicien.Nom_liste;
   dialog_sort_2.querySelector(".nom_sort").textContent = magicien.Nom_sort;
   dialog_sort_2.querySelector(".fatigue_cout").value = magicien.Fatigue_sort;
+  dialog_sort_2.querySelector(".fatigue_base").textContent = " / " + sort.Niveau;
   dialog_sort_2.querySelector(".concentration_cout").value = magicien.Concentration_sort;
+  dialog_sort_2.querySelector(".concentration_base").textContent = " / " + sort.Niveau;
 
   // Définition des valeurs et simulation des événements input
   const prompt_save = dialog_sort_2.querySelector(".prompt_save");
   prompt_save.value = sort.Sauvegarde;
   prompt_save.dispatchEvent(new Event('input', { bubbles: true }));
 
-  const bonus_sort = Bonus_sorts.find((b) =>
+  // Définition des valeurs et simulation des événements input pour les dégâts
+  let bonus_sort = Bonus_sorts.find((b) =>
     b.Nom_bonus === "Dégâts" &&
     b.Nom_liste === magicien.Nom_liste &&
     b.Nom_sort === magicien.Nom_sort);
   const prompt_degats = dialog_sort_2.querySelector(".prompt_degats");
-  prompt_degats.value = bonus_sort.Valeur;
+  if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
+    prompt_degats.value = bonus_sort.Valeur;
+  }
+  else {
+    prompt_degats.value = "-";
+  }
   prompt_degats.dispatchEvent(new Event('input', { bubbles: true }));
 
+  // Définition des valeurs et simulation des événements input pour les dégâts généraux
+  bonus_sort = Bonus_sorts.find((b) =>
+    b.Nom_bonus === "Type dégâts" &&
+    b.Nom_liste === magicien.Nom_liste &&
+    b.Nom_sort === magicien.Nom_sort &&
+    b.Valeur === "Localisés");
+  const sel_degats = dialog_sort_2.querySelector(".sel_degats");
+  if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
+    sel_degats.value = "1";
+  }
+  else {
+    sel_degats.value = "0";
+  }
+
+  // Définition des valeurs et simulation des événements input pour la durée de réussite
+  bonus_sort = Bonus_sorts.find((b) =>
+    b.Nom_bonus === "Durée" &&
+    b.Nom_liste === magicien.Nom_liste &&
+    b.Nom_sort === magicien.Nom_sort &&
+    b.Succes);
   const prompt_duree_succes = dialog_sort_2.querySelector(".prompt_duree_succes");
-  prompt_duree_succes.value = sort.Duree;
+  if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
+    prompt_duree_succes.value = bonus_sort.Valeur;
+  }
+  else {
+    prompt_duree_succes.value = sort.Duree;
+  }
   prompt_duree_succes.dispatchEvent(new Event('input', { bubbles: true }));
 
+  // Définition des valeurs et simulation des événements input pour la durée d'échec
+  bonus_sort = Bonus_sorts.find((b) =>
+    b.Nom_bonus === "Durée" &&
+    b.Nom_liste === magicien.Nom_liste &&
+    b.Nom_sort === magicien.Nom_sort &&
+    !b.Succes);
   const prompt_duree_echec = dialog_sort_2.querySelector(".prompt_duree_echec");
-  prompt_duree_echec.value = sort.Duree;
+  if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
+    prompt_duree_echec.value = bonus_sort.Valeur;
+  }
+  else {
+    prompt_duree_echec.value = sort.Duree;
+  }
   prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
 
   // Activation/désactivation des options selon les possibilités
@@ -1038,35 +1071,23 @@ function afficher_confirmation_sort() {
     sel_etat_echec.appendChild(nouvelleOption.cloneNode(true));
 
     // Récupération de la valeur du bonus en cas de réussite
-    let valeur_succes = "";
     const bonus_sort_succes = Bonus_sorts.find((b) =>
       b.Nom_bonus === bonus.Nom_bonus &&
       b.Nom_liste === magicien.Nom_liste &&
       b.Nom_sort === magicien.Nom_sort &&
-      b.Success);
+      b.Succes);
     if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") {
       sel_etat_succes.value = bonus.Nom_bonus;
-      valeur_succes = bonus_sort_succes.Valeur;
-    }
-    if (valeur_succes != "") {
-      prompt_duree_succes.value = valeur_succes;
-      prompt_duree_succes.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     // Récupération de la valeur du bonus en cas d'échec
-    let valeur_echec = "";
     const bonus_sort_echec = Bonus_sorts.find((b) =>
       b.Nom_bonus === bonus.Nom_bonus &&
       b.Nom_liste === magicien.Nom_liste &&
       b.Nom_sort === magicien.Nom_sort &&
-      !b.Success);
+      !b.Succes);
     if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") {
       sel_etat_echec.value = bonus.Nom_bonus;
-      valeur_echec = bonus_sort_echec.Valeur;
-    }
-    if (valeur_echec != "") {
-      prompt_duree_echec.value = valeur_echec;
-      prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
     }
   });
 
@@ -1074,14 +1095,14 @@ function afficher_confirmation_sort() {
   ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
     // Création du div pour le bonus
     const div = document.createElement("div");
-    div.id = "div_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+    div.id = "div_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_");
     div.style.display = "flex";
     div.style.alignItems = "center";
     div.style.justifyContent = "space-between";
 
     // Création du titre du bonus
     const titre = document.createElement("span");
-    titre.id = "titre_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_");
+    titre.id = "titre_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_");
     titre.innerHTML = bonus.Nom_bonus + " :&nbsp;";
     div.appendChild(titre);
 
@@ -1091,7 +1112,7 @@ function afficher_confirmation_sort() {
       b.Nom_bonus === bonus.Nom_bonus &&
       b.Nom_liste === magicien.Nom_liste &&
       b.Nom_sort === magicien.Nom_sort &&
-      b.Success);
+      b.Succes);
     if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") valeur_succes = bonus_sort_succes.Valeur;
 
     // Récupération de la valeur du bonus en cas d'échec
@@ -1100,7 +1121,7 @@ function afficher_confirmation_sort() {
       b.Nom_bonus === bonus.Nom_bonus &&
       b.Nom_liste === magicien.Nom_liste &&
       b.Nom_sort === magicien.Nom_sort &&
-      !b.Success);
+      !b.Succes);
     if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") valeur_echec = bonus_sort_echec.Valeur;
 
     // Création d'un conteneur pour les 2 champs (positionnés à droite)
@@ -1112,7 +1133,7 @@ function afficher_confirmation_sort() {
 
     // Création du champ du Bonus en cas de réussite
     const champs_succes = document.createElement("input");
-    champs_succes.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_") + "_succes";
+    champs_succes.id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + "_succes";
     champs_succes.type = "text";
     champs_succes.style.width = "35px";
     champs_succes.style.textAlign = "center";
@@ -1123,7 +1144,7 @@ function afficher_confirmation_sort() {
 
     // Création du champ du Bonus en cas d'échec
     const champs_echec = champs_succes.cloneNode(true);
-    champs_echec.id = "champs_" + bonus.Nom_bonus.toLowerCase().replace(" ", "_") + "_echec";
+    champs_echec.id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + "_echec";
     champs_echec.style.backgroundColor = "rgb(255, 192, 192)";
     champs_echec.value = valeur_echec;
     conteneurChamps.appendChild(champs_echec);
@@ -1442,15 +1463,14 @@ for (let i = 0; i < inputs.length; i++) {
 }
 
 function info_arme() {
-  const model = Models.find((m) => m.Nom_model === m_selected.Model);
   let score1 = null;
   let score2 = null;
 
   // Bonus de compétence d'arme
   if (m_selected.Arme1 !== "" && m_selected.Arme1 !== "Lancement de sort")
-    score1 = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
+    score1 = m_selected.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
   if (m_selected.Arme2 !== "" && m_selected.Arme2 !== "Lancement de sort")
-    score2 = model.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
+    score2 = m_selected.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
 
   // Bonus d'attaque
   if (score1 !== null) score1 += m_selected.B_att;
@@ -1467,11 +1487,11 @@ function info_arme() {
   ) {
     if (m_selected.Arme1 !== "Bouclier" && m_selected.Arme2 !== "Bouclier") {
       if (m_selected.Arme1 === "Dague" || m_selected.Arme2 === "Dague") {
-        score1 -= Math.max(2 - model.get_competence("Escrime"), 0);
-        score2 -= Math.max(2 - model.get_competence("Escrime"), 0);
+        score1 -= Math.max(2 - m_selected.get_competence("Escrime"), 0);
+        score2 -= Math.max(2 - m_selected.get_competence("Escrime"), 0);
       } else {
-        score1 -= Math.max(6 - model.get_competence("Escrime"), 0);
-        score2 -= Math.max(6 - model.get_competence("Escrime"), 0);
+        score1 -= Math.max(6 - m_selected.get_competence("Escrime"), 0);
+        score2 -= Math.max(6 - m_selected.get_competence("Escrime"), 0);
       }
     }
   }
@@ -1636,7 +1656,7 @@ arme1.addEventListener("click", function (event) {
     m_selected.Arme2 = arme2.value;
 
     // Mise à jour de l'information affichée
-    info_arme();
+    if (arme1.value !== "Lancement de sort") info_arme();
   }, 0);
 });
 
@@ -2250,8 +2270,6 @@ dialog_sort_1
         s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
         s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent
     );
-    m_selected.Fatigue -= sort.Niveau;
-    m_selected.Concentration -= sort.Niveau;
     m_selected.Fatigue_sort = sort.Niveau;
     m_selected.Concentration_sort = sort.Niveau;
     dialog_sort_1.close();
@@ -2266,8 +2284,6 @@ dialog_sort_1
         s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
         s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent
     );
-    m_selected.Fatigue -= 2 * sort.Niveau;
-    m_selected.Concentration -= 2 * sort.Niveau;
     m_selected.Fatigue_sort = 2 * sort.Niveau;
     m_selected.Concentration_sort = 2 * sort.Niveau;
     dialog_sort_1.close();
@@ -2282,8 +2298,6 @@ dialog_sort_1
         s.Nom_liste === dialog_sort_1.querySelector(".nom_liste").textContent &&
         s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent
     );
-    m_selected.Fatigue -= 3 * sort.Niveau;
-    m_selected.Concentration -= 3 * sort.Niveau;
     m_selected.Fatigue_sort = 3 * sort.Niveau;
     m_selected.Concentration_sort = 3 * sort.Niveau;
     dialog_sort_1.close();
@@ -2303,22 +2317,15 @@ dialog_sort_1
   .querySelector(".acter")
   .addEventListener("click", function (event) {
     // Mise à jour des points de fatigue et de concentration
-    m_selected.Fatigue -= dialog_sort_1.querySelector(".fatigue_cout").value;
-    m_selected.Concentration -= dialog_sort_1.querySelector(
-      ".concentration_cout"
-    ).value;
-    m_selected.Fatigue_sort =
-      dialog_sort_1.querySelector(".fatigue_cout").value;
-    m_selected.Concentration_sort = dialog_sort_1.querySelector(
-      ".concentration_cout"
-    ).value;
+    m_selected.Fatigue_sort = dialog_sort_1.querySelector(".fatigue_cout").value;
+    m_selected.Concentration_sort = dialog_sort_1.querySelector(".concentration_cout").value;
+
     dialog_sort_1.close();
   });
 
 dialog_sort_1.addEventListener("close", function (event) {
   dialog_details_2.querySelector(".fatigue").value = m_selected.Fatigue;
-  dialog_details_2.querySelector(".concentration").value =
-    m_selected.Concentration;
+  dialog_details_2.querySelector(".concentration").value = m_selected.Concentration;
 });
 
 dialog_sort_2.addEventListener("close", function (event) {
@@ -2336,7 +2343,8 @@ dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (
   let formula = null;
   let auto_save = false;
 
-  formula = event.target.value.toLowerCase().replace(/« (.+) »/g, "$1");
+  formula = event.target.value.toLowerCase();
+  formula = formula.replace(/« (.+) »/g, "$1");
   formula = formula.replace(/\[(.+)\]/g, "$1");
 
   if (formula !== event.target.value.toLowerCase()) auto_save = true;
@@ -2410,26 +2418,16 @@ dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (
   let modificateur = parseInt(formula.replace(base, "").replace(/[+-]/g, ""), 10);
   if (isNaN(modificateur)) modificateur = 0;
 
-  base = (base[0] ?? "").toUpperCase() + (base.slice(1) ?? "").toLowerCase();
-
-  if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
+  if (base === "") {
+    dialog_sort_2.querySelector(".res_save").textContent = eval(operateur.toString() + modificateur.toString());
+  }
+  else if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
     dialog_sort_2.querySelector(".res_save").textContent = "(???)";
-  } else {
+  }
+  else {
     dialog_sort_2.querySelector(".res_save").textContent =
       "(" + (auto_save ? "[" : "") + base + (auto_save ? "]" : "") + operateur.toString() + modificateur.toString() + ")";
   }
-
-  // Application des sauvegardes au sort des cibles
-  Pions.filter((p) => p.Cible_sort).forEach((p) => {
-    console.log("Sauvegarde au sort :",
-      p.Titre,
-      p.sauvegarde_au_sort(
-        auto_save,
-        base,
-        operateur.toString() + modificateur.toString()
-      )
-    );
-  });
 });
 
 // Gestion du changement de la durée
@@ -2470,11 +2468,6 @@ dialog_sort_2.addEventListener("input", function (event) {
   else {
     dialog_sort_2.querySelector(res).textContent = "(???)";
   }
-
-  // Application des sauvegardes au sort des cibles
-  Pions.filter((p) => p.Cible_sort).forEach((p) => {
-    console.log("Durée du sort :", p.Titre, duree, modificateur);
-  });
 });
 
 // Gestion du changement des dégâts
@@ -2509,15 +2502,6 @@ dialog_sort_2.querySelector(".prompt_degats").addEventListener("input", function
   } else {
     dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
   }
-
-  // Application des sauvegardes au sort des cibles
-  Pions.filter((p) => p.Cible_sort).forEach((p) => {
-    console.log("Dégâts du sort :",
-      p.Titre,
-      dialog_sort_2.querySelector("#sel_degats").value === "0" ? "généraux" : "localisés",
-      degats,
-      modificateur);
-  });
 });
 
 // Gestion des clics sur les spans pour sélectionner le type de dégâts / durée
@@ -2527,4 +2511,88 @@ dialog_sort_2.querySelectorAll("span").forEach((span) => {
     if (radio === null || typeof radio === "undefined") return;
     radio.click();
   });
+});
+
+// Bouton "Acter" (Valide la sélection spécifique et ferme le dialogue)
+dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (event) {
+  const magicien = Pions.find((p) => p.Attaquant);
+
+  // Mise à jour des points de fatigue et de concentration
+  magicien.Fatigue -= dialog_sort_2.querySelector(".fatigue_cout").value;
+  magicien.Concentration -= dialog_sort_2.querySelector(".concentration_cout").value;
+
+  Pions.filter((p) => p.Cible_sort).forEach((p) => {
+    // Détermination de la sauvegarde au sort
+    let save = p.sauvegarde_au_sort(
+      dialog_sort_2.querySelector(".res_save").textContent);
+
+    // Traitement des dégâts du sort
+    p.degats_du_sort(
+      save,
+      dialog_sort_2.querySelector(".res_degats").textContent,
+      dialog_sort_2.querySelector(".sel_degats").value === "0" ? "généraux" : "localisés");
+
+    // Détermination de la durée du sort et de l'état
+    let duree = null;
+    let etat = null;
+    if (save >= 0) {
+      duree = p.duree_du_sort(
+        save, // MR
+        dialog_sort_2.querySelector(".res_duree_succes").textContent);
+      etat = dialog_sort_2.querySelector("#sel_etat_succes").value;
+    }
+    else {
+      duree = p.duree_du_sort(
+        -save, // ME
+        dialog_sort_2.querySelector(".res_duree_echec").textContent);
+      etat = dialog_sort_2.querySelector("#sel_etat_echec").value;
+    }
+
+    if (etat !== "") {
+      const attaque1 = new Attaque();
+      attaque1.Model = p.Model;
+      attaque1.Indice = p.Indice;
+      attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;
+      attaque1.Competence = etat;
+      attaque1.Bonus = null;
+      Attaques.push(attaque1);
+    }
+
+    // Autres types de bonus
+    ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
+      let id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + (save >= 0 ? "_succes" : "_echec");
+      let champs = dialog_sort_2.querySelector("#" + id);
+      
+      if (champs.value !== "") {
+         const attaque1 = new Attaque();
+        attaque1.Model = p.Model;
+        attaque1.Indice = p.Indice;
+        attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;
+        attaque1.Competence = bonus.Nom_bonus;
+        attaque1.Bonus = champs.value;
+        Attaques.push(attaque1);
+      }
+    });
+
+    Attaques.sort(Attaque.tri);
+  });
+
+  // Réinitialisation des variables de sortilège du magicien
+  magicien.Nom_liste = null;
+  magicien.Nom_sort = null;
+  magicien.Incantation = 0;
+  magicien.Fatigue_sort = 0;
+  magicien.Concentration_sort = 0;
+  magicien.setArmes();
+
+  magicien.Attaquant = false;
+  Pions.forEach((p) => { p.Cible_sort = false; });
+
+  // Mise à jour de la carte
+  Map.generateHexMap();
+  Map.drawHexMap();
+
+  dialog_sort_2.close();
+
+  next_attaque();
 });

@@ -7,10 +7,12 @@
 
 // === VARIABLES GLOBALES DE COMBAT ===
 let Attaques = [];              // Tableau contenant toutes les attaques
+let current_attaque = null;     // Attaque en cours
 let Cacs = [];                  // Tableau des combats au corps à corps
 let Cacs_save = null;           // Tableau des combats futurs
-let order_combats = -2;         // Index de l'attaque actuelle
 let break_combats = false;      // Flag d'arrêt du combat
+let Nb_rounds = 0;              // Nombre de rounds de combat
+
 let contre_attaque = null;      // contre-attaque
 
 /**
@@ -42,8 +44,7 @@ function calculateInitiative(pion, main = 0) {
     const arme2 = pion.Arme2 ? Armes.find(a => a.Nom_arme === pion.Arme2) : null;
     const init1 = arme1 ? arme1.Init : 99;
     const init2 = arme2 ? arme2.Init : 99;
-    const model = Models.find(m => m.Nom_model === pion.Model);
-    const vitesseBonus = Math.floor((model.Vp - 10) / 2);
+    const vitesseBonus = Math.floor((pion.getValue("Vp") - 10) / 2);
     const res1 = init1 - ((arme1 && arme1.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
     const res2 = init2 - ((arme2 && arme2.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
 
@@ -73,10 +74,16 @@ function isInMeleeCombat(pion1, pion2) {
  * Classe Attaque - Représente une attaque dans l'ordre d'initiative
  */
 class Attaque {
-    Model = "";     // Modèle du personnage
-    Indice = 0;     // Indice du pion
-    Timing = 0;     // Timing d'initiative
-    Main = 0;       // Main de l'attaque
+    Model = "";        // Modèle du personnage
+    Indice = 0;        // Indice du pion
+    Timing = 0;        // Timing d'initiative
+
+    // Attaque de l'une des 2 mains
+    Main = null;       // Main de l'attaque (1 ou 2)
+
+    // Bonus / malus temporaires
+    Competence = null; // Competence de l'attaque (si bonus)
+    Bonus = null;      // Bonus de l'attaque (si bonus)
 
     /**
      * Tri des attaques par timing puis par type, modèle et indice
@@ -156,9 +163,6 @@ class Cac {
         const init1 = calculateInitiative(pion1);
         const init2 = calculateInitiative(pion2);
 
-        const model1 = Models.find(m => m.Nom_model === pion1.Model);
-        const model2 = Models.find(m => m.Nom_model === pion2.Model);
-
         // Détermination de l'avantage selon l'initiative et la valeur de VP
         // Avantage 1 = allié (pion1), Avantage 2 = ennemi (pion2), 0 = aucun
         this.Avantage = 0;
@@ -168,7 +172,7 @@ class Cac {
         else if (init1 > init2) {
             this.Avantage = 2;  // Ennemi plus rapide
         }
-        else if (model1.Vp >= model2.Vp) {
+        else if (pion1.Vp >= pion2.Vp) {
             this.Avantage = 1;  // Égalité, allié avec plus de VP
         }
         else {
@@ -185,15 +189,18 @@ class Cac {
 /**
  * Initialise et démarre le système d'attaques
  */
-function start_attaques() {
+function start_next_round() {
     // Restauration des combats au corps à corps
-    if (Cacs_save != null) Cacs = cloneCacs(Cacs_save); // Clone de Cacs_save avec méthodes préservées
+    if (Cacs_save != null) {
+        Cacs = cloneCacs(Cacs_save); // Clone de Cacs_save avec méthodes préservées
+        Nb_rounds++;
+    }
     else {
         Cacs = [];
 
         Pions.filter(pion1 => pion1.Type === "allies").forEach(pion1 => {
             Pions.filter(pion2 => pion2.Type === "ennemis").forEach(pion2 => {
-                // Si les pions sont en combat au corps à corps, on crée un combat au corps à corps
+                // Si les pions sont en combat en mélée, on crée un combat au corps à corps
                 if (isInMeleeCombat(pion1, pion2)) {
                     const c = new Cac();
                     c.Model_allie = pion1.Model;
@@ -209,10 +216,8 @@ function start_attaques() {
 
         // Clone de Cacs avec méthodes préservées
         Cacs_save = cloneCacs(Cacs);
+        Nb_rounds = 0;
     }
-
-    // Réinitialisation des attaques 
-    Attaques = [];
 
     // Réinitialisation des états des pions
     Pions.forEach(pion => {
@@ -234,17 +239,19 @@ function start_attaques() {
     // Calcul des timings d'initiative
     Pions.forEach(pion => {
         if (pion.Arme1 === "Lancement de sort") {
+            // Création de l'attaque : lancement de sort
+            const sort = Sorts.find(s => s.Nom_liste === pion.Nom_liste && s.Nom_sort === pion.Nom_sort);
+            if (sort === null || typeof sort === "undefined") return;
+
+            // Si le temps d'incantation du sort est differente de celui de base, on ne relance pas le sort
+            if (pion.Incantation !== expurger_temps_sort(sort.Incantation)) return;
+
             const attaque1 = new Attaque();
             attaque1.Model = pion.Model;
             attaque1.Indice = pion.Indice;
             attaque1.Main = 1;
-            if (pion.Incantation <= 5) {
-                attaque1.Timing = pion.Incantation;
-                Attaques.push(attaque1);
-            }
-            else {
-                pion.Incantation -= 5;
-            }
+            attaque1.Timing = Nb_rounds * 5 + pion.Incantation;
+            Attaques.push(attaque1);
             return;
         }
 
@@ -253,7 +260,7 @@ function start_attaques() {
         const attaque1 = new Attaque();
         attaque1.Model = pion.Model;
         attaque1.Indice = pion.Indice;
-        attaque1.Timing = 2 + 0.1 * init1;
+        attaque1.Timing = Nb_rounds * 5 + 2 + 0.1 * init1;
         attaque1.Main = 1;
         Attaques.push(attaque1);
 
@@ -263,10 +270,9 @@ function start_attaques() {
             const attaque2 = new Attaque();
             attaque2.Model = pion.Model;
             attaque2.Indice = pion.Indice;
-            attaque2.Timing = 3 + 0.1 * init2;
+            attaque2.Timing = Nb_rounds * 5 + 3 + 0.1 * init2;
             attaque2.Main = 2;
             Attaques.push(attaque2);
-            // }
         }
     });
 
@@ -274,24 +280,25 @@ function start_attaques() {
     Attaques.sort(Attaque.tri);
 
     // Réinitialisation des variables
-    order_combats = -1;
     break_combats = false;
     contre_attaque = null;
 
     Messages.ecriture_directe("Phase de combat initialisée");
 }
 
+let init_round = false;
 /**
  * Passe à l'attaque suivante dans l'ordre d'initiative
  */
 function next_attaque() {
-    console.log("Attaques :", Attaques, "order_combats :", order_combats, "Cacs :", Cacs);
+    // Initialisation du round si c'est le début du round
+    if (!init_round) {
+        init_round = true;
+        start_next_round();
+    }
 
-    // Initialisation du combat si c'est le début
-    if (order_combats === -2) start_attaques();
-
-    // Fin du combat si toutes les attaques sont terminées
-    if (break_combats || order_combats + 1 > Attaques.length - 1) {
+    // Fin du round si toutes les attaques sont terminées
+    if (break_combats || Attaques.filter(a => a.Competence === null).length === 0) {
         // Prend l'avantage sur les attaquants qui n'ont pas attaqué
         Cacs.filter(c => c.Attaque === 0 && c.Avantage === 1).forEach(x => {
             const attaquant = Pions.find(p => p.Model === x.Model_allie && p.Indice === x.Indice_allie);
@@ -311,17 +318,22 @@ function next_attaque() {
         Map.generateHexMap();
         Map.drawHexMap();
 
-        // Fin du combat
+        // Fin du round
         break_combats = true;
-        order_combats = -2;
         contre_attaque = null;
+        init_round = false;
         Messages.ecriture_directe("Fin de la phase combat");
         return;
     }
 
+    // On expurge les éléments passé de date (dont ceux ayant Compétence non nulle)
+    Attaques = Attaques.filter(a => a.Timing >= Nb_rounds * 5);
+    Attaques.sort(Attaque.tri);
+
     // Passage à l'attaque suivante
-    order_combats++;
-    const attaque = Attaques[order_combats];
+    current_attaque = Attaques.filter(a => a.Competence === null)[0];
+    const index = Attaques.indexOf(current_attaque);
+    Attaques.splice(index, 1);
 
     // Fermeture de tous les dialogues de combat
     [dialog_attaque_1, dialog_attaque_2, dialog_attaque_3, dialog_defense_1, dialog_defense_2]
@@ -336,15 +348,15 @@ function next_attaque() {
     });
 
     // Sélection de l'attaquant actuel
-    const attaquant = Pions.find(p => p.Model === attaque.Model && p.Indice === attaque.Indice);
+    const attaquant = Pions.find(p => p.Model === current_attaque.Model && p.Indice === current_attaque.Indice);
     attaquant.Attaquant = true;
 
     // Réinitialisation des états d'attaque
-    if (attaque.Main === 1) {
+    if (current_attaque.Main === 1) {
         attaquant.at1_att = true;
         attaquant.at2_att = false;
     }
-    else if (attaque.Main === 2) {
+    else if (current_attaque.Main === 2) {
         attaquant.at1_att = false;
         attaquant.at2_att = true;
     }
@@ -355,22 +367,31 @@ function next_attaque() {
 
     // Gestion des lancements de sorts
     if (attaquant.Arme1 === "Lancement de sort") {
-        Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${attaque.Timing.toFixed(2)}s)...`);
+        if (current_attaque.Timing > Nb_rounds * 5 + 5) {
+            attaquant.Incantation -= 5;
+            Attaques.push(current_attaque);
+            next_attaque();
+            return;
+        }
 
-        // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort)
+        Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${current_attaque.Timing.toFixed(2)}s)...`);
+
+        // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort ou un multiple)
         attaquant.Fatigue -= attaquant.Fatigue_sort;
         attaquant.Fatigue_down = attaquant.Fatigue_sort;
 
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
 
-        // Affichage du panneau d'information du sort
-        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
-        createSpellInfo(document.body, sort);
-
         // Identification des cibles de sort : potentiellement tout le monde, mais au début aucune cible
         Pions.forEach(pion => { pion.Cible_sort = false; });
-        if (sort.zone === "le magicien") attaquant.Cible_sort = true;
+
+        // Affichage du panneau d'information du sort
+        const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
+        if (sort !== null && typeof sort !== "undefined") {
+            createSpellInfo(document.body, sort);
+            if (sort.zone === "le magicien") attaquant.Cible_sort = true;
+        }
 
         // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
         document.removeEventListener("click", closeSpellInfo);
@@ -382,17 +403,18 @@ function next_attaque() {
         Map.generateHexMap();
         Map.drawHexMap();
 
+        // next_attaque(); // Ne pas passer à l'attaque suivante : il faut selectionner les cibles du sort
         return;
     }
 
     // Identification de l'arme
     let arme = null;
-    if (attaque.Main === 1) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
-    else if (attaque.Main === 2) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
+    if (current_attaque.Main === 1) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
+    else if (current_attaque.Main === 2) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
 
     // Initialisation des défenseurs
     if (contre_attaque) {
-        Pions.find(p => p.Model === contre_attaque.Model && p.Indice === contre_attaque.Indice).Defenseur = true;
+        contre_attaque.Defenseur = true;
     }
     else {
         Pions.forEach(pion => {
@@ -413,11 +435,11 @@ function next_attaque() {
             // Combat au corps à corps : vérifier les Cacs
             const combat = Cacs.find(c => {
                 if (attaquant.Type === "allies") {
-                    return c.Model_allie === attaque.Model && c.Indice_allie === attaque.Indice &&
+                    return c.Model_allie === current_attaque.Model && c.Indice_allie === current_attaque.Indice &&
                         c.Model_ennemi === pion.Model && c.Indice_ennemi === pion.Indice && c.Avantage === 1;
                 } else {
                     return c.Model_allie === pion.Model && c.Indice_allie === pion.Indice &&
-                        c.Model_ennemi === attaque.Model && c.Indice_ennemi === attaque.Indice && c.Avantage === 2;
+                        c.Model_ennemi === current_attaque.Model && c.Indice_ennemi === current_attaque.Indice && c.Avantage === 2;
                 }
             });
 
@@ -427,7 +449,6 @@ function next_attaque() {
 
     // Vérifier s'il y a des défenseurs
     if (!Pions.find(p => p.Defenseur)) {
-        console.log("Aucun défenseur trouvé");
         contre_attaque = null;
         next_attaque();
         return;
@@ -440,7 +461,6 @@ function next_attaque() {
     if ((!attaquant.Arme1 || attaquant.Arme1 === "" || attaquant.Arme1_engagee) &&
         (!attaquant.Arme2 || attaquant.Arme2 === "" || attaquant.Arme2 === "Bouclier" || attaquant.Arme2_engagee) &&
         (!arme || arme.A_distance)) {
-        console.log("Aucune attaque possible");
         contre_attaque = null;
         next_attaque();
         return;
@@ -450,7 +470,6 @@ function next_attaque() {
     if (contre_attaque || Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
 
     contre_attaque = null;
-    console.log("Fin next_attaque");
 }
 
 /**
@@ -458,13 +477,12 @@ function next_attaque() {
  */
 function calcul_fdc_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
 
     if (dialog_attaque_2.querySelector(".surprise_totale").checked) return 0;
     if (dialog_attaque_2.querySelector(".immobile").checked) return 0;
     if (defenseur.Poitrine < 0) return 0;
 
-    let fdc = model_def.get_competence("Feinte de corps") + (defenseur.B_fdc || 0);
+    let fdc = defenseur.get_competence("Feinte de corps") + (defenseur.B_fdc || 0);
 
     // On perd 2 en FdC pour chaque attaquant au corps-à-corps qui a l'avantage
     let malus_FdC = 0;
@@ -504,7 +522,6 @@ function calcul_fdc_def() {
  */
 function explications_fdc_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
     let fdc = 0;
 
     let explication = `<strong>Calcul de la feinte de corps du défenseur :</strong><br>`;
@@ -513,8 +530,8 @@ function explications_fdc_def() {
     else if (dialog_attaque_2.querySelector(".immobile").checked) explication += `Immobile : FdC = 0<br>`;
     else if (defenseur.Poitrine < 0) explication += `Poitrine gravement blessée : FdC = 0<br>`;
     else {
-        fdc = model_def.get_competence("Feinte de corps");
-        explication += `Base du modèle : ${model_def.get_competence("Feinte de corps") || 0}<br>`;
+        fdc = defenseur.get_competence("Feinte de corps");
+        explication += `Base du modèle : ${defenseur.get_competence("Feinte de corps") || 0}<br>`;
 
         if (defenseur.B_fdc !== 0) {
             explication += `Bonus de feinte de corps : ${defenseur.B_fdc || 0}<br>`;
@@ -590,7 +607,6 @@ function explications_fdc_def() {
  */
 function calcul_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
-    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
     let score = attaquant.jet_att;
 
     // Malus de base de -10
@@ -603,14 +619,14 @@ function calcul_scr_att() {
     if (attaquant.at1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
-            score += model_att.get_competence(Arme1.Competence);
+            score += attaquant.get_competence(Arme1.Competence);
         }
     }
 
     if (attaquant.at2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
-            score += model_att.get_competence(Arme2.Competence);
+            score += attaquant.get_competence(Arme2.Competence);
         }
     }
 
@@ -621,9 +637,9 @@ function calcul_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                score -= Math.max(2 - model_att.get_competence("Escrime"), 0);
+                score -= Math.max(2 - attaquant.get_competence("Escrime"), 0);
             } else {
-                score -= Math.max(6 - model_att.get_competence("Escrime"), 0);
+                score -= Math.max(6 - attaquant.get_competence("Escrime"), 0);
             }
         }
     }
@@ -649,7 +665,6 @@ function calcul_scr_att() {
  */
 function explications_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
-    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
 
     let explication = `<strong>Calcul du score d'attaque :</strong><br>`;
     explication += `Jet de dés : ${attaquant.jet_att || 0}<br>`;
@@ -658,13 +673,13 @@ function explications_scr_att() {
     if (attaquant.at1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
-            competence = model_att.get_competence(Arme1.Competence);
+            competence = attaquant.get_competence(Arme1.Competence);
         }
     }
     else if (attaquant.at2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
-            competence = model_att.get_competence(Arme2.Competence);
+            competence = attaquant.get_competence(Arme2.Competence);
         }
     }
     explication += `Plus la Compétence de l'arme : ${competence}<br>`;
@@ -679,11 +694,11 @@ function explications_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_att.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(2 - model_att.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - attaquant.get_competence("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(2 - attaquant.get_competence("Escrime"), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_att.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(6 - model_att.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - attaquant.get_competence("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(6 - attaquant.get_competence("Escrime"), 0);
             }
         }
     }
@@ -717,7 +732,6 @@ function explications_scr_att() {
  */
 function calcul_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
     let score = defenseur.jet_def;
     score -= 10;
 
@@ -728,13 +742,13 @@ function calcul_scr_def() {
         let Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (typeof Arme1 === "undefined") Arme1 = null;
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
-            competenceArme += Arme1.Facteur_parade * model_def.get_competence(Arme1.Competence);
+            competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
         }
 
         let Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (typeof Arme2 === "undefined") Arme2 = null;
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
-            competenceArme += Arme2.Facteur_parade * model_def.get_competence(Arme2.Competence);
+            competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
         }
 
         score += competenceArme;
@@ -742,7 +756,7 @@ function calcul_scr_def() {
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        score += model_def.get_competence("Esquive");
+        score += defenseur.get_competence("Esquive");
         if (defenseur.Nb_action > 0) {
             score -= defenseur.Nb_action;
         }
@@ -752,9 +766,9 @@ function calcul_scr_def() {
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                score -= Math.max(2 - model_def.get_competence("Escrime"), 0);
+                score -= Math.max(2 - defenseur.get_competence("Escrime"), 0);
             } else {
-                score -= Math.max(6 - model_def.get_competence("Escrime"), 0);
+                score -= Math.max(6 - defenseur.get_competence("Escrime"), 0);
             }
         }
     }
@@ -771,7 +785,6 @@ function calcul_scr_def() {
  */
 function explications_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    const model_def = Models.find(m => m.Nom_model === defenseur.Model);
 
     let explication = `<strong>Calcul du score de défense :</strong><br>`;
     explication += `Jet de dés : ${defenseur.jet_def || 0}<br>`;
@@ -784,12 +797,12 @@ function explications_scr_def() {
     if (defenseur.pr1_def || defenseur.pr2_def) {
         const Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
-            competenceArme += Arme1.Facteur_parade * model_def.get_competence(Arme1.Competence);
+            competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
         }
 
         const Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
-            competenceArme += Arme2.Facteur_parade * model_def.get_competence(Arme2.Competence);
+            competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
         }
         explication += `Plus la Compétence de parade : ${competenceArme}<br>`;
         scoreFinal = defenseur.jet_def - 10 + competenceArme;
@@ -797,20 +810,20 @@ function explications_scr_def() {
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        explication += `Plus la Compétence d'esquive : ${model_def.get_competence("Esquive")}<br>`;
+        explication += `Plus la Compétence d'esquive : ${defenseur.get_competence("Esquive")}<br>`;
         if ((defenseur.Nb_action || 0) > 0) explication += `Moins le Nombre d'actions : ${-defenseur.Nb_action}<br>`;
-        scoreFinal = defenseur.jet_def - 10 + (model_def.get_competence("Esquive") || 0) - (defenseur.Nb_action || 0);
+        scoreFinal = defenseur.jet_def - 10 + (defenseur.get_competence("Esquive") || 0) - (defenseur.Nb_action || 0);
     }
 
     // Malus d'escrime pour combat à deux armes
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - model_def.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(2 - model_def.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - defenseur.get_competence("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(2 - defenseur.get_competence("Escrime"), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - model_def.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(6 - model_def.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - defenseur.get_competence("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(6 - defenseur.get_competence("Escrime"), 0);
             }
         }
     }
@@ -855,7 +868,7 @@ function calcul_dommages(margin) {
 
     // Le coefficient de force de l'arme multiplie le modificateur de force du personnage
     const model_att = Models.find(m => m.Nom_model === attaquant.Model);
-    damage += arme.Coeff_force * Math.floor((model_att.Force - 10) / 2);
+    damage += arme.Coeff_force * Math.floor((attaquant.getValue("Force") - 10) / 2);
 
     // Arrondi des dommages pour éviter les décimales
     damage = Math.round(damage);
@@ -956,18 +969,30 @@ function contre_attaque_defenseur() {
     if (arme && arme.A_distance) return;
 
     // Ramener la future attaque du defenseur à la prochaine position
-    const next_att_def = Attaques.filter(
-        x => x.Model === defenseur.Model &&
-            x.Indice === defenseur.Indice &&
-            Attaques.indexOf(x) > order_combats)[0];
+    let next_att_def = null;
+    Attaques.filter(x =>
+        x.Model === defenseur.Model &&
+        x.Indice === defenseur.Indice &&
+        x.Competence === null).forEach(a => {
+            if (a.Main === 1) {
+                if (!defenseur.Arme1 || defenseur.Arme1 === "") return;
+                if (defenseur.Arme1 === "Bouclier") return;
+                if (defenseur.Arme1 === "Lancement de sort") return;
+                if (defenseur.Arme1_engagee) return;
+            }
+            if (a.Main === 2) {
+                if (!defenseur.Arme2 || defenseur.Arme2 === "") return;
+                if (defenseur.Arme2 === "Bouclier") return;
+                if (defenseur.Arme2 === "Lancement de sort") return;
+                if (defenseur.Arme2_engagee) return;
+            }
+            next_att_def = a;
+        });
 
-    if (next_att_def) {
-        // Supprimer l'attaque du defenseur de la liste des attaques
-        const index = Attaques.indexOf(next_att_def);
-        if (index > -1) Attaques.splice(index, 1);
-
-        // Ajouter l'attaque du defenseur à la position order_combats
-        Attaques.splice(order_combats + 1, 0, next_att_def);
+    if (next_att_def !== null && typeof next_att_def !== "undefined") {
+        // Ramener la future attaque du defenseur à la prochaine position
+        next_att_def.Timing = Nb_rounds * 5 + 0.01;
+        Attaques.sort(Attaque.tri);
 
         contre_attaque = attaquant;
 
@@ -983,20 +1008,25 @@ function contre_attaque_defenseur() {
  */
 function resoudre_attaque() {
     // Récupération des pions et calcul des scores
-    const attaquant = Pions.find(p => p.Attaquant);
-    const defenseur = Pions.find(p => p.Defenseur);
+    let attaquant = Pions.find(p => p.Attaquant);
+    let defenseur = Pions.find(p => p.Defenseur);
     const scr_att = calcul_scr_att();
     const scr_def = calcul_scr_def();
     const margin = scr_att - Math.max(scr_def, 0);
 
-    // S'il n'y a pas d'attaque, on perd l'avantage et on passe à l'attaque suivante
+    // Si l'attaquant lance un sort, on ne fait rien
+    if (attaquant.Arme1 === "Lancement de sort") return;
+
+    // Si l'attaquant est blessé, on perd l'avantage et on passe à l'attaque suivante
     if (attaquant.Est_blesse) {
         prend_avantage(defenseur, attaquant);
         contre_attaque_defenseur();
         next_attaque();
         return;
     }
-    else if (!attaquant.at1_att && !attaquant.at2_att) {
+
+    // S'il n'y a pas d'attaque, on passe à l'attaque suivante
+    if (!attaquant.at1_att && !attaquant.at2_att) {
         contre_attaque_defenseur();
         next_attaque();
         return;
@@ -1117,6 +1147,5 @@ function resoudre_attaque() {
         contre_attaque_defenseur();
     }
 
-    // Passer automatiquement à l'attaque suivante dans l'ordre d'initiative
     next_attaque();
 }
