@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : ven. 05 déc. 2025 à 16:04
+-- Généré le : sam. 13 déc. 2025 à 21:08
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -55,6 +55,84 @@ INSERT INTO `arme` (`Nom_arme`, `Competence`, `Facteur_parade`, `Is_personnel`, 
 ('Elémental d\'eau', 'Attaque', NULL, 1, 1, 0, 2, 0, 18, 0, 0, NULL, 9),
 ('Epée longue (1 main)', 'Epée', 0.7, 0, 0, 0, 1.5, 1, 18, 1, 0, NULL, 6),
 ('Epée trolle (1 main)', 'Epée', 0.6, 0, 0, 0, 1.75, 2, 23, 1, 0, NULL, 5);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `bonus`
+--
+
+CREATE TABLE `bonus` (
+  `Nom_bonus` varchar(128) NOT NULL,
+  `Nature` varchar(128) DEFAULT NULL,
+  `Ordre` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `bonus`
+--
+
+INSERT INTO `bonus` (`Nom_bonus`, `Nature`, `Ordre`) VALUES
+('Abdomen', 'Armure', 3),
+('Ajout Fatigue par tour', 'Divers', 4),
+('Attaque CàC', 'Compétence', 1),
+('Attaque Dist', 'Compétence', 2),
+('Aveuglé', 'Etat', 0),
+('Bras droit', 'Armure', 4),
+('Bras gauche', 'Armure', 5),
+('Charisme', 'Attribut', 3),
+('Coordination', 'Attribut', 4),
+('Dégâts', 'Divers', -1),
+('Dégâts généraux', 'Divers', -1),
+('Dommages CàC', 'Divers', 1),
+('Dommages Dist', 'Divers', 2),
+('Durée', 'Divers', -1),
+('Esquive', 'Compétence', 4),
+('Feinte de corps', 'Compétence', 3),
+('Force', 'Attribut', 1),
+('Hébété', 'Etat', 0),
+('Initiative', 'Divers', 3),
+('Jambe droite', 'Armure', 6),
+('Jambe gauche', 'Armure', 7),
+('Neutre', 'Etat', 0),
+('Pacifique', 'Etat', 0),
+('Parade', 'Compétence', 5),
+('Poitrine', 'Armure', 2),
+('Sonné', 'Etat', 0),
+('Tête', 'Armure', 1),
+('Type dégâts', 'Divers', -1),
+('Vivacité physique', 'Attribut', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `bonus_sort`
+--
+
+CREATE TABLE `bonus_sort` (
+  `Nom_liste` varchar(128) NOT NULL,
+  `Nom_sort` varchar(256) NOT NULL,
+  `Nom_bonus` varchar(128) NOT NULL,
+  `Succes` tinyint(1) NOT NULL DEFAULT 1,
+  `Valeur` varchar(32) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Déchargement des données de la table `bonus_sort`
+--
+
+INSERT INTO `bonus_sort` (`Nom_liste`, `Nom_sort`, `Nom_bonus`, `Succes`, `Valeur`) VALUES
+('Liste de la lumière et de l\'électricité', 'Flash lumineux', 'Aveuglé', 0, NULL),
+('Liste de la lumière et de l\'électricité', 'Flash lumineux', 'Durée', 0, 'ME'),
+('Liste du feu', 'Boule de feu', 'Dégâts', 1, '3D4+1-MR'),
+('Liste du feu', 'Boule de feu', 'Durée', 0, '5'),
+('Liste du feu', 'Boule de feu', 'Durée', 1, '2'),
+('Liste du feu', 'Boule de feu', 'Esquive', 0, '-2'),
+('Liste du feu', 'Boule de feu', 'Hébété', 0, NULL),
+('Liste du feu', 'Boule de feu', 'Hébété', 1, NULL),
+('Liste du feu', 'Boule de feu', 'Parade', 0, '-2'),
+('Liste du froid', 'Ligne de glace', 'Dégâts', 1, '1D4+3-MR'),
+('Liste du froid', 'Ligne de glace', 'Type dégâts', 1, 'Localisés');
 
 -- --------------------------------------------------------
 
@@ -653,11 +731,11 @@ CREATE TABLE `model` (
 
 INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Capacites`, `Etat`, `PM`, `PP`, `VP`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Perception`, `VM`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`, `Tete`, `Poitrine`, `Abdomen`, `BrasG`, `BrasD`, `JambeG`, `JambeD`) VALUES
 ('Boris', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Christophe', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 14, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Christophe', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 14, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
 ('Cyril', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
 ('Elémental d\'air', 0, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', '', 4, 10, 20, 30, 0, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 5, 5, 4, 4, 6, 6),
 ('Elémental d\'eau', 0, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', '', 3, 14, 16, 40, 0, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20, 4, 7, 7, 5, 5, 8, 8),
-('Guilhem', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Guilhem', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 15, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
 ('Guillaume', 1, '', '', 0, 0, 10, 0, 80, 0, 'Liste du feu', 14, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
 ('Ludovic', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10);
 
@@ -732,7 +810,7 @@ INSERT INTO `sort` (`Nom_liste`, `Nom_sort`, `Niveau`, `Portee`, `Incantation`, 
 ('Liste des créatures surnaturelles', 'Chasseur invisible', 7, 'contact', '10 s', '2 h', '-', 'le magicien', 'Par ce sort le magicien invoque pour l’aider une créature venant d’un autre plan d’existence. Cette créature a besoin qu’un pentacle soit dessiné sur le sol pour se matérialiser.\nIl s’agit d’un chasseur invisible, dont les caractéristiques sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Il a un score de +6 en attaque, +5 en feinte de corps, +3 en esquive et inflige des dommages incapacitants égaux à 1,5 x marge + 1. Les attaques et défenses contre lui s’effectuent en difficulté « Malaisé » (malus de -2).\nAu moment où il arrive, le magicien a la possibilité de lui ordonner de remplir une mission. La créature est d’une grande intelligence (autour de 14 en Vivacité mentale et en Abstraction) et s’acquittera de son mieux de sa tâche, pour peu que celle-ci ne soit pas en opposition avec sa philosophie (voir la philosophie associée à la Liste de Magie Pure dans le chapitre La nature de la magie).\nIl n’est possible de donner qu’une mission au chasseur invisible, comme « Ramène-moi tel objet qui se trouve à tel endroit » ou « Suis-moi et protège-moi ». Il refusera les missions à tiroirs ou trop complexes.\nLe chasseur invisible disparaît après un jour ou une fois qu’il a accompli sa mission.\nLe magicien peut utiliser ce sort pour contrôler un chasseur invisible qui a été invoqué ou le renvoyer dans son plan d’existence. Dans ce cas, l’incantation est réduite à seulement 5 secondes. Le chasseur invisible a droit à une sauvegarde sous respectivement PM+2 pour le contrôler et PM-2 pour le renvoyer dans son propre plan.', 4),
 ('Liste du feu', 'Chauffer', 1, '-', '2 s', '2 h', '-', 'boule de 3m *', 'Ce sort permet d\'élever la température de l\'air à l\'intérieur de la zone d’effet. Le magicien décide une fois pour toute au début du sort de la température qu\'il règnera ; celle-ci peut aller de la température naturelle à environ 40 degrés Celsius. La zone d’effets se déplace ensuite avec le magicien.\nNotez que tout autre sort affectant la température occulte celui-ci (mais ne le dissipe pas).', 4),
 ('Liste de la nature', 'Chef de clan', 20, '-', '2 min', '1 semaine', '-', 'le magicien', 'Ce sortilège confère au magicien un pouvoir presque absolu sur une race d’animaux de son choix.\nTous les animaux de cette race présents dans un rayon de 15 km autour du magicien sont conscients de sa présence et se mettent en route pour le rejoindre et l’aider. Seuls les animaux déjà sous l’effet d’un sortilège ne répondent pas à cet appel.\nPendant toute la durée du sort, tout animal de cette race s’approchant à moins de 15 km du magicien subit aussitôt son influence ; inversement cette influence cesse d’affecter tout animal qui se trouve à un moment éloigné de plus de 15 km du magicien.\nChacun des animaux est vis à vis du magicien comme sous le coup d’un sortilège d’Alliance : le magicien est à tout moment parfaitement conscient de sa localisation, peut en se concentrant percevoir le monde à travers ses sens et est lié à lui par une forme limitée d’empathie/télépathie qui lui permet de lui donner des ordres simples, comme « cache toi », « reviens » « sois prudent » ou « surveille ». Le magicien est de plus sous l’effet d’un sortilège de Langage animal vis à vis de la race choisie, qui lui permet de converser avec ses représentants pour obtenir des renseignements précis ou donner des consignes un peu plus complexes (la complexité des ordres exécutables par les animaux reste cependant limitée par leur intelligence).\nLes animaux de la race choisie par le magicien considèrent celui-ci comme leur chef incontestable et lui obéissent aveuglément. Ils mourront pour lui sans l’ombre d’une hésitation. De plus, tant qu’ils sont sous son influence, ils sont insensibles à tout autre sortilège visant à obtenir une influence sur eux, comme Langage animal ou Amitié animale par exemple.', 2),
-('Liste des créatures surnaturelles', 'Chiens des enfers', 6, '20 m', '12 s', '1 h', 'spéciale', '20 m de rayon', 'Ce sort fait apparaître 1d4+1 chiens des enfers à partir du point choisi par le magicien. Les chiens se matérialisent progressivement, de sorte qu’il est possible d’anticiper leur arrivée.\nLes chiens des enfers sont naturellement agressifs et auront tendance à attaquer les créatures les plus proches à leur portée, à moins que celles-ci ne leur paraissent trop puissantes. Le magicien et ses compagnons proches entrent dans cette dernière catégorie : les chiens sont conscients que le magicien les a invoqués, ce qui traduit une certaine capacité magique dont ils se méfieront. Ils ne lui obéiront pas particulièrement, mais ils éviteront de l’attaquer, sauf s’il apparaît très affaibli. S’il n’y a aucune créature à attaquer à leur proximité, les chiens des enfers partiront en chasse, grâce notamment à leur odorat remarquable.\nLes caractéristiques des chiens des enfers sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Ils ont +7 en attaque, +5 en feinte de corps, +4 en esquive, et infligent des dommages égaux à 1,5 x marge +1.', 5),
+('Liste des créatures surnaturelles', 'Chiens des enfers', 6, '20 m', '15 s', '1 h', 'spéciale', '20 m de rayon', 'Ce sort fait apparaître 1d4+1 chiens des enfers à partir du point choisi par le magicien. Les chiens se matérialisent progressivement, de sorte qu’il est possible d’anticiper leur arrivée.\nLes chiens des enfers sont naturellement agressifs et auront tendance à attaquer les créatures les plus proches à leur portée, à moins que celles-ci ne leur paraissent trop puissantes. Le magicien et ses compagnons proches entrent dans cette dernière catégorie : les chiens sont conscients que le magicien les a invoqués, ce qui traduit une certaine capacité magique dont ils se méfieront. Ils ne lui obéiront pas particulièrement, mais ils éviteront de l’attaquer, sauf s’il apparaît très affaibli. S’il n’y a aucune créature à attaquer à leur proximité, les chiens des enfers partiront en chasse, grâce notamment à leur odorat remarquable.\nLes caractéristiques des chiens des enfers sont décrites en annexe du présent livre de magie et plus en détail dans le chapitre « Les créatures surnaturelles » du livre du monde. Ils ont +7 en attaque, +5 en feinte de corps, +4 en esquive, et infligent des dommages égaux à 1,5 x marge +1.', 5),
 ('Liste de l\'air', 'Chute de plumes', 2, '50 m', '1/10 s', '5 min', '-', '1 créature', 'La créature ciblée est soudain entourée d\'une enveloppe d\'air qui la propulse vers le haut. La force de cette poussée s\'ajuste magiquement afin que la chute du personnage dépasse à peine la vitesse de l\'air ambiant. Il tombe ainsi à la vitesse d\'une plume, et atterrit délicatement sur le sol.', 1),
 ('Liste de la magie pure', 'Chute de plumes', 2, '50 m', '1/10 s', '5 min', '-', '1 créature', 'La créature ciblée est soudain entourée d\'une enveloppe d\'ondes magiques à l\'intérieur de laquelle la gravité est contrôlée, de façon à réduire sa vitesse de chute à 50 cm/s. Elle tombe lentement et peut donc atterrir délicatement sur le sol. De même, elle peut marcher sur un sol spongieux (y compris sables mouvants) sans s’y enfoncer.\nNotez que ce sortilège affecte la vitesse du déplacement vertical par rapport au sol, mais ne change pas une éventuelle vitesse horizontale.', 1),
 ('Liste des détections', 'Clairaudience', 4, '-', '4 s', '15 min', '-', 'le magicien', 'Ce sort permet au magicien de déplacer le lieu depuis lequel il écoute. En se concentrant sur un endroit qu\'il a effectivement en vue (jusqu’à une limite de 1 km), il peut entendre les sons comme s\'il s\'y trouvait. Cela peut notamment lui permettre de saisir une conversation distante, même si elle se tient à voix basse. Les obstacles matériels importants gênent le passage des ondes magiques du sortilège, et c\'est pourquoi il est nécessaire au magicien de voir l\'endroit depuis lequel il veut écouter.', 1),
@@ -1130,6 +1208,12 @@ INSERT INTO `sort_connu` (`Nom_liste`, `Nom_sort`, `Nom_model`) VALUES
 ('Liste de la terre', 'Statue', 'Christophe'),
 ('Liste de la terre', 'Tempête de sable', 'Christophe'),
 ('Liste du feu', 'Nuée de météores', 'Christophe'),
+('Liste de la lumière et de l\'électricité', 'Boule de lumière', 'Elémental d\'air'),
+('Liste de la lumière et de l\'électricité', 'Eclair', 'Elémental d\'air'),
+('Liste de la lumière et de l\'électricité', 'Moduler la lumière', 'Elémental d\'air'),
+('Liste de la lumière et de l\'électricité', 'Nuage électrique', 'Elémental d\'air'),
+('Liste de la lumière et de l\'électricité', 'Poigne électrique', 'Elémental d\'air'),
+('Liste de la lumière et de l\'électricité', 'Projectile magique', 'Elémental d\'air'),
 ('Liste de l\'air', 'Vol', 'Guilhem'),
 ('Liste de l\'harmonie', 'Accélération de la guérison', 'Guilhem'),
 ('Liste de l\'harmonie', 'Atténuation des sons', 'Guilhem'),
@@ -1158,6 +1242,20 @@ INSERT INTO `sort_connu` (`Nom_liste`, `Nom_sort`, `Nom_model`) VALUES
 ALTER TABLE `arme`
   ADD PRIMARY KEY (`Nom_arme`),
   ADD KEY `FK_Arme` (`Competence`);
+
+--
+-- Index pour la table `bonus`
+--
+ALTER TABLE `bonus`
+  ADD PRIMARY KEY (`Nom_bonus`);
+
+--
+-- Index pour la table `bonus_sort`
+--
+ALTER TABLE `bonus_sort`
+  ADD PRIMARY KEY (`Nom_liste`,`Nom_sort`,`Nom_bonus`,`Succes`),
+  ADD KEY `FK_Bonus_sort1` (`Nom_bonus`),
+  ADD KEY `FK_Bonus_sort2` (`Nom_sort`,`Nom_liste`);
 
 --
 -- Index pour la table `competence`
@@ -1208,7 +1306,7 @@ ALTER TABLE `sort`
 ALTER TABLE `sort_connu`
   ADD PRIMARY KEY (`Nom_model`,`Nom_liste`,`Nom_sort`),
   ADD KEY `FK_Sort_connu1` (`Nom_model`),
-  ADD KEY `FK_Sort_connu2` (`Nom_sort`,`Nom_liste`);
+  ADD KEY `FK_Sort_connu2` (`Nom_liste`,`Nom_sort`);
 
 --
 -- Contraintes pour les tables déchargées
@@ -1219,6 +1317,13 @@ ALTER TABLE `sort_connu`
 --
 ALTER TABLE `arme`
   ADD CONSTRAINT `FK_Arme` FOREIGN KEY (`Competence`) REFERENCES `competence` (`Nom_competence`);
+
+--
+-- Contraintes pour la table `bonus_sort`
+--
+ALTER TABLE `bonus_sort`
+  ADD CONSTRAINT `FK_Bonus_sort1` FOREIGN KEY (`Nom_bonus`) REFERENCES `bonus` (`Nom_bonus`),
+  ADD CONSTRAINT `FK_Bonus_sort2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
 
 --
 -- Contraintes pour la table `competence`
@@ -1263,7 +1368,7 @@ ALTER TABLE `sort`
 --
 ALTER TABLE `sort_connu`
   ADD CONSTRAINT `FK_Sort_connu1` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`),
-  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
+  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_liste`,`Nom_sort`) REFERENCES `sort` (`Nom_liste`, `Nom_sort`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
