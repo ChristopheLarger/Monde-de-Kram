@@ -772,6 +772,7 @@ function afficher_defense(phase) {
     let par_def_1 = null;
     if (Arme1 !== null && typeof Arme1 !== "undefined") {
       par_def_1 = Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+      par_def_1 += defenseur.get_bonus("Parade");
     }
     if (Arme1 === null || typeof Arme1 === "undefined" || Arme1.Facteur_parade === null || par_def_1 === null) {
       dialog_defense_1
@@ -788,6 +789,7 @@ function afficher_defense(phase) {
     let par_def_2 = null;
     if (Arme2 !== null && typeof Arme2 !== "undefined") {
       par_def_2 = Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+      par_def_2 += defenseur.get_bonus("Parade");
     }
     if (Arme2 === null || typeof Arme2 === "undefined" || Arme2.Facteur_parade === null || par_def_2 === null) {
       dialog_defense_1
@@ -971,14 +973,19 @@ function afficher_confirmation_sort() {
     s.Nom_liste === magicien.Nom_liste &&
     s.Nom_sort === magicien.Nom_sort);
 
+  // Calcul du nombre de modulations
+  const competence_mage = magicien.get_competence("Maîtriser la magie");
+  const competence_pretre = magicien.get_competence("Théognosie");
+  let modulations = Math.max(competence_pretre, competence_mage);
+  modulations = Math.floor((modulations - 4) / 2);
+  if (magicien.Concentration_sort === 2 * sort.Niveau) modulations += 2;
+  if (magicien.Concentration_sort === 3 * sort.Niveau) modulations += 4;
+
   // Initialisation des champs du dialogue
-  dialog_sort_2.querySelector(".nom").textContent = magicien.Titre;
+  dialog_sort_2.querySelector(".titre").textContent = magicien.Titre;
+  dialog_sort_2.querySelector(".modulations").textContent = modulations;
   dialog_sort_2.querySelector(".nom_liste").textContent = magicien.Nom_liste;
   dialog_sort_2.querySelector(".nom_sort").textContent = magicien.Nom_sort;
-  dialog_sort_2.querySelector(".fatigue_cout").value = magicien.Fatigue_sort;
-  dialog_sort_2.querySelector(".fatigue_base").textContent = " / " + sort.Niveau;
-  dialog_sort_2.querySelector(".concentration_cout").value = magicien.Concentration_sort;
-  dialog_sort_2.querySelector(".concentration_base").textContent = " / " + sort.Niveau;
 
   // Définition des valeurs et simulation des événements input
   const prompt_save = dialog_sort_2.querySelector(".prompt_save");
@@ -1042,10 +1049,6 @@ function afficher_confirmation_sort() {
     prompt_duree_echec.value = sort.Duree;
   }
   prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
-
-  // Activation/désactivation des options selon les possibilités
-  dialog_sort_2.querySelector(".fatigue_cout").disabled = true;
-  dialog_sort_2.querySelector(".concentration_cout").disabled = true;
 
   // Nettoyage et ajout d'une option vide
   dialog_sort_2.querySelector("#armures").innerHTML = "";
@@ -2518,8 +2521,8 @@ dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (ev
   const magicien = Pions.find((p) => p.Attaquant);
 
   // Mise à jour des points de fatigue et de concentration
-  magicien.Fatigue -= dialog_sort_2.querySelector(".fatigue_cout").value;
-  magicien.Concentration -= dialog_sort_2.querySelector(".concentration_cout").value;
+  magicien.Fatigue -= magicien.Fatigue_sort;
+  magicien.Concentration -= magicien.Concentration_sort;
 
   Pions.filter((p) => p.Cible_sort).forEach((p) => {
     // Détermination de la sauvegarde au sort
@@ -2562,9 +2565,9 @@ dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (ev
     ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
       let id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + (save >= 0 ? "_succes" : "_echec");
       let champs = dialog_sort_2.querySelector("#" + id);
-      
+
       if (champs.value !== "") {
-         const attaque1 = new Attaque();
+        const attaque1 = new Attaque();
         attaque1.Model = p.Model;
         attaque1.Indice = p.Indice;
         attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;

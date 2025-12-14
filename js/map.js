@@ -920,22 +920,32 @@ class Pion extends Map {
     }
 
     /**
-     * Calcul la valeur d'une compétence
-     * @param {string} competence - Nom de la compétence
-     * @returns {number} - Valeur de la compétence
+     * Calcul la valeur d'un attribut
+     * @param {string} attribut - Nom de l'attribut
+     * @returns {number} - Valeur de l'attribut
      */
-    getValue(competence) {
+    getValue(attribut) {
         const model = Models.find(m => m.Nom_model === this.Model);
-        let bonus = model[competence];
-        if (bonus !== null && typeof bonus !== "undefined") Attaques.filter(a =>
+        let bonus = model[attribut];
+        if (attribut === "Vp") attribut = "Vivacité physique";
+        if (attribut === "Vm") attribut = "Vivacité mentale";
+        if (attribut === "Pp") attribut = "Puissance physique";
+        if (attribut === "Pm") attribut = "Puissance mentale";
+        
+        if (bonus !== null && typeof bonus !== "undefined") bonus += this.get_bonus(attribut);
+        return bonus;
+    }
+
+    get_bonus(attribut) {
+        let bonus = 0;
+        Attaques.filter(a =>
             a.Model === this.Model &&
             a.Indice === this.Indice &&
-            a.Competence === competence &&
+            a.Competence === attribut &&
             a.Timing > Nb_rounds * 5
         ).forEach(a => {
             bonus += a.Bonus;
         });
-
         return bonus;
     }
 

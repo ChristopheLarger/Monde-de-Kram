@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : sam. 13 déc. 2025 à 21:08
+-- Généré le : dim. 14 déc. 2025 à 10:28
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -83,7 +83,6 @@ INSERT INTO `bonus` (`Nom_bonus`, `Nature`, `Ordre`) VALUES
 ('Charisme', 'Attribut', 3),
 ('Coordination', 'Attribut', 4),
 ('Dégâts', 'Divers', -1),
-('Dégâts généraux', 'Divers', -1),
 ('Dommages CàC', 'Divers', 1),
 ('Dommages Dist', 'Divers', 2),
 ('Durée', 'Divers', -1),
@@ -156,12 +155,16 @@ INSERT INTO `competence` (`Nom_competence`, `Competence_majeure`, `Is_personnel`
 ('Arc', 'Projectiles', 0, NULL, 0),
 ('Armes de jet', NULL, 0, 'Co+F', -4),
 ('Attaque', NULL, 1, NULL, 0),
+('Connaissance de l\'occulte', NULL, 0, 'V', -5),
+('Connaissance des arcanes', NULL, 0, 'Ab', -5),
 ('Couteau de lancer', 'Armes de jet', 0, NULL, 2),
 ('Epée', 'Tranchantes', 0, '', 0),
 ('Feinte de corps', NULL, 0, 'Co', 1),
+('Maîtriser la magie', 'Connaissance des arcanes', 0, NULL, 0),
 ('Parade', NULL, 1, NULL, 0),
 ('Parade bouclier', NULL, 0, 'Co', -1),
 ('Projectiles', NULL, 0, 'Co+P', -4),
+('Théognosie', 'Connaissance de l\'occulte', 0, NULL, 0),
 ('Tranchantes', NULL, 0, 'Co+VP', -4);
 
 -- --------------------------------------------------------

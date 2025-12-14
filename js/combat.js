@@ -7,6 +7,7 @@
 
 // === VARIABLES GLOBALES DE COMBAT ===
 let Attaques = [];              // Tableau contenant toutes les attaques
+let Attaques_reportees = [];    // Tableau contenant les attaques reportées
 let current_attaque = null;     // Attaque en cours
 let Cacs = [];                  // Tableau des combats au corps à corps
 let Cacs_save = null;           // Tableau des combats futurs
@@ -44,9 +45,9 @@ function calculateInitiative(pion, main = 0) {
     const arme2 = pion.Arme2 ? Armes.find(a => a.Nom_arme === pion.Arme2) : null;
     const init1 = arme1 ? arme1.Init : 99;
     const init2 = arme2 ? arme2.Init : 99;
-    const vitesseBonus = Math.floor((pion.getValue("Vp") - 10) / 2);
-    const res1 = init1 - ((arme1 && arme1.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
-    const res2 = init2 - ((arme2 && arme2.A_projectile) ? 0 : vitesseBonus) - pion.B_ini;
+    const Vp_bonus = - Math.floor((pion.getValue("Vp") - 10) / 2);
+    const res1 = init1 + ((arme1 && arme1.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
+    const res2 = init2 + ((arme2 && arme2.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
 
     if (main === 1) return res1;
     if (main === 2) return res2;
@@ -236,6 +237,10 @@ function start_next_round() {
         pion.Fatigue_down = 0;
     });
 
+    // On relance les attaques reportées
+    Attaques = Attaques_reportees;
+    Attaques_reportees = [];
+
     // Calcul des timings d'initiative
     Pions.forEach(pion => {
         if (pion.Arme1 === "Lancement de sort") {
@@ -369,7 +374,7 @@ function next_attaque() {
     if (attaquant.Arme1 === "Lancement de sort") {
         if (current_attaque.Timing > Nb_rounds * 5 + 5) {
             attaquant.Incantation -= 5;
-            Attaques.push(current_attaque);
+            Attaques_reportees.push(current_attaque);
             next_attaque();
             return;
         }
@@ -390,7 +395,7 @@ function next_attaque() {
         const sort = Sorts.find(s => s.Nom_liste === attaquant.Nom_liste && s.Nom_sort === attaquant.Nom_sort);
         if (sort !== null && typeof sort !== "undefined") {
             createSpellInfo(document.body, sort);
-            if (sort.zone === "le magicien") attaquant.Cible_sort = true;
+            if (sort.Zone === "le magicien") attaquant.Cible_sort = true;
         }
 
         // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
@@ -620,6 +625,8 @@ function calcul_scr_att() {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
             score += attaquant.get_competence(Arme1.Competence);
+            if (Arme1.A_distance) score += attaquant.get_bonus("Attaque Dist");
+            else score += attaquant.get_bonus("Attaque CàC");
         }
     }
 
@@ -627,6 +634,8 @@ function calcul_scr_att() {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
             score += attaquant.get_competence(Arme2.Competence);
+            if (Arme2.A_distance) score += attaquant.get_bonus("Attaque Dist");
+            else score += attaquant.get_bonus("Attaque CàC");
         }
     }
 
@@ -674,12 +683,16 @@ function explications_scr_att() {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
             competence = attaquant.get_competence(Arme1.Competence);
+            if (Arme1.A_distance) competence += attaquant.get_bonus("Attaque Dist");
+            else competence += attaquant.get_bonus("Attaque CàC");
         }
     }
     else if (attaquant.at2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
             competence = attaquant.get_competence(Arme2.Competence);
+            if (Arme2.A_distance) competence += attaquant.get_bonus("Attaque Dist");
+            else competence += attaquant.get_bonus("Attaque CàC");
         }
     }
     explication += `Plus la Compétence de l'arme : ${competence}<br>`;
@@ -743,12 +756,14 @@ function calcul_scr_def() {
         if (typeof Arme1 === "undefined") Arme1 = null;
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
             competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+            competenceArme += defenseur.get_bonus("Parade");
         }
 
         let Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (typeof Arme2 === "undefined") Arme2 = null;
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
             competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+            competenceArme += defenseur.get_bonus("Parade");
         }
 
         score += competenceArme;
@@ -798,11 +813,13 @@ function explications_scr_def() {
         const Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
             competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+            competenceArme += defenseur.get_bonus("Parade");
         }
 
         const Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
             competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+            competenceArme += defenseur.get_bonus("Parade");
         }
         explication += `Plus la Compétence de parade : ${competenceArme}<br>`;
         scoreFinal = defenseur.jet_def - 10 + competenceArme;
@@ -867,8 +884,9 @@ function calcul_dommages(margin) {
     if (damage > arme.Plafond) damage = arme.Plafond;
 
     // Le coefficient de force de l'arme multiplie le modificateur de force du personnage
-    const model_att = Models.find(m => m.Nom_model === attaquant.Model);
     damage += arme.Coeff_force * Math.floor((attaquant.getValue("Force") - 10) / 2);
+    if (arme.A_distance) damage += attaquant.get_bonus("Dommages Dist");
+    else damage += attaquant.get_bonus("Dommages CàC");
 
     // Arrondi des dommages pour éviter les décimales
     damage = Math.round(damage);
@@ -876,13 +894,13 @@ function calcul_dommages(margin) {
     // Détermination de la valeur d'armure selon la localisation de l'attaque
     let armor = 0;
     switch (attaquant.loc_att) {
-        case "Tete": armor = defenseur.Armure_tete; break;
-        case "Poitrine": armor = defenseur.Armure_poitrine; break;
-        case "Abdomen": armor = defenseur.Armure_abdomen; break;
-        case "Brasg": armor = defenseur.Armure_brasg; break;
-        case "Brasd": armor = defenseur.Armure_brasd; break;
-        case "Jambeg": armor = defenseur.Armure_jambeg; break;
-        case "Jambed": armor = defenseur.Armure_jambed; break;
+        case "Tete": armor = defenseur.Armure_tete + defenseur.get_bonus("Tete"); break;
+        case "Poitrine": armor = defenseur.Armure_poitrine + defenseur.get_bonus("Poitrine"); break;
+        case "Abdomen": armor = defenseur.Armure_abdomen + defenseur.get_bonus("Abdomen"); break;
+        case "Brasg": armor = defenseur.Armure_brasg + defenseur.get_bonus("Bras gauche"); break;
+        case "Brasd": armor = defenseur.Armure_brasd + defenseur.get_bonus("Bras droit"); break;
+        case "Jambeg": armor = defenseur.Armure_jambeg + defenseur.get_bonus("Jambe gauche"); break;
+        case "Jambed": armor = defenseur.Armure_jambed + defenseur.get_bonus("Jambe droite"); break;
     }
 
     // Calcul des dégâts réels après réduction par l'armure
