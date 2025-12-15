@@ -30,6 +30,10 @@ const dialog_sort_2 = document.getElementById("dialog_sort_2");
 const dialog_defense_1 = document.getElementById("dialog_defense_1");
 const dialog_defense_2 = document.getElementById("dialog_defense_2");
 
+// Dialogues pour les modèles de personnages
+const dialog_model_1 = document.getElementById("modal_model_pj");
+
+
 // === VARIABLES GLOBALES ===
 let m_selected = null; // Personnage actuellement sélectionné
 
@@ -2598,4 +2602,24 @@ dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (ev
   dialog_sort_2.close();
 
   next_attaque();
+});
+
+// Gestion du clic sur la class model de la boite de dialog_detail_2
+// Lorsque l'utilisateur clique sur un élément de class 'model' dans dialog_details_2,
+// on ouvre la modale du modèle PJ (modal_model_pj) pour afficher/modifier ses détails.
+
+dialog_details_2.addEventListener("click", function (event) {
+  // Vérifie si l'élément cliqué ou un de ses parents porte la class 'model'
+  let target = event.target;
+  while (target && target !== dialog_details_2) {
+    if (target.classList && target.classList.contains("model")) {
+      // Ouvre la modale associée au modèle PJ
+      dialog_model_1.showModal && dialog_model_1.showModal();
+      // Empêche tout autre gestionnaire éventuel
+      event.stopPropagation();
+      break;
+    }
+    target = target.parentElement;
+  }
+
 });

@@ -235,7 +235,7 @@
         </tr>
         <tr>
             <td>Modèle :&nbsp;</td>
-            <td><span class="model"></span><span class="indice"></span></td>
+            <td><span class="model" style="cursor: pointer; color: blue; text-decoration: underline;"></span><span class="indice" ></span></td>
             <td>&nbsp;</td>
             <td>Allié :&nbsp;</td>
             <td>
@@ -334,7 +334,7 @@
             <td></td>
             <td colspan="2">Bonus Dommage :&nbsp;</td>
             <td><input type="text" class="b_dom" style="text-align: center;">&nbsp;</td>
-            <td> </td>
+            <td></td>
             <td></td>
             <td></td>
         </tr>
@@ -793,108 +793,247 @@
     </div>
 </div>
 <!-- === MODALE DE DÉTAILS DU MODÈLE PJ === -->
-<dialog id="modal_model_pj" class="modal_model_pj" open
-    style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-    <div class="modal_model_pj_content">
-        <span class="close_model_pj">&times;</span>
-        <h2>Détails du Modèle</h2>
-        <div id="model_details_content_pj" style="width: auto; height: auto; font-size: x-large; padding: 20px;">
-            <p>Nom du modèle : <span class="nom_model_pj"></span></p>
-            <p>Description du modèle : <span class="description_model_pj"></span></p>
-            <p>Caractéristiques du modèle : <span class="caracteristiques_model_pj"></span>
-            <table style="width: 100%; white-space: nowrap;">
-                <tr>
-                    <td></td>
-                    <td>Race</td>
-                    <td><span class="race_model_pj"></span></td>
-                    <td></td>
-                    <td>Expérience</td>
-                    <td><span class="experience_model_pj"></span></td>
-                    <td></td>
-                    <td>Score</td>
-                    <td><span class="niveau_model_pj"></span></td>
-                    <td></td>
-                    <td>Ajustement</td>
-                    <td><span class="ajustement_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Force :</td>
-                    <td><span class="force_model_pj"></span></td>
-
-                </tr>
-                <tr>
-                    <td>Constitution :</td>
-                    <td><span class="constitution_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Vivacité physique :</td>
-                    <td><span class="vitalite_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Perception :</td>
-                    <td><span class="perception_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Niveau physique :</td>
-                    <td><span class="niveau_physique_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Vivacité mentale :</td>
-                    <td><span class="vivacite_mentale_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Volonté :</td>
-                    <td><span class="volonte_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Abstraction :</td>
-                    <td><span class="abstraction_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Charisme :</td>
-                    <td><span class="charisme_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Niveau mental :</td>
-                    <td><span class="niveau_mental_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Adaptation :</td>
-                    <td><span class="adaptation_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Combat :</td>
-                    <td><span class="combat_model_pj"></span></td>
-                </tr>
-                <td>Foi :</td>
-                <td><span class="foi_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Magie :</td>
-                    <td><span class="magie_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Memoire :</td>
-                    <td><span class="memoire_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Telepathie :</td>
-                    <td><span class="telepathie_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Sixieme sens :</td>
-                    <td><span class="sixieme_sens_model_pj"></span></td>
-                </tr>
-                <tr>
-                    <td>Coordination :</td>
-                    <td><span class="coordination_model_pj"></span></td>
-            </table>
-            </p>
-            <p>Compétences du modèle : <span class="competences_model_pj"></span></p>
-            <p>Equipement du modèle : <span class="equipement_model_pj"></span></p>
-            <p>Inventaire du modèle : <span class="inventaire_model_pj"></span></p>
-            <p>Objets du modèle : <span class="objets_model_pj"></span></p>
+<dialog id="modal_model_pj" class="modal_model_pj"
+    style="position: fixed; top: 50%; left: 50%;
+           transform: translate(-50%, -50%); max-width: 360px;">
+    <div class="modal_model_pj_content" style="width: 100%;">
+        <span class="close_model_pj"
+            style="position: absolute; top: 5px; right: 5px; cursor: pointer; font-size: 1.5em; line-height: 1;">&times;</span>
+        <h2 style="margin-top: 0; text-align: center;">Détails du Modèle</h2>
+        <div id="model_details_content_pj" style="width: 100%;">
+            <div style="display: flex; ">
+                <div style="white-space: nowrap;"  >Nom : &nbsp;</div>
+                <div style="width: 100%; margin-right: 10px;" ><input type="text" style="width: 100%;" disabled></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; width: 100% ; padding-top: 5px;">
+                <div>Race :
+                    <select>
+                        <option value="humain">Humain</option>
+                        <option value="aquablue">Aquablue</option>
+                        <option value="elfe">Elfe</option>
+                        <option value="gnome">Gnome</option>
+                        <option value="nain">Nain</option>
+                        <option value="orc">Orc</option>
+                        <option value="troll">Troll</option>
+                        <option value="toutlisse">Toutlisse</option>
+                        <option value="autre">Autre</option>
+                    </select>
+                </div>
+                <div style="margin-right: 5px;">Magie :
+                    <select>
+                        <option value="classique">Classique</option>
+                        <option value="religieuse">Religieuse</option>
+                        <option value="sans">Sans magie</option>
+                    </select>
+                </div>
+            </div>
         </div>
+        <table style="width: 100%; border-collapse: separate; border-spacing: 5px; white-space: nowrap;">
+            <colgroup>
+                <col style="width: 50%;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+                <col style="width: 50%;">
+            </colgroup>
+            <tr>
+                <td></td>
+                <td style="text-align: center;">Race</td>
+                <td></td>
+                <td style="text-align: center;">Xp</td>
+                <td></td>
+                <td style="text-align: center;">Score</td>
+                <td></td>
+                <td style="text-align: center;">Ajust</td>
+            </tr>
+            <tr>
+                <td>Force :</td>
+                <td><input type="text" disabled class="force_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="force_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="force_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="force_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Constitution :</td>
+                <td><input type="text" disabled class="constitution_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="constitution_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="constitution_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="constitution_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Vivacité physique :</td>
+                <td><input type="text" disabled class="vitalite_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vitalite_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vitalite_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vitalite_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Perception :</td>
+                <td><input type="text" disabled class="perception_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="perception_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="perception_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="perception_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Niveau physique :</td>
+                <td><input type="text" disabled class="niveau_physique_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_physique_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_physique_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_physique_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Vivacité mentale :</td>
+                <td><input type="text" disabled class="vivacite_mentale_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vivacite_mentale_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vivacite_mentale_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="vivacite_mentale_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Volonté :</td>
+                <td><input type="text" disabled class="volonte_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="volonte_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="volonte_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="volonte_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Abstraction :</td>
+                <td><input type="text" disabled class="abstraction_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="abstraction_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="abstraction_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="abstraction_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Charisme :</td>
+                <td><input type="text" disabled class="charisme_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="charisme_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="charisme_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="charisme_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Niveau mental :</td>
+                <td><input type="text" disabled class="niveau_mental_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_mental_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_mental_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="niveau_mental_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Adaptation :</td>
+                <td><input type="text" disabled class="adaptation_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="adaptation_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="adaptation_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="adaptation_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Combat :</td>
+                <td><input type="text" disabled class="combat_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="combat_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="combat_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="combat_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Foi :</td>
+                <td><input type="text" disabled class="foi_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="foi_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="foi_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="foi_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Magie :</td>
+                <td><input type="text" disabled class="magie_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="magie_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="magie_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="magie_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Memoire :</td>
+                <td><input type="text" disabled class="memoire_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="memoire_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="memoire_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="memoire_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Telepathie :</td>
+                <td><input type="text" disabled class="telepathie_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="telepathie_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="telepathie_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="telepathie_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Sixieme sens :</td>
+                <td><input type="text" disabled class="sixieme_sens_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="sixieme_sens_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="sixieme_sens_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="sixieme_sens_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+            <tr>
+                <td>Coordination :</td>
+                <td><input type="text" disabled class="coordination_race" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="coordination_experience" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="coordination_score" style="width: 35px;"></td>
+                <td></td>
+                <td><input type="text" class="coordination_ajustement" disabled style="width: 35px;"></td>
+            </tr>
+        </table>
+        <p>Compétences du modèle : <span class="competences"></span></p>
+    </div>
+    </div>
     </div>
 </dialog>
 <!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
