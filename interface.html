@@ -235,7 +235,8 @@
         </tr>
         <tr>
             <td>Modèle :&nbsp;</td>
-            <td><span class="model" style="cursor: pointer; color: blue; text-decoration: underline;"></span><span class="indice" ></span></td>
+            <td><span class="model" style="cursor: pointer; color: blue; text-decoration: underline;"></span><span
+                    class="indice"></span></td>
             <td>&nbsp;</td>
             <td>Allié :&nbsp;</td>
             <td>
@@ -793,21 +794,20 @@
     </div>
 </div>
 <!-- === MODALE DE DÉTAILS DU MODÈLE PJ === -->
-<dialog id="modal_model_pj" class="modal_model_pj"
-    style="position: fixed; top: 50%; left: 50%;
+<dialog id="modal_model_pj" class="modal_model_pj" style="position: fixed; top: 50%; left: 50%;
            transform: translate(-50%, -50%); max-width: 360px;">
     <div class="modal_model_pj_content" style="width: 100%;">
-        <span class="close_model_pj"
+        <span class="close_model_pj" onclick="dialog_model_1.close();"
             style="position: absolute; top: 5px; right: 5px; cursor: pointer; font-size: 1.5em; line-height: 1;">&times;</span>
         <h2 style="margin-top: 0; text-align: center;">Détails du Modèle</h2>
         <div id="model_details_content_pj" style="width: 100%;">
-            <div style="display: flex; ">
-                <div style="white-space: nowrap;"  >Nom : &nbsp;</div>
-                <div style="width: 100%; margin-right: 10px;" ><input type="text" style="width: 100%;" disabled></div>
+            <div style="display: flex;">
+                <div style="white-space: nowrap;">Nom : &nbsp;</div>
+                <div style="width: 100%; margin-right: 10px;"><input type="text" style="width: 100%;" disabled></div>
             </div>
             <div style="display: flex; justify-content: space-between; width: 100% ; padding-top: 5px;">
                 <div>Race :
-                    <select>
+                    <select class="race_select">
                         <option value="humain">Humain</option>
                         <option value="aquablue">Aquablue</option>
                         <option value="elfe">Elfe</option>
@@ -872,13 +872,13 @@
             </tr>
             <tr>
                 <td>Vivacité physique :</td>
-                <td><input type="text" disabled class="vitalite_race" style="width: 35px;"></td>
+                <td><input type="text" disabled class="vivacite_physique_race" style="width: 35px;"></td>
                 <td></td>
-                <td><input type="text" class="vitalite_experience" style="width: 35px;"></td>
+                <td><input type="text" class="vivacite_physique_experience" style="width: 35px;"></td>
                 <td></td>
-                <td><input type="text" class="vitalite_score" style="width: 35px;"></td>
+                <td><input type="text" class="vivacite_physique_score" style="width: 35px;"></td>
                 <td></td>
-                <td><input type="text" class="vitalite_ajustement" disabled style="width: 35px;"></td>
+                <td><input type="text" class="vivacite_physique_ajustement" disabled style="width: 35px;"></td>
             </tr>
             <tr>
                 <td>Perception :</td>
@@ -892,7 +892,7 @@
             </tr>
             <tr>
                 <td>Niveau physique :</td>
-                <td><input type="text" disabled class="niveau_physique_race" style="width: 35px;"></td>
+                <td></td>
                 <td></td>
                 <td><input type="text" class="niveau_physique_experience" style="width: 35px;"></td>
                 <td></td>
@@ -942,7 +942,7 @@
             </tr>
             <tr>
                 <td>Niveau mental :</td>
-                <td><input type="text" disabled class="niveau_mental_race" style="width: 35px;"></td>
+                <td></td>
                 <td></td>
                 <td><input type="text" class="niveau_mental_experience" style="width: 35px;"></td>
                 <td></td>
@@ -1012,7 +1012,7 @@
             </tr>
             <tr>
                 <td>Sixieme sens :</td>
-                <td><input type="text" disabled class="sixieme_sens_race" style="width: 35px;"></td>
+                <td></td>
                 <td></td>
                 <td><input type="text" class="sixieme_sens_experience" style="width: 35px;"></td>
                 <td></td>
@@ -1022,7 +1022,7 @@
             </tr>
             <tr>
                 <td>Coordination :</td>
-                <td><input type="text" disabled class="coordination_race" style="width: 35px;"></td>
+                <td></td>
                 <td></td>
                 <td><input type="text" class="coordination_experience" style="width: 35px;"></td>
                 <td></td>
@@ -1031,9 +1031,6 @@
                 <td><input type="text" class="coordination_ajustement" disabled style="width: 35px;"></td>
             </tr>
         </table>
-        <p>Compétences du modèle : <span class="competences"></span></p>
-    </div>
-    </div>
     </div>
 </dialog>
 <!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
