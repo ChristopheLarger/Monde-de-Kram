@@ -58,6 +58,9 @@
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
             $js .= "    Etat: " . toJS($row['Etat']) . ",\n";
 
+            $js .= "    Race: " . toJS($row['Race']) . ",\n";
+            $js .= "    Magie_type: " . toJS($row['Magie_type']) . ",\n";
+
             $js .= "    Pm: " . toJS($row['PM'], 'int') . ",\n";
             $js .= "    Pp: " . toJS($row['PP'], 'int') . ",\n";
 
@@ -77,6 +80,21 @@
             $js .= "    Magie: " . toJS($row['Magie'], 'int') . ",\n";
             $js .= "    Memoire: " . toJS($row['Memoire'], 'int') . ",\n";
             $js .= "    Telepathie: " . toJS($row['Telepathie'], 'int') . ",\n";
+
+            $js .= "    Force_experience: " . toJS($row['Force_experience'], 'int') . ",\n";
+            $js .= "    Constitution_experience: " . toJS($row['Constitution_experience'], 'int') . ",\n";
+            $js .= "    Vivacite_physique_experience: " . toJS($row['Vivacite_physique_experience'], 'int') . ",\n";
+            $js .= "    Perception_experience: " . toJS($row['Perception_experience'], 'int') . ",\n";
+            $js .= "    Vivacite_mentale_experience: " . toJS($row['Vivacite_mentale_experience'], 'int') . ",\n";
+            $js .= "    Volonte_experience: " . toJS($row['Volonte_experience'], 'int') . ",\n";
+            $js .= "    Abstraction_experience: " . toJS($row['Abstraction_experience'], 'int') . ",\n";
+            $js .= "    Charisme_experience: " . toJS($row['Charisme_experience'], 'int') . ",\n";
+            $js .= "    Adaptation_experience: " . toJS($row['Adaptation_experience'], 'int') . ",\n";
+            $js .= "    Combat_experience: " . toJS($row['Combat_experience'], 'int') . ",\n";
+            $js .= "    Foi_experience: " . toJS($row['Foi_experience'], 'int') . ",\n";
+            $js .= "    Magie_experience: " . toJS($row['Magie_experience'], 'int') . ",\n";
+            $js .= "    Memoire_experience: " . toJS($row['Memoire_experience'], 'int') . ",\n";
+            $js .= "    Telepathie_experience: " . toJS($row['Telepathie_experience'], 'int') . ",\n";
 
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";

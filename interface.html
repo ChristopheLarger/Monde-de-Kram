@@ -803,7 +803,7 @@
         <div id="model_details_content_pj" style="width: 100%;">
             <div style="display: flex;">
                 <div style="white-space: nowrap;">Nom : &nbsp;</div>
-                <div style="width: 100%; margin-right: 10px;"><input type="text" style="width: 100%;" disabled></div>
+                <div style="width: 100%; margin-right: 10px;"><input class="nom_model" type="text" style="width: 100%;" disabled></div>
             </div>
             <div style="display: flex; justify-content: space-between; width: 100% ; padding-top: 5px;">
                 <div>Race :
@@ -820,7 +820,7 @@
                     </select>
                 </div>
                 <div style="margin-right: 5px;">Magie :
-                    <select>
+                    <select class="magie_select">
                         <option value="classique">Classique</option>
                         <option value="religieuse">Religieuse</option>
                         <option value="sans">Sans magie</option>
@@ -896,7 +896,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="text" class="niveau_physique_score" style="width: 35px;"></td>
+                <td><input type="text" class="niveau_physique_score" style="width: 35px;" disabled></td>
                 <td></td>
                 <td><input type="text" class="niveau_physique_ajustement" disabled style="width: 35px;"></td>
             </tr>
@@ -946,7 +946,7 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="text" class="niveau_mental_score" style="width: 35px;"></td>
+                <td><input type="text" class="niveau_mental_score" style="width: 35px;" disabled></td>
                 <td></td>
                 <td><input type="text" class="niveau_mental_ajustement" disabled style="width: 35px;"></td>
             </tr>
@@ -1016,9 +1016,9 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="text" class="sixieme_sens_score" style="width: 35px;"></td>
+                <td><input type="text" class="sixieme_sens_score" style="width: 35px;" disabled></td>
                 <td></td>
-                <td><input type="text" class="sixieme_sens_ajustement" disabled style="width: 35px;"></td>
+                <td><input type="text" class="sixieme_sens_ajustement" style="width: 35px;" disabled></td>
             </tr>
             <tr>
                 <td>Coordination :</td>
@@ -1026,9 +1026,9 @@
                 <td></td>
                 <td></td>
                 <td></td>
-                <td><input type="text" class="coordination_score" style="width: 35px;"></td>
+                <td><input type="text" class="coordination_score" style="width: 35px;" disabled></td>
                 <td></td>
-                <td><input type="text" class="coordination_ajustement" disabled style="width: 35px;"></td>
+                <td><input type="text" class="coordination_ajustement" style="width: 35px;" disabled></td>
             </tr>
         </table>
     </div>
