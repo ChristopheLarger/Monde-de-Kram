@@ -2842,17 +2842,14 @@ dialog_details_2.addEventListener("click", function (event) {
 // Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
 function change_race_model() {
   if (!dialog_model_1) return;
-
   const raceSelect = dialog_model_1.querySelector(".race_select");
   if (!raceSelect) return;
-
   // On n'enregistre le listener "change" qu'une seule fois
   if (!raceSelect.dataset.changeRaceBound) {
     raceSelect.addEventListener("change", function () {
       const race = raceSelect.value;
       const attr = attributs_races[race];
       if (!attr) return;
-
       // Remplir les champs *_race de la modale
       dialog_model_1.querySelector(".force_race").value = attr.force;
       dialog_model_1.querySelector(".constitution_race").value =
@@ -2872,6 +2869,7 @@ function change_race_model() {
       dialog_model_1.querySelector(".magie_race").value = attr.magie;
       dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
       dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
+
     });
 
     // Marqueur pour ne pas ré-attacher le listener plusieurs fois
@@ -2881,6 +2879,7 @@ function change_race_model() {
   // Simuler un évènement "change" pour mettre à jour immédiatement les champs
   const event = new Event("change", { bubbles: true });
   raceSelect.dispatchEvent(event);
+  
 }
 
 function open_model_pj() {
@@ -2895,7 +2894,7 @@ function open_model_pj() {
   // 2. (Optionnel) Changer la valeur sélectionnée
   selectRace.value = "humain"; // mets ici la valeur que tu veux sélectionner
 
-  // 3. Créer et déclencher l’évènement "change"
+  // 3. Créer et déclencher l'évènement "change"
   const event = new Event("change", { bubbles: true });
   selectRace.dispatchEvent(event);
 }
@@ -2929,7 +2928,13 @@ function ajustement_model_pj() {
   function calculerAjustement(attr) {
     const scoreField = dialog_model_1.querySelector(`.${attr}_score`);
     const ajustementField = dialog_model_1.querySelector(`.${attr}_ajustement`);
-
+    const raceField = dialog_model_1.querySelector(`.${attr}_race`);
+    console.log(attr);
+    ajustementField.style.textAlign = "center";
+    if (raceField){
+      raceField.style.textAlign = "center";
+    }
+    
     if (scoreField && ajustementField) {
       const score = parseFloat(scoreField.value) || 0;
       const ajustement = Math.floor((score - 10) / 2);
@@ -2952,23 +2957,21 @@ function ajustement_model_pj() {
 }
 
 dialog_model_1.addEventListener("change", function (event) {
-  const scoreField = event.target;
   if (!event.target.className.includes("_score")) return;
-  const attribut = event.target.className.replace('_score', "");
-  const race = dialog_model_1.querySelector(`.${attribut}_race`);
   event.target.value = event.target.value.replace(/[^0-9]/g, "");
-  const min = 3;
-  const max = 18 + parseInt(race.value, 10);
-  const regexp = /^[0-9]{0,2}$/;
-  const match = event.target.value.match(regexp);
-  if (match == null){
-  event.target.value = event.target.value.substring(0, 2);
-  }
-  if (parseInt(event.target.value, 10) < min){
-    event.target.value = min;
-  }
-  if (parseInt(event.target.value, 10) > max){
-    event.target.value = max;
-  };
+  event.target.style.textAlign = "center";
 });
 
+dialog_model_1.addEventListener("change", function (event) {
+  if (!event.target.className.includes("_experience")) return;
+  // On garde seulement les chiffres puis on limite à 2 caractères
+  const value = event.target.value.replace(/[^0-9]/g, "");
+  const i = parseInt(value, 10);
+  event.target.style.textAlign = "center";
+  if (isNaN(i)) {
+    event.target.value = "";
+  } else if (i > 100) {
+    event.target.value = i % 100;
+    console.log(i % 100);
+  }
+});
