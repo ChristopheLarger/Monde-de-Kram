@@ -1309,7 +1309,7 @@ ALTER TABLE `sort`
 ALTER TABLE `sort_connu`
   ADD PRIMARY KEY (`Nom_model`,`Nom_liste`,`Nom_sort`),
   ADD KEY `FK_Sort_connu1` (`Nom_model`),
-  ADD KEY `FK_Sort_connu2` (`Nom_liste`,`Nom_sort`);
+  ADD KEY `FK_Sort_connu2` (`Nom_sort`,`Nom_liste`);
 
 --
 -- Contraintes pour les tables déchargées
@@ -1371,7 +1371,7 @@ ALTER TABLE `sort`
 --
 ALTER TABLE `sort_connu`
   ADD CONSTRAINT `FK_Sort_connu1` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`),
-  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_liste`,`Nom_sort`) REFERENCES `sort` (`Nom_liste`, `Nom_sort`);
+  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`,`Nom_liste`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

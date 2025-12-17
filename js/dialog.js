@@ -30,9 +30,127 @@ const dialog_sort_2 = document.getElementById("dialog_sort_2");
 const dialog_defense_1 = document.getElementById("dialog_defense_1");
 const dialog_defense_2 = document.getElementById("dialog_defense_2");
 
+// Dialogues pour les modèles de personnages
+const dialog_model_1 = document.getElementById("modal_model_pj");
+
 // === VARIABLES GLOBALES ===
 let m_selected = null; // Personnage actuellement sélectionné
 
+const attributs_races = {
+  humain: {
+    force: 0,
+    constitution: 0,
+    vivacite_physique: 0,
+    perception: 0,
+    vivacite_mentale: 0,
+    volonte: 0,
+    abstraction: 0,
+    charisme: 0,
+    adaptation: 0,
+    combat: 0,
+    foi: 0,
+    magie: 0,
+    memoire: 0,
+    telepathie: 0,
+  },
+  aquablue: {
+    force: 1,
+    constitution: 2,
+    vivacite_physique: 1,
+    perception: 1,
+    vivacite_mentale: -2,
+    volonte: 1,
+    abstraction: -1,
+    charisme: -1,
+    adaptation: -1,
+    combat: 1,
+    foi: 2,
+    magie: -2,
+    memoire: -1,
+    telepathie: 1,
+  },
+  elfe: {
+    force: -1,
+    constitution: -1,
+    vivacite_physique: 2,
+    perception: 2,
+    vivacite_mentale: 0,
+    volonte: -2,
+    abstraction: 0,
+    charisme: 2,
+    adaptation: 1,
+    combat: -1,
+    foi: -2,
+    magie: 2,
+    memoire: 1,
+    telepathie: -1,
+  },
+  gnome: {
+    force: -3,
+    constitution: -1,
+    vivacite_physique: 2,
+    perception: 1,
+    vivacite_mentale: 1,
+    volonte: -1,
+    abstraction: 1,
+    charisme: 1,
+    adaptation: 2,
+    combat: -2,
+    foi: 2,
+    magie: -1,
+    memoire: -2,
+    telepathie: 2,
+  },
+  nain: {
+    force: 0,
+    constitution: 4,
+    vivacite_physique: -2,
+    perception: -1,
+    vivacite_mentale: -1,
+    volonte: +3,
+    abstraction: -1,
+    charisme: 0,
+    adaptation: -2,
+    combat: +1,
+    foi: +1,
+    magie: -2,
+    memoire: +3,
+    telepathie: +1,
+  },
+  orc: {
+    force: 2,
+    constitution: 2,
+    vivacite_physique: -2,
+    perception: 1,
+    vivacite_mentale: -1,
+    volonte: 2,
+    abstraction: -1,
+    charisme: -1,
+    adaptation: 3,
+    combat: 2,
+    foi: -1,
+    magie: -2,
+    memoire: -2,
+    telepathie: 0,
+  },
+
+  troll: {
+    force: 4,
+    constitution: 4,
+    vivacite_physique: -3,
+    perception: -2,
+    vivacite_mentale: -1,
+    volonte: 0,
+    abstraction: -2,
+    charisme: 1,
+    adaptation: 1,
+    combat: 1,
+    foi: 0,
+    magie: -3,
+    memoire: -1,
+    telepathie: 1,
+  },
+};
 /**
  * Affiche le dialogue pour définir les dimensions de la carte
  * Permet de spécifier la largeur et la hauteur de la carte de fond
@@ -51,7 +169,7 @@ function afficher_dim_carte() {
     image_fond.onload = function () {
       dialog_dim_carte.querySelector(".hauteur").value = Math.round(
         (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) /
-        image_fond.width
+          image_fond.width
       );
     };
   }
@@ -203,17 +321,16 @@ function afficher_Details(col, row) {
     while (arme1.options.length > 2) arme1.removeChild(arme1.lastChild);
 
     // Ajout des armes du modèle
-    const is_monster = Armes.some(arme => arme.Nom_arme === m_selected.Model)
+    const is_monster = Armes.some((arme) => arme.Nom_arme === m_selected.Model);
 
     if (is_monster) {
-      const arme = Armes.find(arme => arme.Nom_arme === m_selected.Model);
+      const arme = Armes.find((arme) => arme.Nom_arme === m_selected.Model);
       const nouvelleOption = document.createElement("option");
       nouvelleOption.value = arme.Nom_arme;
       nouvelleOption.textContent = arme.Nom_arme;
       arme1.appendChild(nouvelleOption);
-    }
-    else {
-      Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
+    } else {
+      Armes.filter((arme) => !arme.Is_personnel).forEach((arme) => {
         if (arme.Nom_arme === "Bouclier") return;
 
         const nouvelleOption = document.createElement("option");
@@ -322,9 +439,11 @@ function afficher_Details(col, row) {
       m_selected.Nom_liste !== "" &&
       m_selected.Nom_liste !== "0"
     ) {
-      const sort = Sorts.find((s) =>
-        s.Nom_liste === m_selected.Nom_liste &&
-        s.Nom_sort === m_selected.Nom_sort);
+      const sort = Sorts.find(
+        (s) =>
+          s.Nom_liste === m_selected.Nom_liste &&
+          s.Nom_sort === m_selected.Nom_sort
+      );
 
       dialog_details_2.querySelector(".liste").textContent = sort.Nom_liste;
       dialog_details_2.querySelector(".sort").textContent = sort.Nom_sort;
@@ -512,11 +631,13 @@ function afficher_attaque(phase) {
 
     // Activation/désactivation des options d'accès aux armes pour l'attaque courante
     if (current_attaque && current_attaque.Main === 1) {
-      dialog_attaque_1.querySelector(".arme_radio1").disabled = attaquant.Arme1_engagee || attaquant.Esquive;
+      dialog_attaque_1.querySelector(".arme_radio1").disabled =
+        attaquant.Arme1_engagee || attaquant.Esquive;
       dialog_attaque_1.querySelector(".arme_radio2").disabled = true;
     } else if (current_attaque && current_attaque.Main === 2) {
       dialog_attaque_1.querySelector(".arme_radio1").disabled = true;
-      dialog_attaque_1.querySelector(".arme_radio2").disabled = attaquant.Arme2_engagee || attaquant.Esquive;
+      dialog_attaque_1.querySelector(".arme_radio2").disabled =
+        attaquant.Arme2_engagee || attaquant.Esquive;
     }
 
     dialog_attaque_1.showModal();
@@ -714,7 +835,9 @@ function affiche_def() {
     scr_def =
       defenseur.jet_def -
       10 +
-      (defenseur.esq_def ? defenseur.get_competence("Esquive") - defenseur.Nb_action : 0);
+      (defenseur.esq_def
+        ? defenseur.get_competence("Esquive") - defenseur.Nb_action
+        : 0);
   } else {
     // Parade pour les attaques au corps à corps
     scr_def = calcul_scr_def();
@@ -857,10 +980,16 @@ function afficher_defense(phase) {
     const Arme1 = Armes.find((a) => a.Nom_arme === defenseur.Arme1);
     let par_def_1 = null;
     if (Arme1 !== null && typeof Arme1 !== "undefined") {
-      par_def_1 = Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+      par_def_1 =
+        Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
       par_def_1 += defenseur.get_bonus("Parade");
     }
-    if (Arme1 === null || typeof Arme1 === "undefined" || Arme1.Facteur_parade === null || par_def_1 === null) {
+    if (
+      Arme1 === null ||
+      typeof Arme1 === "undefined" ||
+      Arme1.Facteur_parade === null ||
+      par_def_1 === null
+    ) {
       dialog_defense_1
         .querySelector(".arme_radio1")
         .closest("tr").style.display = "none";
@@ -874,10 +1003,16 @@ function afficher_defense(phase) {
     const Arme2 = Armes.find((a) => a.Nom_arme === defenseur.Arme2);
     let par_def_2 = null;
     if (Arme2 !== null && typeof Arme2 !== "undefined") {
-      par_def_2 = Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+      par_def_2 =
+        Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
       par_def_2 += defenseur.get_bonus("Parade");
     }
-    if (Arme2 === null || typeof Arme2 === "undefined" || Arme2.Facteur_parade === null || par_def_2 === null) {
+    if (
+      Arme2 === null ||
+      typeof Arme2 === "undefined" ||
+      Arme2.Facteur_parade === null ||
+      par_def_2 === null
+    ) {
       dialog_defense_1
         .querySelector(".arme_radio2")
         .closest("tr").style.display = "none";
@@ -908,7 +1043,8 @@ function afficher_defense(phase) {
     // Désactivation des parades pour les attaques à distance ou les sorts
     if (is_distant || defenseur.Arme1 === "Lancement de sort") {
       dialog_defense_1.querySelector(".arme_radio1").disabled = true;
-      if (defenseur.Arme2 !== "Bouclier") dialog_defense_1.querySelector(".arme_radio2").disabled = true;
+      if (defenseur.Arme2 !== "Bouclier")
+        dialog_defense_1.querySelector(".arme_radio2").disabled = true;
     }
 
     dialog_defense_1.showModal();
@@ -1055,9 +1191,10 @@ function afficher_confirmation_sort() {
   const sel_etat_echec = dialog_sort_2.querySelector("#sel_etat_echec");
 
   // Récupération du sort en cours de lancement
-  const sort = Sorts.find((s) =>
-    s.Nom_liste === magicien.Nom_liste &&
-    s.Nom_sort === magicien.Nom_sort);
+  const sort = Sorts.find(
+    (s) =>
+      s.Nom_liste === magicien.Nom_liste && s.Nom_sort === magicien.Nom_sort
+  );
 
   // Calcul du nombre de modulations
   const competence_mage = magicien.get_competence("Maîtriser la magie");
@@ -1076,73 +1213,81 @@ function afficher_confirmation_sort() {
   // Définition des valeurs et simulation des événements input
   const prompt_save = dialog_sort_2.querySelector(".prompt_save");
   prompt_save.value = sort.Sauvegarde;
-  prompt_save.dispatchEvent(new Event('input', { bubbles: true }));
+  prompt_save.dispatchEvent(new Event("input", { bubbles: true }));
 
   // Définition des valeurs et simulation des événements input pour les dégâts
-  let bonus_sort = Bonus_sorts.find((b) =>
-    b.Nom_bonus === "Dégâts" &&
-    b.Nom_liste === magicien.Nom_liste &&
-    b.Nom_sort === magicien.Nom_sort);
+  let bonus_sort = Bonus_sorts.find(
+    (b) =>
+      b.Nom_bonus === "Dégâts" &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort
+  );
   const prompt_degats = dialog_sort_2.querySelector(".prompt_degats");
   if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
     prompt_degats.value = bonus_sort.Valeur;
-  }
-  else {
+  } else {
     prompt_degats.value = "-";
   }
-  prompt_degats.dispatchEvent(new Event('input', { bubbles: true }));
+  prompt_degats.dispatchEvent(new Event("input", { bubbles: true }));
 
   // Définition des valeurs et simulation des événements input pour les dégâts généraux
-  bonus_sort = Bonus_sorts.find((b) =>
-    b.Nom_bonus === "Type dégâts" &&
-    b.Nom_liste === magicien.Nom_liste &&
-    b.Nom_sort === magicien.Nom_sort &&
-    b.Valeur === "Localisés");
+  bonus_sort = Bonus_sorts.find(
+    (b) =>
+      b.Nom_bonus === "Type dégâts" &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      b.Valeur === "Localisés"
+  );
   const sel_degats = dialog_sort_2.querySelector(".sel_degats");
   if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
     sel_degats.value = "1";
-  }
-  else {
+  } else {
     sel_degats.value = "0";
   }
 
   // Définition des valeurs et simulation des événements input pour la durée de réussite
-  bonus_sort = Bonus_sorts.find((b) =>
-    b.Nom_bonus === "Durée" &&
-    b.Nom_liste === magicien.Nom_liste &&
-    b.Nom_sort === magicien.Nom_sort &&
-    b.Succes);
-  const prompt_duree_succes = dialog_sort_2.querySelector(".prompt_duree_succes");
+  bonus_sort = Bonus_sorts.find(
+    (b) =>
+      b.Nom_bonus === "Durée" &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      b.Succes
+  );
+  const prompt_duree_succes = dialog_sort_2.querySelector(
+    ".prompt_duree_succes"
+  );
   if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
     prompt_duree_succes.value = bonus_sort.Valeur;
-  }
-  else {
+  } else {
     prompt_duree_succes.value = sort.Duree;
   }
-  prompt_duree_succes.dispatchEvent(new Event('input', { bubbles: true }));
+  prompt_duree_succes.dispatchEvent(new Event("input", { bubbles: true }));
 
   // Définition des valeurs et simulation des événements input pour la durée d'échec
-  bonus_sort = Bonus_sorts.find((b) =>
-    b.Nom_bonus === "Durée" &&
-    b.Nom_liste === magicien.Nom_liste &&
-    b.Nom_sort === magicien.Nom_sort &&
-    !b.Succes);
+  bonus_sort = Bonus_sorts.find(
+    (b) =>
+      b.Nom_bonus === "Durée" &&
+      b.Nom_liste === magicien.Nom_liste &&
+      b.Nom_sort === magicien.Nom_sort &&
+      !b.Succes
+  );
   const prompt_duree_echec = dialog_sort_2.querySelector(".prompt_duree_echec");
   if (bonus_sort !== null && typeof bonus_sort !== "undefined") {
     prompt_duree_echec.value = bonus_sort.Valeur;
-  }
-  else {
+  } else {
     prompt_duree_echec.value = sort.Duree;
   }
-  prompt_duree_echec.dispatchEvent(new Event('input', { bubbles: true }));
+  prompt_duree_echec.dispatchEvent(new Event("input", { bubbles: true }));
 
   // Nettoyage et ajout d'une option vide
   dialog_sort_2.querySelector("#armures").innerHTML = "";
   dialog_sort_2.querySelector("#competences").innerHTML = "";
   dialog_sort_2.querySelector("#attributs").innerHTML = "";
   dialog_sort_2.querySelector("#divers").innerHTML = "";
-  while (sel_etat_succes.options.length > 0) sel_etat_succes.removeChild(sel_etat_succes.lastChild);
-  while (sel_etat_echec.options.length > 0) sel_etat_echec.removeChild(sel_etat_echec.lastChild);
+  while (sel_etat_succes.options.length > 0)
+    sel_etat_succes.removeChild(sel_etat_succes.lastChild);
+  while (sel_etat_echec.options.length > 0)
+    sel_etat_echec.removeChild(sel_etat_echec.lastChild);
 
   // Ajout d'une option vide dans les Etats de réussite et d'échec
   let nouvelleOption = document.createElement("option");
@@ -1152,7 +1297,7 @@ function afficher_confirmation_sort() {
   sel_etat_echec.appendChild(nouvelleOption.cloneNode(true));
 
   // Ajout des options pour les Etats de réussite et d'échec
-  ListeBonus.filter(bonus => bonus.Nature === "Etat").forEach(bonus => {
+  ListeBonus.filter((bonus) => bonus.Nature === "Etat").forEach((bonus) => {
     nouvelleOption = document.createElement("option");
     nouvelleOption.value = bonus.Nom_bonus;
     nouvelleOption.textContent = bonus.Nom_bonus;
@@ -1160,28 +1305,37 @@ function afficher_confirmation_sort() {
     sel_etat_echec.appendChild(nouvelleOption.cloneNode(true));
 
     // Récupération de la valeur du bonus en cas de réussite
-    const bonus_sort_succes = Bonus_sorts.find((b) =>
-      b.Nom_bonus === bonus.Nom_bonus &&
-      b.Nom_liste === magicien.Nom_liste &&
-      b.Nom_sort === magicien.Nom_sort &&
-      b.Succes);
-    if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") {
+    const bonus_sort_succes = Bonus_sorts.find(
+      (b) =>
+        b.Nom_bonus === bonus.Nom_bonus &&
+        b.Nom_liste === magicien.Nom_liste &&
+        b.Nom_sort === magicien.Nom_sort &&
+        b.Succes
+    );
+    if (
+      bonus_sort_succes !== null &&
+      typeof bonus_sort_succes !== "undefined"
+    ) {
       sel_etat_succes.value = bonus.Nom_bonus;
     }
 
     // Récupération de la valeur du bonus en cas d'échec
-    const bonus_sort_echec = Bonus_sorts.find((b) =>
-      b.Nom_bonus === bonus.Nom_bonus &&
-      b.Nom_liste === magicien.Nom_liste &&
-      b.Nom_sort === magicien.Nom_sort &&
-      !b.Succes);
+    const bonus_sort_echec = Bonus_sorts.find(
+      (b) =>
+        b.Nom_bonus === bonus.Nom_bonus &&
+        b.Nom_liste === magicien.Nom_liste &&
+        b.Nom_sort === magicien.Nom_sort &&
+        !b.Succes
+    );
     if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") {
       sel_etat_echec.value = bonus.Nom_bonus;
     }
   });
 
   // Ajout des options pour les autres types de bonus
-  ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
+  ListeBonus.filter(
+    (bonus) => bonus.Nature !== "Etat" && bonus.Ordre >= 0
+  ).forEach((bonus) => {
     // Création du div pour le bonus
     const div = document.createElement("div");
     div.id = "div_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_");
@@ -1197,21 +1351,27 @@ function afficher_confirmation_sort() {
 
     // Récupération de la valeur du bonus en cas de réussite
     let valeur_succes = "";
-    const bonus_sort_succes = Bonus_sorts.find((b) =>
-      b.Nom_bonus === bonus.Nom_bonus &&
-      b.Nom_liste === magicien.Nom_liste &&
-      b.Nom_sort === magicien.Nom_sort &&
-      b.Succes);
-    if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined") valeur_succes = bonus_sort_succes.Valeur;
+    const bonus_sort_succes = Bonus_sorts.find(
+      (b) =>
+        b.Nom_bonus === bonus.Nom_bonus &&
+        b.Nom_liste === magicien.Nom_liste &&
+        b.Nom_sort === magicien.Nom_sort &&
+        b.Succes
+    );
+    if (bonus_sort_succes !== null && typeof bonus_sort_succes !== "undefined")
+      valeur_succes = bonus_sort_succes.Valeur;
 
     // Récupération de la valeur du bonus en cas d'échec
     let valeur_echec = "";
-    const bonus_sort_echec = Bonus_sorts.find((b) =>
-      b.Nom_bonus === bonus.Nom_bonus &&
-      b.Nom_liste === magicien.Nom_liste &&
-      b.Nom_sort === magicien.Nom_sort &&
-      !b.Succes);
-    if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined") valeur_echec = bonus_sort_echec.Valeur;
+    const bonus_sort_echec = Bonus_sorts.find(
+      (b) =>
+        b.Nom_bonus === bonus.Nom_bonus &&
+        b.Nom_liste === magicien.Nom_liste &&
+        b.Nom_sort === magicien.Nom_sort &&
+        !b.Succes
+    );
+    if (bonus_sort_echec !== null && typeof bonus_sort_echec !== "undefined")
+      valeur_echec = bonus_sort_echec.Valeur;
 
     // Création d'un conteneur pour les 2 champs (positionnés à droite)
     const conteneurChamps = document.createElement("div");
@@ -1222,7 +1382,10 @@ function afficher_confirmation_sort() {
 
     // Création du champ du Bonus en cas de réussite
     const champs_succes = document.createElement("input");
-    champs_succes.id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + "_succes";
+    champs_succes.id =
+      "champs_" +
+      bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") +
+      "_succes";
     champs_succes.type = "text";
     champs_succes.style.width = "35px";
     champs_succes.style.textAlign = "center";
@@ -1233,7 +1396,8 @@ function afficher_confirmation_sort() {
 
     // Création du champ du Bonus en cas d'échec
     const champs_echec = champs_succes.cloneNode(true);
-    champs_echec.id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + "_echec";
+    champs_echec.id =
+      "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + "_echec";
     champs_echec.style.backgroundColor = "rgb(255, 192, 192)";
     champs_echec.value = valeur_echec;
     conteneurChamps.appendChild(champs_echec);
@@ -1557,9 +1721,13 @@ function info_arme() {
 
   // Bonus de compétence d'arme
   if (m_selected.Arme1 !== "" && m_selected.Arme1 !== "Lancement de sort")
-    score1 = m_selected.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme1).Competence);
+    score1 = m_selected.get_competence(
+      Armes.find((a) => a.Nom_arme === m_selected.Arme1).Competence
+    );
   if (m_selected.Arme2 !== "" && m_selected.Arme2 !== "Lancement de sort")
-    score2 = m_selected.get_competence(Armes.find(a => a.Nom_arme === m_selected.Arme2).Competence);
+    score2 = m_selected.get_competence(
+      Armes.find((a) => a.Nom_arme === m_selected.Arme2).Competence
+    );
 
   // Bonus d'attaque
   if (score1 !== null) score1 += m_selected.B_att;
@@ -1691,7 +1859,7 @@ arme1.addEventListener("click", function (event) {
     }
 
     // Vérification si le personnage est un monstre
-    const is_monster = Armes.some(arme => arme.Nom_arme === m_selected.Model)
+    const is_monster = Armes.some((arme) => arme.Nom_arme === m_selected.Model);
 
     // Nettoyage et ajout d'une option vide
     while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
@@ -1712,7 +1880,7 @@ arme1.addEventListener("click", function (event) {
     else {
       // Ajout des armes disponibles du modèle
       if (!is_monster) {
-        Armes.filter(arme => !arme.Is_personnel).forEach(arme => {
+        Armes.filter((arme) => !arme.Is_personnel).forEach((arme) => {
           if (arme.Deux_mains) return;
 
           const nouvelleOption = document.createElement("option");
@@ -2406,8 +2574,11 @@ dialog_sort_1
   .querySelector(".acter")
   .addEventListener("click", function (event) {
     // Mise à jour des points de fatigue et de concentration
-    m_selected.Fatigue_sort = dialog_sort_1.querySelector(".fatigue_cout").value;
-    m_selected.Concentration_sort = dialog_sort_1.querySelector(".concentration_cout").value;
+    m_selected.Fatigue_sort =
+      dialog_sort_1.querySelector(".fatigue_cout").value;
+    m_selected.Concentration_sort = dialog_sort_1.querySelector(
+      ".concentration_cout"
+    ).value;
 
     dialog_sort_1.close();
   });
@@ -2419,107 +2590,136 @@ dialog_sort_2.addEventListener("close", function (event) {
 });
 
 // Gestion du changement de la concentration spécifique
-dialog_sort_2.querySelector(".prompt_save").addEventListener("input", function (event) {
-  if (event.target.value === "-" || event.target.value === "") {
-    dialog_sort_2.querySelector(".res_save").textContent = "(Néant)";
-    return;
-  }
-  let formula = null;
-  let auto_save = false;
+dialog_sort_2
+  .querySelector(".prompt_save")
+  .addEventListener("input", function (event) {
+    if (event.target.value === "-" || event.target.value === "") {
+      dialog_sort_2.querySelector(".res_save").textContent = "(Néant)";
+      return;
+    }
+    let formula = null;
+    let auto_save = false;
 
-  formula = event.target.value.toLowerCase();
-  formula = formula.replace(/« (.+) »/g, "$1");
-  formula = formula.replace(/\[(.+)\]/g, "$1");
+    formula = event.target.value.toLowerCase();
+    formula = formula.replace(/« (.+) »/g, "$1");
+    formula = formula.replace(/\[(.+)\]/g, "$1");
 
-  if (formula !== event.target.value.toLowerCase()) auto_save = true;
+    if (formula !== event.target.value.toLowerCase()) auto_save = true;
 
-  formula = formula.replace(/ /g, "");
-  formula = formula.replace(/\t/g, "");
-  formula = formula.replace(/^.*\(/g, "");
-  formula = formula.replace(/\).*$/g, "");
-  formula = formula.replace(/\+n/g, "");
-  formula = formula.replace(/\-n/g, "");
-  formula = formula.replace(/\-var/g, "");
-  formula = formula.replace(/\+nbre/g, "");
-  formula = formula.replace(/spéciale/g, "");
+    formula = formula.replace(/ /g, "");
+    formula = formula.replace(/\t/g, "");
+    formula = formula.replace(/^.*\(/g, "");
+    formula = formula.replace(/\).*$/g, "");
+    formula = formula.replace(/\+n/g, "");
+    formula = formula.replace(/\-n/g, "");
+    formula = formula.replace(/\-var/g, "");
+    formula = formula.replace(/\+nbre/g, "");
+    formula = formula.replace(/spéciale/g, "");
 
-  formula = formula.replace(/c$/g, "Con");
-  formula = formula.replace(/c\+/g, "Con+");
-  formula = formula.replace(/c\-/g, "Con-");
+    formula = formula.replace(/c$/g, "Con");
+    formula = formula.replace(/c\+/g, "Con+");
+    formula = formula.replace(/c\-/g, "Con-");
 
-  formula = formula.replace(/co$/g, "Cor");
-  formula = formula.replace(/co\+/g, "Cor+");
-  formula = formula.replace(/co\-/g, "Cor-");
+    formula = formula.replace(/co$/g, "Cor");
+    formula = formula.replace(/co\+/g, "Cor+");
+    formula = formula.replace(/co\-/g, "Cor-");
 
-  formula = formula.replace(/v$/g, "Vol");
-  formula = formula.replace(/v\+/g, "Vol+");
-  formula = formula.replace(/v\-/g, "Vol-");
+    formula = formula.replace(/v$/g, "Vol");
+    formula = formula.replace(/v\+/g, "Vol+");
+    formula = formula.replace(/v\-/g, "Vol-");
 
-  formula = formula.replace(/ab$/g, "Abs");
-  formula = formula.replace(/ab\+/g, "Abs+");
-  formula = formula.replace(/ab\-/g, "Abs-");
+    formula = formula.replace(/ab$/g, "Abs");
+    formula = formula.replace(/ab\+/g, "Abs+");
+    formula = formula.replace(/ab\-/g, "Abs-");
 
-  formula = formula.replace(/foi$/g, "Foi");
-  formula = formula.replace(/foi\+/g, "Foi+");
-  formula = formula.replace(/foi\-/g, "Foi-");
+    formula = formula.replace(/foi$/g, "Foi");
+    formula = formula.replace(/foi\+/g, "Foi+");
+    formula = formula.replace(/foi\-/g, "Foi-");
 
-  formula = formula.replace(/mag$/g, "Mag");
-  formula = formula.replace(/mag\+/g, "Mag+");
-  formula = formula.replace(/mag\-/g, "Mag-");
+    formula = formula.replace(/mag$/g, "Mag");
+    formula = formula.replace(/mag\+/g, "Mag+");
+    formula = formula.replace(/mag\-/g, "Mag-");
 
-  formula = formula.replace(/6esens/g, "6eS");
-  formula = formula.replace(/6es/g, "6eS");
+    formula = formula.replace(/6esens/g, "6eS");
+    formula = formula.replace(/6es/g, "6eS");
 
-  formula = formula.replace(/mem$/g, "Mem");
-  formula = formula.replace(/mem\+/g, "Mem+");
-  formula = formula.replace(/mem\-/g, "Mem-");
+    formula = formula.replace(/mem$/g, "Mem");
+    formula = formula.replace(/mem\+/g, "Mem+");
+    formula = formula.replace(/mem\-/g, "Mem-");
 
-  formula = formula.replace(/nm$/g, "NM");
-  formula = formula.replace(/nm\+/g, "NM+");
-  formula = formula.replace(/nm\-/g, "NM-");
+    formula = formula.replace(/nm$/g, "NM");
+    formula = formula.replace(/nm\+/g, "NM+");
+    formula = formula.replace(/nm\-/g, "NM-");
 
-  formula = formula.replace(/p$/g, "Per");
-  formula = formula.replace(/p\+/g, "Per+");
-  formula = formula.replace(/p\-/g, "Per-");
+    formula = formula.replace(/p$/g, "Per");
+    formula = formula.replace(/p\+/g, "Per+");
+    formula = formula.replace(/p\-/g, "Per-");
 
-  formula = formula.replace(/thp$/g, "Thp");
-  formula = formula.replace(/thp\+/g, "Thp+");
-  formula = formula.replace(/thp\-/g, "Thp-");
+    formula = formula.replace(/thp$/g, "Thp");
+    formula = formula.replace(/thp\+/g, "Thp+");
+    formula = formula.replace(/thp\-/g, "Thp-");
 
-  formula = formula.replace(/vm$/g, "VM");
-  formula = formula.replace(/vm\+/g, "VM+");
-  formula = formula.replace(/vm\-/g, "VM-");
+    formula = formula.replace(/vm$/g, "VM");
+    formula = formula.replace(/vm\+/g, "VM+");
+    formula = formula.replace(/vm\-/g, "VM-");
 
-  formula = formula.replace(/ch$/g, "Cha");
-  formula = formula.replace(/ch\+/g, "Cha+");
-  formula = formula.replace(/ch\-/g, "Cha-");
+    formula = formula.replace(/ch$/g, "Cha");
+    formula = formula.replace(/ch\+/g, "Cha+");
+    formula = formula.replace(/ch\-/g, "Cha-");
 
-  let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
+    let base = formula.replace(/[+-]/g, "").replace(/[0-9]*$/, "");
 
-  let operateur = formula.replace(/[^+-]/g, "").charAt(0);
-  if (operateur === "") operateur = "+";
+    let operateur = formula.replace(/[^+-]/g, "").charAt(0);
+    if (operateur === "") operateur = "+";
 
-  let modificateur = parseInt(formula.replace(base, "").replace(/[+-]/g, ""), 10);
-  if (isNaN(modificateur)) modificateur = 0;
+    let modificateur = parseInt(
+      formula.replace(base, "").replace(/[+-]/g, ""),
+      10
+    );
+    if (isNaN(modificateur)) modificateur = 0;
 
-  if (base === "") {
-    dialog_sort_2.querySelector(".res_save").textContent = eval(operateur.toString() + modificateur.toString());
-  }
-  else if (!["Con", "Cor", "Vol", "Abs", "Foi", "Mag", "6eS", "Mem", "NM", "Per", "Thp", "VM", "Cha"].includes(base)) {
-    dialog_sort_2.querySelector(".res_save").textContent = "(???)";
-  }
-  else {
-    dialog_sort_2.querySelector(".res_save").textContent =
-      "(" + (auto_save ? "[" : "") + base + (auto_save ? "]" : "") + operateur.toString() + modificateur.toString() + ")";
-  }
-});
+    if (base === "") {
+      dialog_sort_2.querySelector(".res_save").textContent = eval(
+        operateur.toString() + modificateur.toString()
+      );
+    } else if (
+      ![
+        "Con",
+        "Cor",
+        "Vol",
+        "Abs",
+        "Foi",
+        "Mag",
+        "6eS",
+        "Mem",
+        "NM",
+        "Per",
+        "Thp",
+        "VM",
+        "Cha",
+      ].includes(base)
+    ) {
+      dialog_sort_2.querySelector(".res_save").textContent = "(???)";
+    } else {
+      dialog_sort_2.querySelector(".res_save").textContent =
+        "(" +
+        (auto_save ? "[" : "") +
+        base +
+        (auto_save ? "]" : "") +
+        operateur.toString() +
+        modificateur.toString() +
+        ")";
+    }
+  });
 
 // Gestion du changement de la durée
 dialog_sort_2.addEventListener("input", function (event) {
   // Récupération du champs résultat
   let res = null;
-  if (event.target.classList.contains("prompt_duree_succes")) res = ".res_duree_succes";
-  else if (event.target.classList.contains("prompt_duree_echec")) res = ".res_duree_echec";
+  if (event.target.classList.contains("prompt_duree_succes"))
+    res = ".res_duree_succes";
+  else if (event.target.classList.contains("prompt_duree_echec"))
+    res = ".res_duree_echec";
   else return;
 
   // Si le champ est vide, on affiche "(Néant)"
@@ -2547,137 +2747,371 @@ dialog_sort_2.addEventListener("input", function (event) {
   // Affichage du résultat
   modificateur = modificateur.toUpperCase();
   if (duree !== null) {
-    dialog_sort_2.querySelector(res).textContent = "(" + duree + modificateur + ")";
-  }
-  else {
+    dialog_sort_2.querySelector(res).textContent =
+      "(" + duree + modificateur + ")";
+  } else {
     dialog_sort_2.querySelector(res).textContent = "(???)";
   }
 });
 
 // Gestion du changement des dégâts
-dialog_sort_2.querySelector(".prompt_degats").addEventListener("input", function (event) {
-  // Si le champ est vide, on affiche "(Néant)"
-  if (event.target.value === "-" || event.target.value === "") {
-    dialog_sort_2.querySelector(".res_degats").textContent = "(Néant)";
-    return;
-  }
+dialog_sort_2
+  .querySelector(".prompt_degats")
+  .addEventListener("input", function (event) {
+    // Si le champ est vide, on affiche "(Néant)"
+    if (event.target.value === "-" || event.target.value === "") {
+      dialog_sort_2.querySelector(".res_degats").textContent = "(Néant)";
+      return;
+    }
 
-  // Récupération de la formule
-  let formula = event.target.value.toLowerCase();
+    // Récupération de la formule
+    let formula = event.target.value.toLowerCase();
 
-  // Récupération du modificateur
-  let match = formula.match(/([+\-][0-9]*m[re])/);
-  let modificateur = match ? match[1] : null;
-  if (modificateur === null) {
-    match = formula.match(/^([0-9]*m[re])/);
-    modificateur = match ? "+" + match[1] : "";
-  }
+    // Récupération du modificateur
+    let match = formula.match(/([+\-][0-9]*m[re])/);
+    let modificateur = match ? match[1] : null;
+    if (modificateur === null) {
+      match = formula.match(/^([0-9]*m[re])/);
+      modificateur = match ? "+" + match[1] : "";
+    }
 
-  // Récupération des dégâts
-  formula = formula.replace(/[\+|\-]*[0-9]*m[re]/g, "");
-  formula = formula.replace(/\s+/, ""); // Suppression des espaces
-  let degats = LancerDes.rollDice(formula);
+    // Récupération des dégâts
+    formula = formula.replace(/[\+|\-]*[0-9]*m[re]/g, "");
+    formula = formula.replace(/\s+/, ""); // Suppression des espaces
+    let degats = LancerDes.rollDice(formula);
 
-  // Affichage du résultat
-  modificateur = modificateur.toUpperCase();
-  if (degats !== null) {
-    dialog_sort_2.querySelector(".res_degats").textContent =
-      "(" + degats + modificateur + ")";
-  } else {
-    dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
-  }
-});
+    // Affichage du résultat
+    modificateur = modificateur.toUpperCase();
+    if (degats !== null) {
+      dialog_sort_2.querySelector(".res_degats").textContent =
+        "(" + degats + modificateur + ")";
+    } else {
+      dialog_sort_2.querySelector(".res_degats").textContent = "(???)";
+    }
+  });
 
 // Gestion des clics sur les spans pour sélectionner le type de dégâts / durée
 dialog_sort_2.querySelectorAll("span").forEach((span) => {
   span.addEventListener("mousedown", function (event) {
-    const radio = event.target.closest("td").querySelector('input[type="radio"]');
+    const radio = event.target
+      .closest("td")
+      .querySelector('input[type="radio"]');
     if (radio === null || typeof radio === "undefined") return;
     radio.click();
   });
 });
 
 // Bouton "Acter" (Valide la sélection spécifique et ferme le dialogue)
-dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (event) {
-  const magicien = Pions.find((p) => p.Attaquant);
+dialog_sort_2
+  .querySelector(".appliquer")
+  .addEventListener("click", function (event) {
+    const magicien = Pions.find((p) => p.Attaquant);
 
   // Mise à jour des points de fatigue et de concentration
   magicien.Concentration -= magicien.Concentration_sort;
   magicien.Fatigue -= magicien.Fatigue_sort;
   magicien.Fatigue_down = Math.max(magicien.Fatigue_down, magicien.Fatigue_sort);
 
-  Pions.filter((p) => p.Cible_sort).forEach((p) => {
-    // Détermination de la sauvegarde au sort
-    let save = p.sauvegarde_au_sort(
-      dialog_sort_2.querySelector(".res_save").textContent);
+    Pions.filter((p) => p.Cible_sort).forEach((p) => {
+      // Détermination de la sauvegarde au sort
+      let save = p.sauvegarde_au_sort(
+        dialog_sort_2.querySelector(".res_save").textContent
+      );
 
-    // Traitement des dégâts du sort
-    p.degats_du_sort(
-      save,
-      dialog_sort_2.querySelector(".res_degats").textContent,
-      dialog_sort_2.querySelector(".sel_degats").value === "0" ? "généraux" : "localisés");
+      // Traitement des dégâts du sort
+      p.degats_du_sort(
+        save,
+        dialog_sort_2.querySelector(".res_degats").textContent,
+        dialog_sort_2.querySelector(".sel_degats").value === "0"
+          ? "généraux"
+          : "localisés"
+      );
 
-    // Détermination de la durée du sort et de l'état
-    let duree = null;
-    let etat = null;
-    if (save >= 0) {
-      duree = p.duree_du_sort(
-        save, // MR
-        dialog_sort_2.querySelector(".res_duree_succes").textContent);
-      etat = dialog_sort_2.querySelector("#sel_etat_succes").value;
-    }
-    else {
-      duree = p.duree_du_sort(
-        -save, // ME
-        dialog_sort_2.querySelector(".res_duree_echec").textContent);
-      etat = dialog_sort_2.querySelector("#sel_etat_echec").value;
-    }
+      // Détermination de la durée du sort et de l'état
+      let duree = null;
+      let etat = null;
+      if (save >= 0) {
+        duree = p.duree_du_sort(
+          save, // MR
+          dialog_sort_2.querySelector(".res_duree_succes").textContent
+        );
+        etat = dialog_sort_2.querySelector("#sel_etat_succes").value;
+      } else {
+        duree = p.duree_du_sort(
+          -save, // ME
+          dialog_sort_2.querySelector(".res_duree_echec").textContent
+        );
+        etat = dialog_sort_2.querySelector("#sel_etat_echec").value;
+      }
 
-    if (etat !== "") {
-      const attaque1 = new Attaque();
-      attaque1.Model = p.Model;
-      attaque1.Indice = p.Indice;
-      attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;
-      attaque1.Competence = etat;
-      attaque1.Bonus = null;
-      Attaques.push(attaque1);
-    }
-
-    // Autres types de bonus
-    ListeBonus.filter(bonus => bonus.Nature !== "Etat" && bonus.Ordre >= 0).forEach(bonus => {
-      let id = "champs_" + bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") + (save >= 0 ? "_succes" : "_echec");
-      let champs = dialog_sort_2.querySelector("#" + id);
-
-      if (champs.value !== "") {
+      if (etat !== "") {
         const attaque1 = new Attaque();
         attaque1.Model = p.Model;
         attaque1.Indice = p.Indice;
         attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;
-        attaque1.Competence = bonus.Nom_bonus;
-        attaque1.Bonus = champs.value;
+        attaque1.Competence = etat;
+        attaque1.Bonus = null;
         Attaques.push(attaque1);
       }
+
+      // Autres types de bonus
+      ListeBonus.filter(
+        (bonus) => bonus.Nature !== "Etat" && bonus.Ordre >= 0
+      ).forEach((bonus) => {
+        let id =
+          "champs_" +
+          bonus.Nom_bonus.toLowerCase().replaceAll(" ", "_") +
+          (save >= 0 ? "_succes" : "_echec");
+        let champs = dialog_sort_2.querySelector("#" + id);
+
+        if (champs.value !== "") {
+          const attaque1 = new Attaque();
+          attaque1.Model = p.Model;
+          attaque1.Indice = p.Indice;
+          attaque1.Timing = Nb_rounds * 5 + magicien.Incantation + duree;
+          attaque1.Competence = bonus.Nom_bonus;
+          attaque1.Bonus = champs.value;
+          Attaques.push(attaque1);
+        }
+      });
+
+      Attaques.sort(Attaque.tri);
     });
 
-    Attaques.sort(Attaque.tri);
+    // Réinitialisation des variables de sortilège du magicien
+    magicien.Nom_liste = null;
+    magicien.Nom_sort = null;
+    magicien.Incantation = 0;
+    magicien.Fatigue_sort = 0;
+    magicien.Concentration_sort = 0;
+    magicien.setArmes();
+
+    magicien.Attaquant = false;
+    Pions.forEach((p) => {
+      p.Cible_sort = false;
+    });
+
+    // Mise à jour de la carte
+    Map.generateHexMap();
+    Map.drawHexMap();
+
+    dialog_sort_2.close();
+
+    next_attaque();
   });
 
-  // Réinitialisation des variables de sortilège du magicien
-  magicien.Nom_liste = null;
-  magicien.Nom_sort = null;
-  magicien.Incantation = 0;
-  magicien.Fatigue_sort = 0;
-  magicien.Concentration_sort = 0;
-  magicien.setArmes();
+// Gestion du clic sur la class model de la boite de dialog_detail_2
+// Lorsque l'utilisateur clique sur un élément de class 'model' dans dialog_details_2,
+// on ouvre la modale du modèle PJ (modal_model_pj) pour afficher/modifier ses détails.
 
-  magicien.Attaquant = false;
-  Pions.forEach((p) => { p.Cible_sort = false; });
+dialog_details_2
+  .querySelector(".model")
+  .addEventListener("click", function (event) {
+    open_model_pj();
+    // Vérifie si l'élément cliqué ou un de ses parents porte la class 'model'
+    let target = event.target;
+    const nom_model = dialog_details_2.querySelector(".model").textContent;
+    // Récupération du modèle
+    const model = Models.find((m) => m.Nom_model === nom_model);
+    // Remplissage des champs du modèle
 
-  // Mise à jour de la carte
-  Map.generateHexMap();
-  Map.drawHexMap();
+    dialog_model_1.querySelector(".nom_model").value = model.Nom_model;
+    dialog_model_1.querySelector(".race_select").value =
+      model.Race.toLowerCase();
+    change_race_model();
+    dialog_model_1.querySelector(".race_select").dispatchEvent(changeEvent);
+    dialog_model_1.querySelector(".magie_select").value =
+      model.Magie_type.toLowerCase();
+    dialog_model_1.querySelector(".force_experience").value =
+      model.Force_experience;
 
-  dialog_sort_2.close();
+    dialog_model_1.querySelector(".constitution_experience").value =
+      model.Constitution_experience;
+    dialog_model_1.querySelector(".vivacite_physique_experience").value =
+      model.Vivacite_physique_experience;
+    dialog_model_1.querySelector(".perception_experience").value =
+      model.Perception_experience;
+    dialog_model_1.querySelector(".vivacite_mentale_experience").value =
+      model.Vivacite_mentale_experience;
+    dialog_model_1.querySelector(".volonte_experience").value =
+      model.Volonte_experience;
+    dialog_model_1.querySelector(".abstraction_experience").value =
+      model.Abstraction_experience;
+    dialog_model_1.querySelector(".charisme_experience").value =
+      model.Charisme_experience;
+    dialog_model_1.querySelector(".adaptation_experience").value =
+      model.Adaptation_experience;
+    dialog_model_1.querySelector(".combat_experience").value =
+      model.Combat_experience;
+    dialog_model_1.querySelector(".foi_experience").value =
+      model.Foi_experience;
+    dialog_model_1.querySelector(".magie_experience").value =
+      model.Magie_experience;
+    dialog_model_1.querySelector(".memoire_experience").value =
+      model.Memoire_experience;
+    dialog_model_1.querySelector(".telepathie_experience").value =
+      model.Telepathie_experience;
 
-  next_attaque();
+    dialog_model_1.querySelector(".force_score").value = model.Force;
+    dialog_model_1.querySelector(".constitution_score").value =
+      model.Constitution;
+    dialog_model_1.querySelector(".vivacite_physique_score").value = model.Vp;
+    dialog_model_1.querySelector(".perception_score").value = model.Perception;
+    dialog_model_1.querySelector(".vivacite_mentale_score").value = model.Vm;
+    dialog_model_1.querySelector(".volonte_score").value = model.Volonte;
+    dialog_model_1.querySelector(".abstraction_score").value =
+      model.Abstraction;
+    dialog_model_1.querySelector(".charisme_score").value = model.Charisme;
+    dialog_model_1.querySelector(".adaptation_score").value = model.Adaptation;
+    dialog_model_1.querySelector(".combat_score").value = model.Combat;
+    dialog_model_1.querySelector(".foi_score").value = model.Foi;
+    dialog_model_1.querySelector(".magie_score").value = model.Magie;
+    dialog_model_1.querySelector(".memoire_score").value = model.Memoire;
+    dialog_model_1.querySelector(".telepathie_score").value = model.Telepathie;
+
+    // Ouvre la modale associée au modèle PJ
+    dialog_model_1.showModal && dialog_model_1.showModal();
+    // Empêche tout autre gestionnaire éventuel
+    event.stopPropagation();
+
+    ajustement_model_pj();
+
+  });
+
+dialog_model_1
+  .querySelector(".race_select")
+  .addEventListener("change", function () {
+    change_race_model();
+  });
+// Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
+function change_race_model() {
+  if (!dialog_model_1) return;
+  const raceSelect = dialog_model_1.querySelector(".race_select");
+  if (!raceSelect) return;
+  // On n'enregistre le listener "change" qu'une seule fois
+  if (!raceSelect.dataset.changeRaceBound) {
+    raceSelect.addEventListener("change", function () {
+      const race = raceSelect.value;
+      const attr = attributs_races[race];
+      if (!attr) return;
+      // Remplir les champs *_race de la modale
+      dialog_model_1.querySelector(".force_race").value = attr.force;
+      dialog_model_1.querySelector(".constitution_race").value =
+        attr.constitution;
+      dialog_model_1.querySelector(".vivacite_physique_race").value =
+        attr.vivacite_physique;
+      dialog_model_1.querySelector(".perception_race").value = attr.perception;
+      dialog_model_1.querySelector(".vivacite_mentale_race").value =
+        attr.vivacite_mentale;
+      dialog_model_1.querySelector(".volonte_race").value = attr.volonte;
+      dialog_model_1.querySelector(".abstraction_race").value =
+        attr.abstraction;
+      dialog_model_1.querySelector(".charisme_race").value = attr.charisme;
+      dialog_model_1.querySelector(".adaptation_race").value = attr.adaptation;
+      dialog_model_1.querySelector(".combat_race").value = attr.combat;
+      dialog_model_1.querySelector(".foi_race").value = attr.foi;
+      dialog_model_1.querySelector(".magie_race").value = attr.magie;
+      dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
+      dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
+    });
+
+    // Marqueur pour ne pas ré-attacher le listener plusieurs fois
+    raceSelect.dataset.changeRaceBound = "1";
+  }
+}
+
+function open_model_pj() {
+  change_race_model();
+  // 1. Récupérer le <select> de la race
+  // Adapte le sélecteur à ton HTML : id, name, class, etc.
+  const selectRace = document
+    .getElementById("modal_model_pj")
+    .querySelector(".race_select");
+  // ou par id : const selectRace = document.getElementById('race');
+
+  // 2. (Optionnel) Changer la valeur sélectionnée
+  selectRace.value = "humain"; // mets ici la valeur que tu veux sélectionner
+
+  // 3. Créer et déclencher l'évènement "change"
+  const event = new Event("change", { bubbles: true });
+  selectRace.dispatchEvent(event);
+}
+
+function ajustement_model_pj() {
+  if (!dialog_model_1) return;
+
+  // Liste de tous les attributs avec leurs champs correspondants
+  const attributs = [
+    "force",
+    "constitution",
+    "vivacite_physique",
+    "perception",
+    "vivacite_mentale",
+    "volonte",
+    "abstraction",
+    "charisme",
+    "adaptation",
+    "combat",
+    "foi",
+    "magie",
+    "memoire",
+    "telepathie",
+  ];
+  attributs.forEach((a) => {
+    calculerAjustement(a);
+    console.log(a);
+  });
+  // Fonction pour calculer un ajustement
+  function calculerAjustement(attr) {
+    const scoreField = dialog_model_1.querySelector(`.${attr}_score`);
+    const ajustementField = dialog_model_1.querySelector(`.${attr}_ajustement`);
+    const raceField = dialog_model_1.querySelector(`.${attr}_race`);
+    const experienceField = dialog_model_1.querySelector(`.${attr}_experience`);
+    ajustementField.style.textAlign = "center";
+    if (raceField) {
+      raceField.style.textAlign = "center";
+    }
+    if (scoreField) {
+      scoreField.style.textAlign = "center";
+    }
+    if (experienceField) {
+      experienceField.style.textAlign = "center";
+    }
+
+    if (scoreField && ajustementField) {
+      const score = parseFloat(scoreField.value) || 0;
+      const ajustement = Math.floor((score - 10) / 2);
+      ajustementField.value = ajustement;
+      console.log(ajustement);
+    }
+  }
+
+  // Calculer tous les ajustements une première fois
+  attributs.forEach((attr) => calculerAjustement(attr));
+
+  // Ajouter des listeners pour mettre à jour automatiquement
+  attributs.forEach((attr) => {
+    const scoreField = dialog_model_1.querySelector(`.${attr}_score`);
+    scoreField.addEventListener("input", () => calculerAjustement(attr));
+  });
+}
+
+dialog_model_1.addEventListener("change", function (event) {
+  if (!event.target.className.includes("_score")) return;
+  event.target.value = event.target.value.replace(/[^0-9]/g, "");
+  event.target.style.textAlign = "center";
+});
+
+dialog_model_1.addEventListener("change", function (event) {
+  if (!event.target.className.includes("_experience")) return;
+  // On garde seulement les chiffres puis on limite à 2 caractères
+  const value = event.target.value.replace(/[^0-9]/g, "");
+  const i = parseInt(value, 10);
+  event.target.style.textAlign = "center";
+  if (isNaN(i)) {
+    event.target.value = "";
+  } else if (i > 100) {
+    event.target.value = i % 100;
+    console.log(i % 100);
+  }
 });
