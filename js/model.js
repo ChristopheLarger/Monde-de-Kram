@@ -23,15 +23,15 @@ class Model {
     this.Magie_type = data.Magie_type || "";
 
     // Statistiques
-    this.Pm = data.Pm || 0;
-    this.Pp = data.Pp || 0;
+    this.Puissance_mentale = data.Puissance_mentale || 0;
+    this.Puissance_physique = data.Puissance_physique || 0;
 
     this.Force = data.Force || 0;
     this.Constitution = data.Constitution || 0;
-    this.Vp = data.Vp || 0;
+    this.Vivacite_physique = data.Vivacite_physique || 0;
     this.Perception = data.Perception || 0;
 
-    this.Vm = data.Vm || 0;
+    this.Vivacite_mentale = data.Vivacite_mentale || 0;
     this.Volonte = data.Volonte || 0;
     this.Abstraction = data.Abstraction || 0;
     this.Charisme = data.Charisme || 0;
@@ -56,7 +56,6 @@ class Model {
     
     this.Adaptation_experience = data.Adaptation_experience || 0;
     this.Combat_experience = data.Combat_experience || 0;
-    
     this.Foi_experience = data.Foi_experience || 0;
     this.Magie_experience = data.Magie_experience || 0;
     this.Memoire_experience = data.Memoire_experience || 0;

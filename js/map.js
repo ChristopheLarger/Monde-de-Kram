@@ -927,11 +927,6 @@ class Pion extends Map {
     getValue(attribut) {
         const model = Models.find(m => m.Nom_model === this.Model);
         let bonus = model[attribut];
-        if (attribut === "Vp") attribut = "Vivacité physique";
-        if (attribut === "Vm") attribut = "Vivacité mentale";
-        if (attribut === "Pp") attribut = "Puissance physique";
-        if (attribut === "Pm") attribut = "Puissance mentale";
-        
         if (bonus !== null && typeof bonus !== "undefined") bonus += this.get_bonus(attribut);
         return bonus;
     }
@@ -964,7 +959,7 @@ class Pion extends Map {
      * @returns {number} - Coordination
      */
     coordination() {
-        return Math.round((this.getValue("Vp") + this.getValue("Perception") + this.getValue("Vm")) / 3);
+        return Math.round((this.getValue("Vivacite_physique") + this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 3);
     }
 
     /**
@@ -980,7 +975,7 @@ class Pion extends Map {
      * @returns {number} - Niveau mental
      */
     niveau_mental() {
-        return Math.round((this.getValue("Force") + this.getValue("Constitution") + this.getValue("Vp") + this.getValue("Perception")) / 4);
+        return Math.round((this.getValue("Force") + this.getValue("Constitution") + this.getValue("Vivacite_physique") + this.getValue("Perception")) / 4);
     }
 
     /**
@@ -988,7 +983,7 @@ class Pion extends Map {
      * @returns {number} - Niveau physique
      */
     niveau_physique() {
-        return Math.round((this.getValue("Vm") + this.getValue("Volonte") + this.getValue("Abstraction") + this.getValue("Charisme")) / 4);
+        return Math.round((this.getValue("Vivacite_mentale") + this.getValue("Volonte") + this.getValue("Abstraction") + this.getValue("Charisme")) / 4);
     }
 
     /**
@@ -1025,22 +1020,22 @@ class Pion extends Map {
                 attribut = (this.coordination() + this.getValue("Volonte")) / 2;
                 break;
             case "Co+VM":
-                attribut = (this.coordination() + this.getValue("Vm")) / 2;
+                attribut = (this.coordination() + this.getValue("Vivacite_mentale")) / 2;
                 break;
             case "Co+VP":
-                attribut = (this.coordination() + this.getValue("Vp")) / 2;
+                attribut = (this.coordination() + this.getValue("Vivacite_physique")) / 2;
                 break;
             case "NP":
                 attribut = this.niveau_physique();
                 break;
             case "P+VM":
-                attribut = (this.getValue("Perception") + this.getValue("Vm")) / 2;
+                attribut = (this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 2;
                 break;
             case "V":
                 attribut = this.getValue("Volonte");
                 break;
             case "VP":
-                attribut = this.getValue("Vp");
+                attribut = this.getValue("Vivacite_physique");
                 break;
             default:
                 attribut = 10; // Attribut par défaut
@@ -1458,7 +1453,7 @@ class Pion extends Map {
         save = save.replace("NM", pion.niveau_mental());
         save = save.replace("Per", pion.getValue("Perception"));
         save = save.replace("Thp", pion.getValue("Telepathie"));
-        save = save.replace("VM", pion.getValue("Vm"));
+        save = save.replace("VM", pion.getValue("Vivacite_mentale"));
         save = save.replace("Cha", pion.getValue("Charisme"));
 
         save = eval(save);

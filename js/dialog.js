@@ -2955,9 +2955,9 @@ dialog_details_2
     dialog_model_1.querySelector(".force_score").value = model.Force;
     dialog_model_1.querySelector(".constitution_score").value =
       model.Constitution;
-    dialog_model_1.querySelector(".vivacite_physique_score").value = model.Vp;
+    dialog_model_1.querySelector(".vivacite_physique_score").value = model.Vivacite_physique;
     dialog_model_1.querySelector(".perception_score").value = model.Perception;
-    dialog_model_1.querySelector(".vivacite_mentale_score").value = model.Vm;
+    dialog_model_1.querySelector(".vivacite_mentale_score").value = model.Vivacite_mentale;
     dialog_model_1.querySelector(".volonte_score").value = model.Volonte;
     dialog_model_1.querySelector(".abstraction_score").value =
       model.Abstraction;

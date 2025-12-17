@@ -45,7 +45,7 @@ function calculateInitiative(pion, main = 0) {
     const arme2 = pion.Arme2 ? Armes.find(a => a.Nom_arme === pion.Arme2) : null;
     const init1 = arme1 ? arme1.Init : 99;
     const init2 = arme2 ? arme2.Init : 99;
-    const Vp_bonus = - Math.floor((pion.getValue("Vp") - 10) / 2);
+    const Vp_bonus = - Math.floor((pion.getValue("Vivacite_physique") - 10) / 2);
     const res1 = init1 + ((arme1 && arme1.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
     const res2 = init2 + ((arme2 && arme2.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
 
@@ -173,7 +173,7 @@ class Cac {
         else if (init1 > init2) {
             this.Avantage = 2;  // Ennemi plus rapide
         }
-        else if (pion1.Vp >= pion2.Vp) {
+        else if (pion1.Vivacite_physique >= pion2.Vivacite_physique) {
             this.Avantage = 1;  // Égalité, allié avec plus de VP
         }
         else {
