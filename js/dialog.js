@@ -103,8 +103,8 @@ function afficher_Details_arme1() {
   const arme1 = dialog_details_2.querySelector(".arme1");
   // Gestion de l'affichage des titres et des informations relatives à l'arme 1 sélectionnée
   if (arme1.value === "Lancement de sort") {
-    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "1";
-    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "5";
+    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "2";
+    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "1";
 
     dialog_details_2.querySelector(".titre_arme2").style.display = "none";
     dialog_details_2.querySelector(".arme2").style.display = "none";
@@ -115,8 +115,8 @@ function afficher_Details_arme1() {
     dialog_details_2.querySelector(".titre_sort").style.display = "";
     dialog_details_2.querySelector(".sort").style.display = "";
   } else {
-    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "2";
-    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "4";
+    dialog_details_2.querySelector(".titre_arme2").closest("td").colSpan = "1";
+    dialog_details_2.querySelector(".arme2").closest("td").colSpan = "1";
 
     dialog_details_2.querySelector(".titre_arme2").style.display = "";
     dialog_details_2.querySelector(".arme2").style.display = "";
@@ -181,12 +181,10 @@ function afficher_Details(col, row) {
     const p_selected = Models.find((p) => p.Nom_model === m_selected.Model);
 
     // Gestion des permissions selon le type de personnage
-    if (
-      p_selected.Is_joueur ||
-      document.getElementById("joueur").value != "MJ"
-    ) {
+    if (p_selected.Is_joueur || document.getElementById("joueur").value != "MJ") {
       dialog_details_2.querySelector("#Dupliquer").disabled = true;
-    } else {
+    }
+    else {
       dialog_details_2.querySelector("#Dupliquer").disabled = false;
     }
 
@@ -367,6 +365,94 @@ function afficher_Details(col, row) {
       arme2.disabled = false;
     }
   }
+
+  // Affichage des états temporaires
+  afficher_etats_temporaires()
+}
+
+/**
+ * Affiche les états temporaires du personnage
+ */
+function afficher_etats_temporaires() {
+  dialog_details_2.querySelector(".etats").innerHTML = "";
+  const colgroup = document.createElement("colgroup");
+  colgroup.innerHTML =
+    `<col style="width: 1px;">
+     <col style="width: 1px;">
+     <col style="width: 1px;">
+     <col style="width: 1px;">
+     <col style="width: auto;">
+     <col style="width: 1px;">
+     <col style="width: 1px;">
+     <col style="width: 1px;">
+     <col style="width: 1px;">`
+  dialog_details_2.querySelector(".etats").appendChild(colgroup);
+
+  Attaques.sort(Attaque.tri);
+
+  const Etats = Attaques.filter(a =>
+    a.Model === m_selected.Model &&
+    a.Indice === m_selected.Indice &&
+    a.Timing > Nb_rounds * 5 &&
+    a.Competence !== null);
+  let tr = null;
+  for (let i = 0; i < Etats.length; i++) {
+    const e = Etats[i];
+    if (tr === null) tr = document.createElement("tr");
+
+    // ------ Premier état : Force ------
+    const td1 = document.createElement("td");
+    td1.innerHTML = e.Competence + " :&nbsp;";
+    tr.appendChild(td1);
+    const td2 = document.createElement("td");
+    td2.style.textAlign = "center";
+    td2.innerHTML = e.Bonus;
+    tr.appendChild(td2);
+    const td3 = document.createElement("td");
+    td3.style.textAlign = "right";
+    td3.innerHTML = "(" + (e.Timing - Nb_rounds * 5 - 5) + " s)";
+    tr.appendChild(td3);
+    const td4 = document.createElement("td");
+    td4.innerHTML = "<img src='images/Supprimer.png' onclick='delete_etat(" + i + ");' alt='Supprimer'" +
+      "style='width: 20px; height: 20px; cursor: pointer; vertical-align: middle;'>";
+    tr.appendChild(td4);
+
+    if (i % 2 === 0) {
+      const td5 = document.createElement("td");
+      td5.innerHTML = "&nbsp;";
+      tr.appendChild(td5);
+
+      if (i === Etats.length - 1) {
+        tr.appendChild(document.createElement("td"));
+        tr.appendChild(document.createElement("td"));
+        tr.appendChild(document.createElement("td"));
+        tr.appendChild(document.createElement("td"));
+        dialog_details_2.querySelector(".etats").appendChild(tr);
+        tr = null;
+      }
+    }
+    else {
+      dialog_details_2.querySelector(".etats").appendChild(tr);
+      tr = null;
+    }
+  }
+}
+
+/**
+ * Supprime un état temporaire
+ * @param {number} i - Index de l'état à supprimer
+ */
+function delete_etat(i) {
+  Attaques.sort(Attaque.tri);
+  const Etats = Attaques.filter(a =>
+    a.Model === m_selected.Model &&
+    a.Indice === m_selected.Indice &&
+    a.Timing > Nb_rounds * 5 &&
+    a.Competence !== null
+  );
+  const index = Attaques.indexOf(Etats[i]);
+  Attaques.splice(index, 1);
+  afficher_etats_temporaires();
 }
 
 /**
@@ -2326,11 +2412,6 @@ dialog_sort_1
     dialog_sort_1.close();
   });
 
-dialog_sort_1.addEventListener("close", function (event) {
-  dialog_details_2.querySelector(".fatigue").value = m_selected.Fatigue;
-  dialog_details_2.querySelector(".concentration").value = m_selected.Concentration;
-});
-
 dialog_sort_2.addEventListener("close", function (event) {
   // Supprimer le panneau d'information existant s'il existe...
   if (document.getElementById(`spell-info`))
@@ -2521,8 +2602,9 @@ dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (ev
   const magicien = Pions.find((p) => p.Attaquant);
 
   // Mise à jour des points de fatigue et de concentration
-  magicien.Fatigue -= magicien.Fatigue_sort;
   magicien.Concentration -= magicien.Concentration_sort;
+  magicien.Fatigue -= magicien.Fatigue_sort;
+  magicien.Fatigue_down = Math.max(magicien.Fatigue_down, magicien.Fatigue_sort);
 
   Pions.filter((p) => p.Cible_sort).forEach((p) => {
     // Détermination de la sauvegarde au sort

@@ -2397,7 +2397,6 @@ document.addEventListener("keydown", function (event) {
             event.preventDefault();
             event.stopPropagation();
 
-
             let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != null && x.Nom_liste != "" && x.Incantation <= 5);
             if (magicien !== null && typeof magicien !== "undefined") {
                 afficher_confirmation_sort();

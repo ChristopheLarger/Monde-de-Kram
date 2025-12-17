@@ -381,10 +381,6 @@ function next_attaque() {
 
         Messages.ecriture_directe(`Lancement de sort par ${attaquant.Titre} (${current_attaque.Timing.toFixed(2)}s)...`);
 
-        // Perdre X point de fatigue pour le lanceur de sort (X étant généralement le niveau du sort ou un multiple)
-        attaquant.Fatigue -= attaquant.Fatigue_sort;
-        attaquant.Fatigue_down = attaquant.Fatigue_sort;
-
         // Sélection du lanceur de sort pour connaitre la distance entre lui et les autres pions
         attaquant.Selected = true;
 
@@ -452,15 +448,15 @@ function next_attaque() {
         });
     }
 
+    Map.generateHexMap();
+    Map.drawHexMap();
+
     // Vérifier s'il y a des défenseurs
     if (!Pions.find(p => p.Defenseur)) {
         contre_attaque = null;
         next_attaque();
         return;
     }
-
-    Map.generateHexMap();
-    Map.drawHexMap();
 
     // Vérifier si des attaques sont possibles
     if ((!attaquant.Arme1 || attaquant.Arme1 === "" || attaquant.Arme1_engagee) &&
@@ -475,6 +471,7 @@ function next_attaque() {
     if (contre_attaque || Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
 
     contre_attaque = null;
+    
 }
 
 /**
@@ -968,15 +965,16 @@ function contre_attaque_defenseur() {
     const attaquant = Pions.find(p => p.Attaquant);
     const defenseur = Pions.find(p => p.Defenseur);
 
-    if (contre_attaque) return;
+    if (contre_attaque) return false;
 
-    if (defenseur.Esquive) return;
+    if (defenseur.Esquive) return false;
 
-    if (defenseur.Est_blesse) return;
+    if (defenseur.Est_blesse) return false;
 
     if ((!defenseur.Arme1 || defenseur.Arme1 === "" || defenseur.Arme1_engagee) &&
-        (!defenseur.Arme2 || defenseur.Arme2 === "" || defenseur.Arme2_engagee)) return;
+        (!defenseur.Arme2 || defenseur.Arme2 === "" || defenseur.Arme2_engagee)) return false;
 
+    // Si l'attaqaunt a utilisé une arme à distance, on ne peut pas contre-attaquer
     let arme = null;
     if (attaquant.at1_att) {
         arme = (attaquant.Arme1 && attaquant.Arme1 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
@@ -984,7 +982,7 @@ function contre_attaque_defenseur() {
     else if (attaquant.at2_att) {
         arme = (attaquant.Arme2 && attaquant.Arme2 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
     }
-    if (arme && arme.A_distance) return;
+    if (arme && arme.A_distance) return false;
 
     // Ramener la future attaque du defenseur à la prochaine position
     let next_att_def = null;
@@ -1016,7 +1014,13 @@ function contre_attaque_defenseur() {
 
         // Message informant de la contre-attaque
         Messages.ecriture_directe(`${defenseur.Titre} contre-attaque ${attaquant.Titre}`);
+   
+        next_attaque();
+        return true;
     }
+
+    next_attaque();
+    return false;
 }
 
 /**
@@ -1039,14 +1043,12 @@ function resoudre_attaque() {
     if (attaquant.Est_blesse) {
         prend_avantage(defenseur, attaquant);
         contre_attaque_defenseur();
-        next_attaque();
         return;
     }
 
     // S'il n'y a pas d'attaque, on passe à l'attaque suivante
     if (!attaquant.at1_att && !attaquant.at2_att) {
         contre_attaque_defenseur();
-        next_attaque();
         return;
     }
 
@@ -1163,6 +1165,7 @@ function resoudre_attaque() {
     }
     else { // if (scr_def >= 0) {
         contre_attaque_defenseur();
+        return;
     }
 
     next_attaque();
