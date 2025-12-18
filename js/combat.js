@@ -324,10 +324,8 @@ function next_attaque() {
         Map.drawHexMap();
 
         // Fin du round
-        break_combats = true;
-        contre_attaque = null;
         init_round = false;
-        Messages.ecriture_directe("Fin de la phase combat");
+        Messages.ecriture_directe("Fin du round de combat");
         return;
     }
 
@@ -375,7 +373,8 @@ function next_attaque() {
         if (current_attaque.Timing > Nb_rounds * 5 + 5) {
             attaquant.Incantation -= 5;
             Attaques_reportees.push(current_attaque);
-            next_attaque();
+            console.log("Lancement de sort reporté : on passe à l'attaque suivante");
+            next_attaque(); // On passe à l'attaque suivante
             return;
         }
 
@@ -394,21 +393,18 @@ function next_attaque() {
             if (sort.Zone === "le magicien") attaquant.Cible_sort = true;
         }
 
-        // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
-        document.removeEventListener("click", closeSpellInfo);
-
-        // Réinitialisation de la contre-attaque
-        contre_attaque = null;
-
         // Mise à jour de la carte
         Map.generateHexMap();
         Map.drawHexMap();
+
+        // Ne pas Fermer le panneau d'information du sort en cliquant ailleurs
+        document.removeEventListener("click", closeSpellInfo);
 
         // next_attaque(); // Ne pas passer à l'attaque suivante : il faut selectionner les cibles du sort
         return;
     }
 
-    // Identification de l'arme
+    // Identification de l'arme de l'attaquant
     let arme = null;
     if (current_attaque.Main === 1) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
     else if (current_attaque.Main === 2) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
@@ -416,20 +412,15 @@ function next_attaque() {
     // Initialisation des défenseurs
     if (contre_attaque) {
         contre_attaque.Defenseur = true;
+        contre_attaque = null;
     }
     else {
         Pions.forEach(pion => {
             if (pion.Type === attaquant.Type) return; // Pas de défense contre ceux du même camp
 
-            // Attaque à distance : tous les ennemis peuvent défendre s'ils sont à portée
+            // Attaque à distance : tous les ennemis peuvent défendre (on ne gère pas la portée des armes)
             if (arme && arme.A_distance) {
-                const distance = hexDistance(
-                    parseInt(attaquant.Position.split(',')[0]),
-                    parseInt(attaquant.Position.split(',')[1]),
-                    parseInt(pion.Position.split(',')[0]),
-                    parseInt(pion.Position.split(',')[1])
-                );
-                if (distance <= arme.Portee) pion.Defenseur = true;
+                pion.Defenseur = true;
                 return;
             }
 
@@ -453,8 +444,8 @@ function next_attaque() {
 
     // Vérifier s'il y a des défenseurs
     if (!Pions.find(p => p.Defenseur)) {
-        contre_attaque = null;
-        next_attaque();
+        console.log("Aucun défenseur : on passe à l'attaque suivante");
+        next_attaque(); // On passe à l'attaque suivante
         return;
     }
 
@@ -462,16 +453,16 @@ function next_attaque() {
     if ((!attaquant.Arme1 || attaquant.Arme1 === "" || attaquant.Arme1_engagee) &&
         (!attaquant.Arme2 || attaquant.Arme2 === "" || attaquant.Arme2 === "Bouclier" || attaquant.Arme2_engagee) &&
         (!arme || arme.A_distance)) {
-        contre_attaque = null;
-        next_attaque();
+        console.log("Aucune attaque possible : on passe à l'attaque suivante");
+        next_attaque(); // On passe à l'attaque suivante
         return;
     }
 
-    // Afficher le dialogue d'attaque (la cible est définie dans le cas d'une contre-attaque)
-    if (contre_attaque || Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
+    // Afficher directement le dialogue d'attaque s'il n'y a qu'un unique défenseur possible
+    if (Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
 
-    contre_attaque = null;
-    
+    console.log("Fin de la fonction next_attaque !");
+    // next_attaque(); // Ne pas passer à l'attaque suivante : il faut selectionner le défenseur parmi les défenseurs possibles
 }
 
 /**
@@ -961,9 +952,13 @@ function declare_attaque(attaquant, defenseur) {
  * Process une contre-attaque
  * Si une contre-attaque est possible, elle est déclarée
  */
-function contre_attaque_defenseur() {
+function contre_attaque_du_defenseur() {
     const attaquant = Pions.find(p => p.Attaquant);
     const defenseur = Pions.find(p => p.Defenseur);
+
+    console.log("attaquant :", attaquant);
+    console.log("defenseur :", defenseur);
+    console.log("contre_attaque :", contre_attaque);
 
     if (contre_attaque) return false;
 
@@ -984,12 +979,13 @@ function contre_attaque_defenseur() {
     }
     if (arme && arme.A_distance) return false;
 
-    // Ramener la future attaque du defenseur à la prochaine position
+    // Trouver la future attaque du defenseur
     let next_att_def = null;
     Attaques.filter(x =>
         x.Model === defenseur.Model &&
         x.Indice === defenseur.Indice &&
         x.Competence === null).forEach(a => {
+            if (next_att_def !== null) return;
             if (a.Main === 1) {
                 if (!defenseur.Arme1 || defenseur.Arme1 === "") return;
                 if (defenseur.Arme1 === "Bouclier") return;
@@ -1005,22 +1001,17 @@ function contre_attaque_defenseur() {
             next_att_def = a;
         });
 
-    if (next_att_def !== null && typeof next_att_def !== "undefined") {
-        // Ramener la future attaque du defenseur à la prochaine position
-        next_att_def.Timing = Nb_rounds * 5 + 0.01;
-        Attaques.sort(Attaque.tri);
+    if (next_att_def === null || typeof next_att_def === "undefined") return false;
 
-        contre_attaque = attaquant;
+    // Ramener la future attaque du defenseur à la prochaine position
+    next_att_def.Timing = Nb_rounds * 5 + 0.01;
+    Attaques.sort(Attaque.tri);
 
-        // Message informant de la contre-attaque
-        Messages.ecriture_directe(`${defenseur.Titre} contre-attaque ${attaquant.Titre}`);
-   
-        next_attaque();
-        return true;
-    }
+    contre_attaque = attaquant;
 
-    next_attaque();
-    return false;
+    // Message informant de la contre-attaque
+    Messages.ecriture_directe(`${defenseur.Titre} contre-attaque ${attaquant.Titre}`);
+    return true;
 }
 
 /**
@@ -1042,13 +1033,17 @@ function resoudre_attaque() {
     // Si l'attaquant est blessé, on perd l'avantage et on passe à l'attaque suivante
     if (attaquant.Est_blesse) {
         prend_avantage(defenseur, attaquant);
-        contre_attaque_defenseur();
+        contre_attaque_du_defenseur();
+        console.log("Attaquant blessé : on passe à l'attaque suivante");
+        next_attaque();
         return;
     }
 
     // S'il n'y a pas d'attaque, on passe à l'attaque suivante
     if (!attaquant.at1_att && !attaquant.at2_att) {
-        contre_attaque_defenseur();
+        contre_attaque_du_defenseur();
+        console.log("Aucune attaque possible : on passe à l'attaque suivante");
+        next_attaque();
         return;
     }
 
@@ -1100,20 +1095,6 @@ function resoudre_attaque() {
         }
     }
 
-    // Case 1 : Défense échouée (scr_def négatif mais marge positive ou nulle)
-    if (scr_def < 0 && margin >= 0) {
-    }
-    // Case 2 : Attaque interceptée partiellement (marge positive)
-    else if ((margin > 0)) {
-    }
-    // Case 3 : Attaque interceptée mais attaquant garde l'avantage : Parade avec marge > -2 ou esquive avec marge > -4
-    else if ((defenseur.pr1_def && margin > -2) || (defenseur.pr2_def && margin > -2) || (defenseur.esq_def && margin > -4)) {
-    }
-    // Case 4 : Attaque interceptée complètement, défenseur prend l'avantage
-    else {
-        if (!contre_attaque) prend_avantage(defenseur, attaquant);
-    }
-
     // Déterminer si l'attaque réussit (marge > 0 ou marge = 0 mais défense échouée)
     if (margin > 0 || (margin === 0 && scr_def < 0)) {
         // === ATTAQUE RÉUSSIE ===
@@ -1161,12 +1142,17 @@ function resoudre_attaque() {
 
             // L'attaquant prend l'avantage sur le défenseur
             prend_avantage(attaquant, defenseur);
+
+            // On passe à l'attaque suivante
+            console.log("Attaque réussie : on passe à l'attaque suivante");
+            next_attaque();
+            return;
         }
     }
-    else { // if (scr_def >= 0) {
-        contre_attaque_defenseur();
-        return;
-    }
 
+    // L'attaque a échouée
+    contre_attaque_du_defenseur();
+
+    console.log("Attaque échouée : on passe à l'attaque suivante");
     next_attaque();
 }
