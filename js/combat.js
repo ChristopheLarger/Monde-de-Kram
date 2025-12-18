@@ -373,7 +373,6 @@ function next_attaque() {
         if (current_attaque.Timing > Nb_rounds * 5 + 5) {
             attaquant.Incantation -= 5;
             Attaques_reportees.push(current_attaque);
-            console.log("Lancement de sort reporté : on passe à l'attaque suivante");
             next_attaque(); // On passe à l'attaque suivante
             return;
         }
@@ -444,7 +443,6 @@ function next_attaque() {
 
     // Vérifier s'il y a des défenseurs
     if (!Pions.find(p => p.Defenseur)) {
-        console.log("Aucun défenseur : on passe à l'attaque suivante");
         next_attaque(); // On passe à l'attaque suivante
         return;
     }
@@ -453,16 +451,12 @@ function next_attaque() {
     if ((!attaquant.Arme1 || attaquant.Arme1 === "" || attaquant.Arme1_engagee) &&
         (!attaquant.Arme2 || attaquant.Arme2 === "" || attaquant.Arme2 === "Bouclier" || attaquant.Arme2_engagee) &&
         (!arme || arme.A_distance)) {
-        console.log("Aucune attaque possible : on passe à l'attaque suivante");
         next_attaque(); // On passe à l'attaque suivante
         return;
     }
 
     // Afficher directement le dialogue d'attaque s'il n'y a qu'un unique défenseur possible
     if (Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
-
-    console.log("Fin de la fonction next_attaque !");
-    // next_attaque(); // Ne pas passer à l'attaque suivante : il faut selectionner le défenseur parmi les défenseurs possibles
 }
 
 /**
@@ -956,10 +950,6 @@ function contre_attaque_du_defenseur() {
     const attaquant = Pions.find(p => p.Attaquant);
     const defenseur = Pions.find(p => p.Defenseur);
 
-    console.log("attaquant :", attaquant);
-    console.log("defenseur :", defenseur);
-    console.log("contre_attaque :", contre_attaque);
-
     if (contre_attaque) return false;
 
     if (defenseur.Esquive) return false;
@@ -1034,7 +1024,6 @@ function resoudre_attaque() {
     if (attaquant.Est_blesse) {
         prend_avantage(defenseur, attaquant);
         contre_attaque_du_defenseur();
-        console.log("Attaquant blessé : on passe à l'attaque suivante");
         next_attaque();
         return;
     }
@@ -1042,7 +1031,6 @@ function resoudre_attaque() {
     // S'il n'y a pas d'attaque, on passe à l'attaque suivante
     if (!attaquant.at1_att && !attaquant.at2_att) {
         contre_attaque_du_defenseur();
-        console.log("Aucune attaque possible : on passe à l'attaque suivante");
         next_attaque();
         return;
     }
@@ -1144,7 +1132,6 @@ function resoudre_attaque() {
             prend_avantage(attaquant, defenseur);
 
             // On passe à l'attaque suivante
-            console.log("Attaque réussie : on passe à l'attaque suivante");
             next_attaque();
             return;
         }
@@ -1152,7 +1139,5 @@ function resoudre_attaque() {
 
     // L'attaque a échouée
     contre_attaque_du_defenseur();
-
-    console.log("Attaque échouée : on passe à l'attaque suivante");
     next_attaque();
 }

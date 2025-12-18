@@ -3059,7 +3059,6 @@ function ajustement_model_pj() {
   ];
   attributs.forEach((a) => {
     calculerAjustement(a);
-    console.log(a);
   });
   // Fonction pour calculer un ajustement
   function calculerAjustement(attr) {
@@ -3082,7 +3081,6 @@ function ajustement_model_pj() {
       const score = parseFloat(scoreField.value) || 0;
       const ajustement = Math.floor((score - 10) / 2);
       ajustementField.value = ajustement;
-      console.log(ajustement);
     }
   }
 
@@ -3112,6 +3110,5 @@ dialog_model_1.addEventListener("change", function (event) {
     event.target.value = "";
   } else if (i > 100) {
     event.target.value = i % 100;
-    console.log(i % 100);
   }
 });
