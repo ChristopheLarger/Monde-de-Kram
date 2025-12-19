@@ -119,19 +119,6 @@ class ChatServer implements MessageComponentInterface
         return true;
     }
 
-    const Id_table = [
-        "Arme" => "Nom_arme",
-        "Bonus" => "Nom_bonus",
-        "Bonus_sort" => "Nom_liste@Nom_sort@Nom_bonus@Succes",
-        "Competence" => "Nom_competence",
-        "Comp_connue" => "Nom_competence@Nom_model",
-        "Connecteur" => "Nom_liste@Pred_sort@Suc_sort",
-        "Liste" => "Nom_liste",
-        "Model" => "Nom_model",
-        "Sort" => "Nom_liste@Nom_sort",
-        "Sort_connu" => "Nom_model@Nom_liste@Nom_sort",
-        "Model" => "Nom_model",
-    ];
     /**
      * FONCTION DE MODIFICATION D'UN CHAMPS D'UNE TABLE
      * ================================================
@@ -140,6 +127,19 @@ class ChatServer implements MessageComponentInterface
      */
     private function Set_champs($msg)
     {
+        $id_table = [
+            "Arme" => "Nom_arme",
+            "Bonus" => "Nom_bonus",
+            "Bonus_sort" => "Nom_liste@Nom_sort@Nom_bonus@Succes",
+            "Competence" => "Nom_competence",
+            "Comp_connue" => "Nom_competence@Nom_model",
+            "Connecteur" => "Nom_liste@Pred_sort@Suc_sort",
+            "Liste" => "Nom_liste",
+            "Model" => "Nom_model",
+            "Sort" => "Nom_liste@Nom_sort",
+            "Sort_connu" => "Nom_model@Nom_liste@Nom_sort",
+            "Model" => "Nom_model"];
+
         // Set Nom_attribut@Valeur_attribut@Nom_table@Id_table
         // Exemple : Set Force@10@Model@Guilhem
         $regex = "/^MJ: Set ([^@]+)@([^@]+)@([^@]+)@(.+)$/";
@@ -147,18 +147,17 @@ class ChatServer implements MessageComponentInterface
         if (! preg_match($regex, $msg, $result)) return false;
         
         // Extraction des clés et des valeurs de l'ID de la table
-        $key = $Id_table[$result[3]].split("@");
-        $value = $result[4].split("@");
+        $key = explode("@", $id_table[$result[3]]);
+        $value = explode("@", $result[4]);
 
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
-
         if ($conn->connect_error) {
             echo "Echec de connexion à la base de données.\n";
             die("Échec de la connexion : " . $conn->connect_error);
         } else {
-            $query = "UPDATE " . $result[3] . " SET " . $result[1] . " = " . $result[2];
-            $query .= " WHERE " . $key[0] . " = " . $value[0];
+            $query = "UPDATE " . $result[3] . " SET " . $result[1] . " = \"" . $result[2] . "\"";
+            $query .= " WHERE " . $key[0] . " = \"" . $value[0] . "\"";
             for ($i = 1; $i < count($key); $i++) {
                 $query .= " AND " . $key[$i] . " = " . $value[$i];
             }
