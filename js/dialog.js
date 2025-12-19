@@ -3132,7 +3132,8 @@ dialog_model_1
 
     let raceOption = dialog_model_1.querySelector(".race_select").value;
     raceOption = raceOption.charAt(0).toUpperCase() + raceOption.slice(1);
-    model.Race = raceOption
+    model.Race = raceOption;
+    sendMessage("Set", "Race@" + model.Race + "@Model@" + model.Nom_model);
 
     let magieOption = dialog_model_1.querySelector(".magie_select").value;
     magieOption = magieOption.charAt(0).toUpperCase() + magieOption.slice(1);
