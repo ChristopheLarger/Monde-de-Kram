@@ -56,7 +56,6 @@
             // $js .= "    Image: new Image(\"Images/" . $row['Nom'] . ".png\"),\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
-            $js .= "    Etat: " . toJS($row['Etat']) . ",\n";
 
             $js .= "    Race: " . toJS($row['Race']) . ",\n";
             $js .= "    Magie_type: " . toJS($row['Magie_type']) . ",\n";

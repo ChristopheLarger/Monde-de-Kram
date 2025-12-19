@@ -18,7 +18,6 @@ class Model {
     this.Image = data.Image || null;
     this.Is_joueur = data.Is_joueur || false;
     this.Capacites = data.Capacites || "";
-    this.Etat = data.Etat || "";
     this.Race = data.Race || "";
     this.Magie_type = data.Magie_type || "";
 
