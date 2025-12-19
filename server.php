@@ -70,9 +70,10 @@ class ChatServer implements MessageComponentInterface
         // === DIFFUSION DU MESSAGE ===
         // Parcourir tous les clients connectés
         foreach ($this->clients as $client) {
+            echo "Msg : " . $msg . "\n";
             // Ne pas renvoyer le message à l'expéditeur
             if ($from != $client) {
-                echo "Msg : " . $msg . "\n";
+                
                 // Envoyer le message aux clients
                 $client->send($msg);
             }
