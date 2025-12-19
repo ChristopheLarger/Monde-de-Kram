@@ -3156,4 +3156,6 @@ dialog_model_1
 
 dialog_model_1
   .querySelector(".cancel_model_pj")
-  .addEventListener("click", function (event) {});
+  .addEventListener("click", function (event) {
+    dialog_model_1.close();
+  });
