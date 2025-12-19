@@ -150,6 +150,41 @@ const attributs_races = {
     memoire: -1,
     telepathie: 1,
   },
+
+  toutlisse: {
+    force: 1,
+    constitution: 1,
+    vivacite_physique: 1,
+    perception: 2,
+    vivacite_mentale: 0,
+    volonte: 1,
+    abstraction: 0,
+    charisme: -2,
+    adaptation: 1,
+    combat: 2,
+    foi: -1,
+    magie: -2,
+    memoire: -2,
+    telepathie: 1,
+  },
+
+  autre: {
+    force: 0,
+    constitution: 0,
+    vivacite_physique: 0,
+    perception: 0,
+    vivacite_mentale: 0,
+    volonte: 0,
+    abstraction: 0,
+    charisme: 0,
+    adaptation: 0,
+    combat: 0,
+    foi: 0,
+    magie: 0,
+    memoire: 0,
+    telepathie: 0,
+  },
+
 };
 /**
  * Affiche le dialogue pour définir les dimensions de la carte
@@ -169,7 +204,7 @@ function afficher_dim_carte() {
     image_fond.onload = function () {
       dialog_dim_carte.querySelector(".hauteur").value = Math.round(
         (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) /
-          image_fond.width
+        image_fond.width
       );
     };
   }
@@ -1424,6 +1459,88 @@ function afficher_confirmation_sort() {
   dialog_sort_2.showModal();
 }
 
+// === ÉVÉNEMENTS POUR LES MODÈLES DE PJ ===
+// Gestion de l'affichage du modèle de PJ
+function afficher_model() {
+  const model = Models.find((m) => m.Nom_model === m_selected.Model);
+
+  // Remplissage des champs du modèle
+  dialog_model_1.querySelector(".nom_model").value = model.Nom_model;
+  dialog_model_1.querySelector(".race_select").value = model.Race.toLowerCase();
+  dialog_model_1.querySelector(".magie_select").value = model.Magie_type.toLowerCase();
+
+  dialog_model_1.querySelector(".force_score").value = model.Force;
+  dialog_model_1.querySelector(".constitution_score").value = model.Constitution;
+  dialog_model_1.querySelector(".vivacite_physique_score").value = model.Vivacite_physique;
+  dialog_model_1.querySelector(".perception_score").value = model.Perception;
+  dialog_model_1.querySelector(".vivacite_mentale_score").value = model.Vivacite_mentale;
+  dialog_model_1.querySelector(".volonte_score").value = model.Volonte;
+  dialog_model_1.querySelector(".abstraction_score").value = model.Abstraction;
+  dialog_model_1.querySelector(".charisme_score").value = model.Charisme;
+  dialog_model_1.querySelector(".adaptation_score").value = model.Adaptation;
+  dialog_model_1.querySelector(".combat_score").value = model.Combat;
+  dialog_model_1.querySelector(".foi_score").value = model.Foi;
+  dialog_model_1.querySelector(".magie_score").value = model.Magie;
+  dialog_model_1.querySelector(".memoire_score").value = model.Memoire;
+  dialog_model_1.querySelector(".telepathie_score").value = model.Telepathie;
+
+  dialog_model_1.querySelector(".force_experience").value = model.Force_experience;
+  dialog_model_1.querySelector(".constitution_experience").value = model.Constitution_experience;
+  dialog_model_1.querySelector(".vivacite_physique_experience").value = model.Vivacite_physique_experience;
+  dialog_model_1.querySelector(".perception_experience").value = model.Perception_experience;
+  dialog_model_1.querySelector(".vivacite_mentale_experience").value = model.Vivacite_mentale_experience;
+  dialog_model_1.querySelector(".volonte_experience").value = model.Volonte_experience;
+  dialog_model_1.querySelector(".abstraction_experience").value = model.Abstraction_experience;
+  dialog_model_1.querySelector(".charisme_experience").value = model.Charisme_experience;
+  dialog_model_1.querySelector(".adaptation_experience").value = model.Adaptation_experience;
+  dialog_model_1.querySelector(".combat_experience").value = model.Combat_experience;
+  dialog_model_1.querySelector(".foi_experience").value = model.Foi_experience;
+  dialog_model_1.querySelector(".magie_experience").value = model.Magie_experience;
+  dialog_model_1.querySelector(".memoire_experience").value = model.Memoire_experience;
+  dialog_model_1.querySelector(".telepathie_experience").value = model.Telepathie_experience;
+
+  // Centre tous les inputs & met à jour les ajustements
+  dialog_model_1.querySelectorAll("input").forEach((input) => {
+    if (input.className.includes("_experience")) input.style.textAlign = "center";
+    if (input.className.includes("_race")) input.style.textAlign = "center";
+    if (input.className.includes("_ajustement")) input.style.textAlign = "center";
+    if (input.className.includes("_score")) {
+      input.style.textAlign = "center";
+      // Simule un changement de score pour mettre à jour les ajustements
+      const event = new Event("change", { bubbles: true });
+      input.dispatchEvent(event);
+    }
+  });
+
+  // Simule un changement de race pour mettre à jour les attributs _race
+  const event = new Event("change", { bubbles: true });
+  dialog_model_1.querySelector(".race_select").dispatchEvent(event);
+
+  dialog_model_1.showModal();
+}
+
+// Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
+dialog_model_1.querySelector(".race_select").addEventListener("change", function () {
+  const race = dialog_model_1.querySelector(".race_select").value;
+  const attr = attributs_races[race];
+
+  // Remplir les champs *_race de la modale
+  dialog_model_1.querySelector(".force_race").value = attr.force;
+  dialog_model_1.querySelector(".constitution_race").value = attr.constitution;
+  dialog_model_1.querySelector(".vivacite_physique_race").value = attr.vivacite_physique;
+  dialog_model_1.querySelector(".perception_race").value = attr.perception;
+  dialog_model_1.querySelector(".vivacite_mentale_race").value = attr.vivacite_mentale;
+  dialog_model_1.querySelector(".volonte_race").value = attr.volonte;
+  dialog_model_1.querySelector(".abstraction_race").value = attr.abstraction;
+  dialog_model_1.querySelector(".charisme_race").value = attr.charisme;
+  dialog_model_1.querySelector(".adaptation_race").value = attr.adaptation;
+  dialog_model_1.querySelector(".combat_race").value = attr.combat;
+  dialog_model_1.querySelector(".foi_race").value = attr.foi;
+  dialog_model_1.querySelector(".magie_race").value = attr.magie;
+  dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
+  dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
+});
+
 // === ÉVÉNEMENTS POUR LES DIMENSIONS DE FORMES ===
 // Gestion des dialogues de création de formes géométriques
 
@@ -1948,6 +2065,11 @@ dialog_details_2
   .addEventListener("click", function (event) {
     m_selected.dupliquer();
   });
+
+// Gestion du clic sur la class model de la boite de dialog_detail_2
+dialog_details_2.querySelector(".model").addEventListener("click", function (event) {
+  afficher_model();
+});
 
 // === ÉVÉNEMENTS D'ATTAQUE ===
 // Gestion des interactions avec les dialogues d'attaque
@@ -2807,10 +2929,10 @@ dialog_sort_2
   .addEventListener("click", function (event) {
     const magicien = Pions.find((p) => p.Attaquant);
 
-  // Mise à jour des points de fatigue et de concentration
-  magicien.Concentration -= magicien.Concentration_sort;
-  magicien.Fatigue -= magicien.Fatigue_sort;
-  magicien.Fatigue_down = Math.max(magicien.Fatigue_down, magicien.Fatigue_sort);
+    // Mise à jour des points de fatigue et de concentration
+    magicien.Concentration -= magicien.Concentration_sort;
+    magicien.Fatigue -= magicien.Fatigue_sort;
+    magicien.Fatigue_down = Math.max(magicien.Fatigue_down, magicien.Fatigue_sort);
 
     Pions.filter((p) => p.Cible_sort).forEach((p) => {
       // Détermination de la sauvegarde au sort
@@ -2900,215 +3022,48 @@ dialog_sort_2
     next_attaque();
   });
 
-// Gestion du clic sur la class model de la boite de dialog_detail_2
-// Lorsque l'utilisateur clique sur un élément de class 'model' dans dialog_details_2,
-// on ouvre la modale du modèle PJ (modal_model_pj) pour afficher/modifier ses détails.
-
-dialog_details_2
-  .querySelector(".model")
-  .addEventListener("click", function (event) {
-    open_model_pj();
-    // Vérifie si l'élément cliqué ou un de ses parents porte la class 'model'
-    let target = event.target;
-    const nom_model = dialog_details_2.querySelector(".model").textContent;
-    // Récupération du modèle
-    const model = Models.find((m) => m.Nom_model === nom_model);
-    // Remplissage des champs du modèle
-
-    dialog_model_1.querySelector(".nom_model").value = model.Nom_model;
-    dialog_model_1.querySelector(".race_select").value =
-      model.Race.toLowerCase();
-    change_race_model();
-    dialog_model_1.querySelector(".race_select").dispatchEvent(changeEvent);
-    dialog_model_1.querySelector(".magie_select").value =
-      model.Magie_type.toLowerCase();
-    dialog_model_1.querySelector(".force_experience").value =
-      model.Force_experience;
-
-    dialog_model_1.querySelector(".constitution_experience").value =
-      model.Constitution_experience;
-    dialog_model_1.querySelector(".vivacite_physique_experience").value =
-      model.Vivacite_physique_experience;
-    dialog_model_1.querySelector(".perception_experience").value =
-      model.Perception_experience;
-    dialog_model_1.querySelector(".vivacite_mentale_experience").value =
-      model.Vivacite_mentale_experience;
-    dialog_model_1.querySelector(".volonte_experience").value =
-      model.Volonte_experience;
-    dialog_model_1.querySelector(".abstraction_experience").value =
-      model.Abstraction_experience;
-    dialog_model_1.querySelector(".charisme_experience").value =
-      model.Charisme_experience;
-    dialog_model_1.querySelector(".adaptation_experience").value =
-      model.Adaptation_experience;
-    dialog_model_1.querySelector(".combat_experience").value =
-      model.Combat_experience;
-    dialog_model_1.querySelector(".foi_experience").value =
-      model.Foi_experience;
-    dialog_model_1.querySelector(".magie_experience").value =
-      model.Magie_experience;
-    dialog_model_1.querySelector(".memoire_experience").value =
-      model.Memoire_experience;
-    dialog_model_1.querySelector(".telepathie_experience").value =
-      model.Telepathie_experience;
-
-    dialog_model_1.querySelector(".force_score").value = model.Force;
-    dialog_model_1.querySelector(".constitution_score").value =
-      model.Constitution;
-    dialog_model_1.querySelector(".vivacite_physique_score").value = model.Vivacite_physique;
-    dialog_model_1.querySelector(".perception_score").value = model.Perception;
-    dialog_model_1.querySelector(".vivacite_mentale_score").value = model.Vivacite_mentale;
-    dialog_model_1.querySelector(".volonte_score").value = model.Volonte;
-    dialog_model_1.querySelector(".abstraction_score").value =
-      model.Abstraction;
-    dialog_model_1.querySelector(".charisme_score").value = model.Charisme;
-    dialog_model_1.querySelector(".adaptation_score").value = model.Adaptation;
-    dialog_model_1.querySelector(".combat_score").value = model.Combat;
-    dialog_model_1.querySelector(".foi_score").value = model.Foi;
-    dialog_model_1.querySelector(".magie_score").value = model.Magie;
-    dialog_model_1.querySelector(".memoire_score").value = model.Memoire;
-    dialog_model_1.querySelector(".telepathie_score").value = model.Telepathie;
-
-    // Ouvre la modale associée au modèle PJ
-    dialog_model_1.showModal && dialog_model_1.showModal();
-    // Empêche tout autre gestionnaire éventuel
-    event.stopPropagation();
-
-    ajustement_model_pj();
-
-  });
-
-dialog_model_1
-  .querySelector(".race_select")
-  .addEventListener("change", function () {
-    change_race_model();
-  });
-// Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
-function change_race_model() {
-  if (!dialog_model_1) return;
-  const raceSelect = dialog_model_1.querySelector(".race_select");
-  if (!raceSelect) return;
-  // On n'enregistre le listener "change" qu'une seule fois
-  if (!raceSelect.dataset.changeRaceBound) {
-    raceSelect.addEventListener("change", function () {
-      const race = raceSelect.value;
-      const attr = attributs_races[race];
-      if (!attr) return;
-      // Remplir les champs *_race de la modale
-      dialog_model_1.querySelector(".force_race").value = attr.force;
-      dialog_model_1.querySelector(".constitution_race").value =
-        attr.constitution;
-      dialog_model_1.querySelector(".vivacite_physique_race").value =
-        attr.vivacite_physique;
-      dialog_model_1.querySelector(".perception_race").value = attr.perception;
-      dialog_model_1.querySelector(".vivacite_mentale_race").value =
-        attr.vivacite_mentale;
-      dialog_model_1.querySelector(".volonte_race").value = attr.volonte;
-      dialog_model_1.querySelector(".abstraction_race").value =
-        attr.abstraction;
-      dialog_model_1.querySelector(".charisme_race").value = attr.charisme;
-      dialog_model_1.querySelector(".adaptation_race").value = attr.adaptation;
-      dialog_model_1.querySelector(".combat_race").value = attr.combat;
-      dialog_model_1.querySelector(".foi_race").value = attr.foi;
-      dialog_model_1.querySelector(".magie_race").value = attr.magie;
-      dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
-      dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
-    });
-
-    // Marqueur pour ne pas ré-attacher le listener plusieurs fois
-    raceSelect.dataset.changeRaceBound = "1";
-  }
-}
-
-function open_model_pj() {
-  change_race_model();
-  // 1. Récupérer le <select> de la race
-  // Adapte le sélecteur à ton HTML : id, name, class, etc.
-  const selectRace = document
-    .getElementById("modal_model_pj")
-    .querySelector(".race_select");
-  // ou par id : const selectRace = document.getElementById('race');
-
-  // 2. (Optionnel) Changer la valeur sélectionnée
-  selectRace.value = "humain"; // mets ici la valeur que tu veux sélectionner
-
-  // 3. Créer et déclencher l'évènement "change"
-  const event = new Event("change", { bubbles: true });
-  selectRace.dispatchEvent(event);
-}
-
-function ajustement_model_pj() {
-  if (!dialog_model_1) return;
-
-  // Liste de tous les attributs avec leurs champs correspondants
-  const attributs = [
-    "force",
-    "constitution",
-    "vivacite_physique",
-    "perception",
-    "vivacite_mentale",
-    "volonte",
-    "abstraction",
-    "charisme",
-    "adaptation",
-    "combat",
-    "foi",
-    "magie",
-    "memoire",
-    "telepathie",
-  ];
-  attributs.forEach((a) => {
-    calculerAjustement(a);
-  });
-  // Fonction pour calculer un ajustement
-  function calculerAjustement(attr) {
-    const scoreField = dialog_model_1.querySelector(`.${attr}_score`);
-    const ajustementField = dialog_model_1.querySelector(`.${attr}_ajustement`);
-    const raceField = dialog_model_1.querySelector(`.${attr}_race`);
-    const experienceField = dialog_model_1.querySelector(`.${attr}_experience`);
-    ajustementField.style.textAlign = "center";
-    if (raceField) {
-      raceField.style.textAlign = "center";
-    }
-    if (scoreField) {
-      scoreField.style.textAlign = "center";
-    }
-    if (experienceField) {
-      experienceField.style.textAlign = "center";
-    }
-
-    if (scoreField && ajustementField) {
-      const score = parseFloat(scoreField.value) || 0;
-      const ajustement = Math.floor((score - 10) / 2);
-      ajustementField.value = ajustement;
-    }
-  }
-
-  // Calculer tous les ajustements une première fois
-  attributs.forEach((attr) => calculerAjustement(attr));
-
-  // Ajouter des listeners pour mettre à jour automatiquement
-  attributs.forEach((attr) => {
-    const scoreField = dialog_model_1.querySelector(`.${attr}_score`);
-    scoreField.addEventListener("input", () => calculerAjustement(attr));
-  });
-}
-
+// Gestion du changement des scores et des expériences
 dialog_model_1.addEventListener("change", function (event) {
-  if (!event.target.className.includes("_score")) return;
+  if (!event.target.className.includes("_score") && !event.target.className.includes("_experience")) return;
+
+  // On garde seulement les chiffres
   event.target.value = event.target.value.replace(/[^0-9]/g, "");
-  event.target.style.textAlign = "center";
-});
 
-dialog_model_1.addEventListener("change", function (event) {
-  if (!event.target.className.includes("_experience")) return;
-  // On garde seulement les chiffres puis on limite à 2 caractères
-  const value = event.target.value.replace(/[^0-9]/g, "");
-  const i = parseInt(value, 10);
-  event.target.style.textAlign = "center";
-  if (isNaN(i)) {
-    event.target.value = "";
-  } else if (i > 100) {
-    event.target.value = i % 100;
-  }
+  // On calcule l'ajustement
+  dialog_model_1.querySelector(`.${event.target.className.replace("_score", "_ajustement")}`).value =
+    Math.floor((parseInt(event.target.value) - 10) / 2);
+
+  // On met à jour les éléments calculés et leur ajustements
+  dialog_model_1.querySelector(".niveau_physique_score").value = Math.round((
+    parseInt(dialog_model_1.querySelector(".force_score").value) +
+    parseInt(dialog_model_1.querySelector(".constitution_score").value) +
+    parseInt(dialog_model_1.querySelector(".vivacite_physique_score").value) +
+    parseInt(dialog_model_1.querySelector(".perception_score").value)) / 4);
+
+  dialog_model_1.querySelector(".niveau_physique_ajustement").value =
+    Math.floor((dialog_model_1.querySelector(".niveau_physique_score").value - 10) / 2);
+
+  dialog_model_1.querySelector(".niveau_mental_score").value = Math.round((
+    parseInt(dialog_model_1.querySelector(".volonte_score").value) +
+    parseInt(dialog_model_1.querySelector(".abstraction_score").value) +
+    parseInt(dialog_model_1.querySelector(".vivacite_mentale_score").value) +
+    parseInt(dialog_model_1.querySelector(".charisme_score").value)) / 4);
+
+  dialog_model_1.querySelector(".niveau_mental_ajustement").value =
+    Math.floor((dialog_model_1.querySelector(".niveau_mental_score").value - 10) / 2);
+
+  dialog_model_1.querySelector(".coordination_score").value = Math.round((
+    parseInt(dialog_model_1.querySelector(".vivacite_physique_score").value) +
+    parseInt(dialog_model_1.querySelector(".perception_score").value) +
+    parseInt(dialog_model_1.querySelector(".vivacite_mentale_score").value)) / 3);
+
+  dialog_model_1.querySelector(".coordination_ajustement").value =
+    Math.floor((dialog_model_1.querySelector(".coordination_score").value - 10) / 2);
+
+  dialog_model_1.querySelector(".sixieme_sens_score").value = Math.round((
+    parseInt(dialog_model_1.querySelector(".adaptation_score").value) +
+    parseInt(dialog_model_1.querySelector(".perception_score").value)) / 2);
+
+  dialog_model_1.querySelector(".sixieme_sens_ajustement").value =
+    Math.floor((dialog_model_1.querySelector(".sixieme_sens_score").value - 10) / 2);
 });
