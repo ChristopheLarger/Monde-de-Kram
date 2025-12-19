@@ -696,7 +696,7 @@ function createListeModal(Nom_liste) {
         const nom_liste = title.textContent;
 
       sendMessage(
-          "Sort_connu",
+          "Bascule_sort_connu",
           m_selected.Model + "@" + nom_liste + "@" + Nom_sort
         );
         const sort = SortsConnus.find(

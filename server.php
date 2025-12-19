@@ -12,9 +12,9 @@
 // Importation des classes nécessaires pour le serveur WebSocket
 use Ratchet\MessageComponentInterface;  // Interface pour les composants de message
 use Ratchet\ConnectionInterface;        // Interface pour les connexions
-use Ratchet\Http\HttpServer;           // Serveur HTTP pour Ratchet
-use Ratchet\WebSocket\WsServer;        // Serveur WebSocket
-use Ratchet\Server\IoServer;          // Serveur I/O principal
+use Ratchet\Http\HttpServer;            // Serveur HTTP pour Ratchet
+use Ratchet\WebSocket\WsServer;         // Serveur WebSocket
+use Ratchet\Server\IoServer;            // Serveur I/O principal
 
 // === CHARGEMENT DES DÉPENDANCES ===
 // Chargement automatique des classes via Composer
@@ -63,20 +63,9 @@ class ChatServer implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg)
     {
-        // === FONCTIONNALITÉS DE BASE DE DONNÉES (COMMENTÉES) ===
-        // Ces fonctions permettaient de sauvegarder automatiquement les changements
-        // de statistiques des personnages en base de données
-        // $this->msgSet("Fatigue", $msg);
-        // $this->msgSet("Concentration", $msg);
-        // $this->msgSet("PdV", $msg);
-        // $this->msgSet("Tete", $msg);
-        // $this->msgSet("Poitrine", $msg);
-        // $this->msgSet("Abdomen", $msg);
-        // $this->msgSet("BrasG", $msg);
-        // $this->msgSet("BrasD", $msg);
-        // $this->msgSet("JambeG", $msg);
-        // $this->msgSet("JambeD", $msg);
-        $this->msgSet($msg);
+        $this->Set_champs($msg);
+
+        $this->Bascule_sort_connu($msg);
 
         // === DIFFUSION DU MESSAGE ===
         // Parcourir tous les clients connectés
@@ -84,31 +73,24 @@ class ChatServer implements MessageComponentInterface
             // Ne pas renvoyer le message à l'expéditeur
             if ($from != $client) {
                 echo "Msg : " . $msg . "\n";
-                // Envoyer le message au client
+                // Envoyer le message aux clients
                 $client->send($msg);
             }
         }
     }
 
     /**
-     * FONCTION DE SAUVEGARDE EN BASE DE DONNÉES (COMMENTÉE)
-     * =====================================================
-     * Cette fonction était utilisée pour sauvegarder automatiquement
-     * les changements de statistiques des personnages en base de données
-     * 
-     * @param string $param - Nom du paramètre à sauvegarder
+     * FONCTION DE BASCULE DES SORTS CONNUS
+     * ====================================
      * @param string $msg - Message contenant les données
-     * @return bool - true si la sauvegarde a réussi
+     * @return bool - true si la bascule du sort connu a réussi
      */
-    private function msgSet($msg)
+    private function Bascule_sort_connu($msg)
     {
-        // Expression régulière pour extraire les données du message
-        $regex = "/^MJ: Sort_connu ([^@]+)@([^@]+)@([^@]+)$/";
-        echo $msg . "\n";
+        $regex = "/^MJ: Bascule_sort_connu ([^@]+)@([^@]+)@([^@]+)$/";
+
         if (! preg_match($regex, $msg, $result)) return false;
-        // if ($result[1] != "Sort_connu") return false;
-        // echo $param . " -- " . $result[1] . " -- " . $result[2] . "\n";
-        echo $result[1] . " -- " . $result[2] . " -- " . $result[3] . "\n";
+        
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
@@ -116,11 +98,7 @@ class ChatServer implements MessageComponentInterface
             echo "Echec de connexion à la base de données.\n";
             die("Échec de la connexion : " . $conn->connect_error);
         } else {
-
-            // Préparation de la requête SQL de mise à jour
-        
             $query = "SELECT * FROM sort_connu WHERE Nom_model = ? AND Nom_liste = ? AND Nom_sort = ?";
-
             $stmt = $conn->prepare($query);
             $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
             $stmt->execute();
@@ -133,6 +111,57 @@ class ChatServer implements MessageComponentInterface
             }
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+    const Id_table = [
+        "Arme" => "Nom_arme",
+        "Bonus" => "Nom_bonus",
+        "Bonus_sort" => "Nom_liste@Nom_sort@Nom_bonus@Succes",
+        "Competence" => "Nom_competence",
+        "Comp_connue" => "Nom_competence@Nom_model",
+        "Connecteur" => "Nom_liste@Pred_sort@Suc_sort",
+        "Liste" => "Nom_liste",
+        "Model" => "Nom_model",
+        "Sort" => "Nom_liste@Nom_sort",
+        "Sort_connu" => "Nom_model@Nom_liste@Nom_sort",
+        "Model" => "Nom_model",
+    ];
+    /**
+     * FONCTION DE MODIFICATION D'UN CHAMPS D'UNE TABLE
+     * ================================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification du champs a réussi
+     */
+    private function Set_champs($msg)
+    {
+        // Set Nom_attribut@Valeur_attribut@Nom_table@Id_table
+        // Exemple : Set Force@10@Model@Guilhem
+        $regex = "/^MJ: Set ([^@]+)@([^@]+)@([^@]+)@(.+)$/";
+
+        if (! preg_match($regex, $msg, $result)) return false;
+        
+        // Extraction des clés et des valeurs de l'ID de la table
+        $key = $Id_table[$result[3]].split("@");
+        $value = $result[4].split("@");
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            $query = "UPDATE " . $result[3] . " SET " . $result[1] . " = " . $result[2];
+            $query .= " WHERE " . $key[0] . " = " . $value[0];
+            for ($i = 1; $i < count($key); $i++) {
+                $query .= " AND " . $key[$i] . " = " . $value[$i];
+            }
+            $stmt = $conn->prepare($query);
             $stmt->execute();
             $stmt->close();
         }
