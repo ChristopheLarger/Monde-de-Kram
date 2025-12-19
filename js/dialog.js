@@ -3029,6 +3029,9 @@ dialog_model_1.addEventListener("change", function (event) {
   // On garde seulement les chiffres
   event.target.value = event.target.value.replace(/[^0-9]/g, "");
 
+  // La suite ne s'applique que si c'est un score
+  if (!event.target.className.includes("_score")) return;
+
   // On calcule l'ajustement
   dialog_model_1.querySelector(`.${event.target.className.replace("_score", "_ajustement")}`).value =
     Math.floor((parseInt(event.target.value) - 10) / 2);
