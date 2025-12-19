@@ -3138,18 +3138,22 @@ dialog_model_1
     let magieOption = dialog_model_1.querySelector(".magie_select").value;
     magieOption = magieOption.charAt(0).toUpperCase() + magieOption.slice(1);
     model.Magie_type = magieOption;
+    sendMessage("Set", "Magie_type@" + model.Magie_type + "@Model@" + model.Nom_model);
+
 
     dialog_model_1.querySelectorAll("input").forEach((input) => {
       if (input.className.includes("_experience")) {
         const attribut =
           input.className.charAt(0).toUpperCase() + input.className.slice(1);
         model[attribut] = input.value;
+        sendMessage("Set", attribut + "@" + model[attribut] + "@Model@" + model.Nom_model);
       }
       if (input.className.includes("_score")) {
         if (input.disabled) return;
         let attribut = input.className.replace(/_score/, "");
         attribut = attribut.charAt(0).toUpperCase() + attribut.slice(1);
         model[attribut] = input.value;
+        sendMessage("Set", attribut + "@" + model[attribut] + "@Model@" + model.Nom_model);
       }
     });
   });

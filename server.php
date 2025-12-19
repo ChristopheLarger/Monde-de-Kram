@@ -73,7 +73,7 @@ class ChatServer implements MessageComponentInterface
             echo "Msg : " . $msg . "\n";
             // Ne pas renvoyer le message à l'expéditeur
             if ($from != $client) {
-                
+
                 // Envoyer le message aux clients
                 $client->send($msg);
             }
@@ -91,7 +91,7 @@ class ChatServer implements MessageComponentInterface
         $regex = "/^MJ: Bascule_sort_connu ([^@]+)@([^@]+)@([^@]+)$/";
 
         if (! preg_match($regex, $msg, $result)) return false;
-        
+
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
@@ -138,14 +138,15 @@ class ChatServer implements MessageComponentInterface
             "Model" => "Nom_model",
             "Sort" => "Nom_liste@Nom_sort",
             "Sort_connu" => "Nom_model@Nom_liste@Nom_sort",
-            "Model" => "Nom_model"];
+            "Model" => "Nom_model"
+        ];
 
         // Set Nom_attribut@Valeur_attribut@Nom_table@Id_table
         // Exemple : Set Force@10@Model@Guilhem
         $regex = "/^MJ: Set ([^@]+)@([^@]+)@([^@]+)@(.+)$/";
 
         if (! preg_match($regex, $msg, $result)) return false;
-        
+
         // Extraction des clés et des valeurs de l'ID de la table
         $key = explode("@", $id_table[$result[3]]);
         $value = explode("@", $result[4]);
@@ -156,11 +157,12 @@ class ChatServer implements MessageComponentInterface
             echo "Echec de connexion à la base de données.\n";
             die("Échec de la connexion : " . $conn->connect_error);
         } else {
-            $query = "UPDATE " . $result[3] . " SET " . $result[1] . " = \"" . $result[2] . "\"";
+            $query = "UPDATE " . $result[3] . " SET `" . $result[1] . "` = \"" . $result[2] . "\"";
             $query .= " WHERE " . $key[0] . " = \"" . $value[0] . "\"";
             for ($i = 1; $i < count($key); $i++) {
                 $query .= " AND " . $key[$i] . " = " . $value[$i];
             }
+            // echo "Query : " . $query . "\n";
             $stmt = $conn->prepare($query);
             $stmt->execute();
             $stmt->close();
