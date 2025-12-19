@@ -203,7 +203,7 @@ function afficher_dim_carte() {
     image_fond.onload = function () {
       dialog_dim_carte.querySelector(".hauteur").value = Math.round(
         (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) /
-          image_fond.width
+        image_fond.width
       );
     };
   }
@@ -3081,7 +3081,7 @@ dialog_model_1.addEventListener("change", function (event) {
       parseInt(dialog_model_1.querySelector(".constitution_score").value) +
       parseInt(dialog_model_1.querySelector(".vivacite_physique_score").value) +
       parseInt(dialog_model_1.querySelector(".perception_score").value)) /
-      4
+    4
   );
 
   dialog_model_1.querySelector(".niveau_physique_ajustement").value =
@@ -3094,7 +3094,7 @@ dialog_model_1.addEventListener("change", function (event) {
       parseInt(dialog_model_1.querySelector(".abstraction_score").value) +
       parseInt(dialog_model_1.querySelector(".vivacite_mentale_score").value) +
       parseInt(dialog_model_1.querySelector(".charisme_score").value)) /
-      4
+    4
   );
 
   dialog_model_1.querySelector(".niveau_mental_ajustement").value = Math.floor(
@@ -3105,7 +3105,7 @@ dialog_model_1.addEventListener("change", function (event) {
     (parseInt(dialog_model_1.querySelector(".vivacite_physique_score").value) +
       parseInt(dialog_model_1.querySelector(".perception_score").value) +
       parseInt(dialog_model_1.querySelector(".vivacite_mentale_score").value)) /
-      3
+    3
   );
 
   dialog_model_1.querySelector(".coordination_ajustement").value = Math.floor(
@@ -3115,7 +3115,7 @@ dialog_model_1.addEventListener("change", function (event) {
   dialog_model_1.querySelector(".sixieme_sens_score").value = Math.round(
     (parseInt(dialog_model_1.querySelector(".adaptation_score").value) +
       parseInt(dialog_model_1.querySelector(".perception_score").value)) /
-      2
+    2
   );
 
   dialog_model_1.querySelector(".sixieme_sens_ajustement").value = Math.floor(
@@ -3153,8 +3153,7 @@ dialog_model_1
     });
   });
 
-  
 
-dialog_model_1
-  .querySelector(".cancel_model_pj")
-  .addEventListener("click", function (event) {});
+
+dialog_model_1.querySelector(".cancel_model_pj").addEventListener("click", function (event) {
+});
