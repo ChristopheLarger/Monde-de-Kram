@@ -1567,12 +1567,12 @@ let Pions = new Array;
 // Listeners //
 // ///////// //
 
+let isMoving_map = false;
+
 // Click droit sur canvas : annulé
 canvas.addEventListener("contextmenu", function (event) {
     event.preventDefault();
 });
-
-let isMoving_map = false;
 
 // Bouton de la souris abaissé
 canvas.addEventListener("mousedown", (event) => {

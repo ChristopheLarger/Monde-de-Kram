@@ -1,0 +1,13 @@
+{
+    // Configuration du retour à la ligne automatique
+    // "on" : retour à la ligne basé sur la largeur de la fenêtre
+    // "wordWrapColumn" : retour à la ligne à une colonne spécifique
+    // "bounded" : retour à la ligne à la plus petite valeur entre la largeur de la fenêtre et wordWrapColumn
+    "editor.wordWrap": "wordWrapColumn",
+    
+    // Nombre de caractères avant le retour à la ligne automatique
+    // Valeur par défaut: 80
+    // Vous pouvez modifier cette valeur selon vos préférences (ex: 100, 120, 150)
+    "editor.wordWrapColumn": 120
+}
+
