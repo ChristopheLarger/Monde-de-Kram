@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost
--- Généré le : dim. 14 déc. 2025 à 10:28
+-- Généré le : sam. 20 déc. 2025 à 10:38
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -690,18 +690,19 @@ CREATE TABLE `model` (
   `Nom_model` varchar(256) NOT NULL,
   `Is_joueur` tinyint(1) NOT NULL DEFAULT 0,
   `Capacites` varchar(1024) NOT NULL,
-  `Etat` varchar(1024) NOT NULL,
-  `PM` int(11) DEFAULT NULL,
-  `PP` int(11) DEFAULT NULL,
-  `VP` int(11) NOT NULL,
+  `Magie_type` varchar(64) NOT NULL DEFAULT 'Sans',
+  `Race` varchar(64) NOT NULL DEFAULT 'Humain',
+  `Puissance_mentale` int(11) DEFAULT NULL,
+  `Puissance_physique` int(11) DEFAULT NULL,
   `Fatigue` int(11) NOT NULL,
   `Concentration` int(11) NOT NULL DEFAULT 0,
   `Ambidextre` tinyint(1) NOT NULL DEFAULT 0,
   `Liste_pretre` varchar(128) DEFAULT NULL,
   `Force` int(11) NOT NULL,
   `Constitution` int(11) NOT NULL,
+  `Vivacite_physique` int(11) NOT NULL,
   `Perception` int(11) NOT NULL,
-  `VM` int(11) NOT NULL,
+  `Vivacite_mentale` int(11) NOT NULL,
   `Abstraction` int(11) NOT NULL,
   `Volonte` int(11) NOT NULL,
   `Charisme` int(11) NOT NULL,
@@ -711,6 +712,20 @@ CREATE TABLE `model` (
   `Combat` int(11) NOT NULL,
   `Memoire` int(11) NOT NULL,
   `Telepathie` int(11) NOT NULL,
+  `Force_experience` int(11) NOT NULL,
+  `Constitution_experience` int(11) NOT NULL,
+  `Vivacite_physique_experience` int(11) NOT NULL,
+  `Perception_experience` int(11) NOT NULL,
+  `Vivacite_mentale_experience` int(11) NOT NULL,
+  `Abstraction_experience` int(11) NOT NULL,
+  `Volonte_experience` int(11) NOT NULL,
+  `Charisme_experience` int(11) NOT NULL,
+  `Adaptation_experience` int(11) NOT NULL,
+  `Combat_experience` int(11) NOT NULL,
+  `Foi_experience` int(11) NOT NULL,
+  `Magie_experience` int(11) NOT NULL,
+  `Telepathie_experience` int(11) NOT NULL,
+  `Memoire_experience` int(11) NOT NULL,
   `Armure_Tete` int(11) NOT NULL DEFAULT 0,
   `Armure_Poitrine` int(11) NOT NULL DEFAULT 0,
   `Armure_Abdomen` int(11) NOT NULL DEFAULT 0,
@@ -732,15 +747,15 @@ CREATE TABLE `model` (
 -- Déchargement des données de la table `model`
 --
 
-INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Capacites`, `Etat`, `PM`, `PP`, `VP`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Perception`, `VM`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`, `Tete`, `Poitrine`, `Abdomen`, `BrasG`, `BrasD`, `JambeG`, `JambeD`) VALUES
-('Boris', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Christophe', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 14, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Cyril', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Elémental d\'air', 0, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', '', 4, 10, 20, 30, 0, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 5, 5, 4, 4, 6, 6),
-('Elémental d\'eau', 0, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', '', 3, 14, 16, 40, 0, 0, NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20, 4, 7, 7, 5, 5, 8, 8),
-('Guilhem', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 15, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Guillaume', 1, '', '', 0, 0, 10, 0, 80, 0, 'Liste du feu', 14, 17, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Ludovic', 1, '', '', 0, 0, 10, 0, 80, 0, NULL, 14, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10);
+INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`, `Tete`, `Poitrine`, `Abdomen`, `BrasG`, `BrasD`, `JambeG`, `JambeD`) VALUES
+('Boris', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 16, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Christophe', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 14, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Cyril', 1, '', 'Sans', 'Troll', 0, 0, 0, 80, 0, NULL, 14, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Elémental d\'air', 0, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', 'Sans', 'Autre', 4, 10, 30, 0, 0, NULL, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 5, 5, 4, 4, 6, 6),
+('Elémental d\'eau', 0, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', 'Sans', 'Autre', 3, 14, 40, 0, 0, NULL, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20, 4, 7, 7, 5, 5, 8, 8),
+('Guilhem', 1, '', 'Classique', 'Humain', 0, 0, 0, 80, 0, NULL, 12, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Guillaume', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, 'Liste du feu', 14, 17, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
+('Ludovic', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10);
 
 -- --------------------------------------------------------
 
@@ -1371,7 +1386,7 @@ ALTER TABLE `sort`
 --
 ALTER TABLE `sort_connu`
   ADD CONSTRAINT `FK_Sort_connu1` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`),
-  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`,`Nom_liste`);
+  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
