@@ -399,16 +399,6 @@ class Messages {
 }
 
 // === ÉVÉNEMENTS D'INTERFACE ===
-// Gestion des événements de l'interface utilisateur
-
-// Fermeture du popup avec la touche Échap
-document.getElementById("popup").addEventListener("keydown", function (event) {
-    if (event.key === "Escape" || event.key === "Esc") {
-        event.target.style.opacity = "0";
-        event.target.style.display = "none";
-    }
-});
-
 // Lancement de 3D6 au clic sur le bouton
 document.getElementById("3D6").addEventListener("click", function (event) {
     LancerDes.sendMessage_3D6();
