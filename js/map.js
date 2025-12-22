@@ -104,8 +104,7 @@ class Map {
             const row_p = parseInt(p.Position.split(",")[1], 10);
 
             // Vérifier la distance et la ligne de vue
-            if (Map.distance(col_p, row_p, col, row) <= p.Vue &&
-                p.ligne_de_vue(col, row)) {
+            if (Map.distance(col_p, row_p, col, row) <= p.Vue && p.ligne_de_vue(col, row)) {
                 is_find = true;
             }
         });
@@ -324,10 +323,10 @@ class Map {
                 // Propriétés par défaut de la case
                 let color = "rgb(192, 192, 192)"; // Couleur de brouillard
                 let strie = false;                 // Pas de striage par défaut
-                let brouillard = !Map.is_visible(col, row); // Brouillard si non visible
+                let isInBrouillard = !Map.is_visible(col, row); // Brouillard si non visible
 
                 // Si la case est visible (pas de brouillard)
-                if (!brouillard) {
+                if (!isInBrouillard) {
                     color = "rgb(255, 255, 255)";
                     Terrains.filter(t => t.Position === col + "," + row).forEach(t => {
                         if (t.Model === "Rocher") color = "rgb(128, 128, 128)";
@@ -349,23 +348,15 @@ class Map {
                     });
                 }
 
-                hexMap.push({ x, y, col, row, color, strie, brouillard });
+                hexMap.push({ x, y, col, row, color, strie, isInBrouillard });
             }
         }
     }
 
     // On dessine un hexagone.
-    static drawHexagon(x, y, color, strie, text, brouillard, selected = false) {
+    static drawHexagon(x, y, color, strie, text, isInBrouillard, selected = false) {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
-
-            // Utiliser les mêmes dimensions que le canvas principal
-            // canvas_selected.width = canvas.width;
-            // canvas_selected.height = canvas.height;
-
-            // Repositionner le canvas_selected pour qu'il se superpose exactement au canvas principal
-            // canvas_selected.style.left = "0px";
-            // canvas_selected.style.top = "0px";
 
             // On dessine l'image au centre de l'hexagone
             const imgSize = hexSize * 1.2;
@@ -391,18 +382,17 @@ class Map {
         }
         ctx.closePath();
 
-        // On remplit de la couleur indiquée, si ce n'est pas du blanc.
+        // On remplit de la couleur indiquée, si ce n'est pas du blanc (couleur de transparence)
         if (color != "rgb(255, 255, 255)") {
-            if (document.getElementById("joueur").value !== "MJ") {
-                ctx.fillStyle = color;
-                ctx.fill();
+            if (document.getElementById("joueur").value === "MJ") {
+                if (isInBrouillard) ctx.globalAlpha = 0.8;
             }
             else {
-                if (brouillard) ctx.globalAlpha = 0.8;
-                ctx.fillStyle = color;
-                ctx.fill();
-                ctx.globalAlpha = 1;
+                if (isInBrouillard) ctx.globalAlpha = 0.8;
             }
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.globalAlpha = 1;
         }
 
         // On dessine le contour de l'hexagone.
@@ -411,7 +401,7 @@ class Map {
         ctx.stroke();
 
         // On dessine l'image au centre de l'hexagone
-        if (!brouillard || document.getElementById("joueur").value === "MJ") {
+        if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
             if (strie) {
                 // On définit un clip pour ne dessiner que dans l'hexagone
                 ctx.save();
@@ -471,6 +461,36 @@ class Map {
                 ctx.fillText(p.Indice, x, y + 0.63 * imgSize);
             }
         }
+
+        // if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
+        if (!isInBrouillard) {
+            // On définit un clip pour ne dessiner que dans l'hexagone
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(points[0].dx, points[0].dy);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].dx, points[i].dy);
+            }
+            ctx.closePath();
+            ctx.clip();
+
+            Formes.filter(rect => (rect.type === "Rectangle" || rect.type === "Mur")).forEach(r => {
+                ctx.save(); // Sauvegarder l'état pour isoler les transformations de ce rectangle
+                ctx.translate(r.x + r.width / 2, r.y + r.height / 2);
+                ctx.rotate(r.theta);
+                ctx.lineWidth = 5;
+                if (r.type === "Mur") {
+                    ctx.fillStyle = r.color;
+                    ctx.fillRect(- r.width / 2, - r.height / 2, r.width, r.height);
+                }
+                else {
+                    ctx.strokeStyle = r.color;
+                    ctx.strokeRect(- r.width / 2, - r.height / 2, r.width, r.height);
+                }
+                ctx.restore(); // Restaurer l'état pour le rectangle suivant
+            });
+            ctx.restore(); // Supprime le clip
+        }
     }
 
     /**
@@ -524,11 +544,23 @@ class Map {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         // Chargement de la carte de fond
-        if (image_fond != null) ctx.drawImage(image_fond, forme_fond.x, forme_fond.y, forme_fond.width, forme_fond.height);
+        if (image_fond != null) {
+            ctx.drawImage(
+                image_fond,
+                forme_fond.x,
+                forme_fond.y,
+                forme_fond.width,
+                forme_fond.height);
+        }
 
         hexMap.forEach(hex => {
-            Map.drawHexagon(hex.x + offsetX, hex.y + offsetY,
-                hex.color, hex.strie, `${hex.col},${hex.row}`, hex.brouillard);
+            Map.drawHexagon(
+                hex.x + offsetX,
+                hex.y + offsetY,
+                hex.color,
+                hex.strie,
+                `${hex.col},${hex.row}`,
+                hex.isInBrouillard);
         });
 
         if (isMode_forme && type_forme === "ellipse") {
@@ -552,24 +584,6 @@ class Map {
             ctx.lineWidth = 2;
             ctx.strokeRect(SelectRectangle.x, SelectRectangle.y, SelectRectangle.width, SelectRectangle.height);
         }
-
-        // Dessine les formes rectangulaires de l'utilisateur
-        Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
-            ctx.save();
-            ctx.beginPath();
-            ctx.translate(r.x + r.width / 2, r.y + r.height / 2);
-            ctx.rotate(r.theta);
-            ctx.lineWidth = 5;
-            if (r.type === "Mur") {
-                ctx.fillStyle = r.color;
-                ctx.fillRect(- r.width / 2, - r.height / 2, r.width, r.height);
-            }
-            else {
-                ctx.strokeStyle = r.color;
-                ctx.strokeRect(- r.width / 2, - r.height / 2, r.width, r.height);
-            }
-            ctx.restore();
-        });
 
         // Dessine les formes elliptiques de l'utilisateur
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
@@ -1313,7 +1327,13 @@ class Pion extends Map {
             const hex_x = hex_col * hexHSpacing;
             const hex_y = hex_row * hexVSpacing + ((hex_col % 2 != 0) ? hexVSpacing / 2 : 0);
 
-            if (Forme.lineIntersectsHexagon({ x: start_x, y: start_y }, { x: end_x, y: end_y }, { x: hex_x, y: hex_y })) {
+            if (hex_x === start_x && hex_y === start_y) return;
+            if (hex_x === end_x && hex_y === end_y) return;
+
+            if (Forme.lineIntersectsHexagon(
+                { x: start_x, y: start_y },
+                { x: end_x, y: end_y },
+                { x: hex_x, y: hex_y })) {
                 is_visible = false;
             }
         });
@@ -1321,7 +1341,11 @@ class Pion extends Map {
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
-            if (m.lineIntersectsRectangle({ x: start_x + offsetX, y: start_y + offsetY }, { x: end_x + offsetX, y: end_y + offsetY })) {
+            if (m.hexagonIntersectsRectangle({x: end_x + offsetX, y: end_y + offsetY})) return;
+
+            if (m.lineIntersectsRectangle(
+                { x: start_x + offsetX, y: start_y + offsetY },
+                { x: end_x + offsetX, y: end_y + offsetY })) {
                 is_visible = false;
             }
         });
@@ -1439,7 +1463,7 @@ class Pion extends Map {
 
         let pion = this;
         if (auto_save) {
-           pion = Pions.find((p) => p.Attaquant); // Le magicien
+            pion = Pions.find((p) => p.Attaquant); // Le magicien
         }
 
         save = save.replace("Con", pion.getValue("Constitution"));
@@ -2510,6 +2534,10 @@ canvas.addEventListener("wheel", function (event) {
     hexHSpacing = hexSize * 1.5;
     hexVSpacing = hexHeight * Math.sqrt(3) / 2;
 
+    // Sauvegarder les anciennes valeurs de offsetX et offsetY avant modification
+    const oldOffsetX = offsetX;
+    const oldOffsetY = offsetY;
+
     // Calculer la position de la case après le zoom
     const hexXY_after = Map.get_XY(col, row);
 
@@ -2517,16 +2545,17 @@ canvas.addEventListener("wheel", function (event) {
     offsetX = mouseX - relX_before * ratio - hexXY_after.x;
     offsetY = mouseY - relY_before * ratio - hexXY_after.y;
 
+    // Utiliser les anciennes valeurs de offsetX et offsetY pour le calcul du zoom
     Formes.forEach(r => {
-        r.x = ratio * (r.x - offsetX) + offsetX;
-        r.y = ratio * (r.y - offsetY) + offsetY;
+        r.x = ratio * (r.x - oldOffsetX) + offsetX;
+        r.y = ratio * (r.y - oldOffsetY) + offsetY;
         r.width = ratio * r.width;
         r.height = ratio * r.height;
     });
 
     if (image_fond != null) {
-        forme_fond.x = ratio * (forme_fond.x - offsetX) + offsetX;
-        forme_fond.y = ratio * (forme_fond.y - offsetY) + offsetY;
+        forme_fond.x = ratio * (forme_fond.x - oldOffsetX) + offsetX;
+        forme_fond.y = ratio * (forme_fond.y - oldOffsetY) + offsetY;
         forme_fond.width = ratio * forme_fond.width;
         forme_fond.height = ratio * forme_fond.height;
     }

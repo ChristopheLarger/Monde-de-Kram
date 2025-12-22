@@ -30,7 +30,7 @@
 
         <!-- Outils de terrain et formes -->
         <div
-            style="width: 500px; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
+            style="width: 600px; display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -54,6 +54,11 @@
             <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Scission"
                 style="width: 30px; height: 30px; cursor: pointer;">
             <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Gomme"
+                style="width: 30px; height: 30px; cursor: pointer;">
+            &nbsp;&nbsp;&nbsp;
+            <!-- Outils de formes géométriques -->
+            Divers :&nbsp;
+            <img id="brouillard" src="images/Brouillard.png" onclick="Map.setBrouillard();" alt="Brouillard"
                 style="width: 30px; height: 30px; cursor: pointer;">
         </div>
 
