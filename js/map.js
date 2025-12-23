@@ -437,10 +437,22 @@ class Map {
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(n => n.Nom_model === p.Model);
                 ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-                // if (p.is_cac()) ctx.drawImage(image_cac, x + hexSize - imgSize / 3.3, y - imgSize / 8, imgSize / 4, imgSize / 4);
-                // if (p.is_dist()) ctx.drawImage(image_dist, x + hexSize * Math.cos(Math.PI / 3) - imgSize / 4.5, y - hexSize * Math.sin(Math.PI / 3), imgSize / 3, imgSize / 3);
-                if (p.Concentration > 0) ctx.drawImage(image_mage, x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9, y - hexSize * Math.sin(2 * Math.PI / 3), imgSize / 3, imgSize / 3);
-                if (p.Auto) ctx.drawImage(image_auto, x - hexSize + imgSize / 24, y - imgSize / 6, imgSize / 3, imgSize / 3);
+                if (p.Concentration > 0) {
+                    ctx.drawImage(
+                        image_mage,
+                        x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
+                        y - hexSize * Math.sin(2 * Math.PI / 3),
+                        imgSize / 3,
+                        imgSize / 3);
+                }
+                if (p.Auto) {
+                    ctx.drawImage(
+                        image_auto,
+                        x - hexSize + imgSize / 24,
+                        y - imgSize / 6,
+                        imgSize / 3,
+                        imgSize / 3);
+                }
             }
             else if (t != null && typeof t != "undefined" && t.Model === "Rocher") {
                 ctx.drawImage(image_rocher, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
@@ -462,8 +474,7 @@ class Map {
             }
         }
 
-        // if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
-        if (!isInBrouillard) {
+        if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
             // On définit un clip pour ne dessiner que dans l'hexagone
             ctx.save();
             ctx.beginPath();
@@ -474,6 +485,7 @@ class Map {
             ctx.closePath();
             ctx.clip();
 
+            // Dessine les formes rectangulaires du MJ
             Formes.filter(rect => (rect.type === "Rectangle" || rect.type === "Mur")).forEach(r => {
                 ctx.save(); // Sauvegarder l'état pour isoler les transformations de ce rectangle
                 ctx.translate(r.x + r.width / 2, r.y + r.height / 2);
@@ -489,7 +501,30 @@ class Map {
                 }
                 ctx.restore(); // Restaurer l'état pour le rectangle suivant
             });
+
+            // Dessine les formes elliptiques du MJ
+            Formes.filter(e => e.type === "Ellipse").forEach(e => {
+                ctx.save(); // Sauvegarder l'état pour isoler les transformations de cette ellipse
+                ctx.translate(e.x, e.y);
+                ctx.rotate(e.theta);
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = e.color;
+                ctx.beginPath();
+                ctx.ellipse(
+                    0, // x
+                    0, // y
+                    Math.abs(e.width) / 2, // rayonX
+                    Math.abs(e.height) / 2, // rayonY
+                    0, // rotation
+                    0, // Angle de départ
+                    Math.PI * 2); // Angle final
+                ctx.stroke();
+                ctx.restore(); // Restaurer l'état pour l'ellipse suivante
+            });
             ctx.restore(); // Supprime le clip
+            // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = "black";
         }
     }
 
@@ -584,26 +619,6 @@ class Map {
             ctx.lineWidth = 2;
             ctx.strokeRect(SelectRectangle.x, SelectRectangle.y, SelectRectangle.width, SelectRectangle.height);
         }
-
-        // Dessine les formes elliptiques de l'utilisateur
-        Formes.filter(x => x.type === "Ellipse").forEach(e => {
-            ctx.save();
-            ctx.beginPath();
-            ctx.translate(e.x, e.y);
-            ctx.rotate(e.theta);
-            ctx.strokeStyle = e.color;
-            ctx.lineWidth = 5;
-            ctx.ellipse(
-                0, // x
-                0, // y
-                Math.abs(e.width) / 2, // rayonX
-                Math.abs(e.height) / 2, // rayonY
-                0, // rotation
-                0, // Angle de départ
-                Math.PI * 2); // Angle final
-            ctx.stroke();
-            ctx.restore();
-        });
     }
 
     /**
@@ -1341,7 +1356,7 @@ class Pion extends Map {
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
-            if (m.hexagonIntersectsRectangle({x: end_x + offsetX, y: end_y + offsetY})) return;
+            if (m.hexagonIntersectsRectangle({ x: end_x + offsetX, y: end_y + offsetY })) return;
 
             if (m.lineIntersectsRectangle(
                 { x: start_x + offsetX, y: start_y + offsetY },
@@ -1664,8 +1679,10 @@ canvas.addEventListener("mousedown", (event) => {
             const mouseX_local = mousePoint.x - cx;
             const mouseY_local = mousePoint.y - cy;
 
-            const r1 = new Forme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
-            const r2 = new Forme("Mur", { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+            const r1 = new Forme("Mur",
+                { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
+            const r2 = new Forme("Mur",
+                { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
 
             // Calculer le coin supérieur gauche visuel de l'original
             // Le coin supérieur gauche local est (-width/2, -height/2) dans le repère centré
@@ -1761,8 +1778,15 @@ canvas.addEventListener("mousedown", (event) => {
             if (index_forme_move === Formes.indexOf(r)) index_forme_move = null;
 
             Formes.splice(Formes.indexOf(r), 1);
-            if (r1.width > 0 && r1.height > 0) Formes.push(r1);
-            if (r2.width > 0 && r2.height > 0) Formes.push(r2);
+            r.sendMessage("Rmv");
+            if (r1.width > 0 && r1.height > 0) {
+                Formes.push(r1);
+                r1.sendMessage("Add");
+            }
+            if (r2.width > 0 && r2.height > 0) {
+                Formes.push(r2);
+                r2.sendMessage("Add");
+            }
         });
     }
     else if (event.button === 0 && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
@@ -1818,7 +1842,7 @@ canvas.addEventListener("mousedown", (event) => {
         });
     }
     else if (event.button === 0 && isMode_forme) {
-        // === MODE FORME : SUPPRESSION (GOMME) ===
+        // === MODE FORME : SUPPRESSION () ===
         SelectRectangle.x = mouseX;
         SelectRectangle.y = mouseY;
         SelectRectangle.width = 0;
@@ -1832,6 +1856,7 @@ canvas.addEventListener("mousedown", (event) => {
             if (r.type === "Rectangle" && !r.isOnRectangle(mouseX, mouseY)) return;
             if (r.type === "Mur" && !r.isOnMur(mouseX, mouseY)) return;
             // Suppression du rectangle
+            r.sendMessage("Rmv");
             if (!is_find) Formes.splice(Formes.indexOf(r), 1);
             is_find = true;
         });
@@ -1840,6 +1865,7 @@ canvas.addEventListener("mousedown", (event) => {
         Formes.filter(x => x.type === "Ellipse").forEach(e => {
             if (!e.isOnEllipse(mouseX, mouseY)) return;
             // Suppression de l'ellipse
+            e.sendMessage("Rmv");
             if (!is_find) Formes.splice(Formes.indexOf(e), 1);
             is_find = true;
         });
@@ -1852,7 +1878,10 @@ canvas.addEventListener("mousedown", (event) => {
         isDragging_select = false;
         Map.drawHexMap(true);
     }
-    else if (event.button === 0 && p != null && typeof p != "undefined" && (["MJ", p.Model, p.Control].includes(myself))) {
+    else if (event.button === 0 &&
+        p != null &&
+        typeof p != "undefined" &&
+        (["MJ", p.Model, p.Control].includes(myself))) {
         // === SÉLECTION SIMPLE ===
         // Si le pion n'est pas sélectionné, on nettoie la sélection et sélectionne le pion seul
         if (!p.Selected) {
@@ -1901,7 +1930,10 @@ canvas.addEventListener("mousedown", (event) => {
             index_forme_move = Formes.indexOf(e);
         });
     }
-    else if (event.button === 2 && p != null && typeof p != "undefined" && (["MJ", p.Model, p.Control].includes(myself))) {
+    else if (event.button === 2 &&
+        p != null &&
+        typeof p != "undefined" &&
+        (["MJ", p.Model, p.Control].includes(myself))) {
         // Clic droit : on ouvre la fenetre de modification d'un pion
         event.preventDefault();
         p.afficher_Details();
@@ -1947,8 +1979,13 @@ canvas.addEventListener("mousemove", (event) => {
         lastMouseX = mouseX;
         lastMouseY = mouseY;
         const r = Formes[index_forme_move];
+
+        r.sendMessage("Rmv");
+
         r.x += dx;
         r.y += dy;
+
+        r.sendMessage("Add");
 
         Map.drawHexMap();
     }
@@ -1957,6 +1994,8 @@ canvas.addEventListener("mousemove", (event) => {
         // Le bouton gauche de la souris est enfoncé : on redimensionne une forme
         if (Formes[index_forme_zoom].type === "Rectangle" || Formes[index_forme_zoom].type === "Mur") {
             const r = Formes[index_forme_zoom];
+
+            r.sendMessage("Rmv");
 
             // === CALCUL DE LA POSITION INITIALE DU SOMMET ===
             let R1 = null;
@@ -2031,10 +2070,14 @@ canvas.addEventListener("mousemove", (event) => {
 
             lastMouseX = mouseX;
             lastMouseY = mouseY;
+
+            r.sendMessage("Add");
         }
         else {
             // === REDIMENSIONNEMENT D'UNE ELLIPSE ===
             const e = Formes[index_forme_zoom];
+
+            e.sendMessage("Rmv");
 
             // === CALCUL DE LA POSITION INITIALE DU SOMMET ===
             let E1 = null;
@@ -2107,6 +2150,8 @@ canvas.addEventListener("mousemove", (event) => {
 
             lastMouseX = mouseX;
             lastMouseY = mouseY;
+
+            e.sendMessage("Add");
         }
 
         Map.drawHexMap();
@@ -2203,6 +2248,9 @@ canvas.addEventListener("mousemove", (event) => {
     else if (isDragging_right && isMode_forme && index_forme_move != null) {
         // Le bouton droit de la souris est enfoncé : on pivote une forme
         const f = Formes[index_forme_move];
+
+        f.sendMessage("Rmv");
+
         let O = null;
         let OM = null;
         if (f.type === "Rectangle" || f.type === "Mur") {
@@ -2223,6 +2271,8 @@ canvas.addEventListener("mousemove", (event) => {
         // Calcul de l'angle en radians
         if (vectoriel > 0) f.theta = Math.acos(scalaire / (normeOM * normeOP));
         else f.theta = -Math.acos(scalaire / (normeOM * normeOP));
+
+        f.sendMessage("Add");
 
         Map.drawHexMap();
     }
@@ -2315,7 +2365,8 @@ canvas.addEventListener("mouseup", (event) => {
             r.width = SelectRectangle.width;
             r.height = SelectRectangle.height;
             r.color = document.getElementById("forme_color").value;
-            r.sendMessage("Add");
+
+            if (r.type !== "Gomme") r.sendMessage("Add");
         }
     }
     else if (!isMode_terrain && isDragging_left && !isDragging_select) {

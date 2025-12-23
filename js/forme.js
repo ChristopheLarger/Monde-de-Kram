@@ -28,39 +28,65 @@ class Forme {
      * Traite un message reçu via WebSocket pour créer/supprimer une forme
      */
     sendMessage(tag) {
-        const coords = `${this.x}@${this.y}@${this.width}@${this.height}`;
+        const data = `${this.x}@${this.y}@${this.width}@${this.height}@${this.theta}@${this.color}`;
         switch (tag.toLowerCase()) {
             case "add":
-                sendMessage(`${this.type}_Add`, `${coords}@${this.color}`);
+                sendMessage(`${this.type}_Add`, `${hexSize}@${offsetX}@${offsetY}@${data}`);
                 break;
             case "rmv":
-                sendMessage(`${this.type}_Rmv`, `${coords}@`);
+                sendMessage(`${this.type}_Rmv`, `${hexSize}@${offsetX}@${offsetY}@${data}`);
                 break;
         }
     }
 
     static receiveMessage(data) {
-        const regex = /^.*:<p class='vip' title='([A-Za-z]+)_([a-zA-Z0-9_]+) .+>([0-9]+)@([0-9]+)@([0-9]+)@([0-9]+)@(.*)<\/p>$/;
+        const regex = /^MJ: ([A-Za-z]+)_([a-zA-Z]+) ([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@([0-9\-\.]+)@(.*)$/;
         const result = data.match(regex);
         if (!result) return false;
 
         const type = result[1];
-        if (!["Rectangle", "Ellipse"].includes(type)) return false;
+        if (!["Rectangle", "Ellipse", "Mur"].includes(type)) return false;
 
         const code = result[2];
-        const x = parseInt(result[3], 10);
-        const y = parseInt(result[4], 10);
-        const width = parseInt(result[5], 10);
-        const height = parseInt(result[6], 10);
-        const color = result[7];
+        const hexSize_MJ = parseFloat(result[3]);
+        const offsetX_MJ = parseFloat(result[4]);
+        const offsetY_MJ = parseFloat(result[5]);
+        let x = parseFloat(result[6]);
+        let y = parseFloat(result[7]);
+        let width = parseFloat(result[8]);
+        let height = parseFloat(result[9]);
+        const theta = parseFloat(result[10]);
+        const color = result[11];
+
+        // Adaptation des dimensions à la configuration du client (déplacement et zoom)
+        const ratio = hexSize / hexSize_MJ;
+        x = (x - offsetX_MJ) * ratio + offsetX;
+        y = (y - offsetY_MJ) * ratio + offsetY;
+        width = width * ratio;
+        height = height * ratio;
 
         switch (code.toLowerCase()) {
             case "add":
-                Formes.push(new Forme(type, { x, y, width, height, color }));
+                Formes.push(new Forme(type, { x, y, width, height, theta, color }));
+                // Régénérer la carte
+                Map.generateHexMap();
+                Map.drawHexMap();
                 return true;
             case "rmv":
-                // TODO : Implémenter la suppression de forme
-                return true;
+                const f = Formes.find(frm =>
+                    Math.abs(frm.x - x) < 1e-6 &&
+                    Math.abs(frm.y - y) < 1e-6 &&
+                    Math.abs(frm.width - width) < 1e-6 &&
+                    Math.abs(frm.height - height) < 1e-6 &&
+                    Math.abs(frm.theta - theta) < 1e-6 &&
+                    frm.color === color);
+                if (f !== null && typeof f !== "undefined") {
+                    Formes.splice(Formes.indexOf(f), 1);
+                    // Régénérer la carte
+                    Map.generateHexMap();
+                    Map.drawHexMap();
+                    return true;
+                }
         }
         return false;
     }
@@ -352,8 +378,10 @@ class Forme {
         }
 
         // Transformer les points du segment dans le repère non-rotaté du rectangle
-        const linePoint1Rotated = Forme.rotatePoint(linePoint1.x, linePoint1.y, rectCenterX, rectCenterY, -(this.theta || 0));
-        const linePoint2Rotated = Forme.rotatePoint(linePoint2.x, linePoint2.y, rectCenterX, rectCenterY, -(this.theta || 0));
+        const linePoint1Rotated =
+            Forme.rotatePoint(linePoint1.x, linePoint1.y, rectCenterX, rectCenterY, -(this.theta || 0));
+        const linePoint2Rotated =
+            Forme.rotatePoint(linePoint2.x, linePoint2.y, rectCenterX, rectCenterY, -(this.theta || 0));
 
         // Maintenant, vérifier si le segment (dans le repère non-rotaté) coupe le rectangle (non-rotaté)
         // Le rectangle non-rotaté va de minX à maxX et de minY à maxY
