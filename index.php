@@ -415,15 +415,15 @@
         // === Initialisation du jeu pour les tests ===
         // ============================================
 
-        // // Pré-sélectionner "Maitre du Jeu" dès l'ouverture du site
-        // document.getElementById("joueur").value = "MJ";
+        // Pré-sélectionner "Maitre du Jeu" dès l'ouverture du site
+        document.getElementById("joueur").value = "MJ";
 
-        // // Déclencher l'événement change pour initialiser l'interface
-        // const changeEvent = new Event('change', {
-        //     bubbles: true,
-        //     cancelable: true
-        // });
-        // document.getElementById("joueur").dispatchEvent(changeEvent);
+        // Déclencher l'événement change pour initialiser l'interface
+        const changeEvent = new Event('change', {
+            bubbles: true,
+            cancelable: true
+        });
+        document.getElementById("joueur").dispatchEvent(changeEvent);
 
         // Attendre que l'interface soit complètement initialisée
         setTimeout(function() {

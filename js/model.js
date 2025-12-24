@@ -20,6 +20,9 @@ class Model {
     this.Capacites = data.Capacites || "";
     this.Race = data.Race || "";
     this.Magie_type = data.Magie_type || "";
+    this.Fatigue = data.Fatigue || null;
+    this.Concentration = data.Concentration || 0;
+    this.Liste_pretre = data.Liste_pretre || null;
 
     // Statistiques
     this.Puissance_mentale = data.Puissance_mentale || 0;
@@ -42,7 +45,7 @@ class Model {
     this.Memoire = data.Memoire || 0;
     this.Telepathie = data.Telepathie || 0;
 
-    // staistiques modales details du model
+    // Modificateurs des statistiques d'experience
     this.Force_experience = data.Force_experience || 0;
     this.Constitution_experience = data.Constitution_experience || 0;
     this.Vivacite_physique_experience = data.Vivacite_physique_experience || 0;
@@ -59,11 +62,6 @@ class Model {
     this.Magie_experience = data.Magie_experience || 0;
     this.Memoire_experience = data.Memoire_experience || 0;
     this.Telepathie_experience = data.Telepathie_experience || 0;
-
-    // États
-    this.Fatigue = data.Fatigue || null;
-    this.Concentration = data.Concentration || 0;
-    this.Liste_pretre = data.Liste_pretre || null;
 
     // Capacités de combat
     this.Ambidextre = data.Ambidextre || false;

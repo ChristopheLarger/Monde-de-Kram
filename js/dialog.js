@@ -31,7 +31,7 @@ const dialog_defense_1 = document.getElementById("dialog_defense_1");
 const dialog_defense_2 = document.getElementById("dialog_defense_2");
 
 // Dialogues pour les modèles de personnages
-const dialog_model_1 = document.getElementById("modal_model_pj");
+const dialog_model_1 = document.getElementById("dialog_model_1");
 
 // === VARIABLES GLOBALES ===
 let m_selected = null; // Personnage actuellement sélectionné
@@ -1308,7 +1308,7 @@ function afficher_model() {
   const model = Models.find((m) => m.Nom_model === m_selected.Model);
 
   // Remplissage des champs du modèle
-  dialog_model_1.querySelector(".nom_model").value = model.Nom_model;
+  dialog_model_1.querySelector(".nom_model").textContent = model.Nom_model;
   dialog_model_1.querySelector(".race_select").value = model.Race.toLowerCase();
   dialog_model_1.querySelector(".magie_select").value = model.Magie_type.toLowerCase();
 
@@ -1348,11 +1348,16 @@ function afficher_model() {
 
   // Centre tous les inputs & met à jour les ajustements
   dialog_model_1.querySelectorAll("input").forEach((input) => {
-    if (input.className.includes("_experience")) input.style.textAlign = "center";
-    if (input.className.includes("_race")) input.style.textAlign = "center";
-    if (input.className.includes("_ajustement")) input.style.textAlign = "center";
-    if (input.className.includes("_score")) {
+    if (input.className.includes("_experience") ||
+      input.className.includes("_race") ||
+      input.className.includes("_ajustement") ||
+      input.className.includes("_score")) {
+      input.style.fontSize = "x-large";
       input.style.textAlign = "center";
+      input.style.width = "35px";
+      input.closest("td").style.textAlign = "center";
+    }
+    if (input.className.includes("_score")) {
       // Simule un changement de score pour mettre à jour les ajustements
       const event = new Event("change", { bubbles: true });
       input.dispatchEvent(event);
@@ -1363,32 +1368,9 @@ function afficher_model() {
   const event = new Event("change", { bubbles: true });
   dialog_model_1.querySelector(".race_select").dispatchEvent(event);
 
+  // Afficher la modale
   dialog_model_1.showModal();
 }
-
-// Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
-dialog_model_1.querySelector(".race_select").addEventListener("change", function () {
-  const race = dialog_model_1.querySelector(".race_select").value;
-  const attr = attributs_races[race];
-
-  // Remplir les champs *_race de la modale
-  dialog_model_1.querySelector(".force_race").value = attr.force;
-  dialog_model_1.querySelector(".constitution_race").value = attr.constitution;
-  dialog_model_1.querySelector(".vivacite_physique_race").value = attr.vivacite_physique;
-  dialog_model_1.querySelector(".perception_race").value = attr.perception;
-
-  dialog_model_1.querySelector(".vivacite_mentale_race").value = attr.vivacite_mentale;
-  dialog_model_1.querySelector(".volonte_race").value = attr.volonte;
-  dialog_model_1.querySelector(".abstraction_race").value = attr.abstraction;
-  dialog_model_1.querySelector(".charisme_race").value = attr.charisme;
-
-  dialog_model_1.querySelector(".adaptation_race").value = attr.adaptation;
-  dialog_model_1.querySelector(".combat_race").value = attr.combat;
-  dialog_model_1.querySelector(".foi_race").value = attr.foi;
-  dialog_model_1.querySelector(".magie_race").value = attr.magie;
-  dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
-  dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
-});
 
 // === ÉVÉNEMENTS POUR LES DIMENSIONS DE FORMES ===
 // Gestion des dialogues de création de formes géométriques
@@ -2655,6 +2637,31 @@ dialog_sort_2.querySelector(".appliquer").addEventListener("click", function (ev
   next_attaque();
 });
 
+
+// Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
+dialog_model_1.querySelector(".race_select").addEventListener("change", function () {
+  const race = dialog_model_1.querySelector(".race_select").value;
+  const attr = attributs_races[race];
+
+  // Remplir les champs *_race de la modale
+  dialog_model_1.querySelector(".force_race").value = attr.force;
+  dialog_model_1.querySelector(".constitution_race").value = attr.constitution;
+  dialog_model_1.querySelector(".vivacite_physique_race").value = attr.vivacite_physique;
+  dialog_model_1.querySelector(".perception_race").value = attr.perception;
+
+  dialog_model_1.querySelector(".vivacite_mentale_race").value = attr.vivacite_mentale;
+  dialog_model_1.querySelector(".volonte_race").value = attr.volonte;
+  dialog_model_1.querySelector(".abstraction_race").value = attr.abstraction;
+  dialog_model_1.querySelector(".charisme_race").value = attr.charisme;
+
+  dialog_model_1.querySelector(".adaptation_race").value = attr.adaptation;
+  dialog_model_1.querySelector(".combat_race").value = attr.combat;
+  dialog_model_1.querySelector(".foi_race").value = attr.foi;
+  dialog_model_1.querySelector(".magie_race").value = attr.magie;
+  dialog_model_1.querySelector(".memoire_race").value = attr.memoire;
+  dialog_model_1.querySelector(".telepathie_race").value = attr.telepathie;
+});
+
 // Gestion du changement des scores et des expériences
 dialog_model_1.addEventListener("change", function (event) {
   if (!event.target.className.includes("_score") && !event.target.className.includes("_experience"))
@@ -2706,9 +2713,9 @@ dialog_model_1.addEventListener("change", function (event) {
 });
 
 // Bouton "Enregistrer" (Enregistre les modifications du modèle)
-dialog_model_1.querySelector(".save_model_pj").addEventListener("click", function (event) {
+dialog_model_1.querySelector(".sauvegarder").addEventListener("click", function (event) {
   // Récupération du modèle
-  const Nom_model = dialog_model_1.querySelector(".nom_model").value;
+  const Nom_model = dialog_model_1.querySelector(".nom_model").textContent;
   const model = Models.find((m) => m.Nom_model === Nom_model);
 
   // Enregistrement de la race
@@ -2734,9 +2741,4 @@ dialog_model_1.querySelector(".save_model_pj").addEventListener("click", functio
     model[attribut] = input.value;
     sendMessage("Set", attribut + "@" + model[attribut] + "@Model@" + model.Nom_model);
   });
-});
-
-// Bouton "Fermer" (Ferme le dialogue)
-dialog_model_1.querySelector(".fermer_model_pj").addEventListener("click", function (event) {
-  dialog_model_1.close();
 });
