@@ -112,15 +112,15 @@ dialog {
     position: absolute;
     padding: 5px 10px;
     border-radius: 5px;
-    font-size: 14px;
-    white-space: nowrap;
-    /* Empêche le retour à la ligne */
+    font-size: x-large;
+    white-space: nowrap; /* Empêche le retour à la ligne */
     font-weight: bold;
     color: white;
     background-color: black;
     border: 0px solid white;
-    z-index: 1050;
-    /* Au-dessus des dialogues */
+    z-index: 1010; /* Au-dessus des dialogues */
+    pointer-events: none;
+    display: none;
 }
 
 /* === STYLES DES BOUTONS === */
@@ -148,29 +148,6 @@ dialog {
 #fond:hover {
     background-color: rgb(64, 64, 192);
     /* Bleu plus foncé au survol */
-}
-
-/* === STYLES DES POPUPS === */
-/* Fenêtres popup pour les messages temporaires */
-.popup {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    font-size: 50px;
-    transform: translate(-50%, -50%);
-    /* Centrage parfait */
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
-    /* Ombre portée */
-    text-align: center;
-    z-index: 1000;
-    opacity: 0;
-    /* Invisible par défaut */
-    transition: opacity 0.5s ease-in-out;
-    /* Animation de fondu */
-    display: none;
 }
 
 /* === STYLES DES INTERRUPTEURS (TOGGLE SWITCHES) === */

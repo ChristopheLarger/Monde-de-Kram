@@ -7,21 +7,23 @@
 
 // === RÉFÉRENCES DOM ===
 // Éléments d'interface utilisateur
-const tooltip = document.getElementById("tooltip");           // Tooltip pour afficher des informations
-const canvas_color = document.getElementById("canvas_color"); // Sélecteur de couleur pour le canvas
-const forme_color = document.getElementById("forme_color");     // Sélecteur de couleur pour les formes
-const canvas = document.getElementById("hexCanvas");          // Canvas principal pour la carte
+const tooltip = document.getElementById("tooltip");                    // Tooltip pour afficher des informations
+const canvas_color = document.getElementById("canvas_color");          // Sélecteur de couleur pour le canvas
+const forme_color = document.getElementById("forme_color");            // Sélecteur de couleur pour les formes
+const canvas = document.getElementById("hexCanvas");                   // Canvas principal pour la carte
 const canvas_selected = document.getElementById("hexCanvas_selected"); // Canvas pour les sélections
+const canvas_zoom = document.getElementById("hexCanvas_zoom");         // Canvas pour les sélections
 
 // === PARAMÈTRES DE LA CARTE ===
 // Dimensions et espacement des hexagones
-let hexDimensionsX = 20;                    // Largeur de la carte en hexagones
-let hexDimensionsY = 20;                    // Hauteur de la carte en hexagones
-let hexSize = 40;                           // Taille des hexagones en pixels
-let hexWidth = Math.sqrt(3) * hexSize;      // Largeur d'un hexagone
-let hexHeight = 2 * hexSize;                 // Hauteur d'un hexagone
-let hexHSpacing = hexSize * 1.5;            // Espacement horizontal entre hexagones
+let hexDimensionsX = 20;                        // Largeur de la carte en hexagones
+let hexDimensionsY = 20;                        // Hauteur de la carte en hexagones
+let hexSize = 40;                               // Taille des hexagones en pixels
+let hexWidth = Math.sqrt(3) * hexSize;          // Largeur d'un hexagone
+let hexHeight = 2 * hexSize;                    // Hauteur d'un hexagone
+let hexHSpacing = hexSize * 1.5;                // Espacement horizontal entre hexagones
 let hexVSpacing = hexHeight * Math.sqrt(3) / 2; // Espacement vertical entre hexagones
+let hexSize_zoom = 200;                         // Taille des hexagones en pixels pour le zoom
 
 // === VARIABLES DE POSITION ET INTERACTION ===
 let offsetX = canvas.width / 2;             // Décalage horizontal initial (centre de l'écran)
@@ -38,6 +40,7 @@ let isMode_forme = false;                   // Mode placement de formes
 let type_terrain = "";                      // Type de terrain sélectionné
 let type_forme = "";                        // Type de forme sélectionné
 let old_forme = "";                         // Ancien type de forme
+let isMode_coordonnees = false;             // Mode affichage des coordonnées
 
 // Variables de position et interface
 let lastMouseX = 0, lastMouseY = 0;         // Dernière position de la souris
@@ -87,7 +90,16 @@ class Map {
      * @param {string} data - Message reçu du serveur
      */
     static receiveMessage(data) {
-        // TODO : Implémenter le traitement des messages
+        const regex = /^MJ: Mode_coordonnees ([0-1])$/;
+        const result = data.match(regex);
+        if (!result) return false;
+
+        isMode_coordonnees = (result[1] === "1") ? true : false;
+
+        Map.generateHexMap();
+        Map.drawHexMap();
+
+        return true;
     }
 
     /**
@@ -339,7 +351,6 @@ class Map {
                     if (typeof magicien === "undefined") magicien = null;
 
                     Pions.filter(p => p.Position === col + "," + row).forEach(p => {
-                        if (p.Type === "ennemis") strie = true;
                         if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
                         else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
                         else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
@@ -347,6 +358,11 @@ class Map {
                         else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
                     });
                 }
+
+                // Est-ce un ennemi ?
+                Pions.filter(p => p.Position === col + "," + row).forEach(p => {
+                    if (p.Type === "ennemis") strie = true;
+                });
 
                 hexMap.push({ x, y, col, row, color, strie, isInBrouillard });
             }
@@ -420,7 +436,14 @@ class Map {
                 const minY = Math.min(...points.map(p => p.dy)) - spacing;
                 const maxY = Math.max(...points.map(p => p.dy)) + spacing;
                 ctx.beginPath();
-                ctx.strokeStyle = "gray";
+
+                if (color === "rgb(192, 192, 192)") {
+                    ctx.strokeStyle = "white";
+                }
+                else {
+                    ctx.strokeStyle = "gray";
+                }
+
                 ctx.lineWidth = 1;
                 for (let x = minX - (maxY - minY); x <= maxX; x += spacing) {
                     ctx.moveTo(x, minY);
@@ -525,6 +548,245 @@ class Map {
             // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
             ctx.lineWidth = 2;
             ctx.strokeStyle = "black";
+
+            // Affiche les coordonnées si le mode est activé
+            if (isMode_coordonnees) {
+                ctx.fillStyle = "black";
+                ctx.font = `Bold ${hexSize / 3}px Arial`;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(text, x, y);
+            }
+        }
+    }
+
+    // On dessine l'hexagone zoomé.
+    static drawZoomHexagon(pion) {
+        const ctx = canvas_zoom.getContext("2d");
+        ctx.clearRect(0, 0, canvas_zoom.width, canvas_zoom.height);
+        if (pion === null || typeof pion === "undefined") return;
+
+        // On identifie les coordonnées du pion et le brouillard
+        const col = parseInt(pion.Position.split(",")[0]);
+        const row = parseInt(pion.Position.split(",")[1]);
+        const isInBrouillard = !Map.is_visible(col, row);
+
+        if (isInBrouillard && document.getElementById("joueur").value !== "MJ") return;
+
+        // Calculer la position relative de l'hexagone sur la carte
+        const hexXY = Map.get_XY(col, row);
+
+        // Calculer la position absolue du centre de l'hexagone sur le canvas
+        const hexCenterX = hexXY.x + offsetX - canvas.width / 2;
+        const hexCenterY = hexXY.y + offsetY - canvas.height / 2;
+
+        // Afficher le div combat pour que le canvas_zoom soit visible
+        const combatDiv = document.getElementById("combat");
+        combatDiv.style.display = "";
+        canvas_zoom.style.display = "";
+
+        // Utiliser les mêmes dimensions que le canvas principal
+        canvas_zoom.width = canvas.width;
+        canvas_zoom.height = canvas.height;
+
+        // Repositionner le canvas_zoom
+        const combatRect = combatDiv.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+
+        // Position relative du canvas par rapport au conteneur #combat
+        const relativeLeft = canvasRect.left - combatRect.left;
+        const relativeTop = canvasRect.top - combatRect.top;
+
+        // Positionner le canvas_zoom centré sur le pion, mais décalé vers le haut
+        canvas_zoom.style.left = (relativeLeft + hexCenterX) + "px";
+        canvas_zoom.style.top = (relativeTop + hexCenterY) + "px";
+
+        // Définir les propriétés de l'hexagone
+        let color = "rgb(192, 192, 192)"; // Brouillard par défaut de l'hexagone
+        let strie = false;
+
+        // On enregistre et dessine les sommets des hexagones.
+        ctx.beginPath();
+        let points = [];
+        for (let i = 0; i < 6; i++) {
+            let angle = (Math.PI / 3) * i;
+            let dx = canvas.width / 2 + hexSize_zoom * Math.cos(angle);
+            let dy = canvas.height / 2 + hexSize_zoom * Math.sin(angle);
+            points.push({ dx, dy });
+            ctx.lineTo(dx, dy);
+        }
+        ctx.closePath();
+
+        // Si la case est visible (pas de brouillard)
+        if (!isInBrouillard) {
+            color = "rgb(255, 255, 255)";
+            Terrains.filter(t => t.Position === pion.Position).forEach(t => {
+                if (t.Model === "Rocher") color = "rgb(128, 128, 128)";
+                else if (t.Model === "Arbre") color = "rgb(128, 255, 128)";
+                else if (t.Model === "Eau") color = "rgb(0, 255, 255)";
+            });
+
+            // Définition de la couleur de l'hexagone en fonction du type de pion
+            let magicien = Pions.find(p => p.Attaquant && p.Nom_liste != "");
+            if (typeof magicien === "undefined") magicien = null;
+
+            Pions.filter(p => p.Position === pion.Position).forEach(p => {
+                if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
+                else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
+                else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
+                else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
+                else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
+            });
+        }
+
+        // Est-ce un ennemi ?
+        Pions.filter(p => p.Position === pion.Position).forEach(p => {
+            if (p.Type === "ennemis") strie = true;
+        });
+
+        // On remplit de la couleur indiquée, si ce n'est pas du blanc (couleur de transparence)
+        // if (color != "rgb(255, 255, 255)") {
+        if (document.getElementById("joueur").value === "MJ") {
+            if (isInBrouillard) ctx.globalAlpha = 0.8;
+        }
+        else {
+            if (isInBrouillard) ctx.globalAlpha = 0.8;
+        }
+        ctx.fillStyle = color;
+        ctx.fill();
+        ctx.globalAlpha = 1;
+        // }
+
+        // On dessine le contour de l'hexagone.
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        if (strie) {
+            // On définit un clip pour ne dessiner que dans l'hexagone
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(points[0].dx, points[0].dy);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].dx, points[i].dy);
+            }
+            ctx.closePath();
+            ctx.clip();
+
+            // On strie l'hexagone dans le clip
+            const spacing = Math.round(hexSize_zoom / 8);
+            const minX = Math.min(...points.map(p => p.dx)) - spacing;
+            const maxX = Math.max(...points.map(p => p.dx)) + spacing;
+            const minY = Math.min(...points.map(p => p.dy)) - spacing;
+            const maxY = Math.max(...points.map(p => p.dy)) + spacing;
+            ctx.beginPath();
+
+            if (color === "rgb(192, 192, 192)") {
+                ctx.strokeStyle = "white";
+            }
+            else {
+                ctx.strokeStyle = "gray";
+            }
+
+            ctx.lineWidth = 3;
+            for (let x = minX - (maxY - minY); x <= maxX; x += spacing) {
+                ctx.moveTo(x, minY);
+                ctx.lineTo(x + (maxY - minY), maxY);
+            }
+            ctx.stroke();
+            ctx.restore(); // Supprime le clip
+            ctx.lineWidth = 1;
+        }
+
+        // On dessine l'image au centre de l'hexagone
+        const imgSize = hexSize_zoom * 1.2;
+        const model = Models.find(n => n.Nom_model === pion.Model);
+        ctx.drawImage(model.Image,
+            canvas.width / 2 - imgSize / 2,
+            canvas.height / 2 - imgSize / 2,
+            imgSize,
+            imgSize);
+        if (pion.Concentration > 0) {
+            ctx.drawImage(
+                image_mage,
+                canvas.width / 2 + hexSize_zoom * Math.cos(2 * Math.PI / 3) - imgSize / 9,
+                canvas.height / 2 - hexSize_zoom * Math.sin(2 * Math.PI / 3),
+                imgSize / 3,
+                imgSize / 3);
+        }
+        if (pion.Auto) {
+            ctx.drawImage(
+                image_auto,
+                canvas.width / 2 - hexSize_zoom + imgSize / 24,
+                canvas.height / 2 - imgSize / 6,
+                imgSize / 3,
+                imgSize / 3);
+        }
+
+        // On ajoute l'indice sur l'image le cas échéant
+        if (pion.Indice != 0) {
+            ctx.fillStyle = "black";
+            ctx.font = `Bold ${hexSize_zoom / 3}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(pion.Indice, canvas.width / 2, canvas.height / 2 + 0.63 * imgSize);
+        }
+
+        // On ajoute le titre sur l'image avec un fond blanc
+        ctx.font = `Bold ${hexSize_zoom / 4}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        const textX = canvas.width / 2;
+        let textY = canvas.height / 2 - 0.89 * imgSize;
+
+        // Mesurer le texte pour calculer la taille du fond
+        const textWidth = ctx.measureText(pion.Titre).width;
+        const textHeight = parseInt(ctx.font.match(/\d+/)[0], 10); // Extraire la taille de la police
+
+        // Ajouter du padding autour du texte
+        const padding = textHeight * 0.3;
+        const rectWidth = textWidth + padding * 2;
+        const rectHeight = textHeight + padding * 2;
+
+        // Dessiner le fond blanc
+        ctx.fillStyle = "white";
+        ctx.fillRect(textX - rectWidth / 2, textY - rectHeight / 2, rectWidth, rectHeight);
+
+        // Dessiner le texte
+        ctx.fillStyle = "black";
+        ctx.fillText(pion.Titre, textX, textY);
+
+        // On ajoute la distance et les coordonnées avec un fond blanc
+        ctx.font = `Bold ${hexSize_zoom / 6}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        textY = canvas.height / 2 + 0.89 * imgSize;
+
+
+        // Calculer et afficher la distance depuis le pion sélectionné
+        let text = "";
+        const p_sel = Pions.find(x => x.Selected);
+        if (p_sel != null && typeof p_sel != "undefined") {
+            const c_sel = p_sel.Position.split(",")[0];
+            const r_sel = p_sel.Position.split(",")[1];
+            text += "Dist : " + Map.distance(c_sel, r_sel, col, row) + " m";
+        }
+
+        text += (text.length > 0 ? " - " : "") + "Coord : " + col + ", " + row;
+
+        // Ajouter du padding autour du texte
+        const rectWidth2 = ctx.measureText(text).width + padding * 2;
+
+        if (text != "") {
+            // Dessiner le fond blanc
+            ctx.fillStyle = "white";
+            ctx.fillRect(textX - rectWidth2 / 2, textY - rectHeight / 2, rectWidth2, rectHeight);
+
+            // Dessiner le texte
+            ctx.fillStyle = "black";
+            ctx.fillText(text, textX, textY);
         }
     }
 
@@ -634,13 +896,14 @@ class Map {
             tooltip.style.display = "none";
             return;
         }
-        tooltip.style.display = "block";
 
-        // Afficher le titre du pion si visible
-        if (p != null && typeof p != "undefined" && Map.is_visible(col, row)) {
-            tooltip.innerHTML = p.Titre + "<br>";
+        // On ne montre pas le tooltip dans le cas d'un afficahe zoom de l'hexagone
+        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") && p != null && typeof p != "undefined") {
+            return;
         }
-        else tooltip.innerHTML = "";
+
+        tooltip.style.display = "block";
+        tooltip.innerHTML = "";
 
         // Calculer et afficher la distance depuis le pion sélectionné
         const p_sel = Pions.find(x => x.Selected);
@@ -649,9 +912,30 @@ class Map {
             const r_sel = p_sel.Position.split(",")[1];
             tooltip.innerHTML += "(" + Map.distance(c_sel, r_sel, col, row) + " m)";
         }
-        else {
-            tooltip.innerHTML += "(--)";
-        }
+
+        tooltip.innerHTML += (tooltip.innerHTML.length > 0 ? "<br>" : "") + "(" + col + ", " + row + ")";
+    }
+
+    static setMode_coordonnees() {
+        isMode_coordonnees = !isMode_coordonnees;
+
+        sendMessage("Mode_coordonnees", isMode_coordonnees ? "1" : "0");
+
+        Map.generateHexMap();
+        Map.drawHexMap();
+    }
+
+    static setPortee_vue() {
+        const portee_vue = parseInt(document.getElementById("portee_vue").value);
+        if (portee_vue < 3) portee_vue = 3;
+        if (portee_vue > 99) portee_vue = 99;
+        document.getElementById("portee_vue").value = portee_vue;
+
+        // Tout le monde a cette portée de vue par défaut
+        Pions.forEach(p => { p.Vue = portee_vue; });
+
+        Map.generateHexMap();
+        Map.drawHexMap();
     }
 }
 
@@ -846,6 +1130,9 @@ class Pion extends Map {
 
     // === CAPACITÉS SPÉCIALES ===
     Auto = false;            // Mode automatique (booléen)
+
+    // === ÉTATS DE COMBAT ===
+    is_flying = false;       // Booléen indiquant si le pion est en vol
 
     // === POINTS DE VIE & Co ===
     Fatigue = 0;             // Niveau de fatigue
@@ -1334,25 +1621,29 @@ class Pion extends Map {
 
         let is_visible = true;
 
-        Terrains.filter(x => x.Model != "Eau").forEach(t => {
-            if (!is_visible) return;
+        // Si le pion n'est pas en vol, on tient compte des terrains qui cachent la vue
+        if (!this.is_flying) {
+            Terrains.filter(x => x.Model != "Eau").forEach(t => {
+                if (!is_visible) return;
 
-            const hex_col = t.Position.split(",")[0];
-            const hex_row = t.Position.split(",")[1];
-            const hex_x = hex_col * hexHSpacing;
-            const hex_y = hex_row * hexVSpacing + ((hex_col % 2 != 0) ? hexVSpacing / 2 : 0);
+                const hex_col = t.Position.split(",")[0];
+                const hex_row = t.Position.split(",")[1];
+                const hex_x = hex_col * hexHSpacing;
+                const hex_y = hex_row * hexVSpacing + ((hex_col % 2 != 0) ? hexVSpacing / 2 : 0);
 
-            if (hex_x === start_x && hex_y === start_y) return;
-            if (hex_x === end_x && hex_y === end_y) return;
+                if (hex_x === start_x && hex_y === start_y) return;
+                if (hex_x === end_x && hex_y === end_y) return;
 
-            if (Forme.lineIntersectsHexagon(
-                { x: start_x, y: start_y },
-                { x: end_x, y: end_y },
-                { x: hex_x, y: hex_y })) {
-                is_visible = false;
-            }
-        });
+                if (Forme.lineIntersectsHexagon(
+                    { x: start_x, y: start_y },
+                    { x: end_x, y: end_y },
+                    { x: hex_x, y: hex_y })) {
+                    is_visible = false;
+                }
+            });
+        }
 
+        // En vol ou pas, on ne voit pas derrière les murs à cause des plafonds
         Formes.filter(x => x.type === "Mur").forEach(m => {
             if (!is_visible) return;
 
@@ -1878,9 +2169,7 @@ canvas.addEventListener("mousedown", (event) => {
         isDragging_select = false;
         Map.drawHexMap(true);
     }
-    else if (event.button === 0 &&
-        p != null &&
-        typeof p != "undefined" &&
+    else if (event.button === 0 && p != null && typeof p != "undefined" &&
         (["MJ", p.Model, p.Control].includes(myself))) {
         // === SÉLECTION SIMPLE ===
         // Si le pion n'est pas sélectionné, on nettoie la sélection et sélectionne le pion seul
@@ -1888,6 +2177,9 @@ canvas.addEventListener("mousedown", (event) => {
             Pions.forEach(x => { x.Selected = false; });
             p.Selected = true;
         }
+
+        Map.drawZoomHexagon(p);
+
         isDragging_select = false;
         Map.drawHexMap(true);
     }
@@ -1936,6 +2228,9 @@ canvas.addEventListener("mousedown", (event) => {
         (["MJ", p.Model, p.Control].includes(myself))) {
         // Clic droit : on ouvre la fenetre de modification d'un pion
         event.preventDefault();
+
+        Map.drawZoomHexagon(null);
+
         p.afficher_Details();
     }
     else if (event.button === 2) {
@@ -1954,6 +2249,13 @@ canvas.addEventListener("mousemove", (event) => {
     const mousePos = Map.getMousePosition(event);
     let mouseX = mousePos.x;
     let mouseY = mousePos.y;
+
+    // Convertir en coordonnées de grille
+    const hex = Map.getHexagonAtPoint(mouseX, mouseY);
+    const col = hex.col;
+    const row = hex.row;
+
+    const p = Pions.find(x => x.Position === col + "," + row);
 
     if (isDragging_left && isMode_terrain && type_terrain != "gomme") {
         // Le bouton gauche de la souris est enfoncé : on dessine des tas de terrains
@@ -2349,6 +2651,9 @@ canvas.addEventListener("mousemove", (event) => {
         tooltip.style.left = (event.pageX + 10) + "px";
         tooltip.style.top = (event.pageY + 10) + "px";
         Map.update_tooltip(col, row);
+
+        // Puis on effectue un éventuel zoom sur le pion
+        Map.drawZoomHexagon(p);
     }
 });
 
@@ -2458,7 +2763,6 @@ document.addEventListener("keydown", function (event) {
             type_forme = "";
             default_cursor = "default";
             canvas.style.cursor = default_cursor;
-            Tool.hidePopup();
             Pions.forEach(x => { x.Attaquant = false; x.Defenseur = false; });
             break_combats = true;
             break;

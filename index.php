@@ -22,7 +22,7 @@
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
     <script src="js/dialog.js"></script> <!-- Gestion des dialogues et interfaces utilisateur -->
     <script src="js/magie.js"></script> <!-- Système de magie -->
-    <script src="js/combat.js"></script> <!-- Système de combat simplifié -->
+    <script src="js/combat.js"></script> <!-- Système de combat -->
 
     <script>
         <?php
@@ -432,13 +432,11 @@
             const guilhem = Pion.add("ennemis", "Guilhem");
             const elemental_air = Pion.add("ennemis", "Elémental d'air");
 
-            // Simuler un lancement de sort pour le personnage Guilhem
-            // guilhem.Arme1 = "Lancement de sort";
-            // guilhem.Nom_liste = "Liste du froid";
-            // guilhem.Nom_sort = "Ligne de glace";
-            // guilhem.Incantation = 2;
+            // Remise à zéro des portées de vue
+            Map.setPortee_vue();
 
-            // next_attaque();
+            // Christophe est en vol
+            christophe.is_flying = true;
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();

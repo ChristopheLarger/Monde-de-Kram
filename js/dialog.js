@@ -1372,8 +1372,31 @@ function afficher_model() {
   dialog_model_1.showModal();
 }
 
-// === ÉVÉNEMENTS POUR LES DIMENSIONS DE FORMES ===
-// Gestion des dialogues de création de formes géométriques
+// === ÉVÉNEMENTS ===
+// Tooltips pour les boutons de terrain, formes et coordonnées
+document.addEventListener("mouseover", function (event) {
+  if (["rocher", "arbre", "eau", "gomme_t",
+    "rectangle", "ellipse", "mur", "scission", "gomme_f",
+    "coordonnees", "forme_color", "portee_vue"].includes(event.target.id)) {
+    tooltip.style.left = event.clientX + 10 + "px";
+    tooltip.style.top = event.clientY + 10 + "px";
+    tooltip.style.display = "block";
+    if (event.target.id === "forme_color") {
+      tooltip.innerHTML = "Couleur de la forme";
+    } else {
+      tooltip.innerHTML = event.target.alt;
+    }
+  }
+});
+
+// Tooltips pour les boutons de terrain, formes et coordonnées
+document.addEventListener("mouseout", function (event) {
+  if (["rocher", "arbre", "eau", "gomme_t",
+    "rectangle", "ellipse", "mur", "scission", "gomme_f",
+    "coordonnees", "forme_color"].includes(event.target.id)) {
+      tooltip.style.display = "none";
+    }
+});
 
 // Validation des dimensions de carte
 dialog_dim_carte.querySelector("#Valider").addEventListener("click", function (event) {

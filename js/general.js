@@ -152,32 +152,6 @@ class Login {
 }
 
 /**
- * Classe Tool - Outils utilitaires pour l'interface
- * Gère l'affichage des popups et autres éléments d'interface
- */
-class Tool {
-    /**
-     * Affiche un popup avec le texte donné
-     * @param {string} text - Texte à afficher dans le popup
-     */
-    static showPopup(text) {
-        const popup = document.getElementById("popup");
-        popup.innerHTML = text;
-        popup.style.display = "block";
-        popup.style.opacity = "1";
-    }
-
-    /**
-     * Masque le popup actuellement affiché
-     */
-    static hidePopup() {
-        const popup = document.getElementById("popup");
-        popup.style.opacity = "0";
-        popup.style.display = "none";
-    }
-}
-
-/**
  * Classe LancerDes - Gère les lancers de dés (SIMPLIFIÉE)
  * Utilise les utilitaires mathématiques pour simplifier le code
  */

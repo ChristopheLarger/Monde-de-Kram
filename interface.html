@@ -26,7 +26,7 @@
 <div id="combat" style="width: 97.8%; display: none; position: relative;">
     <!-- Barre d'outils pour la gestion de la carte -->
     <div id="div_tools" class="titre_dialogue"
-        style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between;">
+        style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between; white-space: nowrap;">
 
         <!-- Outils de terrain et formes -->
         <div
@@ -39,27 +39,33 @@
                 style="width: 30px; height: 30px; cursor: pointer;">
             <img id="eau" src="images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
                 style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Gomme"
-                style="width: 30px; height: 30px; cursor: pointer;">
+            <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');"
+                alt="Suppression de terrain" style="width: 30px; height: 30px; cursor: pointer;">
             &nbsp;&nbsp;&nbsp;
             <!-- Outils de formes géométriques -->
             Formes :&nbsp;
-            <input type="color" id="forme_color" value="#000000" style="width: 20px; height: 20px;">
+            <input type="color" id="forme_color" value="#000000"
+                style="width: 20px; height: 20px; min-width: 20px;">&nbsp;
             <img id="rectangle" src="images/Rectangle.png" onclick="Forme.setFormeMode('rectangle');" alt="Rectangle"
-                style="width: 30px; height: 30px; cursor: pointer;">
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
             <img id="ellipse" src="images/Ellipse.png" onclick="Forme.setFormeMode('ellipse');" alt="Ellipse"
-                style="width: 30px; height: 30px; cursor: pointer;">
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
             <img id="mur" src="images/Mur.png" onclick="Forme.setFormeMode('mur');" alt="Mur"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Scission"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Gomme"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Percer un mur"
+                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
+            <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Suppression de forme"
                 style="width: 30px; height: 30px; cursor: pointer;">
             &nbsp;&nbsp;&nbsp;
-            <!-- Outils de formes géométriques -->
+            <!-- Portée de vue -->
+            Vue :&nbsp;
+            <input type="number" id="portee_vue" min="3" max="99" value="12" step="1" alt="Portée de vue en mètres"
+                style="width: 45px; font-size: x-large;" onchange="Map.setPortee_vue();">
+            &nbsp;&nbsp;&nbsp;
+            <!-- Outils divers -->
             Divers :&nbsp;
-            <img id="brouillard" src="images/Brouillard.png" onclick="Map.setBrouillard();" alt="Brouillard"
-                style="width: 30px; height: 30px; cursor: pointer;">
+            <img id="coordonnees" src="images/Coordonnees.png" onclick="Map.setMode_coordonnees();"
+                alt="Affichage des coordonnees sur la carte" style="width: 30px; height: 30px; cursor: pointer;">
         </div>
 
         <!-- Outils de gestion de carte -->
@@ -78,7 +84,10 @@
 
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
-        style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none;"></canvas>
+        style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
+    <!-- Canvas pour l'affichage de l'hexagone zoomé (superposé) -->
+    <canvas id="hexCanvas_zoom" tabindex="0"
+        style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 1;pointer-events: none; z-index: 1025;"></canvas>
 </div>
 
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
@@ -726,7 +735,7 @@
 </dialog>
 
 <!-- Tooltip pour afficher des informations contextuelles -->
-<div id="tooltip" class="tooltip" style="pointer-events: none; display: none;"></div>
+<div id="tooltip" class="tooltip"></div>
 
 <!-- === MODALE DU DIAGRAMME DE MAGIE === -->
 <div id="modal" class="modal">
