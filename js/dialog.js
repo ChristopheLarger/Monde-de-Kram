@@ -1662,10 +1662,6 @@ function info_arme() {
   if (m_selected.Arme2 !== "" && m_selected.Arme2 !== "Lancement de sort")
     score2 = m_selected.get_competence(Armes.find((a) => a.Nom_arme === m_selected.Arme2).Competence);
 
-  // Bonus d'attaque
-  if (score1 !== null) score1 += m_selected.B_att;
-  if (score2 !== null) score2 += m_selected.B_att;
-
   // Malus d'escrime pour combat à deux armes
   if (score1 !== null &&
     m_selected.Arme1 &&

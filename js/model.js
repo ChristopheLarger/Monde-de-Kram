@@ -87,6 +87,17 @@ class Model {
 
     if (this.Fatigue === null || this.Fatigue < 1)
       this.Fatigue = 2 * this.Constitution + 4;
+
+    if (this.Pdv === null || this.Pdv< 1) {
+      this.Pdv = this.Constitution + 5;
+      this.Tete = Math.round(this.Pdv / 5);
+      this.Poitrine = Math.round(this.Pdv / 3);
+      this.Abdomen = Math.round(this.Pdv / 3);
+      this.Brasg = Math.round(this.Pdv / 4);
+      this.Brasd = Math.round(this.Pdv / 4);
+      this.Jambeg = Math.round(this.Pdv * 0.4);
+      this.Jambed = Math.round(this.Pdv * 0.4);
+    }
   }
 }
 // Tableau global contenant tous les modèles de personnages

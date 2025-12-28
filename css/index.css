@@ -80,7 +80,7 @@ dialog {
 
 /* Zone de dialogue spécifique */
 .dialogue {
-    height: 200px;
+    height: 160px;
     background-color: white;
     overflow-x: auto;
     /* Défilement horizontal si nécessaire */
