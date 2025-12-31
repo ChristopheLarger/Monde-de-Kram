@@ -292,6 +292,9 @@ function afficher_Details_arme1() {
  * @param {number} row - Ligne de la position
  */
 function afficher_Details(col, row) {
+  // On masque le zoom du pion
+  Map.drawZoomHexagon();
+
   // Recherche du pion à la position donnée
   m_selected = Pions.find((x) => x.Position === col + "," + row);
 
@@ -532,7 +535,6 @@ function afficher_etats_temporaires() {
     const e = Etats[i];
     if (tr === null) tr = document.createElement("tr");
 
-    // ------ Premier état : Force ------
     const td1 = document.createElement("td");
     td1.innerHTML = e.Competence + " :&nbsp;";
     tr.appendChild(td1);

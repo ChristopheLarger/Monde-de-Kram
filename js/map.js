@@ -494,7 +494,7 @@ class Map {
                 ctx.fillText(p.Indice,
                     x + hexSize * Math.cos(Math.PI / 3) - imgSize / 9,
                     y - hexSize * Math.sin(Math.PI / 3) + imgSize / 6);
-        
+
             }
         }
 
@@ -561,11 +561,11 @@ class Map {
         }
     }
 
-    static drawText(text, fontSize, x, y, background = "", color = "black") {
+    static drawText(text, fontSize, x, y, background = "", color = "black", textAlign = "center") {
         if (text === "") return;
         const ctx = canvas_zoom.getContext("2d");
         ctx.font = `Bold ${fontSize}px Arial`;
-        ctx.textAlign = "center";
+        ctx.textAlign = textAlign;
         ctx.textBaseline = "middle";
         const textX = canvas.width / 2 + x;
         const textY = canvas.height / 2 + y;
@@ -574,11 +574,22 @@ class Map {
             // Mesurer le texte pour calculer la taille du fond
             const textHeight = parseInt(ctx.font.match(/\d+/)[0], 10); // Extraire la taille de la police
             // Ajouter du padding autour du texte
-            const rectWidth = ctx.measureText(text).width + textHeight * 0.3 * 2;
-            const rectHeight = textHeight + textHeight * 0.3 * 2;
+            const padding = textHeight * 0.3;
+            const rectWidth = ctx.measureText(text).width + padding * 2;
+            const rectHeight = textHeight + padding * 2;
             // Dessiner le fond blanc
             ctx.fillStyle = background;
-            ctx.fillRect(textX - rectWidth / 2, textY - rectHeight / 2, rectWidth, rectHeight);
+            switch (textAlign) {
+                case "left":
+                    ctx.fillRect(textX - padding, textY - rectHeight / 2, 2 * rectWidth, rectHeight);
+                    break;
+                case "right":
+                    ctx.fillRect(textX - rectWidth + padding, textY - rectHeight / 2, rectWidth, rectHeight);
+                    break;
+                default:
+                    ctx.fillRect(textX - rectWidth / 2, textY - rectHeight / 2, rectWidth, rectHeight);
+                    break;
+            }
         }
         // Dessiner le texte
         ctx.fillStyle = color;
@@ -587,16 +598,142 @@ class Map {
 
     static drawPdvText(pion, zone, x, y) {
         const model = Models.find(n => n.Nom_model === pion.Model);
-        let color = "rgb(0, 192, 0)";
-        if (pion[zone] < 0) color = "rgb(255, 0, 0)";
-        else if (pion[zone] < model[zone]) color = "rgb(0, 0, 192)";
-        Map.drawText(pion[zone] + " / " + model[zone], hexSize_zoom / 10,
-            hexSize_zoom * x,
-            hexSize_zoom * y, "", color);
+        // On ne dessine pas la concentration si elle est à 0 en valeur max
+        if (zone === "Concentration" && model.Concentration === 0) return;
+
+        // On définit la couleur en fonction de la valeur actuelle
+        let color = "rgb(0, 216, 0)";
+        if (pion[zone] <= 0) color = "rgb(216, 0, 0)";
+        else if (pion[zone] < model[zone]) color = "rgb(0, 0, 216)";
+
+        if (zone === "Fatigue" || zone === "Concentration") {
+            // Ajout de l'en-tête de la fatigue, de la concentration
+            Map.drawText(zone.slice(0, 3), hexSize_zoom / 10,
+                hexSize_zoom * x,
+                hexSize_zoom * (y - 0.12), "white", color);
+            // Ajout du texte valeur actuelle et valeur max en couleur correspondante
+            Map.drawText(pion[zone] + " / " + model[zone], hexSize_zoom / 10,
+                hexSize_zoom * x,
+                hexSize_zoom * y, "white", color);
+        }
+        else if (zone === "Pdv") {
+            // Ajout de l'en-tête des points de vie
+            Map.drawText(zone.slice(0, 3), hexSize_zoom / 10,
+                hexSize_zoom * x,
+                hexSize_zoom * (y - 0.12), "white", color);
+            // Ajout du texte valeur actuelle et valeur max en couleur correspondante
+            Map.drawText(pion[zone] + " / " + model[zone] + " (" + pion.armure_generale() + ")",
+                hexSize_zoom / 10,
+                hexSize_zoom * x,
+                hexSize_zoom * y, "white", color);
+        }
+        else {
+            // Ajout du texte valeur actuelle et valeur max en couleur correspondante
+            Map.drawText(pion[zone] + " / " + model[zone] + " (" + pion["Armure_" + zone.toLowerCase()] + ")",
+                hexSize_zoom / 10,
+                hexSize_zoom * x,
+                hexSize_zoom * y, "white", color);
+        }
+
+        return color;
     }
 
-    // On dessine l'hexagone zoomé.
-    static drawZoomHexagon(pion) {
+    /**
+     * Transforme une image en remplaçant le bleu par le vert uniquement dans la zone du bras droit
+     * @param {Image} image - L'image source à transformer
+     * @param {number} width - Largeur de destination
+     * @param {number} height - Hauteur de destination
+     * @returns {HTMLCanvasElement} Canvas avec l'image transformée
+     */
+    static makeSkeleton(pion) {
+        // Créer un canvas temporaire
+        const tempCanvas = document.createElement('canvas');
+        const ratio = image_skeleton.width / image_skeleton.height;
+        tempCanvas.height = Math.sqrt(3) * hexSize_zoom;
+        tempCanvas.width = tempCanvas.height * ratio;
+        const ctx = tempCanvas.getContext('2d');
+
+        // Dessiner l'image sur le canvas temporaire
+        ctx.drawImage(image_skeleton, 0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Récupérer les données des pixels
+        const imageData = ctx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+        const data = imageData.data;
+
+        // Position des points de vie et organes associés
+        let position = [];
+        position["Pdv"] = { X: 1.80, Y: 1.15, XMin: 0, XMax: 0, YMin: 0, YMax: 0 };
+        position["Tete"] = { X: 1.45, Y: -0.85, XMin: 0.30, XMax: 0.70, YMin: 0, YMax: 0.13 };
+        position["Poitrine"] = { X: 2.32, Y: -0.70, XMin: 0.30, XMax: 0.70, YMin: 0.13, YMax: 0.32 };
+        position["Abdomen"] = { X: 1.25, Y: -0.60, XMin: 0.30, XMax: 0.70, YMin: 0.32, YMax: 0.45 };
+        position["Brasg"] = { X: 2.38, Y: -0.27, XMin: 0.70, XMax: 1.00, YMin: 0.10, YMax: 0.75 };
+        position["Brasd"] = { X: 1.23, Y: -0.27, XMin: 0.00, XMax: 0.30, YMin: 0.10, YMax: 0.75 };
+        position["Jambeg"] = { X: 2.25, Y: 0.42, XMin: 0.50, XMax: 0.70, YMin: 0.45, YMax: 1.00 };
+        position["Jambed"] = { X: 1.35, Y: 0.42, XMin: 0.3, XMax: 0.5, YMin: 0.45, YMax: 1.00 };
+
+        // Afficher les points de vie et colorer les organes associés
+        for (let key of Object.keys(position)) {
+            const color = Map.drawPdvText(pion, key, position[key].X, position[key].Y);
+
+            // Parcourir tous les pixels
+            for (let i = 0; i < data.length; i += 4) {
+                // Calculer les coordonnées du pixel
+                const pixelIndex = i / 4;
+                const x = pixelIndex % tempCanvas.width;
+                const y = Math.floor(pixelIndex / tempCanvas.width);
+                const XMin = position[key].XMin * tempCanvas.width;
+                const XMax = position[key].XMax * tempCanvas.width;
+                const YMin = position[key].YMin * tempCanvas.height;
+                const YMax = position[key].YMax * tempCanvas.height;
+                const isIn = (x >= XMin) && (x <= XMax) && (y >= YMin) && (y <= YMax);
+
+                // Ne transformer que si le pixel est dans la zone de l'organe concerné
+                if (!isIn) continue;
+
+                const r = data[i];     // Rouge
+                const g = data[i + 1]; // Vert
+                const b = data[i + 2]; // Bleu
+                const a = data[i + 3]; // Alpha
+
+                // Détecter les pixels bleus (bleu élevé, rouge et vert faibles)
+                const isBlue = b > 50 && b > r * 1.05 && b > g * 1.05 && a > 30;
+
+                if (isBlue) {
+                    // Remplacer le bleu par la couleur de l'organe concerné
+                    const intensity = b; // Garder l'intensité du bleu
+                    if (color === "rgb(0, 216, 0)") {
+                        // Mets l'organe en vert
+                        data[i] = Math.min(255, r * 0.5);       // Réduire le rouge
+                        data[i + 1] = Math.min(255, intensity); // Mettre le vert à l'intensité du bleu
+                        data[i + 2] = Math.min(255, b * 0.3);   // Réduire le bleu
+                    }
+                    else if (color === "rgb(216, 0, 0)") {
+                        // Mets l'organe en rouge
+                        data[i] = Math.min(255, intensity);   // Mettre le rouge à l'intensité du bleu
+                        data[i + 1] = Math.min(255, g * 0.5); // Réduire le vert
+                        data[i + 2] = Math.min(255, b * 0.3); // Réduire le bleu
+                    }
+                    // Alpha reste inchangé
+                }
+            }
+        }
+
+        // Ajout des textes de la fatigue et de la concentration
+        Map.drawPdvText(pion, "Concentration", position["Pdv"].X - 0.50, position["Pdv"].Y);
+        Map.drawPdvText(pion, "Fatigue", position["Pdv"].X + 0.50, position["Pdv"].Y);
+
+        // Remettre les pixels modifiés sur le canvas
+        ctx.putImageData(imageData, 0, 0);
+
+        return tempCanvas;
+    }
+
+    /**
+     * Dessine le zoom de l'hexagone
+     * @param {Object} pion - Le pion concerné par le zoom
+     * @returns {void}
+     */
+    static drawZoomHexagon(pion = null) {
         // Nettoyage du canvas_zoom
         const ctx = canvas_zoom.getContext("2d");
         ctx.clearRect(0, 0, canvas_zoom.width, canvas_zoom.height);
@@ -755,15 +892,15 @@ class Map {
                 imgSize / 3);
         }
 
-        // === AJOUT DU SQUELETTE A DROITE DE L'HEXAGONE ===
-        // =================================================
+        // === AJOUT DU SQUELETTE COLORE A DROITE DE L'HEXAGONE (Points de Vie) ===
+        // ========================================================================
         const ratio = image_skeleton.width / image_skeleton.height;
         const skeletonHeight = Math.sqrt(3) * hexSize_zoom; // Hauteur de l'hexagone zoom
         const skeletonWidth = skeletonHeight * ratio;
         const skeletonX = canvas.width / 2 - skeletonWidth / 2 + 1.8 * hexSize_zoom;
         const skeletonY = canvas.height / 2 - skeletonHeight / 2;
         ctx.drawImage(
-            image_skeleton,
+            Map.makeSkeleton(pion),
             skeletonX,
             skeletonY,
             skeletonWidth,
@@ -775,8 +912,10 @@ class Map {
         Map.drawText(pion.Indice === 0 ? "" : pion.Indice, hexSize_zoom / 3,
             hexSize_zoom * Math.cos(Math.PI / 3) - imgSize / 9,
             - hexSize_zoom * Math.sin(Math.PI / 3) + imgSize / 6);
+
         // Ajout du Titre
         Map.drawText(pion.Titre, hexSize_zoom / 4, 0, -0.89 * imgSize);
+
         // Ajout de la distance et  des coordonnées
         let text = "";
         const p_sel = Pions.find(x => x.Selected);
@@ -787,20 +926,27 @@ class Map {
         }
         text += (text.length > 0 ? " - " : "") + "(" + col + ", " + row + ")";
         Map.drawText(text, hexSize_zoom / 6, 0, 0.84 * imgSize);
+
         // Ajout des armes
         text = (pion.Arme1 === pion.Model) ? "" : pion.Arme1;
         if (pion.Arme2 != "") text += ((text !== "") ? " + " : "") + pion.Arme2;
         Map.drawText(text, hexSize_zoom / 6, 0, 0.61 * imgSize);
 
-        // Ajout des points de vie
-        Map.drawPdvText(pion, "Pdv", 1.80, 1.00)
-        Map.drawPdvText(pion, "Tete", 1.45, -0.85)
-        Map.drawPdvText(pion, "Poitrine", 2.32, -0.70)
-        Map.drawPdvText(pion, "Abdomen", 1.25, -0.60)
-        Map.drawPdvText(pion, "Brasg", 1.23, -0.27)
-        Map.drawPdvText(pion, "Brasd", 2.38, -0.27)
-        Map.drawPdvText(pion, "Jambeg", 1.35, 0.42)
-        Map.drawPdvText(pion, "Jambed", 2.25, 0.42)
+        // Ajout des états temporaires à gauche de l'hexagone
+        Attaques.sort(Attaque.tri);
+        const Etats = Attaques.filter((a) =>
+            a.Model === pion.Model &&
+            a.Indice === pion.Indice &&
+            a.Timing > Nb_rounds * 5 &&
+            a.Competence !== null);
+        for (let i = 0; i < Etats.length; i++) {
+            Map.drawText(Etats[i].Competence + " : ",
+                hexSize_zoom / 10, -2.00 * imgSize, (-0.64 + 0.16 * i) * imgSize, "white", "blue", "left");
+            Map.drawText(Etats[i].Bonus === null ? "-" : Etats[i].Bonus,
+                hexSize_zoom / 10, -1.35 * imgSize, (-0.64 + 0.16 * i) * imgSize, "white", "blue", "center");
+            Map.drawText("(" + (Etats[i].Timing - Nb_rounds * 5 - 5) + " s)",
+                hexSize_zoom / 10, -1.05 * imgSize, (-0.64 + 0.16 * i) * imgSize, "white", "blue", "right");
+        }
     }
 
     /**
@@ -910,8 +1056,9 @@ class Map {
             return;
         }
 
-        // On ne montre pas le tooltip dans le cas d'un afficahe zoom de l'hexagone
-        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") && p != null && typeof p != "undefined") {
+        // On ne montre pas le tooltip dans le cas d'un affichage zoom de l'hexagone
+        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") &&
+            p != null && typeof p != "undefined") {
             return;
         }
 
@@ -1951,6 +2098,7 @@ canvas.addEventListener("mousedown", (event) => {
     else if (event.button === 0 && p != null && typeof p != "undefined" && magicien != null) {
         // Clic gauche sur la cible de sort choisi => on le marque comme cible
         p.Cible_sort = !p.Cible_sort;
+        Map.drawZoomHexagon(p);
     }
     else if (event.button === 0 && isMode_terrain && type_terrain != "gomme") {
         // Mode terrain : ajout d'un terrain à la position cliquée
@@ -2188,6 +2336,7 @@ canvas.addEventListener("mousedown", (event) => {
             p.Selected = true;
         }
 
+        // On dessine le zoom du pion
         Map.drawZoomHexagon(p);
 
         isDragging_select = false;
@@ -2239,7 +2388,8 @@ canvas.addEventListener("mousedown", (event) => {
         // Clic droit : on ouvre la fenetre de modification d'un pion
         event.preventDefault();
 
-        Map.drawZoomHexagon(null);
+        // On nettoie le zoom du pion
+        Map.drawZoomHexagon();
 
         p.afficher_Details();
     }
@@ -2655,14 +2805,22 @@ canvas.addEventListener("mousemove", (event) => {
     }
     else {
         // Rien n'est en cours : on met simplement à jour le tooltip
-        let col = Math.round((mouseX - offsetX) / hexHSpacing);
-        let row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
+        // let col = Math.round((mouseX - offsetX) / hexHSpacing);
+        // let row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
 
-        tooltip.style.left = (event.pageX + 10) + "px";
-        tooltip.style.top = (event.pageY + 10) + "px";
-        Map.update_tooltip(col, row);
+        // On ne montre pas le tooltip dans le cas d'un affichage zoom de l'hexagone
+        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") &&
+            p != null && typeof p != "undefined") {
+            tooltip.style.display = "none";
+        }
+        else {
+            tooltip.style.display = "block";
+            tooltip.style.left = (event.pageX + 10) + "px";
+            tooltip.style.top = (event.pageY + 10) + "px";
+            Map.update_tooltip(col, row);
+        }
 
-        // Puis on effectue un éventuel zoom sur le pion
+        // On dessine le zoom du pion
         Map.drawZoomHexagon(p);
     }
 });
