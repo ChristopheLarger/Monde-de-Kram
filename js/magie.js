@@ -124,6 +124,63 @@ function getMaxSize(Nom_liste) {
   return maxSize;
 }
 
+/**
+ * Affiche la modale de magie (la roue)
+ */
+function afficher_roue_magie() {
+  document.getElementById("modal").style.display = "flex";
+
+  // Réinitialiser tous les boutons de liste avant de mettre en vert
+  Object.keys(shortName).forEach((key) => {
+    const element = document.getElementById(key);
+    if (element) {
+      element.style.color = "";
+      element.style.backgroundColor = "";
+    }
+  });
+
+  // Mettre en vert les listes des sorts connus du personnage sélectionné
+  SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
+    const element = document.getElementById(getShortName(x.Nom_liste));
+    if (element) {
+      element.style.color = "white";
+      element.style.backgroundColor = "green";
+    }
+  });
+
+  const p_selected = Models.find((p) => p.Nom_model === m_selected.Model);
+
+  // Mettre en vert la liste de prêtre et sa liste jumelée si le personnage sélectionné en a une
+  if (p_selected && p_selected.Liste_pretre) {
+    // Trouver la liste de prêtre dans le tableau Listes
+    const listePretre = Listes.find((l) => l.Nom_liste === p_selected.Liste_pretre);
+
+    if (listePretre) {
+      // Mettre en vert le bouton de la liste de prêtre
+      const shortNamePretre = getShortName(p_selected.Liste_pretre);
+      if (shortNamePretre) {
+        const elementPretre = document.getElementById(shortNamePretre);
+        if (elementPretre) {
+          elementPretre.style.color = "white";
+          elementPretre.style.backgroundColor = "green";
+        }
+      }
+
+      // Mettre en vert le bouton de la liste jumelée si elle existe
+      if (listePretre.Nom_jumelee && listePretre.Nom_jumelee !== "") {
+        const shortNameJumelee = getShortName(listePretre.Nom_jumelee);
+        if (shortNameJumelee) {
+          const elementJumelee = document.getElementById(shortNameJumelee);
+          if (elementJumelee) {
+            elementJumelee.style.color = "white";
+            elementJumelee.style.backgroundColor = "green";
+          }
+        }
+      }
+    }
+  }
+}
+
 // Initialisation quand le DOM est prêt
 document.addEventListener("DOMContentLoaded", function () {
   // Récupération des éléments (si présents sur la page)
@@ -638,31 +695,8 @@ function createListeModal(Nom_liste) {
         m_selected.Nom_sort = sort.Nom_sort;
         m_selected.Incantation = expurger_temps_sort(sort.Incantation);
 
-        // Mise à jour du sortilège sélectionné
-        if (
-          m_selected.Nom_sort &&
-          m_selected.Nom_sort !== "" &&
-          m_selected.Nom_sort !== "0" &&
-          m_selected.Nom_liste &&
-          m_selected.Nom_liste !== "" &&
-          m_selected.Nom_liste !== "0"
-        ) {
-          dialog_details_2.querySelector(".liste").textContent =
-            m_selected.Nom_liste;
-          dialog_details_2.querySelector(".sort").textContent =
-            m_selected.Nom_sort;
-          dialog_details_2.querySelector(".info_principale").textContent =
-            " (" +
-            m_selected.Incantation +
-            " s / " +
-            expurger_temps_sort(sort.Incantation) +
-            ")";
-          afficher_param_sort(sort);
-        } else {
-          dialog_details_2.querySelector(".liste").textContent = "--";
-          dialog_details_2.querySelector(".sort").textContent = "";
-          dialog_details_2.querySelector(".info_principale").textContent = "";
-        }
+        refresh_pion();
+        afficher_param_sort(sort);
 
         // Fermer la modale
         if (modal && modal.parentNode) {

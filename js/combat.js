@@ -326,6 +326,7 @@ function next_attaque() {
         // Fin du round
         init_round = false;
         Messages.ecriture_directe("Fin du round de combat");
+        refresh_pion();
         return;
     }
 

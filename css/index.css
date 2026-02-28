@@ -155,8 +155,8 @@ dialog {
 .switch {
     position: relative;
     display: inline-block;
-    width: 60px;
-    height: 28px;
+    width: 30px;
+    height: 12px;
 }
 
 /* Cache l'input checkbox par défaut */
@@ -178,7 +178,7 @@ dialog {
     /* Gris par défaut */
     transition: .4s;
     /* Animation de transition */
-    border-radius: 28px;
+    border-radius: 14px;
     /* Forme arrondie */
 }
 
@@ -186,10 +186,10 @@ dialog {
 .slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
-    left: 4px;
-    bottom: 4px;
+    height: 6px;
+    width: 6px;
+    left: 3px;
+    bottom: 3px;
     background-color: white;
     transition: .4s;
     /* Animation de déplacement */
@@ -205,6 +205,6 @@ input:checked+.slider {
 
 /* Déplace le cercle vers la droite lorsque l'input est coché */
 input:checked+.slider:before {
-    transform: translateX(30px);
+    transform: translateX(17px);
     /* Animation de glissement */
 }

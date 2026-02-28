@@ -438,6 +438,10 @@
             // Christophe est en vol
             christophe.is_flying = true;
 
+            // Rafraîchir le zoom du pion selectionné
+            m_selected = christophe;
+            affiche_zoom_pion();
+
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();
             Map.drawHexMap();

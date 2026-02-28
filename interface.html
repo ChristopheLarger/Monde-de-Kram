@@ -28,7 +28,8 @@
     <div id="div_tools" class="titre_dialogue"
         style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between; white-space: nowrap;">
         <!-- Outils de terrain et formes -->
-        <div style="display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between; font-size: x-large;">
+        <div
+            style="display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between; font-size: x-large;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -83,9 +84,162 @@
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
         style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
-    <!-- Canvas pour l'affichage de l'hexagone zoomé (superposé) -->
-    <canvas id="hexCanvas_zoom" tabindex="0"
-        style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 1;pointer-events: none; z-index: 1025;"></canvas>
+    
+    <img id="zoom_pion" src="images/Silhouette.png" alt="Zoom sur le pion"
+        style="position: fixed; width: 389px; bottom: 0; left: 0; z-index: 1025; border: 3px solid black;">
+
+    <canvas id="canvas_zoom_pion" style="position: fixed; bottom: 0; left: 0; z-index: 1026;"></canvas>
+
+    <div id="div_general" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Général</span>PdV :
+        <input type="text" class="general_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="general_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="general_armure"
+            style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray;" disabled>
+    </div>
+
+    <div id="div_tete" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Tête</span>PdV :
+        <input type="text" class="tete_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="tete_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="tete_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_brasg" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Bras gauche</span>PdV :
+        <input type="text" class="brasg_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="brasg_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="brasg_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_brasd" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Bras droit</span>PdV :
+        <input type="text" class="brasd_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="brasd_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="brasd_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_poitrine" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Poitrine</span>PdV :
+        <input type="text" class="poitrine_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="poitrine_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="poitrine_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_abdomen" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Abdomen</span>PdV :
+        <input type="text" class="abdomen_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="abdomen_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="abdomen_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_jambed" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Jambe droite</span>PdV :
+        <input type="text" class="jambed_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="jambed_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="jambed_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_jambeg" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 73px;">Jambe gauche</span>PdV :
+        <input type="text" class="jambeg_pdv" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="jambeg_max_pdv"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;&nbsp;Armure :
+        <input type="text" class="jambeg_armure" style="text-align: center; width: 17px; font-size: x-small;">
+    </div>
+
+    <div id="div_Conc_Fatigue" style="position: fixed; z-index: 1050; font-size: x-small;">
+        Concentration :
+        <input type="text" class="concentration" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="concentration_max"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+        &nbsp;Fatigue :
+        <input type="text" class="fatigue" style="text-align: center; width: 17px; font-size: x-small;">
+        / <input type="text" class="fatigue_max"
+            style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;" disabled>
+    </div>
+
+    <span class="liste"
+        style="display: none; position: fixed; z-index: 1050; font-size: x-small; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: blue; font-style: italic;">Liste</span>
+    <span class="incantation"
+        style="display: none; position: fixed; z-index: 1050; font-size: x-small; color: blue; font-style: italic; text-align: right; display: inline-block; width: 225px;">Incantation</span>
+    <span class="sort"
+        style="display: none; position: fixed; z-index: 1050; font-size: x-small; max-width: 230px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: blue; font-style: italic;">Sort</span>
+    <span class="info_principale"
+        style="position: fixed; z-index: 1050; font-size: x-small; width: 100px; box-sizing: border-box; text-align: right;">(-)</span>
+    <div id="div_arme_principale" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 82px;">Arme principale :</span>
+        <select class="arme_principale" style="width: 142px; box-sizing: border-box; font-size: x-small;">
+            <option value="">--</option>
+        </select>
+    </div>
+    <span class="info_secondaire"
+        style="position: fixed; z-index: 1050; font-size: x-small; width: 100px; box-sizing: border-box; text-align: right;">(-)</span>
+    <div id="div_arme_secondaire" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 82px;">Arme secondaire :</span>
+        <select class="arme_secondaire" style="width: 142px; box-sizing: border-box; font-size: x-small;">
+            <option value="">--</option>
+        </select>
+    </div>
+
+    <div id="div_nom_allie" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 39px;">Nom :</span>
+        <input type="text" class="nom" style="width: 117px; box-sizing: border-box; font-size: x-small;">
+        &nbsp;&nbsp;<span style="display: inline-block; width: 27px;">Allié :</span>
+        <label class="switch">
+            <input type="checkbox" class="allie">
+            <span class="slider"></span>
+        </label>
+    </div>
+    <div id="div_modele_auto" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <span style="display: inline-block; width: 39px;">
+            <a style="cursor: pointer; color: blue; text-decoration: underline;" onclick="affiche_model();">Modele</a>
+            :
+        </span>
+        <select class="modele" style="width: 117px; box-sizing: border-box; font-size: x-small;">
+            <option value="">--</option>
+        </select>
+        &nbsp;&nbsp;<span style="display: inline-block; width: 27px;">Auto :</span>
+        <label class="switch">
+            <input type="checkbox" class="auto">
+            <span class="slider"></span>
+        </label>
+    </div>
+
+    <div id="div_note" style="position: fixed; z-index: 1050; font-size: x-small;">
+        <textarea class="note" rows="4" style="width: 145px; resize: vertical; font-size: x-small;"
+            placeholder="Note..."></textarea>
+    </div>
+
+    <div id="div_etats"
+        style="position: fixed; z-index: 1050; width: 227px; box-sizing: border-box;">
+        <table class="etats"
+            style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+            <!-- Lignes (sur 7 colonnes : 3 + 1 + 3) : Force, Hébété, Dommages CàC, Aveuglé, etc. -->
+        </table>
+        <img class="figurine" alt="Figurine du pion"
+            style="display: block; width: auto; object-fit: contain; margin-left: auto;">
+    </div>
+
+    <div id="div_buttons"
+        style="position: fixed; z-index: 1050; font-size: x-small; width: 227px; box-sizing: border-box; text-align: right; display: inline-block;">
+        <button class="dupliquer" style="font-size: x-small;">Dupliquer</button>
+    </div>
 </div>
 
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
@@ -209,7 +363,7 @@
 
 <!-- === DIALOGUE DE SÉLECTION DE MODÈLE === -->
 <!-- Fenêtre pour choisir le modèle de personnage à placer sur la carte -->
-<dialog id="dialog_details_1">
+<dialog id="dialog_new_pion">
     <span style="font-size: x-large;">Modèle :&nbsp;</span>
     <select id="model" style="font-size: x-large;">
         <option value="">--</option>
@@ -220,170 +374,6 @@
     <hr>
     <div style="width: 100%; text-align: right;">
         <button id="Fermer" style="font-size: x-large;">Fermer</button>
-    </div>
-</dialog>
-<!-- === DIALOGUE DE DÉTAILS DE PERSONNAGE === -->
-<!-- Fenêtre complète pour modifier les propriétés d'un personnage -->
-<dialog id="dialog_details_2">
-    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
-        <colgroup>
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-        </colgroup>
-        <tr>
-            <td>Nom :&nbsp;</td>
-            <td colspan="12"><input type="text" style="width: 99.5%;" class="titre"></td>
-        </tr>
-        <tr>
-            <td>Modèle :&nbsp;</td>
-            <td><span class="model" style="cursor: pointer; color: blue; text-decoration: underline;"></span><span
-                    class="indice"></span></td>
-            <td>&nbsp;</td>
-            <td>Allié :&nbsp;</td>
-            <td>
-                <label class="switch">
-                    <input type="checkbox" class="type">
-                    <span class="slider"></span>
-                </label>
-            </td>
-            <td>&nbsp;</td>
-            <td>Fatigue :&nbsp;</td>
-            <td><input type="text" class="fatigue" style="text-align: center;"></td>
-            <td><span class="fatigue"></span></td>
-            <td>&nbsp;</td>
-            <td>Concentration :&nbsp;</td>
-            <td><input type="text" class="concentration" style="text-align: center;"></td>
-            <td><span class="concentration"></span></td>
-        </tr>
-    </table>
-    <hr>
-    <textarea class="note" rows="3" style="width: 99.5%; resize: vertical; font-size: x-large;"
-        placeholder="Note..."></textarea>
-    <hr>
-    <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
-        <colgroup>
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-        </colgroup>
-        <tr>
-            <td></td>
-            <td>Vie</td>
-            <td></td>
-            <td>Armure</td>
-            <td></td>
-            <td></td>
-            <td style="text-align: right;">
-                Auto :&nbsp;
-                <label class="switch">
-                    <input type="checkbox" class="auto">
-                    <span class="slider"></span>
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td>Général :&nbsp;</td>
-            <td><input type="text" class="pdv" style="text-align: center;"></td>
-            <td><span class="pdv"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure" style="text-align: center;" disabled></td>
-            <td></td>
-            <td>Arme principale :&nbsp;</td>
-            <td>
-                <select class="arme1" style="font-size: x-large;">
-                    <option value="Lancement de sort">Lancement de sort</option>
-                    <option value="">--</option>
-                </select>
-                <span class="info_principale"></span>
-            </td>
-        </tr>
-        <tr>
-            <td>Tête :&nbsp;</td>
-            <td><input type="text" class="tete" style="text-align: center;"></td>
-            <td><span class="tete"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_tete" style="text-align: center;"></td>
-            <td></td>
-            <td>
-                <span class="titre_liste" style="width: 320px; display: inline-block;">Liste :&nbsp;</span><span
-                    class="liste"></span>
-                <span class="titre_arme2">Arme secondaire :&nbsp;</span>
-            </td>
-            <td>
-                <select class="arme2" style="font-size: x-large;">
-                    <option value="">--</option>
-                </select>
-                <span class="info_secondaire"></span>
-            </td>
-        </tr>
-        <tr>
-            <td>Bras Gauche :&nbsp;</td>
-            <td><input type="text" class="brasg" style="text-align: center;"></td>
-            <td><span class="brasg"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_brasg" style="text-align: center;"></td>
-            <td></td>
-            <td colspan="2"><span class="titre_sort" style="width: 320px; display: inline-block;">Sort
-                    :&nbsp;&nbsp;</span><span class="sort"></span></td>
-        </tr>
-        <tr>
-            <td>Bras Droit :&nbsp;</td>
-            <td><input type="text" class="brasd" style="text-align: center;"></td>
-            <td><span class="brasd"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_brasd" style="text-align: center;"></td>
-            <td></td>
-            <td colspan="2" rowspan="5" class="etats_temporaires" style="vertical-align: top;">
-                <table class="etats"
-                    style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-large;">
-                    <!-- Lignes (sur 7 colonnes : 3 + 1 + 3) : Force, Hébété, Dommages CàC, Aveuglé, etc. -->
-                </table>
-            </td>
-        </tr>
-        <tr>
-            <td>Poitrine :&nbsp;</td>
-            <td><input type="text" class="poitrine" style="text-align: center;"></td>
-            <td><span class="poitrine"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_poitrine" style="text-align: center;"></td>
-            <td></td>
-
-        </tr>
-        <tr>
-            <td>Abdomen :&nbsp;</td>
-            <td><input type="text" class="abdomen" style="text-align: center;"></td>
-            <td><span class="abdomen"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_abdomen" style="text-align: center;"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jambe Gauche :&nbsp;</td>
-            <td><input type="text" class="jambeg" style="text-align: center;"></td>
-            <td><span class="jambeg"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_jambeg" style="text-align: center;"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td>Jambe Droite :&nbsp;</td>
-            <td><input type="text" class="jambed" style="text-align: center;"></td>
-            <td><span class="jambed"></span></td>
-            <td style="text-align: center;"><input type="text" class="armure_jambed" style="text-align: center;"></td>
-            <td></td>
-        </tr>
-    </table>
-    <div style="width: 100%; text-align: right;">
-        <button id="Fermer" style="font-size: x-large;">Fermer</button>
-        <button id="Dupliquer" style="font-size: x-large;">Dupliquer</button>
     </div>
 </dialog>
 
@@ -778,9 +768,9 @@
     </div>
 </div>
 <!-- === MODALE DE DÉTAILS DU MODÈLE PJ === -->
-<dialog id="dialog_model_1" style="font-size: x-large; text-align: right;">
+<dialog id="dialog_model" style="font-size: x-large; text-align: right;">
     <span style="position: absolute; top: 0px; right: 5px; cursor: pointer; font-size: 1.5em; line-height: 1;"
-        onclick="dialog_model_1.close();">&times;</span>
+        onclick="dialog_model.close();">&times;</span>
     <h2 class="nom_model" style="width: 100%; font-size: x-large; text-align: center;">Nom du modèle</h2>
     <table>
         <tr>
