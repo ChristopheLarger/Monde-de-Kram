@@ -67,6 +67,8 @@ class ChatServer implements MessageComponentInterface
 
         $this->Bascule_sort_connu($msg);
 
+        $this->Set_Nom_model($msg);
+
         // === DIFFUSION DU MESSAGE ===
         // Parcourir tous les clients connectés
         foreach ($this->clients as $client) {
@@ -78,6 +80,43 @@ class ChatServer implements MessageComponentInterface
                 $client->send($msg);
             }
         }
+    }
+
+        /**
+     * FONCTION DE CHANGEMENT DE NOM DU MODELE
+     * =======================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la bascule du sort connu a réussi
+     */
+    private function Set_Nom_model($msg)
+    {
+        $regex = "/^MJ: Set_Nom_model ([^@]+)@([^@]+)$/";
+
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            // Changement du nom du modèle dans la base de données
+            $sql = "UPDATE model SET Nom_model = ? WHERE Nom_model = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        // Chagement du nom du fichier image
+        $ancien = "/xampp/htdocs/Kram/Images/" . $result[1] . ".png";
+        $nouveau = "/xampp/htdocs/Kram/Images/" . $result[2] . ".png";
+        echo rename($ancien, $nouveau);
+
+        echo "Changement de nom de l'image de " . $result[1] . " vers " . $result[2] . "\n";
+
+        return true;
     }
 
     /**

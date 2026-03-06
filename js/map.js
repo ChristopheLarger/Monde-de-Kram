@@ -64,14 +64,28 @@ image_eau.src = "images/Eau.png";
 // images pour les différents types de pions
 const image_auto = new Image();
 image_auto.src = "images/Auto.png";
-const image_skeleton = new Image();
-image_skeleton.src = "images/Skeleton.png";
-const image_mage = new Image();
-image_mage.src = "images/Mage.png";
 
 // === IMAGES DE FOND ===
 let image_fond = null;                       // Image de fond de la carte
 let forme_fond = null;                       // Forme de fond
+
+/**
+ * Dessine une image centrée en (centerX, centerY) en conservant ses proportions,
+ * en l'inscrivant dans un carré de côté maxSize.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {HTMLImageElement} img
+ * @param {number} centerX
+ * @param {number} centerY
+ * @param {number} maxSize
+ */
+function drawImageCenteredFit(ctx, img, centerX, centerY, maxSize) {
+    const w = img.naturalWidth || img.width || 1;
+    const h = img.naturalHeight || img.height || 1;
+    const scale = Math.min(maxSize / w, maxSize / h);
+    const drawW = w * scale;
+    const drawH = h * scale;
+    ctx.drawImage(img, centerX - drawW / 2, centerY - drawH / 2, drawW, drawH);
+}
 
 /**
  * Classe Map - Représente un élément sur la carte hexagonale
@@ -372,12 +386,12 @@ class Map {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
-            // On dessine l'image au centre de l'hexagone
+            // On dessine l'image au centre de l'hexagone (proportions conservées)
             const imgSize = hexSize * 1.2;
             const p = Pions.find(q => q.Selected && q.Position === text);
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(x => x.Nom_model === p.Model);
-                ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
+                drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
             }
             return;
         }
@@ -451,21 +465,21 @@ class Map {
                 ctx.restore(); // Supprime le clip
             }
 
-            // On dessine l'image au centre de l'hexagone
+            // On dessine l'image au centre de l'hexagone (proportions conservées)
             const imgSize = hexSize * 1.2;
             const p = Pions.find(q => q.Position === text);
             const t = Terrains.find(r => r.Position === text)
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(n => n.Nom_model === p.Model);
-                ctx.drawImage(m.Image, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-                if (p.Concentration > 0) {
-                    ctx.drawImage(
-                        image_mage,
-                        x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
-                        y - hexSize * Math.sin(2 * Math.PI / 3),
-                        imgSize / 3,
-                        imgSize / 3);
-                }
+                drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
+                // if (p.Concentration > 0) {
+                    // ctx.drawImage(
+                    //     image_mage,
+                    //     x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
+                    //     y - hexSize * Math.sin(2 * Math.PI / 3),
+                    //     imgSize / 3,
+                    //     imgSize / 3);
+                // }
                 if (p.Auto) {
                     ctx.drawImage(
                         image_auto,
@@ -1019,13 +1033,13 @@ class Pion extends Map {
         this.Fatigue = m.Fatigue;
         this.Concentration = m.Concentration;
         this.Pdv = m.Pdv;
-        this.Tete = m.Tete;
-        this.Poitrine = m.Poitrine;
-        this.Abdomen = m.Abdomen;
-        this.Brasg = m.Brasg;
-        this.Brasd = m.Brasd;
-        this.Jambeg = m.Jambeg;
-        this.Jambed = m.Jambed;
+        this.Tete = Math.round(m.Pdv / 5);
+        this.Poitrine = Math.round(m.Pdv / 3);
+        this.Abdomen = Math.round(m.Pdv / 3);
+        this.Brasg = Math.round(m.Pdv / 4);
+        this.Brasd = Math.round(m.Pdv / 4);
+        this.Jambeg = Math.round(m.Pdv * 0.4);
+        this.Jambed = Math.round(m.Pdv * 0.4);
         this.Armure_tete = m.Armure_tete;
         this.Armure_poitrine = m.Armure_poitrine;
         this.Armure_abdomen = m.Armure_abdomen;
@@ -1384,6 +1398,9 @@ class Pion extends Map {
      * @returns {Pion} - Pion ajouté
      */
     static add(type, model, indice = -1) {
+        let m = Models.find(x => x.Nom_model === model);
+        if (m === null || typeof m === "undefined") return null;
+
         let p = Pions.find(x => x.Type === type && x.Model === model && x.Indice === indice);
         if (p === null || typeof p === "undefined") {
             Pions[Pions.length] = new Pion(type, model, indice);
@@ -1481,8 +1498,8 @@ class Pion extends Map {
      * Ouvre la fenetre de dialogue de modification d'un pion
      */
     affiche_Details() {
-        m_selected = this;
-        affiche_zoom_pion();
+        m_pion = this;
+        affiche_pion();
     }
 
     /**
@@ -2521,9 +2538,15 @@ canvas.addEventListener("mouseup", (event) => {
         const col = Math.round((mouseX - offsetX) / hexHSpacing);
         const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
 
-        // Affichage du dialogue de création d'un nouveau pion
-        m_selected = null;
-        affiche_zoom_pion(col, row);
+        m_pion = Pions.find(x => x.Position === col + "," + row);
+        if (m_pion != null && typeof m_pion != "undefined") {
+            affiche_pion();
+        }
+        else {
+            // Affichage du dialogue de création d'un nouveau pion
+            m_pion = null;
+            affiche_pion(col, row);
+        }
     }
 
     isMoving_map = false;
@@ -2786,16 +2809,28 @@ document.getElementById("forme_color").addEventListener("input", function () {
 document.getElementById("img_fond").addEventListener("change", async (event) => {
     const form = document.getElementById("upload_fond");
     const formData = new FormData(form);
-    await fetch("upload.php", { method: "POST", body: formData });
-
-    if (event.target.files.length === 0) {
-        // Aucun fichier sélectionné
-        image_fond = null;
-    }
-    else {
-        image_fond = new Image();
-        image_fond.src = `images/Fond.jpg?t=${new Date().getTime()}`;
-    }
+    formData.append("image", event.target.files[0]);
+    formData.append("nom", "Fond");
+    fetch("upload.php", { method: "POST", body: formData })
+        .then((r) => r.json())
+        .then((data) => {
+            if (data.ok) {
+                if (event.target.files.length === 0) {
+                    // Aucun fichier sélectionné
+                    image_fond = null;
+                }
+                else {
+                    image_fond = new Image();
+                    image_fond.src = data.path + "?t=" + new Date().getTime();
+                }
+                URL.revokeObjectURL(blobUrl);
+            }
+            else console.warn("Upload fond:", data.message);
+        })
+        .catch((e) => {
+            console.warn("Upload fond:", e);
+            URL.revokeObjectURL(blobUrl);
+        });
 
     affiche_dim_carte();
 });

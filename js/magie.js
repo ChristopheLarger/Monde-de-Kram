@@ -127,7 +127,7 @@ function getMaxSize(Nom_liste) {
 /**
  * Affiche la modale de magie (la roue)
  */
-function afficher_roue_magie() {
+function affiche_roue_magie() {
   document.getElementById("modal").style.display = "flex";
 
   // Réinitialiser tous les boutons de liste avant de mettre en vert
@@ -140,7 +140,7 @@ function afficher_roue_magie() {
   });
 
   // Mettre en vert les listes des sorts connus du personnage sélectionné
-  SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
+  SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
     const element = document.getElementById(getShortName(x.Nom_liste));
     if (element) {
       element.style.color = "white";
@@ -148,7 +148,7 @@ function afficher_roue_magie() {
     }
   });
 
-  const p_selected = Models.find((p) => p.Nom_model === m_selected.Model);
+  const p_selected = Models.find((p) => p.Nom_model === m_pion.Model);
 
   // Mettre en vert la liste de prêtre et sa liste jumelée si le personnage sélectionné en a une
   if (p_selected && p_selected.Liste_pretre) {
@@ -252,6 +252,7 @@ function createSpellInfo(modalContent, sort) {
   const spellInfo = document.createElement("div");
   spellInfo.id = "spell-info";
   spellInfo.className = "spell-info";
+  spellInfo.style.zIndex = "1200";
 
   // Ajouter le bouton de fermeture
   const spanClose = document.createElement("span");
@@ -519,6 +520,7 @@ function createListeModal(Nom_liste) {
   modal.id = "modal";
   modal.className = "modal";
   modal.style.display = "flex";
+  modal.style.zIndex = "1150";
 
   // Créer le contenu de la modale
   const modalContent = document.createElement("div");
@@ -585,21 +587,21 @@ function createListeModal(Nom_liste) {
 
       // Vérifier si le sort est connu par le joueur sélectionné
       if (
-        typeof m_selected !== "undefined" &&
-        m_selected !== null &&
-        m_selected.Model
+        typeof m_pion !== "undefined" &&
+        m_pion !== null &&
+        m_pion.Model
       ) {
         let isKnown = SortsConnus.some(
           (sc) =>
-            sc.Nom_model === m_selected.Model &&
+            sc.Nom_model === m_pion.Model &&
             sc.Nom_liste === Nom_liste &&
             sc.Nom_sort === sort.Nom_sort
         );
-        const model = Models.find((m) => m.Nom_model === m_selected.Model);
+        const model = Models.find((m) => m.Nom_model === m_pion.Model);
         
-        if (m_selected.get_competence("Theognosie") !== null && m_selected.get_competence("Theognosie") !== undefined) {
+        if (m_pion.get_competence("Theognosie") !== null && m_pion.get_competence("Theognosie") !== undefined) {
           // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_selected.get_competence("Theognosie")) {
+          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_pion.get_competence("Theognosie")) {
             isKnown = true;
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
@@ -609,7 +611,7 @@ function createListeModal(Nom_liste) {
             );
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
               // Pour la liste jumelée, limite à 2/3 de Theognosie (arrondi)
-              const limiteJumelee = Math.floor((2 * m_selected.get_competence("Theognosie")) / 3);
+              const limiteJumelee = Math.floor((2 * m_pion.get_competence("Theognosie")) / 3);
               if (sort.Niveau <= limiteJumelee) {
                 isKnown = true;
               }
@@ -689,14 +691,14 @@ function createListeModal(Nom_liste) {
       const sort = sortsListe.find(
         (s) => s.Nom_sort === e.target.getAttribute("data-spell")
       );
-      if (sort && typeof m_selected !== "undefined" && m_selected !== null) {
+      if (sort && typeof m_pion !== "undefined" && m_pion !== null) {
         // Stocker le sortilège sélectionné et le nom de la liste dans le pion
-        m_selected.Nom_liste = sort.Nom_liste;
-        m_selected.Nom_sort = sort.Nom_sort;
-        m_selected.Incantation = expurger_temps_sort(sort.Incantation);
+        m_pion.Nom_liste = sort.Nom_liste;
+        m_pion.Nom_sort = sort.Nom_sort;
+        m_pion.Incantation = expurger_temps_sort(sort.Incantation);
 
-        refresh_pion();
-        afficher_param_sort(sort);
+        affiche_pion();
+        affiche_param_sort(sort);
 
         // Fermer la modale
         if (modal && modal.parentNode) {
@@ -731,11 +733,11 @@ function createListeModal(Nom_liste) {
 
       sendMessage(
           "Bascule_sort_connu",
-          m_selected.Model + "@" + nom_liste + "@" + Nom_sort
+          m_pion.Model + "@" + nom_liste + "@" + Nom_sort
         );
         const sort = SortsConnus.find(
           (s) =>
-            s.Nom_model === m_selected.Model &&
+            s.Nom_model === m_pion.Model &&
             s.Nom_liste === Nom_liste &&
             s.Nom_sort === Nom_sort
         );
@@ -746,7 +748,7 @@ function createListeModal(Nom_liste) {
             new SortConnu({
               Nom_liste: nom_liste,
               Nom_sort: Nom_sort,
-              Nom_model: m_selected.Model,
+              Nom_model: m_pion.Model,
             })
           );
         }
@@ -785,7 +787,7 @@ function createListeModal(Nom_liste) {
         element.style.backgroundColor = "";
       }
     });
-    SortsConnus.filter((s) => s.Nom_model === m_selected.Model).forEach((x) => {
+    SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
       const element = document.getElementById(getShortName(x.Nom_liste));
       if (element) {
         element.style.color = "white";

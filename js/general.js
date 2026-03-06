@@ -323,8 +323,8 @@ class Messages {
 
         document.getElementById(("titre_" + joueur).toLowerCase()).addEventListener("contextmenu", function (event) {
             event.preventDefault(); // Empêche l'affichage du menu contextuel par défaut
-            m_selected = Pions.find((x) => x.Titre === joueur);
-            affiche_zoom_pion();
+            m_pion = Pions.find((x) => x.Titre === joueur);
+            affiche_pion();
         });
 
         if (joueur === "MJ") return;

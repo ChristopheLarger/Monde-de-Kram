@@ -55,6 +55,7 @@
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
             // $js .= "    Image: new Image(\"Images/" . $row['Nom'] . ".png\"),\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
+            $js .= "    Is_monster: " . toJS($row['Is_monster'], 'bool') . ",\n";
             $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
 
             $js .= "    Race: " . toJS($row['Race']) . ",\n";
@@ -112,13 +113,6 @@
             $js .= "    Armure_jambed: " . toJS($row['Armure_JambeD'], 'int') . ",\n";
 
             $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
-            $js .= "    Tete: " . toJS($row['Tete'], 'int') . ",\n";
-            $js .= "    Poitrine: " . toJS($row['Poitrine'], 'int') . ",\n";
-            $js .= "    Abdomen: " . toJS($row['Abdomen'], 'int') . ",\n";
-            $js .= "    Brasg: " . toJS($row['BrasG'], 'int') . ",\n";
-            $js .= "    Brasd: " . toJS($row['BrasD'], 'int') . ",\n";
-            $js .= "    Jambeg: " . toJS($row['JambeG'], 'int') . ",\n";
-            $js .= "    Jambed: " . toJS($row['JambeD'], 'int') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -209,7 +203,6 @@
             $js = "Competences[$index] = new Competence({\n";
             $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
             $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
-            $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
             $js .= "    Base: " . toJS($row['Base'], 'int2') . "\n";
             $js .= "});\n";
@@ -340,7 +333,7 @@
             }
 
             // === CHARGEMENT DES COMPÉTENCES ===
-            $query = "SELECT * FROM competence ORDER BY Nom_competence ASC";
+            $query = "SELECT * FROM competence ORDER BY CASE WHEN Competence_majeure IS NULL THEN Nom_competence ELSE Competence_majeure END ASC, Competence_majeure ASC, Nom_competence ASC";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
@@ -395,9 +388,9 @@
         // Chargement des images pour tous les modèles
         for (let i = 0; i < Models.length; i++) {
             Models[i].Image = new Image();
-            Models[i].Image.src = "Images/" + Models[i].Nom_model + ".png";
+            Models[i].Image.src = "Images/Figurines/" + Models[i].Nom_model + ".png";
             Models[i].Image.onerror = function() {
-                console.warn("Image non trouvée pour " + Models[i].Nom_model + ": images/" + Models[i].Nom_model + ".png");
+                console.warn("Image non trouvée pour " + Models[i].Nom_model + ": images/Figurines/" + Models[i].Nom_model + ".png");
             };
         }
         
@@ -436,11 +429,11 @@
             Map.setPortee_vue();
 
             // Christophe est en vol
-            christophe.is_flying = true;
+            guilhem.is_flying = true;
 
             // Rafraîchir le zoom du pion selectionné
-            m_selected = christophe;
-            affiche_zoom_pion();
+            m_pion = guilhem;
+            affiche_pion();
 
             // Régénérer la carte pour afficher les nouveaux pions
             Map.generateHexMap();

@@ -167,17 +167,12 @@ class Model {
     // Propriétés de base
     this.Nom_model = data.Nom_model || "";
     this.Image = data.Image || null;
-    this.Is_joueur = data.Is_joueur || false;
-    this.Capacites = data.Capacites || "";
-    this.Race = data.Race || "";
-    this.Magie_type = data.Magie_type || "";
-    this.Fatigue = data.Fatigue || null;
-    this.Concentration = data.Concentration || 0;
-    this.Liste_pretre = data.Liste_pretre || null;
+    this.Is_joueur = data.Is_joueur || 0;
+    this.Is_monster = data.Is_monster || 0;
 
-    // Statistiques
-    this.Puissance_mentale = data.Puissance_mentale || 0;
-    this.Puissance_physique = data.Puissance_physique || 0;
+    // Attributs de base (Humanoide)
+    this.Race = data.Race || "";
+    this.Ambidextre = data.Ambidextre || 0;
 
     this.Force = data.Force || 0;
     this.Constitution = data.Constitution || 0;
@@ -196,17 +191,17 @@ class Model {
     this.Memoire = data.Memoire || 0;
     this.Telepathie = data.Telepathie || 0;
 
-    // Modificateurs des statistiques d'experience
+    // Modificateurs des statistiques d'experience (Humanoide)
     this.Force_experience = data.Force_experience || 0;
     this.Constitution_experience = data.Constitution_experience || 0;
     this.Vivacite_physique_experience = data.Vivacite_physique_experience || 0;
     this.Perception_experience = data.Perception_experience || 0;
-    
+
     this.Vivacite_mentale_experience = data.Vivacite_mentale_experience || 0;
     this.Volonte_experience = data.Volonte_experience || 0;
     this.Abstraction_experience = data.Abstraction_experience || 0;
     this.Charisme_experience = data.Charisme_experience || 0;
-    
+
     this.Adaptation_experience = data.Adaptation_experience || 0;
     this.Combat_experience = data.Combat_experience || 0;
     this.Foi_experience = data.Foi_experience || 0;
@@ -214,8 +209,34 @@ class Model {
     this.Memoire_experience = data.Memoire_experience || 0;
     this.Telepathie_experience = data.Telepathie_experience || 0;
 
-    // Capacités de combat
-    this.Ambidextre = data.Ambidextre || false;
+    // Caractéristiques de base (Monstre) (+VP de l'humanoide)
+    this.Pdv = data.Pdv || 0;
+    this.Fatigue = data.Fatigue || 0;
+    this.Puissance_mentale = data.Puissance_mentale || 0;
+    this.Puissance_physique = data.Puissance_physique || 0;
+    this.Vivacite_physique2 = data.Vivacite_physique2 || 0;
+    this.Capacites = data.Capacites || "";
+    this.Initiative = data.Initiative || 0;
+    this.Agressivite = data.Agressivite || 0;
+    this.Sociabilite = data.Sociabilite || 0;
+    this.Esquive = data.Esquive || 0;
+    this.Feinte_de_corps = data.Feinte_de_corps || 0;
+    this.Attaque_1 = data.Attaque_1 || 0;
+    this.Parade_1 = data.Parade_1 || 0;
+    this.Bool_parade_1 = data.Bool_parade_1 || 0;
+    this.Coefficient_dommages_1 = data.Coefficient_dommages_1 || 0;
+    this.Bonus_dommages_1 = data.Bonus_dommages_1 || 0;
+    this.Attaque_2 = data.Attaque_2 || 0;
+    this.Bool_attaque_2 = data.Bool_attaque_2 || 0;
+    this.Parade_2 = data.Parade_2 || 0;
+    this.Bool_parade_2 = data.Bool_parade_2 || 0;
+    this.Coefficient_dommages_2 = data.Coefficient_dommages_2 || 0;
+    this.Bonus_dommages_2 = data.Bonus_dommages_2 || 0;
+
+    // Caractéristiques de magie
+    this.Magie_type = data.Magie_type || "";
+    this.Concentration = data.Concentration || 0;
+    this.Liste_pretre = data.Liste_pretre || 0;
 
     // Protection par zone
     this.Armure_tete = data.Armure_tete || 0;
@@ -225,31 +246,46 @@ class Model {
     this.Armure_brasd = data.Armure_brasd || 0;
     this.Armure_jambeg = data.Armure_jambeg || 0;
     this.Armure_jambed = data.Armure_jambed || 0;
+  }
 
-    // Points de vie par zone
-    this.Pdv = data.Pdv || 0;
-    this.Tete = data.Tete || 0;
-    this.Poitrine = data.Poitrine || 0;
-    this.Abdomen = data.Abdomen || 0;
-    this.Brasg = data.Brasg || 0;
-    this.Brasd = data.Brasd || 0;
-    this.Jambeg = data.Jambeg || 0;
-    this.Jambed = data.Jambed || 0;
-
-    if (this.Fatigue === null || this.Fatigue < 1)
-      this.Fatigue = 2 * this.Constitution + 4;
-
-    if (this.Pdv === null || this.Pdv< 1) {
-      this.Pdv = this.Constitution + 5;
-      this.Tete = Math.round(this.Pdv / 5);
-      this.Poitrine = Math.round(this.Pdv / 3);
-      this.Abdomen = Math.round(this.Pdv / 3);
-      this.Brasg = Math.round(this.Pdv / 4);
-      this.Brasd = Math.round(this.Pdv / 4);
-      this.Jambeg = Math.round(this.Pdv * 0.4);
-      this.Jambed = Math.round(this.Pdv * 0.4);
+  /**
+     * Envoie un message du Model
+     * @param {string} tag - Tag du message
+     */
+  sendMessage(tag, val = null) {
+    switch (tag.toLowerCase()) {
+      case "set_nom_model":
+        // Set_Nom_model@Nom_model@Nouveau_nom
+        sendMessage("Set_Nom_model", this.Nom_model + "@" + val);
+        break;
     }
   }
+
+  /**
+ * Duplique un modèle de personnage
+ * @returns {Model} - Modèle dupliqué
+ */
+  dupliquer() {
+    if (this.Is_joueur) return null; // Impossible de dupliquer un modèle de joueur ???
+
+    const m = new Model(this);
+
+    // const champs = Object.keys(this).filter(key => typeof this[key] != "function");
+    // for (let i = 0; i < champs.length; i++) {
+    //   p[champs[i]] = this[champs[i]];
+    // }
+
+    // Set Nom_model
+    let i = 1;
+    while (Models.find(x => x.Nom_model === this.Nom_model +
+      " (" + String(i).padStart(2, '0') + ")")) i++;
+    m.Nom_model = this.Nom_model + " (" + String(i).padStart(2, '0') + ")";
+
+    Models[Models.length] = m;
+
+    return m;
+  }
 }
+
 // Tableau global contenant tous les modèles de personnages
 let Models = [];
