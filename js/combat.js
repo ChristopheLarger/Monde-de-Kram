@@ -470,7 +470,7 @@ function calcul_fdc_def() {
     if (dialog_attaque_2.querySelector(".immobile").checked) return 0;
     if (defenseur.Poitrine < 0) return 0;
 
-    let fdc = defenseur.get_competence("Feinte de corps") + (defenseur.B_fdc || 0);
+    let fdc = defenseur.get_score("Feinte de corps") + (defenseur.B_fdc || 0);
 
     // On perd 2 en FdC pour chaque attaquant au corps-à-corps qui a l'avantage
     let malus_FdC = 0;
@@ -518,8 +518,8 @@ function explications_fdc_def() {
     else if (dialog_attaque_2.querySelector(".immobile").checked) explication += `Immobile : FdC = 0<br>`;
     else if (defenseur.Poitrine < 0) explication += `Poitrine gravement blessée : FdC = 0<br>`;
     else {
-        fdc = defenseur.get_competence("Feinte de corps");
-        explication += `Base du modèle : ${defenseur.get_competence("Feinte de corps") || 0}<br>`;
+        fdc = defenseur.get_score("Feinte de corps");
+        explication += `Base du modèle : ${defenseur.get_score("Feinte de corps") || 0}<br>`;
 
         if (defenseur.B_fdc !== 0) {
             explication += `Bonus de feinte de corps : ${defenseur.B_fdc || 0}<br>`;
@@ -607,7 +607,7 @@ function calcul_scr_att() {
     if (attaquant.at1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
-            score += attaquant.get_competence(Arme1.Competence);
+            score += attaquant.get_score(Arme1.Competence);
             if (Arme1.A_distance) score += attaquant.get_bonus("Attaque Dist");
             else score += attaquant.get_bonus("Attaque CàC");
         }
@@ -616,7 +616,7 @@ function calcul_scr_att() {
     if (attaquant.at2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
-            score += attaquant.get_competence(Arme2.Competence);
+            score += attaquant.get_score(Arme2.Competence);
             if (Arme2.A_distance) score += attaquant.get_bonus("Attaque Dist");
             else score += attaquant.get_bonus("Attaque CàC");
         }
@@ -629,9 +629,9 @@ function calcul_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                score -= Math.max(2 - attaquant.get_competence("Escrime"), 0);
+                score -= Math.max(2 - attaquant.get_score("Escrime"), 0);
             } else {
-                score -= Math.max(6 - attaquant.get_competence("Escrime"), 0);
+                score -= Math.max(6 - attaquant.get_score("Escrime"), 0);
             }
         }
     }
@@ -665,7 +665,7 @@ function explications_scr_att() {
     if (attaquant.at1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
-            competence = attaquant.get_competence(Arme1.Competence);
+            competence = attaquant.get_score(Arme1.Competence);
             if (Arme1.A_distance) competence += attaquant.get_bonus("Attaque Dist");
             else competence += attaquant.get_bonus("Attaque CàC");
         }
@@ -673,7 +673,7 @@ function explications_scr_att() {
     else if (attaquant.at2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
-            competence = attaquant.get_competence(Arme2.Competence);
+            competence = attaquant.get_score(Arme2.Competence);
             if (Arme2.A_distance) competence += attaquant.get_bonus("Attaque Dist");
             else competence += attaquant.get_bonus("Attaque CàC");
         }
@@ -690,11 +690,11 @@ function explications_scr_att() {
     if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - attaquant.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(2 - attaquant.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - attaquant.get_score("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(2 - attaquant.get_score("Escrime"), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - attaquant.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(6 - attaquant.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - attaquant.get_score("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(6 - attaquant.get_score("Escrime"), 0);
             }
         }
     }
@@ -738,14 +738,14 @@ function calcul_scr_def() {
         let Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (typeof Arme1 === "undefined") Arme1 = null;
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
-            competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+            competenceArme += Arme1.Facteur_parade * defenseur.get_score(Arme1.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
 
         let Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (typeof Arme2 === "undefined") Arme2 = null;
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
-            competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+            competenceArme += Arme2.Facteur_parade * defenseur.get_score(Arme2.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
 
@@ -754,7 +754,7 @@ function calcul_scr_def() {
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        score += defenseur.get_competence("Esquive");
+        score += defenseur.get_score("Esquive");
         if (defenseur.Nb_action > 0) {
             score -= defenseur.Nb_action;
         }
@@ -764,9 +764,9 @@ function calcul_scr_def() {
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                score -= Math.max(2 - defenseur.get_competence("Escrime"), 0);
+                score -= Math.max(2 - defenseur.get_score("Escrime"), 0);
             } else {
-                score -= Math.max(6 - defenseur.get_competence("Escrime"), 0);
+                score -= Math.max(6 - defenseur.get_score("Escrime"), 0);
             }
         }
     }
@@ -795,13 +795,13 @@ function explications_scr_def() {
     if (defenseur.pr1_def || defenseur.pr2_def) {
         const Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
-            competenceArme += Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+            competenceArme += Arme1.Facteur_parade * defenseur.get_score(Arme1.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
 
         const Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
-            competenceArme += Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+            competenceArme += Arme2.Facteur_parade * defenseur.get_score(Arme2.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
         explication += `Plus la Compétence de parade : ${competenceArme}<br>`;
@@ -810,20 +810,20 @@ function explications_scr_def() {
 
     // Bonus d'esquive
     if (defenseur.esq_def) {
-        explication += `Plus la Compétence d'esquive : ${defenseur.get_competence("Esquive")}<br>`;
+        explication += `Plus la Compétence d'esquive : ${defenseur.get_score("Esquive")}<br>`;
         if ((defenseur.Nb_action || 0) > 0) explication += `Moins le Nombre d'actions : ${-defenseur.Nb_action}<br>`;
-        scoreFinal = defenseur.jet_def - 10 + (defenseur.get_competence("Esquive") || 0) - (defenseur.Nb_action || 0);
+        scoreFinal = defenseur.jet_def - 10 + (defenseur.get_score("Esquive") || 0) - (defenseur.Nb_action || 0);
     }
 
     // Malus d'escrime pour combat à deux armes
     if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-                explication += `Moins le Malus d'escrime : ${Math.max(2 - defenseur.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(2 - defenseur.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(2 - defenseur.get_score("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(2 - defenseur.get_score("Escrime"), 0);
             } else {
-                explication += `Moins le Malus d'escrime : ${Math.max(6 - defenseur.get_competence("Escrime"), 0)}<br>`;
-                scoreFinal -= Math.max(6 - defenseur.get_competence("Escrime"), 0);
+                explication += `Moins le Malus d'escrime : ${Math.max(6 - defenseur.get_score("Escrime"), 0)}<br>`;
+                scoreFinal -= Math.max(6 - defenseur.get_score("Escrime"), 0);
             }
         }
     }

@@ -36,8 +36,7 @@ class ChatServer implements MessageComponentInterface
      * Constructeur du serveur
      * Initialise le stockage des connexions clients
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->clients = new \SplObjectStorage;
     }
 
@@ -47,8 +46,7 @@ class ChatServer implements MessageComponentInterface
      * 
      * @param ConnectionInterface $conn - Connexion du nouveau client
      */
-    public function onOpen(ConnectionInterface $conn)
-    {
+    public function onOpen(ConnectionInterface $conn) {
         // Ajouter le nouveau client à la liste des connexions actives
         $this->clients->attach($conn);
         echo "Nouvelle connexion ({$conn->resourceId})\n";
@@ -61,13 +59,13 @@ class ChatServer implements MessageComponentInterface
      * @param ConnectionInterface $from - Connexion de l'expéditeur
      * @param string $msg - Message reçu
      */
-    public function onMessage(ConnectionInterface $from, $msg)
-    {
+    public function onMessage(ConnectionInterface $from, $msg) {
         $this->Set_champs($msg);
-
         $this->Bascule_sort_connu($msg);
-
+        $this->Set_Model($msg);
         $this->Set_Nom_model($msg);
+        $this->Set_Degres($msg);
+        $this->Copy_Figurine($msg);
 
         // === DIFFUSION DU MESSAGE ===
         // Parcourir tous les clients connectés
@@ -82,14 +80,86 @@ class ChatServer implements MessageComponentInterface
         }
     }
 
-        /**
+    /**
+     * FONCTION DE COPIE DE LA FIGURINE
+     * ================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la copie de la figurine a réussi
+     */
+    private function Copy_Figurine($msg) {
+        $regex = "/^MJ: Copy_Figurine ([^@]+)@([^@]+)$/";
+
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            // Changement du nom du modèle dans la base de données
+            $sql = "INSERT INTO `model` (
+                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`,
+                `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
+                `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
+                `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`,
+                `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`,
+                `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`,
+                `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`,
+                `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`,
+                `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`)
+                SELECT
+                ?,
+                `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`,
+                `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
+                `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
+                `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`,
+                `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`,
+                `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`,
+                `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`,
+                `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`
+                FROM `model`
+                WHERE `Nom_model` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+
+            $sql = "INSERT INTO `comp_connue` (`Nom_model`, `Nom_competence`, `Degres`)
+                SELECT ?, `Nom_competence`, `Degres`
+                FROM `comp_connue`
+                WHERE `Nom_model` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+            $sql = "INSERT INTO `sort_connu` (`Nom_model`, `Nom_liste`, `Nom_sort`)
+                SELECT ?, `Nom_liste`, `Nom_sort`
+                FROM `sort_connu`
+                WHERE `Nom_model` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+
+            $stmt->close();
+        }
+        
+        // Copie du fichier image
+        $ancien = "/xampp/htdocs/Kram/Images/Figurines/" . $result[1] . ".png";
+        $nouveau = "/xampp/htdocs/Kram/Images/Figurines/" . $result[2] . ".png";
+        echo copy($ancien, $nouveau);
+
+        echo "Copie de l'image de " . $result[1] . " vers " . $result[2] . "\n";
+
+        return true;
+    }
+
+    /**
      * FONCTION DE CHANGEMENT DE NOM DU MODELE
      * =======================================
      * @param string $msg - Message contenant les données
-     * @return bool - true si la bascule du sort connu a réussi
+     * @return bool - true si le changement de nom du modèle a réussi
      */
-    private function Set_Nom_model($msg)
-    {
+    private function Set_Nom_model($msg) {
         $regex = "/^MJ: Set_Nom_model ([^@]+)@([^@]+)$/";
 
         if (! preg_match($regex, $msg, $result)) return false;
@@ -109,12 +179,51 @@ class ChatServer implements MessageComponentInterface
             $stmt->close();
         }
 
-        // Chagement du nom du fichier image
-        $ancien = "/xampp/htdocs/Kram/Images/" . $result[1] . ".png";
-        $nouveau = "/xampp/htdocs/Kram/Images/" . $result[2] . ".png";
+        // Changement du nom du fichier image
+        $ancien = "/xampp/htdocs/Kram/Images/Figurines/" . $result[1] . ".png";
+        $nouveau = "/xampp/htdocs/Kram/Images/Figurines/" . $result[2] . ".png";
         echo rename($ancien, $nouveau);
 
         echo "Changement de nom de l'image de " . $result[1] . " vers " . $result[2] . "\n";
+
+        return true;
+    }
+
+    /**
+     * FONCTION DE CHANGEMENT D'UN ATTRIBUT DU MODELE
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Set_Model($msg) {
+        $regex = "/^MJ: Set_Model_([^@]+) ([^@]+)@([^@]+)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $attribut = $result[1];
+        $nom_model = $result[2];
+        $valeur = $result[3];
+
+        echo "Attribut : " . $attribut . "\n";
+        echo "Nom du modèle : " . $nom_model . "\n";
+        echo "Valeur : " . $valeur . "\n";
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            // Modification de l'attribut du modèle dans la base de données
+            $sql = "UPDATE model SET `" . $attribut . "` = ? WHERE Nom_model = ?";
+
+            echo "Query : " . $sql . "\n";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $valeur, $nom_model);
+            $stmt->execute();
+            $stmt->close();
+        }
 
         return true;
     }
@@ -125,8 +234,7 @@ class ChatServer implements MessageComponentInterface
      * @param string $msg - Message contenant les données
      * @return bool - true si la bascule du sort connu a réussi
      */
-    private function Bascule_sort_connu($msg)
-    {
+    private function Bascule_sort_connu($msg) {
         $regex = "/^MJ: Bascule_sort_connu ([^@]+)@([^@]+)@([^@]+)$/";
 
         if (! preg_match($regex, $msg, $result)) return false;
@@ -158,14 +266,55 @@ class ChatServer implements MessageComponentInterface
         return true;
     }
 
+        /**
+     * FONCTION DE MODIFICATION DES DEGRES D'UNE COMPETENCE CONNUE
+     * ===========================================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification des degrés d'une compétence connue a réussi
+     */
+    private function Set_Degres($msg) {
+        $regex = "/^MJ: Set_Degres ([^@]+)@([^@]+)@([^@]+)$/";
+
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $nom_competence = $result[1];
+        $nom_model = $result[2];
+        $degres = $result[3];
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            $query = "SELECT * FROM comp_connue WHERE Nom_competence = ? AND Nom_model = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ss", $nom_competence, $nom_model);
+            $stmt->execute();
+            $resultMysql = $stmt->get_result();
+
+            if ($resultMysql->num_rows > 0) {
+                $sql = "UPDATE comp_connue SET Degres = ? WHERE Nom_competence = ? AND Nom_model = ?";
+            } else {
+                $sql = "INSERT INTO comp_connue (Degres, Nom_competence, Nom_model) VALUES (?, ?, ?)";
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sss", $degres, $nom_competence, $nom_model);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        return true;
+    }
+
     /**
      * FONCTION DE MODIFICATION D'UN CHAMPS D'UNE TABLE
      * ================================================
      * @param string $msg - Message contenant les données
      * @return bool - true si la modification du champs a réussi
      */
-    private function Set_champs($msg)
-    {
+    private function Set_champs($msg) {
         $id_table = [
             "Arme" => "Nom_arme",
             "Bonus" => "Nom_bonus",
@@ -216,8 +365,7 @@ class ChatServer implements MessageComponentInterface
      * 
      * @param ConnectionInterface $conn - Connexion du client qui se déconnecte
      */
-    public function onClose(ConnectionInterface $conn)
-    {
+    public function onClose(ConnectionInterface $conn) {
         // Retirer le client de la liste des connexions actives
         $this->clients->detach($conn);
         echo "Connexion fermée ({$conn->resourceId})\n";
@@ -230,8 +378,7 @@ class ChatServer implements MessageComponentInterface
      * @param ConnectionInterface $conn - Connexion en erreur
      * @param \Exception $e - Exception levée
      */
-    public function onError(ConnectionInterface $conn, \Exception $e)
-    {
+    public function onError(ConnectionInterface $conn, \Exception $e) {
         echo "Erreur : {$e->getMessage()}\n";
         // Fermer la connexion en erreur
         $conn->close();

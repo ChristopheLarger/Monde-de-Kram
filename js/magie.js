@@ -599,9 +599,9 @@ function createListeModal(Nom_liste) {
         );
         const model = Models.find((m) => m.Nom_model === m_pion.Model);
         
-        if (m_pion.get_competence("Theognosie") !== null && m_pion.get_competence("Theognosie") !== undefined) {
+        if (m_pion.get_score("Théognosie") !== null && m_pion.get_score("Théognosie") !== undefined) {
           // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_pion.get_competence("Theognosie")) {
+          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_pion.get_score("Théognosie")) {
             isKnown = true;
           }
           // Vérifier si c'est la liste jumelée de la liste de prêtre
@@ -610,8 +610,8 @@ function createListeModal(Nom_liste) {
               (l) => l.Nom_liste === model.Liste_pretre
             );
             if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
-              // Pour la liste jumelée, limite à 2/3 de Theognosie (arrondi)
-              const limiteJumelee = Math.floor((2 * m_pion.get_competence("Theognosie")) / 3);
+              // Pour la liste jumelée, limite à 2/3 de Théognosie (arrondi)
+              const limiteJumelee = Math.floor((2 * m_pion.get_score("Théognosie")) / 3);
               if (sort.Niveau <= limiteJumelee) {
                 isKnown = true;
               }

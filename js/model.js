@@ -255,9 +255,20 @@ class Model {
   sendMessage(tag, val = null) {
     switch (tag.toLowerCase()) {
       case "set_nom_model":
-        // Set_Nom_model@Nom_model@Nouveau_nom
+        // Set_Nom_model Nom_model@Nouveau_nom
         sendMessage("Set_Nom_model", this.Nom_model + "@" + val);
-        break;
+        return;
+      case "set_degres":
+        // Set_Degres Nom_competence@Nom_model@Degres
+        sendMessage("Set_Degres", val.Nom_competence + "@" + val.Nom_model + "@" + val.Degres);
+        return;
+    }
+    const regexp = /set_(.*)/;
+    const match = tag.match(regexp);
+    if (match) {
+      const attribut = match[1];
+      if (!(attribut in this)) return;
+      sendMessage("Set_Model_" + attribut, this.Nom_model + "@" + val);
     }
   }
 
@@ -270,22 +281,38 @@ class Model {
 
     const m = new Model(this);
 
-    // const champs = Object.keys(this).filter(key => typeof this[key] != "function");
-    // for (let i = 0; i < champs.length; i++) {
-    //   p[champs[i]] = this[champs[i]];
-    // }
-
     // Set Nom_model
     let i = 1;
     while (Models.find(x => x.Nom_model === this.Nom_model +
       " (" + String(i).padStart(2, '0') + ")")) i++;
     m.Nom_model = this.Nom_model + " (" + String(i).padStart(2, '0') + ")";
 
+    sendMessage("Copy_Figurine", this.Nom_model + "@" + m.Nom_model);
+
     Models[Models.length] = m;
 
     return m;
   }
+
+  /**
+  * Calcul les points de vie
+  * @returns {number} - Points de vie
+  */
+  Points_de_vie() {
+    if (this.Is_monster) return this.Pdv;
+    return (this.Constitution + 5);
+  }
+
+  /**
+  * Calcul les points de fatigue
+  * @returns {number} - Points de fatigue
+  */
+  Points_de_fatigue() {
+    if (this.Is_monster) return this.Fatigue;
+    return (2 * this.Constitution + 4);
+  }
 }
+
 
 // Tableau global contenant tous les modèles de personnages
 let Models = [];

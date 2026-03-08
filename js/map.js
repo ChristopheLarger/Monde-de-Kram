@@ -473,12 +473,12 @@ class Map {
                 const m = Models.find(n => n.Nom_model === p.Model);
                 drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
                 // if (p.Concentration > 0) {
-                    // ctx.drawImage(
-                    //     image_mage,
-                    //     x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
-                    //     y - hexSize * Math.sin(2 * Math.PI / 3),
-                    //     imgSize / 3,
-                    //     imgSize / 3);
+                // ctx.drawImage(
+                //     image_mage,
+                //     x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
+                //     y - hexSize * Math.sin(2 * Math.PI / 3),
+                //     imgSize / 3,
+                //     imgSize / 3);
                 // }
                 if (p.Auto) {
                     ctx.drawImage(
@@ -1121,68 +1121,73 @@ class Pion extends Map {
     }
 
     /**
-     * Calcul la compétence
+     * Calcul le score d'une compétence
      * @param {string} competence - Nom de la compétence
-     * @returns {number} - Compétence
+     * @returns {number} - Score de la compétence
      */
-    #get_competence_sub(competence) {
+    #get_score_sub(competence) {
+        const model = Models.find(m => m.Nom_model === this.Model);
         const comp = Competences.find(comp => comp.Nom_competence === competence);
-        if (!comp) return null;
 
         // Calcul de l'attribut
-        let attribut = comp.Attribut;
-        switch (attribut) {
-            case "Ab":
-                attribut = this.getValue("Abstraction");
-                break;
-            case "Ch":
-                attribut = this.getValue("Charisme");
-                break;
-            case "Co":
-                attribut = this.coordination();
-                break;
-            case "Co+Ch":
-                attribut = (this.coordination() + this.getValue("Charisme")) / 2;
-                break;
-            case "Co+F":
-                attribut = (this.coordination() + this.getValue("Force")) / 2;
-                break;
-            case "Co+P":
-                attribut = (this.coordination() + this.getValue("Perception")) / 2;
-                break;
-            case "Co+V":
-                attribut = (this.coordination() + this.getValue("Volonte")) / 2;
-                break;
-            case "Co+VM":
-                attribut = (this.coordination() + this.getValue("Vivacite_mentale")) / 2;
-                break;
-            case "Co+VP":
-                attribut = (this.coordination() + this.getValue("Vivacite_physique")) / 2;
-                break;
-            case "NP":
-                attribut = this.niveau_physique();
-                break;
-            case "P+VM":
-                attribut = (this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 2;
-                break;
-            case "V":
-                attribut = this.getValue("Volonte");
-                break;
-            case "VP":
-                attribut = this.getValue("Vivacite_physique");
-                break;
-            default:
-                attribut = 10; // Attribut par défaut
-                break;
+        let attribut = 0;
+        if (!model.Is_monster) {
+            attribut = comp.Attribut;
+            switch (attribut) {
+                case "Ab":
+                    attribut = this.getValue("Abstraction");
+                    break;
+                case "Ch":
+                    attribut = this.getValue("Charisme");
+                    break;
+                case "Co":
+                    attribut = this.coordination();
+                    break;
+                case "Co+Ch":
+                    attribut = (this.coordination() + this.getValue("Charisme")) / 2;
+                    break;
+                case "Co+F":
+                    attribut = (this.coordination() + this.getValue("Force")) / 2;
+                    break;
+                case "Co+P":
+                    attribut = (this.coordination() + this.getValue("Perception")) / 2;
+                    break;
+                case "Co+V":
+                    attribut = (this.coordination() + this.getValue("Volonte")) / 2;
+                    break;
+                case "Co+VM":
+                    attribut = (this.coordination() + this.getValue("Vivacite_mentale")) / 2;
+                    break;
+                case "Co+VP":
+                    attribut = (this.coordination() + this.getValue("Vivacite_physique")) / 2;
+                    break;
+                case "NP":
+                    attribut = this.niveau_physique();
+                    break;
+                case "P+VM":
+                    attribut = (this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 2;
+                    break;
+                case "V":
+                    attribut = this.getValue("Volonte");
+                    break;
+                case "VP":
+                    attribut = this.getValue("Vivacite_physique");
+                    break;
+                default:
+                    attribut = 10; // Attribut par défaut
+                    break;
+            }
+            attribut = Math.round((attribut - 10) / 2);
         }
-        attribut = Math.round((attribut - 10) / 2);
 
-        // Calcul des degrés
+        // Ajout des degrés de la compétence connue
         const comp_connue = CompetencesConnues.find(comp =>
             comp.Nom_model === this.Model &&
             comp.Nom_competence === competence);
 
-        if (comp_connue !== null && typeof comp_connue !== "undefined") return comp.Base + attribut + comp_connue.Degres;
+        if (comp_connue !== null && typeof comp_connue !== "undefined") {
+            return comp.Base + attribut + comp_connue.Degres;
+        }
 
         return comp.Base + attribut;
     }
@@ -1192,29 +1197,69 @@ class Pion extends Map {
      * @param {string} competence - Nom de la compétence
      * @returns {number} - Compétence
      */
-    get_competence(competence) {
-        const degres = this.#get_competence_sub(competence);
-        if (degres === null) return null;
+    get_score(competence) {
+        const model = Models.find(m => m.Nom_model === this.Model);
+        let ratio = 1;
 
+        if (model.Is_monster) {
+            switch (competence) {
+                case "Esquive":
+                    return model.Esquive;
+                case "Feinte_de_corps":
+                    return model.Feinte_de_corps;
+                case "Attaque_1":
+                    return model.Attaque_1;
+                case "Parade_1":
+                    return model.Bool_parade_1 ? model.Parade_1 : null;
+                case "Attaque_2":
+                    return model.Bool_attaque_2 ? model.Attaque_2 : null;
+                case "Parade_2":
+                    return (model.Bool_attaque_2 && model.Bool_parade_2) ? model.Parade_2 : null;
+            }
+        }
+        else {
+            switch (competence) {
+                case "Attaque_1":
+                    competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
+                    break;
+                case "Parade_1":
+                    competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
+                    ratio = Armes.find(a => a.Nom_arme === this.Arme1).Facteur_parade;
+                    break;
+                case "Attaque_2":
+                    competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
+                    break;
+                case "Parade_2":
+                    competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
+                    ratio = Armes.find(a => a.Nom_arme === this.Arme2).Facteur_parade;
+                    break;
+            }
+            if (competence === null || typeof competence === "undefined") return null;
+        }
+
+        // Calcul du score de la compétence
+        const score = this.#get_score_sub(competence);
+        if (score === null) return null;
+
+        // Calcul de la compétence majeure
         const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
-        if (comp_majeure === null) return degres;
+        if (comp_majeure === null) return Math.round(score * ratio);
 
-        const degres_majeurs = this.#get_competence_sub(comp_majeure);
-        if (degres_majeurs === null) return null;
-
-        return degres + degres_majeurs;
+        // Calcul du score total
+        return Math.round((score + this.#get_score_sub(comp_majeure)) * ratio);
     }
 
     /**
      * Définit les armes du pion
      */
     setArmes() {
-        // Vérification si le personnage est un monstre
-        const is_monster = Armes.some(arme => arme.Nom_arme === this.Model)
+        const model = Models.find(m => m.Nom_model === this.Model);
 
-        if (is_monster) {
+        if (model.Is_monster) {
             // Sélection de l'arme par défaut si le personnage est un monstre
             this.Arme1 = this.Model;
+            if (Armes.find(a => a.Nom_arme === this.Model).Deux_mains) this.Arme2 = "";
+            else this.Arme2 = this.Model;
         }
         else {
             // Sélection des armes par défaut si le personnage n'est pas un monstre
@@ -1222,7 +1267,7 @@ class Pion extends Map {
             let arme_max = "";
             Armes.forEach(arme => {
                 if (arme.Nom_arme === "Bouclier") return;
-                const comp = this.get_competence(arme.Competence);
+                const comp = this.get_score(arme.Competence);
                 if (comp !== null && comp > comp_max) {
                     comp_max = comp;
                     arme_max = arme.Nom_arme;

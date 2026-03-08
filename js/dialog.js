@@ -262,19 +262,19 @@ function info_armes() {
 
   // Bonus de compétence d'arme
   if (m_pion.Arme1 !== "" && m_pion.Arme1 !== "Lancement de sort")
-    score1 = m_pion.get_competence(Armes.find((a) => a.Nom_arme === m_pion.Arme1).Competence);
+    score1 = m_pion.get_score("Attaque_1");
   if (m_pion.Arme2 !== "" && m_pion.Arme2 !== "Lancement de sort")
-    score2 = m_pion.get_competence(Armes.find((a) => a.Nom_arme === m_pion.Arme2).Competence);
+    score2 = m_pion.get_score("Attaque_2");
 
   // Malus d'escrime pour combat à deux armes
   if (score1 !== null && score2 !== null) {
     if (m_pion.Arme1 !== "Bouclier" && m_pion.Arme2 !== "Bouclier") {
       if (m_pion.Arme1 === "Dague" || m_pion.Arme2 === "Dague") {
-        score1 -= Math.max(2 - m_pion.get_competence("Escrime"), 0);
-        score2 -= Math.max(2 - m_pion.get_competence("Escrime"), 0);
+        score1 -= Math.max(2 - m_pion.get_score("Escrime"), 0);
+        score2 -= Math.max(2 - m_pion.get_score("Escrime"), 0);
       } else {
-        score1 -= Math.max(6 - m_pion.get_competence("Escrime"), 0);
-        score2 -= Math.max(6 - m_pion.get_competence("Escrime"), 0);
+        score1 -= Math.max(6 - m_pion.get_score("Escrime"), 0);
+        score2 -= Math.max(6 - m_pion.get_score("Escrime"), 0);
       }
     }
   }
@@ -689,49 +689,49 @@ function affiche_pion(col = null, row = null) {
   // Mise à jour des points de vie et de l'armure (général)
   let div = document.getElementById("div_general");
   div.querySelector(".general_pdv").value = m_pion.Pdv;
-  div.querySelector(".general_max_pdv").value = model_object.Pdv;
+  div.querySelector(".general_max_pdv").value = model_object.Points_de_vie();
   div.querySelector(".general_armure").value = m_pion.armure_generale();
 
   // Mise à jour des points de vie et de l'armure (tête)
   div = document.getElementById("div_tete");
   div.querySelector(".tete_pdv").value = m_pion.Tete;
-  div.querySelector(".tete_max_pdv").value = Math.round(model_object.Pdv / 5);
+  div.querySelector(".tete_max_pdv").value = Math.round(model_object.Points_de_vie() / 5);
   div.querySelector(".tete_armure").value = m_pion.Armure_tete;
 
   // Mise à jour des points de vie et de l'armure (bras gauche)
   div = document.getElementById("div_brasg");
   div.querySelector(".brasg_pdv").value = m_pion.Brasg;
-  div.querySelector(".brasg_max_pdv").value = Math.round(model_object.Pdv / 4);
+  div.querySelector(".brasg_max_pdv").value = Math.round(model_object.Points_de_vie() / 4);
   div.querySelector(".brasg_armure").value = m_pion.Armure_brasg;
 
   // Mise à jour des points de vie et de l'armure (bras droit)
   div = document.getElementById("div_brasd");
   div.querySelector(".brasd_pdv").value = m_pion.Brasd;
-  div.querySelector(".brasd_max_pdv").value = Math.round(model_object.Pdv / 4);
+  div.querySelector(".brasd_max_pdv").value = Math.round(model_object.Points_de_vie() / 4);
   div.querySelector(".brasd_armure").value = m_pion.Armure_brasd;
 
   // Mise à jour des points de vie et de l'armure (poitrine)
   div = document.getElementById("div_poitrine");
   div.querySelector(".poitrine_pdv").value = m_pion.Poitrine;
-  div.querySelector(".poitrine_max_pdv").value = Math.round(model_object.Pdv / 3);
+  div.querySelector(".poitrine_max_pdv").value = Math.round(model_object.Points_de_vie() / 3);
   div.querySelector(".poitrine_armure").value = m_pion.Armure_poitrine;
 
   // Mise à jour des points de vie et de l'armure (abdomen)
   div = document.getElementById("div_abdomen");
   div.querySelector(".abdomen_pdv").value = m_pion.Abdomen;
-  div.querySelector(".abdomen_max_pdv").value = Math.round(model_object.Pdv / 3);
+  div.querySelector(".abdomen_max_pdv").value = Math.round(model_object.Points_de_vie() / 3);
   div.querySelector(".abdomen_armure").value = m_pion.Armure_abdomen;
 
   // Mise à jour des points de vie et de l'armure (jambes gauche)
   div = document.getElementById("div_jambeg");
   div.querySelector(".jambeg_pdv").value = m_pion.Jambeg;
-  div.querySelector(".jambeg_max_pdv").value = Math.round(model_object.Pdv * 0.4);
+  div.querySelector(".jambeg_max_pdv").value = Math.round(model_object.Points_de_vie() * 0.4);
   div.querySelector(".jambeg_armure").value = m_pion.Armure_jambeg;
 
   // Mise à jour des points de vie et de l'armure (jambes droite)
   div = document.getElementById("div_jambed");
   div.querySelector(".jambed_pdv").value = m_pion.Jambed;
-  div.querySelector(".jambed_max_pdv").value = Math.round(model_object.Pdv * 0.4);
+  div.querySelector(".jambed_max_pdv").value = Math.round(model_object.Points_de_vie() * 0.4);
   div.querySelector(".jambed_armure").value = m_pion.Armure_jambed;
 
   // Mise à jour de la concentration et de la fatigue
@@ -739,7 +739,7 @@ function affiche_pion(col = null, row = null) {
   div.querySelector(".concentration").value = m_pion.Concentration;
   div.querySelector(".concentration_max").value = model_object.Concentration;
   div.querySelector(".fatigue").value = m_pion.Fatigue;
-  div.querySelector(".fatigue_max").value = model_object.Fatigue;
+  div.querySelector(".fatigue_max").value = model_object.Points_de_fatigue();
 
   // Mise à jour du nom et de l'allié
   div = document.getElementById("div_nom_allie");
@@ -1604,7 +1604,7 @@ function affiche_defense_sub() {
   if (is_distant || defenseur.Arme1 === "Lancement de sort") {
     // Esquive uniquement pour les attaques à distance ou les sorts
     scr_def = defenseur.jet_def - 10 +
-      (defenseur.esq_def ? defenseur.get_competence("Esquive") - defenseur.Nb_action : 0);
+      (defenseur.esq_def ? defenseur.get_score("Esquive") - defenseur.Nb_action : 0);
   }
   else {
     // Parade pour les attaques au corps à corps
@@ -1891,7 +1891,7 @@ function affiche_defense(phase) {
     const Arme1 = Armes.find((a) => a.Nom_arme === defenseur.Arme1);
     let par_def_1 = null;
     if (Arme1 !== null && typeof Arme1 !== "undefined") {
-      par_def_1 = Arme1.Facteur_parade * defenseur.get_competence(Arme1.Competence);
+      par_def_1 = defenseur.get_score("Parade_1");
       par_def_1 += defenseur.get_bonus("Parade");
     }
     if (Arme1 === null ||
@@ -1908,7 +1908,7 @@ function affiche_defense(phase) {
     const Arme2 = Armes.find((a) => a.Nom_arme === defenseur.Arme2);
     let par_def_2 = null;
     if (Arme2 !== null && typeof Arme2 !== "undefined") {
-      par_def_2 = Arme2.Facteur_parade * defenseur.get_competence(Arme2.Competence);
+      par_def_2 = defenseur.get_score("Parade_2");
       par_def_2 += defenseur.get_bonus("Parade");
     }
     if (Arme2 === null ||
@@ -2328,7 +2328,7 @@ function affiche_param_sort(sort) {
   dialog_sort_1.querySelector(".nom_sort").textContent = sort.Nom_sort;
   dialog_sort_1.querySelector(".fatigue_actuelle").value = m_pion.Fatigue;
   dialog_sort_1.querySelector(".concentration_actuelle").value = m_pion.Concentration;
-  dialog_sort_1.querySelector(".fatigue_max").textContent = model_object.Fatigue;
+  dialog_sort_1.querySelector(".fatigue_max").textContent = model_object.Points_de_fatigue();
   dialog_sort_1.querySelector(".concentration_max").textContent = model_object.Concentration;
   dialog_sort_1.querySelector(".fatigue_cout").value = sort.Niveau;
   dialog_sort_1.querySelector(".concentration_cout").value = sort.Niveau;
@@ -2357,8 +2357,8 @@ function affiche_confirm_sort() {
   const sort = Sorts.find((s) => s.Nom_liste === magicien.Nom_liste && s.Nom_sort === magicien.Nom_sort);
 
   // Calcul du nombre de modulations
-  const competence_mage = magicien.get_competence("Maîtriser la magie");
-  const competence_pretre = magicien.get_competence("Théognosie");
+  const competence_mage = magicien.get_score("Maîtriser la magie");
+  const competence_pretre = magicien.get_score("Théognosie");
   let modulations = Math.max(competence_pretre, competence_mage);
   modulations = Math.floor((modulations - 4) / 2);
   if (magicien.Concentration_sort === 2 * sort.Niveau) modulations += 2;
@@ -2698,8 +2698,8 @@ function initialise_model() {
     });
 
     // Synchronisation avec le serveur
-    m_model.sendMessage("set_nom_model", this.value);
-    setTimeout(() => { m_model.Image.src = "Images/" + this.value + ".png"; }, 100);
+    m_model.sendMessage("set_Nom_model", this.value);
+    setTimeout(() => { m_model.Image.src = "Images/Figurines/" + this.value + ".png"; }, 100);
     m_model.Nom_model = this.value;
 
     // Remplissage de la liste des modèles (à jour avec le nouveau nom du modèle)
@@ -2738,6 +2738,7 @@ function initialise_model() {
     div.querySelector(".telepathie_race").value = attr.telepathie;
 
     m_model.Race = race;
+    m_model.sendMessage("set_Race", race);
 
     // Score en fond blanc/bleu/rouge selon les valeurs des attributs de la race
     document.getElementById("div_model_0").querySelectorAll("input").forEach((input) => {
@@ -2753,6 +2754,7 @@ function initialise_model() {
 
   document.getElementById("div_model_0").querySelector(".ambidextre").closest("td").addEventListener("click", function (event) {
     m_model.Ambidextre = !m_model.Ambidextre;
+    m_model.sendMessage("set_Ambidextre", m_model.Ambidextre ? 1 : 0);
     document.getElementById("div_model_0").querySelector(".ambidextre").checked = m_model.Ambidextre;
   });
 
@@ -2771,6 +2773,7 @@ function initialise_model() {
   // Sélection manuelle de la parade 1
   document.getElementById("div_model_1").querySelector(".capacites_monstre").addEventListener("input", function (event) {
     m_model.Capacites = event.target.value;
+    m_model.sendMessage("set_Capacites", m_model.Capacites);
   });
 
   // sélection manuelle de l'attaque 2
@@ -2815,6 +2818,7 @@ function initialise_model() {
     div.querySelector(".div_divers_communs").style.maxHeight = maxHeight + "px";
 
     m_model.Magie_type = event.target.value;
+    m_model.sendMessage("set_Magie_type", m_model.Magie_type);
   });
 
   // sélection du liste prêtre
@@ -2826,6 +2830,7 @@ function initialise_model() {
       m_model.Liste_pretre =
         shortName[event.target.value.slice(0, 1).toUpperCase() + event.target.value.slice(1).toLowerCase()];
     }
+    m_model.sendMessage("set_Liste_pretre", m_model.Liste_pretre);
   });
 
   // Gestion du changement des scores et des expériences
@@ -2837,22 +2842,31 @@ function initialise_model() {
         !event.target.className.includes("_experience") &&
         !event.target.className.includes("_monstre") &&
         !event.target.className.includes("_divers_communs") &&
-        !event.target.className.includes("_competence"))
+        !event.target.className.includes("_competence")) {
         return;
+      }
 
       let attribut = "";
       if (event.target.className.includes("bool_")) {
         attribut = event.target.className.replace("_monstre", "");
         attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+        m_model.sendMessage("set_" + attribut, event.target.checked ? 1 : 0);
+
         if (attribut in m_model) m_model[attribut] = event.target.checked ? 1 : 0;
         else console.error("Attribut non trouvé : ", attribut);
+
         return;
       }
 
       if (event.target.type !== "text") return;
 
       // On garde seulement les chiffres
-      event.target.value = event.target.value.replace(/[^0-9\-]/g, "");
+      if (event.target.className.includes("coefficient_")) { // S'agit d'un float
+        event.target.value = event.target.value.replace(/[^0-9\-\.]/g, "");
+      }
+      else {// S'agit d'un int
+        event.target.value = event.target.value.replace(/[^0-9\-]/g, "");
+      }
 
       // Affectation de la valeur à l'attribut correspondant
       let value = parseInt(event.target.value);
@@ -2871,8 +2885,10 @@ function initialise_model() {
       else if (event.target.className.includes("_experience")) {
         attribut = event.target.className;
       }
+      attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+      m_model.sendMessage("set_" + attribut, value);
+
       if (!event.target.disabled && attribut !== "") {
-        attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
         if (attribut in m_model) m_model[attribut] = value;
         else console.error("Attribut non trouvé : ", attribut);
       }
@@ -2901,9 +2917,11 @@ function initialise_model() {
             Nom_model: m_model.Nom_model,
             Degres: event.target.value
           });
+          m_model.sendMessage("set_Degres", competence_connue);
           CompetencesConnues.push(competence_connue);
         }
         else {
+          m_model.sendMessage("set_Degres", competence_connue);
           competence_connue.Degres = event.target.value;
         }
       }
@@ -3156,6 +3174,10 @@ function affiche_model() {
         attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
         if (attribut in m_model) input.checked = m_model[attribut];
         else console.error("Attribut non trouvé : ", attribut);
+
+        const event = new Event("change", { bubbles: true });
+        input.dispatchEvent(event);
+
         return;
       }
 
@@ -3176,10 +3198,15 @@ function affiche_model() {
         attribut = input.className.replace("_monstre", "");
       }
 
-      if (!input.disabled && attribut !== "") {
+      if (attribut !== "") {
         attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-        if (attribut in m_model) input.value = m_model[attribut];
-        else console.error("Attribut non trouvé : ", attribut);
+        if (!["Niveau_physique",
+          "Niveau_mental",
+          "Coordination",
+          "Sixieme_sens"].includes(attribut)) {
+          if (attribut in m_model) input.value = m_model[attribut];
+          else console.error("Attribut non trouvé : ", attribut);
+        }
       }
 
       // Traitement des input de competence majeure et mineure
@@ -3201,7 +3228,9 @@ function affiche_model() {
           competence.Nom_competence === Nom_competence &&
           competence.Nom_model === m_model.Nom_model);
 
-        if (competence_connue !== null && typeof competence_connue !== "undefined") {
+        if (competence_connue !== null &&
+          typeof competence_connue !== "undefined" &&
+          competence_connue.Degres > 0) {
           input.value = competence_connue.Degres;
         }
         else {

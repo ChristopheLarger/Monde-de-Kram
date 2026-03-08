@@ -53,16 +53,11 @@
         {
             $js = "Models[$index] = new Model({\n";
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
-            // $js .= "    Image: new Image(\"Images/" . $row['Nom'] . ".png\"),\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Is_monster: " . toJS($row['Is_monster'], 'bool') . ",\n";
-            $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
 
             $js .= "    Race: " . toJS($row['Race']) . ",\n";
-            $js .= "    Magie_type: " . toJS($row['Magie_type']) . ",\n";
-
-            $js .= "    Puissance_mentale: " . toJS($row['Puissance_mentale'], 'int') . ",\n";
-            $js .= "    Puissance_physique: " . toJS($row['Puissance_physique'], 'int') . ",\n";
+            $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
 
             $js .= "    Force: " . toJS($row['Force'], 'int') . ",\n";
             $js .= "    Constitution: " . toJS($row['Constitution'], 'int') . ",\n";
@@ -98,11 +93,32 @@
             $js .= "    Memoire_experience: " . toJS($row['Memoire_experience'], 'int') . ",\n";
             $js .= "    Telepathie_experience: " . toJS($row['Telepathie_experience'], 'int') . ",\n";
 
+            $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
+            $js .= "    Puissance_mentale: " . toJS($row['Puissance_mentale'], 'int') . ",\n";
+            $js .= "    Puissance_physique: " . toJS($row['Puissance_physique'], 'int') . ",\n";
+            $js .= "    Vivacite_physique2: " . toJS($row['Vivacite_physique2'], 'int') . ",\n";
+            $js .= "    Capacites: " . toJS($row['Capacites']) . ",\n";
+            $js .= "    Initiative: " . toJS($row['Initiative'], 'int') . ",\n";
+            $js .= "    Agressivite: " . toJS($row['Agressivite'], 'int') . ",\n";
+            $js .= "    Sociabilite: " . toJS($row['Sociabilite'], 'int') . ",\n";
+            $js .= "    Esquive: " . toJS($row['Esquive'], 'int') . ",\n";
+            $js .= "    Feinte_de_corps: " . toJS($row['Feinte_de_corps'], 'int') . ",\n";
+            $js .= "    Attaque_1: " . toJS($row['Attaque_1'], 'int') . ",\n";
+            $js .= "    Parade_1: " . toJS($row['Parade_1'], 'int') . ",\n";
+            $js .= "    Bool_parade_1: " . toJS($row['Bool_parade_1'], 'bool') . ",\n";
+            $js .= "    Coefficient_dommages_1: " . toJS($row['Coefficient_dommages_1']) . ",\n";
+            $js .= "    Bonus_dommages_1: " . toJS($row['Bonus_dommages_1'], 'int') . ",\n";
+            $js .= "    Attaque_2: " . toJS($row['Attaque_2'], 'int') . ",\n";
+            $js .= "    Bool_attaque_2: " . toJS($row['Bool_attaque_2'], 'bool') . ",\n";
+            $js .= "    Parade_2: " . toJS($row['Parade_2'], 'int') . ",\n";
+            $js .= "    Bool_parade_2: " . toJS($row['Bool_parade_2'], 'bool') . ",\n";
+            $js .= "    Coefficient_dommages_2: " . toJS($row['Coefficient_dommages_2']) . ",\n";
+            $js .= "    Bonus_dommages_2: " . toJS($row['Bonus_dommages_2'], 'int') . ",\n";
+
+            $js .= "    Magie_type: " . toJS($row['Magie_type']) . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
             $js .= "    Liste_pretre: " . toJS($row['Liste_pretre'], 'null') . ",\n";
-
-            $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
 
             $js .= "    Armure_tete: " . toJS($row['Armure_Tete'], 'int') . ",\n";
             $js .= "    Armure_poitrine: " . toJS($row['Armure_Poitrine'], 'int') . ",\n";
@@ -112,7 +128,6 @@
             $js .= "    Armure_jambeg: " . toJS($row['Armure_JambeG'], 'int') . ",\n";
             $js .= "    Armure_jambed: " . toJS($row['Armure_JambeD'], 'int') . ",\n";
 
-            $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
             $js .= "});\n";
             return $js;
         }
@@ -419,29 +434,27 @@
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
         // Attendre que l'interface soit complètement initialisée
-        setTimeout(function() {
-            const christophe = Pion.add("allies", "Christophe");
-            const elemental_eau = Pion.add("allies", "Elémental d'eau");
-            const guilhem = Pion.add("ennemis", "Guilhem");
-            const elemental_air = Pion.add("ennemis", "Elémental d'air");
+        const christophe = Pion.add("allies", "Christophe");
+        const elemental_eau = Pion.add("allies", "Elémental d'eau");
+        const guilhem = Pion.add("ennemis", "Guilhem");
+        const elemental_air = Pion.add("ennemis", "Elémental d'air");
 
-            // Remise à zéro des portées de vue
-            Map.setPortee_vue();
+        // Remise à zéro des portées de vue
+        Map.setPortee_vue();
 
-            // Christophe est en vol
-            guilhem.is_flying = true;
+        // Guilhem est en vol
+        if (guilhem) guilhem.is_flying = true;
 
-            // Rafraîchir le zoom du pion selectionné
-            m_pion = guilhem;
-            affiche_pion();
+        // Rafraîchir le zoom du pion selectionné
+        m_pion = guilhem;
+        affiche_pion();
 
-            // Régénérer la carte pour afficher les nouveaux pions
-            Map.generateHexMap();
-            Map.drawHexMap();
+        // Régénérer la carte pour afficher les nouveaux pions
+        Map.generateHexMap();
+        Map.drawHexMap();
 
-            // Donner le focus à la carte
-            canvas.focus({ preventScroll: true });
-        }, 200);
+        // Donner le focus à la carte
+        canvas.focus({ preventScroll: true });
     </script>
 </body>
 

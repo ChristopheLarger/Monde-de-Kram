@@ -2,8 +2,8 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Hôte : localhost
--- Généré le : sam. 20 déc. 2025 à 10:38
+-- Hôte : 127.0.0.1
+-- Généré le : sam. 07 mars 2026 à 12:09
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -29,7 +29,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `arme` (
   `Nom_arme` varchar(256) NOT NULL,
-  `Competence` varchar(128) NOT NULL,
+  `Competence` varchar(128) DEFAULT NULL,
   `Facteur_parade` float DEFAULT NULL,
   `Is_personnel` tinyint(1) NOT NULL DEFAULT 0,
   `Deux_mains` tinyint(1) NOT NULL DEFAULT 0,
@@ -51,8 +51,8 @@ INSERT INTO `arme` (`Nom_arme`, `Competence`, `Facteur_parade`, `Is_personnel`, 
 ('Arc long', 'Arc', NULL, 0, 1, 0, 1.25, 1, 14, 0.5, 1, 30, 8),
 ('Bouclier', 'Parade bouclier', 1, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0),
 ('Couteau de lancer', 'Couteau de lancer', NULL, 0, 0, 0, 0.5, 1, 8, 1, 1, 10, 2),
-('Elémental d\'air', 'Attaque', NULL, 1, 1, 0, 1.5, 0, 15, 0, 0, NULL, 9),
-('Elémental d\'eau', 'Attaque', NULL, 1, 1, 0, 2, 0, 18, 0, 0, NULL, 9),
+('Elémental d\'air', NULL, NULL, 1, 1, 0, 1.5, 0, 15, 0, 0, NULL, 9),
+('Elémental d\'eau', NULL, NULL, 1, 1, 0, 2, 0, 18, 0, 0, NULL, 9),
 ('Epée longue (1 main)', 'Epée', 0.7, 0, 0, 0, 1.5, 1, 18, 1, 0, NULL, 6),
 ('Epée trolle (1 main)', 'Epée', 0.6, 0, 0, 0, 1.75, 2, 23, 1, 0, NULL, 5);
 
@@ -142,7 +142,6 @@ INSERT INTO `bonus_sort` (`Nom_liste`, `Nom_sort`, `Nom_bonus`, `Succes`, `Valeu
 CREATE TABLE `competence` (
   `Nom_competence` varchar(128) NOT NULL,
   `Competence_majeure` varchar(128) DEFAULT NULL,
-  `Is_personnel` tinyint(1) NOT NULL DEFAULT 0,
   `Attribut` varchar(7) DEFAULT NULL,
   `Base` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -151,21 +150,38 @@ CREATE TABLE `competence` (
 -- Déchargement des données de la table `competence`
 --
 
-INSERT INTO `competence` (`Nom_competence`, `Competence_majeure`, `Is_personnel`, `Attribut`, `Base`) VALUES
-('Arc', 'Projectiles', 0, NULL, 0),
-('Armes de jet', NULL, 0, 'Co+F', -4),
-('Attaque', NULL, 1, NULL, 0),
-('Connaissance de l\'occulte', NULL, 0, 'V', -5),
-('Connaissance des arcanes', NULL, 0, 'Ab', -5),
-('Couteau de lancer', 'Armes de jet', 0, NULL, 2),
-('Epée', 'Tranchantes', 0, '', 0),
-('Feinte de corps', NULL, 0, 'Co', 1),
-('Maîtriser la magie', 'Connaissance des arcanes', 0, NULL, 0),
-('Parade', NULL, 1, NULL, 0),
-('Parade bouclier', NULL, 0, 'Co', -1),
-('Projectiles', NULL, 0, 'Co+P', -4),
-('Théognosie', 'Connaissance de l\'occulte', 0, NULL, 0),
-('Tranchantes', NULL, 0, 'Co+VP', -4);
+INSERT INTO `competence` (`Nom_competence`, `Competence_majeure`, `Attribut`, `Base`) VALUES
+('Arc', 'Projectiles', NULL, 0),
+('Armes de jet', NULL, 'Co+F', -4),
+('Attaque mains nues', 'Combat mains nues', NULL, 0),
+('Combat mains nues', NULL, 'NP', -2),
+('Compétences mineures', NULL, NULL, 0),
+('Connaissance de l\'occulte', NULL, 'V', -5),
+('Connaissance des arcanes', NULL, 'Ab', -5),
+('Connaissance des mécanismes', NULL, 'Co+VM', -4),
+('Contondantes ou d\'estoc', NULL, 'Co+VP', -3),
+('Couteau de lancer', 'Armes de jet', NULL, 2),
+('Dague', 'Tranchantes', NULL, 1),
+('Déplacement dans la nature', NULL, 'VP', -2),
+('Discrétion', NULL, 'P+VM', -2),
+('Epée', 'Tranchantes', NULL, 0),
+('Equitation', 'Compétences mineures', 'Co+V', -4),
+('Erudition', NULL, 'Ab', -3),
+('Escrime', NULL, 'Co', -4),
+('Esquive', NULL, 'Co+VM', -2),
+('Etoile du matin', 'Contondantes ou d\'estoc', NULL, -1),
+('Feindre / Abuser les autres', NULL, 'Ch', -3),
+('Feinte de corps', NULL, 'Co', 1),
+('Maîtriser la magie', 'Connaissance des arcanes', NULL, 0),
+('Manœuvrer un bateau', 'Compétences mineures', 'NP', -5),
+('Parade bouclier', NULL, 'Co', -1),
+('Parler Humain', 'Compétences mineures', 'Ab', -4),
+('Premiers soins', 'Compétences mineures', 'Co+V', -2),
+('Projectiles', NULL, 'Co+P', -4),
+('Relations avec les autres', NULL, 'Ch', -3),
+('Survie dans la nature', NULL, 'P+VM', -3),
+('Théognosie', 'Connaissance de l\'occulte', NULL, 0),
+('Tranchantes', NULL, 'Co+VP', -4);
 
 -- --------------------------------------------------------
 
@@ -188,9 +204,7 @@ INSERT INTO `comp_connue` (`Nom_model`, `Nom_competence`, `Degres`) VALUES
 ('Christophe', 'Arc', 4),
 ('Christophe', 'Feinte de corps', 4),
 ('Christophe', 'Projectiles', 4),
-('Elémental d\'air', 'Attaque', 8),
 ('Elémental d\'air', 'Feinte de corps', 2),
-('Elémental d\'eau', 'Attaque', 8),
 ('Elémental d\'eau', 'Feinte de corps', 1),
 ('Guilhem', 'Epée', 4),
 ('Guilhem', 'Feinte de corps', 4),
@@ -689,6 +703,7 @@ INSERT INTO `liste` (`Nom_liste`, `Nom_jumelee`) VALUES
 CREATE TABLE `model` (
   `Nom_model` varchar(256) NOT NULL,
   `Is_joueur` tinyint(1) NOT NULL DEFAULT 0,
+  `Is_monster` tinyint(1) NOT NULL DEFAULT 0,
   `Capacites` varchar(1024) NOT NULL,
   `Magie_type` varchar(64) NOT NULL DEFAULT 'Sans',
   `Race` varchar(64) NOT NULL DEFAULT 'Humain',
@@ -733,29 +748,22 @@ CREATE TABLE `model` (
   `Armure_BrasD` int(11) NOT NULL DEFAULT 0,
   `Armure_JambeG` int(11) NOT NULL DEFAULT 0,
   `Armure_JambeD` int(11) NOT NULL DEFAULT 0,
-  `PdV` int(11) NOT NULL,
-  `Tete` int(11) NOT NULL,
-  `Poitrine` int(11) NOT NULL,
-  `Abdomen` int(11) NOT NULL,
-  `BrasG` int(11) NOT NULL,
-  `BrasD` int(11) NOT NULL,
-  `JambeG` int(11) NOT NULL,
-  `JambeD` int(11) NOT NULL
+  `PdV` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `model`
 --
 
-INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`, `Tete`, `Poitrine`, `Abdomen`, `BrasG`, `BrasD`, `JambeG`, `JambeD`) VALUES
-('Boris', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 16, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Christophe', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 14, 10, 10, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Cyril', 1, '', 'Sans', 'Troll', 0, 0, 0, 80, 0, NULL, 14, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Elémental d\'air', 0, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', 'Sans', 'Autre', 4, 10, 30, 0, 0, NULL, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 3, 5, 5, 4, 4, 6, 6),
-('Elémental d\'eau', 0, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', 'Sans', 'Autre', 3, 14, 40, 0, 0, NULL, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20, 4, 7, 7, 5, 5, 8, 8),
-('Guilhem', 1, '', 'Classique', 'Humain', 0, 0, 0, 80, 0, NULL, 12, 15, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Guillaume', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, 'Liste du feu', 14, 17, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10),
-('Ludovic', 1, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 5, 8, 8, 6, 6, 10, 10);
+INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`) VALUES
+('Boris', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 16, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
+('Christophe', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 14, 16, 18, 15, 8, 16, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25),
+('Cyril', 1, 0, '', 'Sans', 'Troll', 0, 0, 0, 80, 0, NULL, 14, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
+('Elémental d\'air', 0, 1, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', 'Sans', 'Autre', 4, 10, 30, 0, 0, NULL, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15),
+('Elémental d\'eau', 0, 1, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', 'Sans', 'Autre', 3, 14, 40, 0, 0, NULL, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20),
+('Guilhem', 1, 0, '', 'Classique', 'Humain', 0, 0, 0, 80, 0, NULL, 12, 15, 10, 13, 10, 10, 10, 10, 10, 10, 10, 10, 10, 12, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 25),
+('Guillaume', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, 'Liste du feu', 14, 17, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
+('Ludovic', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25);
 
 -- --------------------------------------------------------
 
@@ -1244,6 +1252,9 @@ INSERT INTO `sort_connu` (`Nom_liste`, `Nom_sort`, `Nom_model`) VALUES
 ('Liste de la terre', 'Statue', 'Guilhem'),
 ('Liste de la terre', 'Tempête de sable', 'Guilhem'),
 ('Liste de la terre', 'Tremblement de terre', 'Guilhem'),
+('Liste des créatures surnaturelles', 'Chasseur invisible', 'Guilhem'),
+('Liste des créatures surnaturelles', 'Destrier de Monrak', 'Guilhem'),
+('Liste du feu', 'Boule de feu', 'Guilhem'),
 ('Liste du feu', 'Nuée de météores', 'Guilhem'),
 ('Liste de l\'harmonie', 'Atténuation des sons', 'Guillaume'),
 ('Liste de l\'harmonie', 'Catalepsie', 'Guillaume'),
@@ -1334,59 +1345,59 @@ ALTER TABLE `sort_connu`
 -- Contraintes pour la table `arme`
 --
 ALTER TABLE `arme`
-  ADD CONSTRAINT `FK_Arme` FOREIGN KEY (`Competence`) REFERENCES `competence` (`Nom_competence`);
+  ADD CONSTRAINT `FK_Arme` FOREIGN KEY (`Competence`) REFERENCES `competence` (`Nom_competence`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `bonus_sort`
 --
 ALTER TABLE `bonus_sort`
-  ADD CONSTRAINT `FK_Bonus_sort1` FOREIGN KEY (`Nom_bonus`) REFERENCES `bonus` (`Nom_bonus`),
-  ADD CONSTRAINT `FK_Bonus_sort2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
+  ADD CONSTRAINT `FK_Bonus_sort1` FOREIGN KEY (`Nom_bonus`) REFERENCES `bonus` (`Nom_bonus`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Bonus_sort2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `competence`
 --
 ALTER TABLE `competence`
-  ADD CONSTRAINT `FK_Competence` FOREIGN KEY (`Competence_majeure`) REFERENCES `competence` (`Nom_competence`);
+  ADD CONSTRAINT `FK_Competence` FOREIGN KEY (`Competence_majeure`) REFERENCES `competence` (`Nom_competence`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `comp_connue`
 --
 ALTER TABLE `comp_connue`
-  ADD CONSTRAINT `FK_Comp_connue1` FOREIGN KEY (`Nom_competence`) REFERENCES `competence` (`Nom_competence`),
-  ADD CONSTRAINT `FK_Comp_connue2` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`);
+  ADD CONSTRAINT `FK_Comp_connue1` FOREIGN KEY (`Nom_competence`) REFERENCES `competence` (`Nom_competence`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Comp_connue2` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `connecteur`
 --
 ALTER TABLE `connecteur`
-  ADD CONSTRAINT `FK_Connecteur1` FOREIGN KEY (`Pred_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`),
-  ADD CONSTRAINT `FK_Connecteur2` FOREIGN KEY (`Suc_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
+  ADD CONSTRAINT `FK_Connecteur1` FOREIGN KEY (`Pred_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Connecteur2` FOREIGN KEY (`Suc_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `liste`
 --
 ALTER TABLE `liste`
-  ADD CONSTRAINT `PK_Liste` FOREIGN KEY (`Nom_jumelee`) REFERENCES `liste` (`Nom_liste`);
+  ADD CONSTRAINT `PK_Liste` FOREIGN KEY (`Nom_jumelee`) REFERENCES `liste` (`Nom_liste`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `model`
 --
 ALTER TABLE `model`
-  ADD CONSTRAINT `FK_Perso` FOREIGN KEY (`Liste_pretre`) REFERENCES `liste` (`Nom_liste`);
+  ADD CONSTRAINT `FK_Perso` FOREIGN KEY (`Liste_pretre`) REFERENCES `liste` (`Nom_liste`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `sort`
 --
 ALTER TABLE `sort`
-  ADD CONSTRAINT `FK_Sort` FOREIGN KEY (`Nom_liste`) REFERENCES `liste` (`Nom_liste`);
+  ADD CONSTRAINT `FK_Sort` FOREIGN KEY (`Nom_liste`) REFERENCES `liste` (`Nom_liste`) ON UPDATE CASCADE;
 
 --
 -- Contraintes pour la table `sort_connu`
 --
 ALTER TABLE `sort_connu`
-  ADD CONSTRAINT `FK_Sort_connu1` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`),
-  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`);
+  ADD CONSTRAINT `FK_Sort_connu1` FOREIGN KEY (`Nom_model`) REFERENCES `model` (`Nom_model`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `FK_Sort_connu2` FOREIGN KEY (`Nom_sort`,`Nom_liste`) REFERENCES `sort` (`Nom_sort`, `Nom_liste`) ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
