@@ -196,7 +196,7 @@ class ChatServer implements MessageComponentInterface
      * @return bool - true si la modification de l'attribut a réussi
      */
     private function Set_Model($msg) {
-        $regex = "/^MJ: Set_Model_([^@]+) ([^@]+)@([^@]+)$/";
+        $regex = "/^MJ: Set_Model_([^@ ]+) ([^@]+)@([^@]+)$/";
         if (! preg_match($regex, $msg, $result)) return false;
 
         $attribut = $result[1];
