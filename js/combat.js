@@ -326,7 +326,7 @@ function next_attaque() {
         // Fin du round
         init_round = false;
         Messages.ecriture_directe("Fin du round de combat");
-        refresh_pion();
+        affiche_pion();
         return;
     }
 
@@ -457,7 +457,7 @@ function next_attaque() {
     }
 
     // Afficher directement le dialogue d'attaque s'il n'y a qu'un unique défenseur possible
-    if (Pions.filter(p => p.Defenseur).length === 1) afficher_attaque(1);
+    if (Pions.filter(p => p.Defenseur).length === 1) affiche_attaque(1);
 }
 
 /**

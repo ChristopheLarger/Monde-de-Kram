@@ -3289,10 +3289,6 @@ function affiche_model() {
     input.value = c.Degres;
   });
 
-  // Masquage du bouton de duplication du modèle si c'est un modèle de joueur
-  const m = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
-  document.getElementById('div_buttons_dupliquer_model').querySelector(".dupliquer").disabled = m.Is_joueur;
-
   // Affichage de la figurine du modèle
   const fig = document.getElementById('div_figurine_model').querySelector('.figurine');
   fig.style.display = 'block';

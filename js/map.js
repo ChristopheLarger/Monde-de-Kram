@@ -1129,6 +1129,9 @@ class Pion extends Map {
         const model = Models.find(m => m.Nom_model === this.Model);
         const comp = Competences.find(comp => comp.Nom_competence === competence);
 
+        console.log(competence);
+        console.log(comp);
+
         // Calcul de l'attribut
         let attribut = 0;
         if (!model.Is_monster) {
@@ -1234,8 +1237,9 @@ class Pion extends Map {
                     ratio = Armes.find(a => a.Nom_arme === this.Arme2).Facteur_parade;
                     break;
             }
-            if (competence === null || typeof competence === "undefined") return null;
         }
+
+        if (competence === null || typeof competence === "undefined") return null;
 
         // Calcul du score de la compétence
         const score = this.#get_score_sub(competence);
