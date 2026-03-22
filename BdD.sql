@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : sam. 07 mars 2026 à 12:09
+-- Généré le : dim. 22 mars 2026 à 11:07
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -205,6 +205,8 @@ INSERT INTO `comp_connue` (`Nom_model`, `Nom_competence`, `Degres`) VALUES
 ('Christophe', 'Feinte de corps', 4),
 ('Christophe', 'Projectiles', 4),
 ('Elémental d\'air', 'Feinte de corps', 2),
+('Elémental d\'eau', 'Armes de jet', 4),
+('Elémental d\'eau', 'Couteau de lancer', 4),
 ('Elémental d\'eau', 'Feinte de corps', 1),
 ('Guilhem', 'Epée', 4),
 ('Guilhem', 'Feinte de corps', 4),
@@ -748,22 +750,39 @@ CREATE TABLE `model` (
   `Armure_BrasD` int(11) NOT NULL DEFAULT 0,
   `Armure_JambeG` int(11) NOT NULL DEFAULT 0,
   `Armure_JambeD` int(11) NOT NULL DEFAULT 0,
-  `PdV` int(11) NOT NULL
+  `PdV` int(11) NOT NULL,
+  `Vivacite_physique2` int(11) NOT NULL,
+  `Initiative` int(11) NOT NULL,
+  `Agressivite` int(11) NOT NULL,
+  `Sociabilite` int(11) NOT NULL,
+  `Esquive` int(11) NOT NULL,
+  `Feinte_de_corps` int(11) NOT NULL,
+  `Attaque_1` int(11) NOT NULL,
+  `Parade_1` int(11) NOT NULL,
+  `Bool_parade_1` tinyint(1) NOT NULL,
+  `Coefficient_dommages_1` float NOT NULL,
+  `Bonus_dommages_1` int(11) NOT NULL,
+  `Attaque_2` int(11) NOT NULL,
+  `Bool_attaque_2` tinyint(1) NOT NULL,
+  `Parade_2` int(11) NOT NULL,
+  `Bool_parade_2` tinyint(1) NOT NULL,
+  `Coefficient_dommages_2` float NOT NULL,
+  `Bonus_dommages_2` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Déchargement des données de la table `model`
 --
 
-INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`) VALUES
-('Boris', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 16, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
-('Christophe', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 14, 16, 18, 15, 8, 16, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25),
-('Cyril', 1, 0, '', 'Sans', 'Troll', 0, 0, 0, 80, 0, NULL, 14, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
-('Elémental d\'air', 0, 1, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', 'Sans', 'Autre', 4, 10, 30, 0, 0, NULL, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15),
-('Elémental d\'eau', 0, 1, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', 'Sans', 'Autre', 3, 14, 40, 0, 0, NULL, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20),
-('Guilhem', 1, 0, '', 'Classique', 'Humain', 0, 0, 0, 80, 0, NULL, 12, 15, 10, 13, 10, 10, 10, 10, 10, 10, 10, 10, 10, 12, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 25),
-('Guillaume', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, 'Liste du feu', 14, 17, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25),
-('Ludovic', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25);
+INSERT INTO `model` (`Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`) VALUES
+('Boris', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 16, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Christophe', 1, 0, '', 'religieuse', 'humain', 0, 0, 0, 80, 0, NULL, 14, 14, 16, 18, 15, 8, 16, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Cyril', 1, 0, '', 'Sans', 'Troll', 0, 0, 0, 80, 0, NULL, 14, 12, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Elémental d\'air', 0, 1, 'Un élémental d’air est capable de voler à volonté à une vitesse de 40 km/h et d’emporter jusqu’à 10 kg. De plus, il est quasiment invisible. Si on recherche une éventuelle présence, il faut réussir pour le voir un jet sous P s’il est en mouvement et sous P-4 s’il est immobile. Si on ne soupçonne pas sa présence, ces jets deviennent respectivement sous 6ème sens -4 si l’élémental est en mouvement et sous 6ème sens -8 s’il est immobile.', 'sans', 'autre', 4, 10, 30, 0, 0, NULL, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Elémental d\'eau', 0, 1, 'Un élémental d’eau se déplace comme un humanoïde, sauf dans l’eau sa vitesse peut atteindre 25 km/h. Ses compétences de combat y bénéficient en outre d’un bonus de +2. Il bénéficie d’une armure de 4 points contre les armes contondantes ou perforantes.', 'sans', 'autre', 3, 14, 40, 0, 0, NULL, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Guilhem', 1, 0, '', 'classique', 'humain', 0, 0, 0, 80, 0, NULL, 12, 15, 10, 13, 10, 10, 10, 10, 10, 10, 10, 10, 10, 12, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Guillaume', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, 'Liste du feu', 14, 17, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+('Ludovic', 1, 0, '', 'Religieuse', 'Humain', 0, 0, 0, 80, 0, NULL, 14, 20, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
