@@ -1,1 +1,1 @@
-E:\xampp\php\php.exe server.php
+C:\xampp\php\php.exe server.php
