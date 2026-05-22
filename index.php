@@ -93,7 +93,8 @@
             $js .= "    Memoire_experience: " . toJS($row['Memoire_experience'], 'int') . ",\n";
             $js .= "    Telepathie_experience: " . toJS($row['Telepathie_experience'], 'int') . ",\n";
 
-            $js .= "    Pdv: " . toJS($row['PdV'], 'int') . ",\n";
+            $js .= "    Nb_blessures_max: " . toJS($row['Nb_blessures_max'], 'int') . ",\n";
+            $js .= "    Seuil_blessures: " . toJS($row['Seuil_blessures'], 'int') . ",\n";
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Puissance_mentale: " . toJS($row['Puissance_mentale'], 'int') . ",\n";
             $js .= "    Puissance_physique: " . toJS($row['Puissance_physique'], 'int') . ",\n";

@@ -170,6 +170,8 @@ class Model {
     this.Is_joueur = data.Is_joueur || 0;
     this.Is_monster = data.Is_monster || 0;
 
+    this.Nb_blessures_max = data.Nb_blessures_max || 1;
+
     // Attributs de base (Humanoide)
     this.Race = data.Race || "";
     this.Ambidextre = data.Ambidextre || 0;
@@ -210,7 +212,7 @@ class Model {
     this.Telepathie_experience = data.Telepathie_experience || 0;
 
     // Caractéristiques de base (Monstre) (+VP de l'humanoide)
-    this.Pdv = data.Pdv || 0;
+    this.Seuil_blessures = data.Seuil_blessures || 0;
     this.Fatigue = data.Fatigue || 0;
     this.Puissance_mentale = data.Puissance_mentale || 0;
     this.Puissance_physique = data.Puissance_physique || 0;
@@ -295,24 +297,23 @@ class Model {
   }
 
   /**
-  * Calcul les points de vie
-  * @returns {number} - Points de vie
+  * Calcul le seuil de blessures
+  * @returns {number} - Seuil de blessures
   */
-  Points_de_vie() {
-    if (this.Is_monster) return this.Pdv;
-    return (this.Constitution + 5);
+  get_seuil_blessures() {
+    if (this.Is_monster) return this.Seuil_blessures;
+    return (Math.round(this.Constitution / 3) + 2);
   }
 
   /**
   * Calcul les points de fatigue
   * @returns {number} - Points de fatigue
   */
-  Points_de_fatigue() {
+  get_fatigue() {
     if (this.Is_monster) return this.Fatigue;
     return (2 * this.Constitution + 4);
   }
 }
-
 
 // Tableau global contenant tous les modèles de personnages
 let Models = [];

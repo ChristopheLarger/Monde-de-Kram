@@ -965,7 +965,7 @@ class Pion extends Map {
     Fatigue_down = 0;        // Nombre de points de fatigue perdus durant le round
     Fatigue_eco = false;     // Booléen indiquant si la fatigue est économisée au corps à corps
     Concentration = 0;       // Niveau de concentration
-    Pdv = 0;                 // Points de vie totaux
+    General = 0;                 // Points de vie totaux
     Tete = 0;                // Points de vie à la tête
     Poitrine = 0;            // Points de vie à la poitrine
     Abdomen = 0;             // Points de vie à l'abdomen
@@ -1032,14 +1032,14 @@ class Pion extends Map {
 
         this.Fatigue = m.Fatigue;
         this.Concentration = m.Concentration;
-        this.Pdv = m.Pdv;
-        this.Tete = Math.round(m.Pdv / 5);
-        this.Poitrine = Math.round(m.Pdv / 3);
-        this.Abdomen = Math.round(m.Pdv / 3);
-        this.Brasg = Math.round(m.Pdv / 4);
-        this.Brasd = Math.round(m.Pdv / 4);
-        this.Jambeg = Math.round(m.Pdv * 0.4);
-        this.Jambed = Math.round(m.Pdv * 0.4);
+        this.General = 0;
+        this.Tete = 0;
+        this.Poitrine = 0;
+        this.Abdomen = 0;
+        this.Brasg = 0;
+        this.Brasd = 0;
+        this.Jambeg = 0;
+        this.Jambed = 0;
         this.Armure_tete = m.Armure_tete;
         this.Armure_poitrine = m.Armure_poitrine;
         this.Armure_abdomen = m.Armure_abdomen;
@@ -1128,9 +1128,6 @@ class Pion extends Map {
     #get_score_sub(competence) {
         const model = Models.find(m => m.Nom_model === this.Model);
         const comp = Competences.find(comp => comp.Nom_competence === competence);
-
-        console.log(competence);
-        console.log(comp);
 
         // Calcul de l'attribut
         let attribut = 0;
@@ -1734,7 +1731,7 @@ class Pion extends Map {
             Messages.ecriture_directe(`${magicien.Titre} occasionne ${degats} points de dégâts ${texte_loc} à ${this.Titre}`);
         }
         else {
-            this.Pdv -= degats;
+            this.General -= degats;
             Messages.ecriture_directe(`${magicien.Titre} occasionne ${degats} points de dégâts généraux à ${this.Titre}`);
         }
 
