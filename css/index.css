@@ -124,12 +124,14 @@ dialog {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: x-large;
-    white-space: nowrap; /* Empêche le retour à la ligne */
+    white-space: nowrap;
+    /* Empêche le retour à la ligne */
     font-weight: bold;
     color: white;
     background-color: black;
     border: 0px solid white;
-    z-index: 1010; /* Au-dessus des dialogues */
+    z-index: 1010;
+    /* Au-dessus des dialogues */
     pointer-events: none;
     display: none;
 }
@@ -220,34 +222,63 @@ input:checked+.slider:before {
     /* Animation de glissement */
 }
 
-/* Onglets au-dessus de l'image zoom_pion */
-#zoom_pion_tabs {
-    flex: 1;
-    width: 271px;
-    border: 1px solid #999;
-    margin-left: 1px;
-    border-bottom: 0;
-    background: #e8e8e8;
-    font-size: x-small;
-
-}
-
-#zoom_pion_tabs .tab-zoom-pion {
+.tab_model {
     flex: 1;
     padding: 3px 2px;
-    border : 1px solid black;
+    border: 1px solid black;
     background: lightgray;
     cursor: pointer;
     font-size: x-small;
 }
 
-#zoom_pion_tabs .tab-zoom-pion:hover {
+.tab_model:hover {
     background: #999999;
     font-weight: bold;
 }
 
-#zoom_pion_tabs .tab-zoom-pion.active {
+.tab_model.active {
     background: white;
-    border : 3px solid black;
+    border: 3px solid black;
     font-weight: bold;
+}
+
+#div_pion input,
+#div_model_0 input,
+#div_model_1 input,
+#div_model_2 input {
+    font-size: x-small;
+    width: 17px;
+    text-align: center;
+}
+
+#div_model_3 input {
+    font-size: x-small;
+    width: 34px;
+    text-align: right;
+    padding-right: 5px;
+}
+
+#pion input:disabled,
+#div_model_0 input:disabled,
+#div_model_1 input:disabled,
+#div_model_2 input:disabled,
+#div_model_3 input:disabled,
+#pion select:disabled,
+#div_model_0 select:disabled,
+#div_model_1 select:disabled,
+#div_model_2 select:disabled,
+#div_model_3 select:disabled,
+#pion textarea:disabled,
+#div_model_0 textarea:disabled,
+#div_model_1 textarea:disabled,
+#div_model_2 textarea:disabled,
+#div_model_3 textarea:disabled {
+    background-color: lightgray;
+}
+
+#div_cout td {
+    border-width: 0px;
+    border: 1px solid black;
+    text-align: right;
+    padding: 0px 5px 0px 5px;
 }

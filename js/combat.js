@@ -1093,9 +1093,8 @@ function resoudre_attaque() {
 
         // Appliquer les dégâts à la zone corporelle appropriée
         if (damage > 0) {
-            defenseur.Pdv -= damage;
-
             switch (attaquant.loc_att) {
+                case "général": defenseur.General -= damage; break;
                 case "tête": defenseur.Tete -= damage; break;
                 case "poitrine": defenseur.Poitrine -= damage; break;
                 case "abdomen": defenseur.Abdomen -= damage; break;

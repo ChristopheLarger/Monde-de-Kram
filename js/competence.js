@@ -16,6 +16,7 @@ class Competence {
         // Propriétés de base
         this.Nom_competence = data.Nom_competence || null;
         this.Competence_majeure = data.Competence_majeure || null;
+        this.Don = data.Don || null;
         this.Attribut = data.Attribut || null;
         this.Base = data.Base || 0;
     }

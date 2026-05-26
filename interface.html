@@ -85,17 +85,7 @@
     <canvas id="hexCanvas_selected" tabindex="0"
         style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
 
-    <div id="zoom_pion_tabs">
-        <button id="tab-zoom-pion-humanoid" type="button" class="tab-zoom-pion active" data-tab="0"
-            style="display: block; background-color: rgb(128, 128, 255);">Caractéristiques<br>Humanoides</button>
-        <button id="tab-zoom-pion-monstre" type="button" class="tab-zoom-pion" data-tab="1"
-            style="display: none; background-color: rgb(255, 32, 32);">Caractéristiques<br>Monstres</button>
-        <button type="button" class="tab-zoom-pion" data-tab="2" style="background-color: rgb(255, 255, 64);">Magie,
-            Armures<br>& Compétences</button>
-        </button>
-    </div>
-
-    <div id="zoom_pion"
+    <div id="div_pion"
         style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: white; border: 3px solid black;">
         <table style="margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
@@ -109,17 +99,16 @@
             </colgroup>
             <tr>
                 <td colspan="4">
-                    <input type="file" class="input_figurine" accept="image/*"
-                        style="display: none; width: 100%; height: 100%;">
-                    <img class="figurine" alt="Figurine du pion" title="Cliquer pour charger une autre image"
-                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: white; cursor: pointer;">
+                    <img class="figurine" alt="Figurine du pion"
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: white;">
                 </td>
                 <td colspan="3">
                     <table style="width: 100%; white-space: nowrap;">
                         <tr>
                             <td>Nom :</td>
                             <td><input type="text" class="nom"
-                                    style="font-size: x-small; width: 100%; box-sizing: border-box;"></td>
+                                    style="font-size: x-small; width: 100%; box-sizing: border-box;text-align: left;">
+                            </td>
                             <td>Allié :</td>
                             <td><label class="switch">
                                     <input type="checkbox" class="allie">
@@ -184,6 +173,12 @@
                     </table>
                 </td>
             </tr>
+            <tr>
+                <td colspan="7" style="text-align: right;">
+                    <button class="dupliquer"
+                        style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Dupliquer</button>
+                </td>
+            </tr>
         </table>
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
             <textarea class="note" rows="4"
@@ -223,10 +218,10 @@
                         style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
                 </td>
                 <td>
-                    <input type="checkbox" class="general_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
-                    <input type="checkbox" class="general_X2" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="general_X1"
+                        style="vertical-align: middle; width: 17px; height: 17px;">
+                    <input type="checkbox" class="general_X2"
+                        style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="general_X3"
                         style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
@@ -247,8 +242,7 @@
                         style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
                 </td>
                 <td>
-                    <input type="checkbox" class="tete_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="tete_X1" style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="tete_X2" style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
             </tr>
@@ -269,7 +263,7 @@
                 </td>
                 <td>
                     <input type="checkbox" class="poitrine_X1"
-                        style="vertical-align: middle; width: 17px; height: 17px;" checked>
+                        style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="poitrine_X2"
                         style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
@@ -295,8 +289,7 @@
                         style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
                 </td>
                 <td>
-                    <input type="checkbox" class="brasd_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="brasd_X1" style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="brasd_X2" style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
             </tr>
@@ -310,8 +303,7 @@
                     <input type="text" class="brasg_pdv" style="text-align: center; width: 17px; font-size: x-small;">
                 </td>
                 <td>
-                    <input type="checkbox" class="brasg_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="brasg_X1" style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="brasg_X2" style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
             </tr>
@@ -358,8 +350,7 @@
                         style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
                 </td>
                 <td>
-                    <input type="checkbox" class="jambed_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="jambed_X1" style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="jambed_X2" style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
             </tr>
@@ -374,8 +365,7 @@
                         style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
                 </td>
                 <td>
-                    <input type="checkbox" class="jambeg_X1" style="vertical-align: middle; width: 17px; height: 17px;"
-                        checked>
+                    <input type="checkbox" class="jambeg_X1" style="vertical-align: middle; width: 17px; height: 17px;">
                     <input type="checkbox" class="jambeg_X2" style="vertical-align: middle; width: 17px; height: 17px;">
                 </td>
             </tr>
@@ -392,14 +382,9 @@
                     </table>
                 </td>
             </tr>
-            <tr>
-                <td colspan="7" style="text-align: right;">
-                    <button class="dupliquer" style="font-size: x-small;">Dupliquer</button>
-                </td>
-            </tr>
         </table>
 
-        <canvas id="canvas_zoom_pion"
+        <canvas id="canvas_pion"
             style="position: absolute; top: 0; left: 0; z-index: 1026; pointer-events: none;"></canvas>
     </div>
 
@@ -407,8 +392,8 @@
     <script>
         /** Ajuste le canvas à la taille du panneau */
         function sync_canvas_zoom_pion() {
-            const container = document.getElementById('zoom_pion');
-            const canvas = document.getElementById('canvas_zoom_pion');
+            const container = document.getElementById('div_pion');
+            const canvas = document.getElementById('canvas_pion');
             const w = container.clientWidth;
             const h = container.clientHeight;
             if (w === 0 || h === 0) return false;
@@ -422,7 +407,7 @@
 
         /** Point d'un élément en coordonnées du canvas. anchor : center | left | right | top | bottom */
         function get_point_on_canvas(el, anchor = 'center') {
-            const canvas = document.getElementById('canvas_zoom_pion');
+            const canvas = document.getElementById('canvas_pion');
             const r = el.getBoundingClientRect();
             const c = canvas.getBoundingClientRect();
             const midX = (r.left + r.right) / 2 - c.left;
@@ -442,40 +427,40 @@
             switch (cible) {
                 case "brasg":
                 case "jambeg":
-                    p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible), 'bottom');
+                    p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible), 'bottom');
                     break;
                 case "brasd":
                 case "jambed":
-                    p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible), 'top');
+                    p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible), 'top');
                     break;
                 default:
-                    p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible), 'right');
+                    p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible), 'right');
                     break;
             }
-            p2 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_armure'), 'left');
+            p2 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_armure'), 'left');
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p1.x, p2.y);
             ctx.moveTo(p1.x, p2.y);
             ctx.lineTo(p2.x, p2.y);
 
-            p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_armure'), 'right');
-            p2 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_pdv'), 'left');
+            p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_armure'), 'right');
+            p2 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_pdv'), 'left');
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
 
-            p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_pdv'), 'right');
-            p2 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_X1'), 'left');
+            p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_pdv'), 'right');
+            p2 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_X1'), 'left');
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
 
-            p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_X1'), 'right');
-            p2 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_X2'), 'left');
+            p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_X1'), 'right');
+            p2 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_X2'), 'left');
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
 
             if (cible === 'general') {
-                p1 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_X2'), 'right');
-                p2 = get_point_on_canvas(document.querySelector('#zoom_pion .' + cible + '_X3'), 'left');
+                p1 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_X2'), 'right');
+                p2 = get_point_on_canvas(document.querySelector('#div_pion .' + cible + '_X3'), 'left');
                 ctx.moveTo(p1.x, p1.y);
                 ctx.lineTo(p2.x, p2.y);
             }
@@ -484,7 +469,7 @@
         /** Trace les lignes de connexion entre les éléments de points de vie et leurs champs de saisie associés. */
         function trace_ligne_general_pdv() {
             if (!sync_canvas_zoom_pion()) return;
-            const canvas = document.getElementById('canvas_zoom_pion');
+            const canvas = document.getElementById('canvas_pion');
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.beginPath();
@@ -503,26 +488,10 @@
             ctx.stroke();
         }
 
-        /** Largeur de l'input selon son texte (fit-content ne fonctionne pas sur un champ texte). */
-        function ajuster_largeur_input_contenu(input) {
-            if (!input) return;
-            input.style.width = '0';
-            input.style.width = (input.scrollWidth + 8) + 'px';
-        }
-
         /** Configure le suivi des événements de redimensionnement du panneau et le tracé des lignes de connexion. */
         function setup_lignes_zoom_pion() {
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.general'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.tete'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.poitrine'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.brasg'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.brasd'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.abdomen'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.jambed'));
-            ajuster_largeur_input_contenu(document.querySelector('#zoom_pion input.jambeg'));
-
             trace_ligne_general_pdv();
-            const container = document.getElementById('zoom_pion');
+            const container = document.getElementById('div_pion');
             if (typeof ResizeObserver !== 'undefined') {
                 new ResizeObserver(() => trace_ligne_general_pdv()).observe(container);
             }
@@ -534,533 +503,629 @@
         });
     </script>
 
-    <div id="div_model_0" style="display: none; position: fixed; z-index: 1050; width: 231px; box-sizing: border-box;">
-        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+    <div id="div_model"
+        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: white; border: 3px solid black;">
+        <div class="div_model_tabs" style="display: flex; justify-content: space-between;">
+            <button type="button" class="tab-model humanoid" data-tab="0"
+                style="display: block; width: 33%; background-color: rgb(128, 128, 255);">Caractéristiques<br>Humanoides</button>
+            <button type="button" class="tab-model monstre" data-tab="1"
+                style="display: none; width: 33%; background-color: rgb(255, 32, 32);">Caractéristiques<br>Monstres</button>
+            <button type="button" class="tab-model avantages" data-tab="3"
+                style="width: 33%; background-color: rgb(255, 128, 255);">Avantages<br>& Coûts</button>
+            <button type="button" class="tab-model divers" data-tab="2"
+                style="width: 33%; background-color: rgb(255, 255, 64);">Magie, Armures<br>& Compétences</button>
+        </div>
+        <table class="div_model_table" style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
-                <col style="width: 1%;">
-                <col style="width: auto;">
-                <col style="width: 1%;">
-                <col style="width: auto;">
-                <col style="width: 1%;">
-                <col style="width: auto;">
-                <col style="width: 1%;">
+                <col style="width: 100px;">
+                <col style="width: 1px;">
                 <col style="width: auto;">
             </colgroup>
             <tr>
-                <td>Race :</td>
-                <td colspan="8">
-                    <select class="race_select" style="font-size: x-small; box-sizing: border-box; width: 98%;">
-                        <option value="humain">Humain</option>
-                        <option value="aquablue">Aquablue</option>
-                        <option value="elfe">Elfe</option>
-                        <option value="gnome">Gnome</option>
-                        <option value="nain">Nain</option>
-                        <option value="orc">Orc</option>
-                        <option value="troll">Troll</option>
-                        <option value="toutlisse">Toutlisse</option>
-                        <option value="autre">Autre</option>
+                <td rowspan="3">
+                    <input type="file" class="input_figurine" accept="image/*"
+                        style="display: none; width: 100%; height: 100%;">
+                    <img class="figurine" alt="Figurine du pion" title="Cliquer pour charger une autre image"
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: white; cursor: pointer;">
+                </td>
+                <td>Modèle :</td>
+                <td><select class="model_select" style="font-size: x-small; box-sizing: border-box; width: 100%;">
                     </select>
                 </td>
             </tr>
             <tr>
-                <td colspan="8">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td></td>
-                <td style="text-align: center;">Exp</td>
-                <td></td>
-                <td style="text-align: center;">Race</td>
-                <td></td>
-                <td style="text-align: center;">Score</td>
-                <td></td>
-                <td style="text-align: center;">Ajust</td>
-            </tr>
-            <tr>
-                <td>Force :</td>
-                <td><input type="text" class="force_experience"></td>
-                <td></td>
-                <td><input type="text" class="force_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="force_score"></td>
-                <td></td>
-                <td><input type="text" class="force_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Constitution :</td>
-                <td><input type="text" class="constitution_experience"></td>
-                <td></td>
-                <td><input type="text" class="constitution_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="constitution_score"></td>
-                <td></td>
-                <td><input type="text" class="constitution_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Vivacité physique :&nbsp;&nbsp;</td>
-                <td><input type="text" class="vivacite_physique_experience"></td>
-                <td></td>
-                <td><input type="text" class="vivacite_physique_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="vivacite_physique_score"></td>
-                <td></td>
-                <td><input type="text" class="vivacite_physique_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Perception :</td>
-                <td><input type="text" class="perception_experience"></td>
-                <td></td>
-                <td><input type="text" class="perception_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="perception_score"></td>
-                <td></td>
-                <td><input type="text" class="perception_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Niveau physique :</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="niveau_physique_score" disabled></td>
-                <td></td>
-                <td><input type="text" class="niveau_physique_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td colspan="8">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Vivacité mentale :</td>
-                <td><input type="text" class="vivacite_mentale_experience"></td>
-                <td></td>
-                <td><input type="text" class="vivacite_mentale_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="vivacite_mentale_score"></td>
-                <td></td>
-                <td><input type="text" class="vivacite_mentale_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Volonté :</td>
-                <td><input type="text" class="volonte_experience"></td>
-                <td></td>
-                <td><input type="text" class="volonte_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="volonte_score"></td>
-                <td></td>
-                <td><input type="text" class="volonte_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Abstraction :</td>
-                <td><input type="text" class="abstraction_experience"></td>
-                <td></td>
-                <td><input type="text" class="abstraction_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="abstraction_score"></td>
-                <td></td>
-                <td><input type="text" class="abstraction_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Charisme :</td>
-                <td><input type="text" class="charisme_experience"></td>
-                <td></td>
-                <td><input type="text" disabled class="charisme_race"></td>
-                <td></td>
-                <td><input type="text" class="charisme_score"></td>
-                <td></td>
-                <td><input type="text" class="charisme_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Niveau mental :</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="niveau_mental_score" disabled></td>
-                <td></td>
-                <td><input type="text" class="niveau_mental_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td colspan="8">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Adaptation :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="adaptation_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="adaptation_score"></td>
-                <td></td>
-                <td><input type="text" class="adaptation_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Combat :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="combat_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="combat_score"></td>
-                <td></td>
-                <td><input type="text" class="combat_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Foi :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="foi_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="foi_score"></td>
-                <td></td>
-                <td><input type="text" class="foi_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Magie :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="magie_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="magie_score"></td>
-                <td></td>
-                <td><input type="text" class="magie_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Memoire :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="memoire_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="memoire_score"></td>
-                <td></td>
-                <td><input type="text" class="memoire_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Telepathie :</td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="telepathie_race" disabled></td>
-                <td></td>
-                <td><input type="text" class="telepathie_score"></td>
-                <td></td>
-                <td><input type="text" class="telepathie_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td colspan="8">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Sixieme sens :</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="sixieme_sens_score" disabled></td>
-                <td></td>
-                <td><input type="text" class="sixieme_sens_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td>Coordination :</td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td><input type="text" class="coordination_score" disabled></td>
-                <td></td>
-                <td><input type="text" class="coordination_ajustement" disabled></td>
-            </tr>
-            <tr>
-                <td colspan="8">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="8">
-                    <input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;" class="ambidextre">
-                    Ambidextre
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="div_model_1" style="display: none; position: fixed; z-index: 1050; width: 227px; box-sizing: border-box;">
-        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-            <colgroup>
-                <col style="width: 1%;">
-                <col style="width: auto;">
-                <col style="width: 1%;">
-                <col style="width: 1%;">
-            </colgroup>
-            <tr>
-                <td>PdV :&nbsp;</td>
-                <td><input type="text" class="pdv_monstre"></td>
-                <td>Puissance physique :&nbsp;</td>
-                <td><input type="text" class="puissance_physique_monstre"></td>
-            </tr>
-            <tr>
-                <td>Fatigue :&nbsp;</td>
-                <td><input type="text" class="fatigue_monstre"></td>
-                <td>Vivacité physique :&nbsp;</td>
-                <td><input type="text" class="vivacite_physique2_monstre"></td>
-            </tr>
-            <tr>
-                <td>Initiative :&nbsp;</td>
-                <td><input type="text" class="initiative_monstre"></td>
-                <td>Puissance mentale :&nbsp;</td>
-                <td><input type="text" class="puissance_mentale_monstre"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Agressivité :&nbsp;</td>
-                <td><input type="text" class="agressivite_monstre"></td>
-                <td>Sociabilité :&nbsp;</td>
-                <td><input type="text" class="sociabilite_monstre"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Esquive :&nbsp;</td>
-                <td><input type="text" class="esquive_monstre"></td>
-                <td>Feinte de corps :&nbsp;</td>
-                <td><input type="text" class="feinte_de_corps_monstre"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td>Attaque 1 :&nbsp;</td>
-                <td><input type="text" class="attaque_1_monstre"></td>
-                <td>Coeff. dommages 1 :&nbsp;</td>
-                <td><input type="text" class="coefficient_dommages_1_monstre"></td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
-                        class="bool_parade_1_monstre" checked>Parade 1 :&nbsp;</td>
-                <td><input type="text" class="parade_1_monstre"></td>
-                <td>Bonus dommages 1 :&nbsp;</td>
-                <td><input type="text" class="bonus_dommages_1_monstre"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
-                        class="bool_attaque_2_monstre" checked>Attaque 2 :&nbsp;</td>
-                <td><input type="text" class="attaque_2_monstre"></td>
-                <td>Coeff. dommages 2 :&nbsp;</td>
-                <td><input type="text" class="coefficient_dommages_2_monstre"></td>
-            </tr>
-            <tr>
-                <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
-                        class="bool_parade_2_monstre" checked>Parade 2 :&nbsp;</td>
-                <td><input type="text" class="parade_2_monstre"></td>
-                <td>Bonus dommages 2 :&nbsp;</td>
-                <td><input type="text" class="bonus_dommages_2_monstre"></td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <textarea class="capacites_monstre" rows="18" placeholder="Capacites..."
-                        style="width: 97%; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0;"></textarea>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="div_model_2" style="display: none; position: fixed; z-index: 1050; width: 227px; box-sizing: border-box;">
-        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-            <colgroup>
-                <col style="width: 1%;">
-                <col style="width: auto;">
-                <col style="width: auto;">
-                <col style="width: auto;">
-            </colgroup>
-            <tr>
-                <td>Type de magie :&nbsp;</td>
-                <td colspan="3">
-                    <select class="type_de_magie" style="font-size: x-small; box-sizing: border-box; width: 98%;">
-                        <option value="classique">Classique</option>
-                        <option value="religieuse">Religieuse</option>
-                        <option value="sans">Sans magie</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Liste de prêtre :&nbsp;</td>
-                <td colspan="3"><select class="liste_pretre"
-                        style="font-size: x-small; box-sizing: border-box; width: 98%;">
-                        <option value="">--</option>
-                        <option value="air">air</option>
-                        <option value="controle">contrôle de soi</option>
-                        <option value="surnaturelles">créatures surnaturelles</option>
-                        <option value="magie">magie pure</option>
-                        <option value="metamorphoses">métamorphose</option>
-                        <option value="nature">nature</option>
-                        <option value="terre">terre</option>
-                        <option value="lumiere">lumière et électricité</option>
-                        <option value="detections">détections</option>
-                        <option value="illusions">illusion</option>
-                        <option value="esprits">maîtrise des esprits</option>
-                        <option value="isolement">isolement</option>
-                        <option value="feu">feu</option>
-                        <option value="froid">froid</option>
-                        <option value="eau">eau</option>
-                        <option value="harmonie">harmonie</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td>Concentration :&nbsp;</td>
-                <td colspan="3" style="display: flex; align-items: left;">
-                    <input type="text" class="concentration_divers_communs">&nbsp;
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <table
-                        style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-                        <colgroup>
-                            <col style="width: 1%;">
-                            <col style="width: auto;">
-                            <col style="width: 1%;">
-                            <col style="width: 45px;">
-                        </colgroup>
-                        <tr>
-                            <td style="font-weight: bold;">Armure :&nbsp;</td>
-                            <td></td>
-                            <td>Bras gauche :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_brasg_divers_communs">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Tête :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_tete_divers_communs">
-                                </div>
-                            </td>
-                            <td>Bras droit :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_brasd_divers_communs">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Poitrine :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_poitrine_divers_communs">
-                                </div>
-                            </td>
-                            <td>Jambe droite :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_jambed_divers_communs">
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Abdomen :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_abdomen_divers_communs">
-                                </div>
-                            </td>
-                            <td>Jambe gauche :&nbsp;</td>
-                            <td>
-                                <div style="display: flex; align-items: left;">
-                                    <input type="text" class="armure_jambeg_divers_communs">
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <hr>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="4">
-                    <div class="div_divers_communs" style="overflow-y: auto;">
-                        <table class="table_divers_communs" style="box-sizing: border-box;">
-                            <colgroup>
-                                <col style="width: 1%;">
-                                <col style="width: auto;">
-                            </colgroup>
-                            <tr>
-                                <th></th>
-                                <th style="text-align: center;">Degrés</th>
-                            </tr>
-                        </table>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div id="div_buttons_model"
-        style="position: fixed; z-index: 1050; font-size: x-small; width: 155px; box-sizing: border-box; display: none;">
-        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-            <tr>
-                <td style="width: 1%;">Modèle :&nbsp;</td>
-                <td>
-                    <select class="model_select" style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <td style="width: 1%;">Nom :&nbsp;</td>
-                <td>
-                    <input type="text" class="nom_model"
-                        style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                </td>
+                <td>Nom :</td>
+                <td><input type="text" class="nom_model"
+                        style="font-size: x-small; box-sizing: border-box; width: 100%; text-align: left;"> </td>
             </tr>
             <tr>
                 <td colspan="2">
                     <div style="width: 100%; display: flex; justify-content: space-between;">
-                        <button class="retour" style="font-size: x-small; margin-top: 5px;">Retour</button>
-                        <button class="switch_type_model"
-                            style="font-size: x-small; margin-top: 5px; background-color: rgb(255, 32, 32);">Monstre</button>
+                        <button class="retour"
+                            style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Retour</button>
+                        <button class="dupliquer"
+                            style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Dupliquer</button>
+                        <button class="supprimer"
+                            style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Supprimer</button>
                     </div>
                 </td>
             </tr>
         </table>
-    </div>
 
-    <div id="div_buttons_dupliquer_model"
-        style="position: fixed; z-index: 1050; font-size: x-small; width: 227px; box-sizing: border-box; text-align: right; display: inline-block;">
-        <button class="dupliquer" style="font-size: x-small;">Dupliquer</button>
-    </div>
+        <div id="div_model_0" style="display: none; z-index: 1025; background-color: white;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <colgroup>
+                    <col style="width: auto;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                    <col style="width: 1px;">
+                </colgroup>
+                <tr>
+                    <td colspan="9">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Race :&nbsp;<select class="race_select"
+                                    style="font-size: x-small; box-sizing: border-box;">
+                                    <option value="humain">Humain</option>
+                                    <option value="aquante">Aquante</option>
+                                    <option value="elfe">Elfe</option>
+                                    <option value="gnome">Gnome</option>
+                                    <option value="nain">Nain</option>
+                                    <option value="orc">Orc</option>
+                                    <option value="troll">Troll</option>
+                                    <option value="toutlisse">Toutlisse</option>
+                                    <option value="autre">Autre</option>
+                                </select></span>
+                            <button class="switch_type_model"
+                                style="font-size: x-small; background-color: rgb(255, 32, 32);">Convertir
+                                en Monstre</button>
+                        </div>
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;">Base</td>
+                    <td></td>
+                    <td style="text-align: center;">Race</td>
+                    <td></td>
+                    <td style="text-align: center;">Exp</td>
+                    <td></td>
+                    <td style="text-align: center;">Score</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Force :</td>
+                    <td style="text-align: center;"><input type="text" class="force_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="force_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="force_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="force_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Constitution :</td>
+                    <td style="text-align: center;"><input type="text" class="constitution_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="constitution_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="constitution_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="constitution_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Vivacité physique :</td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_physique_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_physique_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_physique_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_physique_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Perception :</td>
+                    <td style="text-align: center;"><input type="text" class="perception_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="perception_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="perception_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="perception_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">Niveau physique :</td>
+                    <td style="text-align: center;"><input type="text" class="niveau_physique_score" disabled></td>
+                </tr>
+                <tr>
+                    <td colspan="9">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Vivacité mentale :</td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Volonté :</td>
+                    <td style="text-align: center;"><input type="text" class="volonte_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="volonte_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="volonte_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="volonte_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Abstraction :</td>
+                    <td style="text-align: center;"><input type="text" class="abstraction_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="abstraction_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="abstraction_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="abstraction_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Charisme :</td>
+                    <td style="text-align: center;"><input type="text" class="charisme_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="charisme_race" disabled></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="charisme_experience"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="charisme_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">Niveau mental :</td>
+                    <td style="text-align: center;"><input type="text" class="niveau_mental_score" disabled></td>
+                </tr>
+                <tr>
+                    <td colspan="9">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Adaptation :</td>
+                    <td style="text-align: center;"><input type="text" class="adaptation_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="adaptation_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="adaptation_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Combat :</td>
+                    <td style="text-align: center;"><input type="text" class="combat_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="combat_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="combat_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Foi :</td>
+                    <td style="text-align: center;"><input type="text" class="foi_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="foi_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="foi_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Magie :</td>
+                    <td style="text-align: center;"><input type="text" class="magie_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="magie_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="magie_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Memoire :</td>
+                    <td style="text-align: center;"><input type="text" class="memoire_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="memoire_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="memoire_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>Telepathie :</td>
+                    <td style="text-align: center;"><input type="text" class="telepathie_base"></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="telepathie_race" disabled></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="text-align: center;"><input type="text" class="telepathie_score" disabled></td>
+                </tr>
+                <tr>
+                    <td colspan="9">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">Sixieme sens :</td>
+                    <td style="text-align: center;"><input type="text" class="sixieme_sens_score" disabled></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td colspan="6">Coordination :</td>
+                    <td style="text-align: center;"><input type="text" class="coordination_score" disabled></td>
+                </tr>
+            </table>
+        </div>
 
+        <div id="div_model_1" style="display: none; z-index: 1025; background-color: white;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <colgroup>
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <td colspan="4" style="vertical-align: bottom; text-align: right;">
+                        <button class="switch_type_model"
+                            style="font-size: x-small; margin-top: 5px; margin-bottom: 5px; background-color: rgb(128, 128, 255);">Convertir
+                            en Humanoide</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Seuil de blessures :&nbsp;</td>
+                    <td><input type="text" class="seuil_blessures_monstre"></td>
+                    <td>&nbsp;&nbsp;Puissance physique :&nbsp;</td>
+                    <td><input type="text" class="puissance_physique_monstre"></td>
+                </tr>
+                <tr>
+                    <td>Fatigue :&nbsp;</td>
+                    <td><input type="text" class="fatigue_monstre"></td>
+                    <td>&nbsp;&nbsp;Vivacité physique :&nbsp;</td>
+                    <td><input type="text" class="vivacite_physique2_monstre"></td>
+                </tr>
+                <tr>
+                    <td>Initiative :&nbsp;</td>
+                    <td><input type="text" class="initiative_monstre"></td>
+                    <td>&nbsp;&nbsp;Puissance mentale :&nbsp;</td>
+                    <td><input type="text" class="puissance_mentale_monstre"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Agressivité :&nbsp;</td>
+                    <td><input type="text" class="agressivite_monstre"></td>
+                    <td>&nbsp;&nbsp;Sociabilité :&nbsp;</td>
+                    <td><input type="text" class="sociabilite_monstre"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Esquive :&nbsp;</td>
+                    <td><input type="text" class="esquive_monstre"></td>
+                    <td>&nbsp;&nbsp;Feinte de corps :&nbsp;</td>
+                    <td><input type="text" class="feinte_de_corps_monstre"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Attaque 1 :&nbsp;</td>
+                    <td><input type="text" class="attaque_1_monstre"></td>
+                    <td>&nbsp;&nbsp;Coeff. dommages 1 :&nbsp;</td>
+                    <td><input type="text" class="coefficient_dommages_1_monstre"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
+                            class="bool_parade_1_monstre" checked>Parade 1 :&nbsp;</td>
+                    <td><input type="text" class="parade_1_monstre"></td>
+                    <td>&nbsp;&nbsp;Bonus dommages 1 :&nbsp;</td>
+                    <td><input type="text" class="bonus_dommages_1_monstre"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
+                            class="bool_attaque_2_monstre" checked>Attaque 2 :&nbsp;</td>
+                    <td><input type="text" class="attaque_2_monstre"></td>
+                    <td>&nbsp;&nbsp;Coeff. dommages 2 :&nbsp;</td>
+                    <td><input type="text" class="coefficient_dommages_2_monstre"></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" style="margin: 0 3px 0 -1px; vertical-align: middle;"
+                            class="bool_parade_2_monstre" checked>Parade 2 :&nbsp;</td>
+                    <td><input type="text" class="parade_2_monstre"></td>
+                    <td>&nbsp;&nbsp;Bonus dommages 2 :&nbsp;</td>
+                    <td><input type="text" class="bonus_dommages_2_monstre"></td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4" style="text-align: center;">
+                        <textarea class="capacites_monstre" placeholder="Capacites..."
+                            style="width: 99%; box-sizing: border-box; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0; overflow-y: auto;"></textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="div_model_2" style="display: none; z-index: 1025; background-color: white;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <colgroup>
+                    <col style="width: 1px;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <td>Type de magie :&nbsp;</td>
+                    <td>
+                        <div style="display: flex; justify-content: space-between;">
+                            <select class="type_de_magie" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="classique">Classique</option>
+                                <option value="religieuse">Religieuse</option>
+                                <option value="sans">Sans magie</option>
+                            </select>
+                            <span>Concentration :&nbsp;<input type="text" class="concentration_divers_communs"
+                                    disabled></span>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Liste de prêtre :&nbsp;</td>
+                    <td><select class="liste_pretre" style="font-size: x-small; box-sizing: border-box;">
+                            <option value="">--</option>
+                            <option value="air">Air</option>
+                            <option value="controle">Contrôle de soi</option>
+                            <option value="surnaturelles">Créatures surnaturelles</option>
+                            <option value="detections">Détections</option>
+                            <option value="eau">Eau</option>
+                            <option value="feu">Feu</option>
+                            <option value="froid">Froid</option>
+                            <option value="harmonie">Harmonie</option>
+                            <option value="illusions">Illusion</option>
+                            <option value="isolement">Isolement</option>
+                            <option value="lumiere">Lumière et électricité</option>
+                            <option value="magie">Magie pure</option>
+                            <option value="esprits">Maîtrise des esprits</option>
+                            <option value="metamorphoses">Métamorphose</option>
+                            <option value="nature">Nature</option>
+                            <option value="terre">Terre</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <hr>
+                        <table
+                            style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                            <colgroup>
+                                <col style="width: auto;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                            </colgroup>
+                            <tr>
+                                <td></td>
+                                <td style="font-weight: bold;">Armure :&nbsp;</td>
+                                <td></td>
+                                <td>&nbsp;Bras gauche :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_brasg_divers_communs">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Tête :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_tete_divers_communs">
+                                    </div>
+                                </td>
+                                <td>&nbsp;Bras droit :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_brasd_divers_communs">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Abdomen :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_abdomen_divers_communs">
+                                    </div>
+                                </td>
+                                <td>&nbsp;Jambe gauche :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_jambeg_divers_communs">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Poitrine :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_poitrine_divers_communs">
+                                    </div>
+                                </td>
+                                <td>&nbsp;Jambe droite :&nbsp;</td>
+                                <td>
+                                    <div style="display: flex; align-items: left;">
+                                        <input type="text" class="armure_jambed_divers_communs">
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <div class="div_divers_communs" style="overflow-y: auto;">
+                            <table class="table_divers_communs" style="box-sizing: border-box;">
+                                <colgroup>
+                                    <col style="width: 100%;">
+                                    <col style="width: 1px;">
+                                    <col style="width: 1px;">
+                                    <col style="width: 1px;">
+                                </colgroup>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th style="text-align: center;">Degrés</th>
+                                    <th style="text-align: center;">Score</th>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div id="div_model_3" style="display: none; z-index: 1025; background-color: white;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <colgroup>
+                    <col style="width: 100px;">
+                    <col style="width: 1px;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                </colgroup>
+                <tr>
+                    <td colspan="2">
+                        <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>
+                        <div id="div_cout" style="width: 100%; display: flex; justify-content: flex-end;">
+                            <table style="border-collapse: collapse; border-spacing: 0px; margin-right: 5px;">
+                                <tr>
+                                    <td style="border-left: none; border-top: none;"></td>
+                                    <td style="font-weight: bold;">Création</td>
+                                    <td style="font-weight: bold;">&nbsp;&nbsp;Final&nbsp;&nbsp;</td>
+                                </tr>
+                                <tr>
+                                    <td>Attributs :</td>
+                                    <td class="attributs_creation_cout"></td>
+                                    <td class="attributs_cout"></td>
+                                </tr>
+                                <tr>
+                                    <td>Dons :</td>
+                                    <td class="dons_creation_cout"></td>
+                                    <td style="background-color: lightgray;"></td>
+                                </tr>
+                                <tr>
+                                    <td>Avantages / Désavantages :</td>
+                                    <td class="avantages_creation_cout"></td>
+                                    <td class="avantages_cout"></td>
+                                </tr>
+                                <tr>
+                                    <td>Compétences :</td>
+                                    <td style="background-color: lightgray;"></td>
+                                    <td class="competences_cout"></td>
+                                </tr>
+                                <tr>
+                                    <td>Magie classique :</td>
+                                    <td style="background-color: lightgray;"></td>
+                                    <td class="magie_classique_cout"></td>
+                                </tr>
+                                <tr>
+                                    <td>Magie religieuse :</td>
+                                    <td style="background-color: lightgray;"></td>
+                                    <td class="magie_religieuse_cout"></td>
+                                </tr>
+                                <tr>
+                                    <td>Départ :</td>
+                                    <td>-2000</td>
+                                    <td style="background-color: lightgray;"></td>
+                                </tr>
+                                <tr>
+                                    <td>Total :</td>
+                                    <td class="total_creation_cout"></td>
+                                    <td class="total_cout"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="white-space: normal; text-align: center;">
+                        <div style="display: flex; justify-content: center;">
+                            <span class="remarques_cout_attributs" style="display: none; color: rgb(255, 32, 32);">
+                                Le coût de l'amélioration des attributs par l'expérience doit être inférieur ou égal à
+                                25% du coût total.</span>
+                            <span class="remarques_cout_avantages" style="display: none; color: rgb(255, 32, 32);">
+                                Le coût de l'achat d'avantages doit être inférieur ou égal à 25% du coût total.</span>
+                        </div>
+                        <hr>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
@@ -1588,268 +1653,6 @@
         </div>
     </div>
 </div>
-
-<!-- === MODALE DE DÉTAILS DU MODÈLE PJ === -->
-<dialog id="dialog_model" style="font-size: x-large; text-align: right;">
-    <span style="position: absolute; top: 0px; right: 5px; cursor: pointer; font-size: 1.5em; line-height: 1;"
-        onclick="dialog_model.close();">&times;</span>
-    <h2 class="nom_model" style="width: 100%; font-size: x-large; text-align: center;">Nom du modèle</h2>
-    <table>
-        <tr>
-            <td style="vertical-align: top;">
-                <table style="white-space: nowrap;">
-                    <tr>
-                        <td></td>
-                        <td style="text-align: center;">Race</td>
-                        <td></td>
-                        <td style="text-align: center;">Exp</td>
-                        <td></td>
-                        <td style="text-align: center;">Score</td>
-                        <td></td>
-                        <td style="text-align: center;">Ajust</td>
-                    </tr>
-                    <tr>
-                        <td>Force :</td>
-                        <td><input type="text" disabled class="force_race"></td>
-                        <td></td>
-                        <td><input type="text" class="force_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="force_score"></td>
-                        <td></td>
-                        <td><input type="text" class="force_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Constitution :</td>
-                        <td><input type="text" disabled class="constitution_race"></td>
-                        <td></td>
-                        <td><input type="text" class="constitution_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="constitution_score"></td>
-                        <td></td>
-                        <td><input type="text" class="constitution_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Vivacité physique :</td>
-                        <td><input type="text" disabled class="vivacite_physique_race"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_physique_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_physique_score"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_physique_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Perception :</td>
-                        <td><input type="text" disabled class="perception_race"></td>
-                        <td></td>
-                        <td><input type="text" class="perception_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="perception_score"></td>
-                        <td></td>
-                        <td><input type="text" class="perception_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Niveau physique :</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="text" class="niveau_physique_score" disabled></td>
-                        <td></td>
-                        <td><input type="text" class="niveau_physique_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td colspan="8">
-                            <hr>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Vivacité mentale :</td>
-                        <td><input type="text" disabled class="vivacite_mentale_race"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_mentale_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_mentale_score"></td>
-                        <td></td>
-                        <td><input type="text" class="vivacite_mentale_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Volonté :</td>
-                        <td><input type="text" disabled class="volonte_race"></td>
-                        <td></td>
-                        <td><input type="text" class="volonte_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="volonte_score"></td>
-                        <td></td>
-                        <td><input type="text" class="volonte_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Abstraction :</td>
-                        <td><input type="text" disabled class="abstraction_race"></td>
-                        <td></td>
-                        <td><input type="text" class="abstraction_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="abstraction_score"></td>
-                        <td></td>
-                        <td><input type="text" class="abstraction_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Charisme :</td>
-                        <td><input type="text" class="charisme_race" disabled></td>
-                        <td></td>
-                        <td><input type="text" class="charisme_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="charisme_score"></td>
-                        <td></td>
-                        <td><input type="text" class="charisme_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Niveau mental :</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="text" class="niveau_mental_score" disabled></td>
-                        <td></td>
-                        <td><input type="text" class="niveau_mental_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td colspan="8">
-                            <hr>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-            <td style="vertical-align: top;">
-                <table style="white-space: nowrap;">
-                    <tr>
-                        <td></td>
-                        <td style="text-align: center;">Race</td>
-                        <td></td>
-                        <td style="text-align: center;">Exp</td>
-                        <td></td>
-                        <td style="text-align: center;">Score</td>
-                        <td></td>
-                        <td style="text-align: center;">Ajust</td>
-                    </tr>
-                    <tr>
-                        <td>Adaptation :</td>
-                        <td><input type="text" disabled class="adaptation_race"></td>
-                        <td></td>
-                        <td><input type="text" class="adaptation_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="adaptation_score"></td>
-                        <td></td>
-                        <td><input type="text" class="adaptation_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Combat :</td>
-                        <td><input type="text" disabled class="combat_race"></td>
-                        <td></td>
-                        <td><input type="text" class="combat_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="combat_score"></td>
-                        <td></td>
-                        <td><input type="text" class="combat_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Foi :</td>
-                        <td><input type="text" disabled class="foi_race"></td>
-                        <td></td>
-                        <td><input type="text" class="foi_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="foi_score"></td>
-                        <td></td>
-                        <td><input type="text" class="foi_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Magie :</td>
-                        <td><input type="text" disabled class="magie_race"></td>
-                        <td></td>
-                        <td><input type="text" class="magie_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="magie_score"></td>
-                        <td></td>
-                        <td><input type="text" class="magie_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Memoire :</td>
-                        <td><input type="text" disabled class="memoire_race"></td>
-                        <td></td>
-                        <td><input type="text" class="memoire_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="memoire_score"></td>
-                        <td></td>
-                        <td><input type="text" class="memoire_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Telepathie :</td>
-                        <td><input type="text" disabled class="telepathie_race"></td>
-                        <td></td>
-                        <td><input type="text" class="telepathie_experience"></td>
-                        <td></td>
-                        <td><input type="text" class="telepathie_score"></td>
-                        <td></td>
-                        <td><input type="text" class="telepathie_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td colspan="8">
-                            <hr>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Sixieme sens :</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="text" class="sixieme_sens_score" disabled></td>
-                        <td></td>
-                        <td><input type="text" class="sixieme_sens_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Coordination :</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td><input type="text" class="coordination_score" disabled></td>
-                        <td></td>
-                        <td><input type="text" class="coordination_ajustement" disabled></td>
-                    </tr>
-                    <tr>
-                        <td>Race :</td>
-                        <td colspan="7" style="text-align: left;">
-                            &nbsp;<select class="race_select" style="font-size: x-large; width: 95%;">
-                                <option value="humain">Humain</option>
-                                <option value="aquablue">Aquablue</option>
-                                <option value="elfe">Elfe</option>
-                                <option value="gnome">Gnome</option>
-                                <option value="nain">Nain</option>
-                                <option value="orc">Orc</option>
-                                <option value="troll">Troll</option>
-                                <option value="toutlisse">Toutlisse</option>
-                                <option value="autre">Autre</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Magie :</td>
-                        <td colspan="7" style="text-align: left;">
-                            &nbsp;<select class="magie_select" style="font-size: x-large; width: 95%;">
-                                <option value="classique">Classique</option>
-                                <option value="religieuse">Religieuse</option>
-                                <option value="sans">Sans magie</option>
-                            </select>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-    <button onclick="dialog_model.close();" style="font-size: x-large;">Fermer</button>
-    <button class="sauvegarder" style="margin-right: 12px; font-size: x-large;">Sauvegarder</button>
-</dialog>
 
 <!-- === DIALOGUE DE PARAMÈTRAGE D'UN SORT === -->
 <!-- Fenêtre pour choisir les paramètres d'un sort (fatigue, concentration) -->

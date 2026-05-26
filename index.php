@@ -219,6 +219,7 @@
             $js = "Competences[$index] = new Competence({\n";
             $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
             $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
+            $js .= "    Don: " . toJS($row['Don'], 'null') . ",\n";
             $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
             $js .= "    Base: " . toJS($row['Base'], 'int2') . "\n";
             $js .= "});\n";
@@ -420,6 +421,10 @@
                 document.getElementById("joueur").appendChild(nouvelleOption);
             }
         }
+
+        // Initialisation du pion et du modèle lorsque les compétences sont chargées
+        initialise_pion();
+        initialise_model();
 
         // === Initialisation du jeu pour les tests ===
         // ============================================

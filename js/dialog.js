@@ -305,43 +305,27 @@ function delete_etat(i) {
 }
 
 function switch_pion_model(visible) {
-  document.getElementById('canvas_zoom_pion').style.display = 'block';
-  if (typeof window.trace_ligne_general_pdv === 'function') {
-    requestAnimationFrame(() => window.trace_ligne_general_pdv());
+  if (visible) {
+    m_model = null;
+    document.getElementById('div_pion').style.display = 'block';
+    document.getElementById('div_model').style.display = 'none';
+    document.getElementById('div_model_0').style.display = 'none';
+    document.getElementById('div_model_1').style.display = 'none';
+    document.getElementById('div_model_2').style.display = 'none';
+    document.getElementById('div_model_3').style.display = 'none';
   }
-
-  document.getElementById('zoom_pion_tabs').style.display = visible ? 'none' : 'flex';
-  document.getElementById('div_model_0').style.display = visible ? 'none' : 'block';
-  document.getElementById('div_model_1').style.display = visible ? 'none' : 'block';
-  document.getElementById('div_model_2').style.display = visible ? 'none' : 'block';
-  document.getElementById('div_buttons_model').style.display = visible ? 'none' : 'block';
-  document.getElementById('div_buttons_dupliquer_model').style.display = visible ? 'none' : 'block';
-
-  if (visible) m_model = null;
-
-  document.getElementById("zoom_pion_tabs").querySelectorAll(".tab-zoom-pion").forEach((tab) => {
-    tab.classList.remove("active");
-    if (tab.dataset.tab === "0") {
-      tab.classList.add("active");
-    }
-  });
-
-  // Affichage de la figurine (du modèle)
-  const fig = document.querySelector('#zoom_pion .figurine');
-  fig.style.display = 'block';
-  if (m_model) fig.src = 'images/Figurines/' + m_model.Nom_model + '.png' + "?t=" + new Date().getTime();
-  else if (m_pion) fig.src = 'images/Figurines/' + m_pion.Model + '.png' + "?t=" + new Date().getTime();
-  else fig.style.display = 'none';
-  fig.onload = function () {
-    Map.generateHexMap();
-    Map.drawHexMap();
-  };
+  else {
+    m_model = Models.find((m) => m.Nom_model === m_pion.Model);
+    document.getElementById('div_pion').style.display = 'none';
+    document.getElementById('div_model').style.display = 'block';
+    if (m_model.Is_monster) document.getElementById('div_model_1').style.display = 'block';
+    else document.getElementById('div_model_0').style.display = 'block';
+  }
 }
 
 /**
  * Affichage du détails des champs du pion lors de l'affichage de l'image zoom du pion
  */
-initialise_pion();
 function initialise_pion() {
   /**
    * Callback pour la gestion des inputs des cases à cocher des zones de blessures
@@ -349,7 +333,7 @@ function initialise_pion() {
    */
   function input_cb_blessures(event) {
     const model_object = Models.find((x) => x.Nom_model === m_pion.Model);
-    const seuil_blessures = model_object.get_seuil_blessures();
+    const seuil_blessures = model_object.get("seuil_blessures");
     let zone = event.target.classList.item(0).slice(0, -3);
     zone = zone.charAt(0).toUpperCase() + zone.slice(1);
 
@@ -377,7 +361,7 @@ function initialise_pion() {
         if (m_pion[zone] >= 3 * seuil_blessures) m_pion[zone] = 3 * seuil_blessures - 1;
       }
     }
-    document.querySelector("#zoom_pion ." + zone.toLowerCase() + "_pdv").value = m_pion[zone];
+    document.querySelector("#div_pion ." + zone.toLowerCase() + "_pdv").value = m_pion[zone];
     set_nb_blessures();
   }
 
@@ -386,157 +370,79 @@ function initialise_pion() {
   switch_pion_model(true);
 
   // Mise à jour des points de vie (général)
-  document.querySelector("#zoom_pion .general_pdv").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .general_pdv").addEventListener("input", function (event) {
     m_pion.General = event.target.value;
     set_nb_blessures();
   });
 
   ["general", "tete", "brasg", "brasd", "poitrine", "abdomen", "jambeg", "jambed"].forEach(zone => {
-    document.querySelector("#zoom_pion ." + zone + "_X1").addEventListener("input", input_cb_blessures);
-    document.querySelector("#zoom_pion ." + zone + "_X2").addEventListener("input", input_cb_blessures);
-    if (zone === "general") document.querySelector("#zoom_pion .general_X3").addEventListener("input", input_cb_blessures);
-  });
+    document.querySelector("#div_pion ." + zone + "_X1").addEventListener("input", input_cb_blessures);
+    document.querySelector("#div_pion ." + zone + "_X2").addEventListener("input", input_cb_blessures);
+    if (zone === "general") document.querySelector("#div_pion .general_X3").addEventListener("input", input_cb_blessures);
 
-  // Mise à jour des points de vie et de l'armure (tête)
-  document.querySelector("#zoom_pion .tete_pdv").addEventListener("input", function (event) {
-    m_pion.Tete = event.target.value;
-    set_nb_blessures();
-  });
+    document.querySelector("#div_pion ." + zone + "_pdv").addEventListener("input", function (event) {
+      const zone = event.target.classList.item(0).replace("_pdv", "");
+      const cible = zone.charAt(0).toUpperCase() + zone.slice(1);
+      m_pion[cible] = event.target.value;
+      set_nb_blessures();
+    });
 
-  document.querySelector("#zoom_pion .tete_armure").addEventListener("input", function (event) {
-    m_pion.Armure_tete = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (bras gauche)
-  document.querySelector("#zoom_pion .brasg_pdv").addEventListener("input", function (event) {
-    m_pion.Brasg = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .brasg_armure").addEventListener("input", function (event) {
-    m_pion.Armure_brasg = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (bras droit)
-  document.querySelector("#zoom_pion .brasd_pdv").addEventListener("input", function (event) {
-    m_pion.Brasd = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .brasd_armure").addEventListener("input", function (event) {
-    m_pion.Armure_brasd = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (poitrine)
-  document.querySelector("#zoom_pion .poitrine_pdv").addEventListener("input", function (event) {
-    m_pion.Poitrine = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .poitrine_armure").addEventListener("input", function (event) {
-    m_pion.Armure_poitrine = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (abdomen)
-  document.querySelector("#zoom_pion .abdomen_pdv").addEventListener("input", function (event) {
-    m_pion.Abdomen = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .abdomen_armure").addEventListener("input", function (event) {
-    m_pion.Armure_abdomen = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (jambes gauche)
-  document.querySelector("#zoom_pion .jambeg_pdv").addEventListener("input", function (event) {
-    m_pion.Jambeg = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .jambeg_armure").addEventListener("input", function (event) {
-    m_pion.Armure_jambeg = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
-  });
-
-  // Mise à jour des points de vie et de l'armure (jambes droite)
-  document.querySelector("#zoom_pion .jambed_pdv").addEventListener("input", function (event) {
-    m_pion.Jambed = event.target.value;
-    set_nb_blessures();
-  });
-
-  document.querySelector("#zoom_pion .jambed_armure").addEventListener("input", function (event) {
-    m_pion.Armure_jambed = event.target.value;
-    document
-      .querySelector("#zoom_pion .general_armure")
-      .value = m_pion.armure_generale();
+    document.querySelector("#div_pion ." + zone + "_armure").addEventListener("input", function (event) {
+      const zone = event.target.classList.item(0).replace("_armure", "");
+      m_pion["Armure_" + zone] = event.target.value;
+      document.querySelector("#div_pion .general_armure").value = m_pion.armure_generale();
+    });
   });
 
   // Mise à jour de la concentration et de la fatigue
-  document.querySelector("#zoom_pion .concentration").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .concentration").addEventListener("input", function (event) {
     m_pion.Concentration = event.target.value;
   });
 
-  document.querySelector("#zoom_pion .fatigue").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .fatigue").addEventListener("input", function (event) {
     m_pion.Fatigue = event.target.value;
   });
 
   // Mise à jour du nom et de l'allié
-  document.querySelector("#zoom_pion .nom").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .nom").addEventListener("input", function (event) {
     m_pion.Titre = event.target.value;
   });
-  document.querySelector("#zoom_pion .allie").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .allie").addEventListener("input", function (event) {
     m_pion.Type = event.target.checked ? "allies" : "ennemis";
     Map.generateHexMap();
     Map.drawHexMap();
   });
 
   // Mise à jour du modele
-  document.querySelector("#zoom_pion .modele_link").addEventListener("click", function (event) {
+  document.querySelector("#div_pion .modele_link").addEventListener("click", function (event) {
     m_model = Models.find((m) => m.Nom_model === m_pion.Model);
     affiche_model();
   });
 
-  document.querySelector("#zoom_pion .modele").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .modele").addEventListener("input", function (event) {
     m_pion.Model = event.target.value;
-    document.querySelector("#zoom_pion .arme_principale").click();
+    document.querySelector("#div_pion .arme_principale").click();
     affiche_pion();
     Map.generateHexMap();
     Map.drawHexMap();
   });
 
   // Mise à jour de l'auto
-  document.querySelector("#zoom_pion .auto").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .auto").addEventListener("input", function (event) {
     m_pion.Auto = event.target.checked;
     Map.generateHexMap();
     Map.drawHexMap();
   });
 
   // Mise à jour de l'arme principale
-  document.querySelector("#zoom_pion .arme_principale").addEventListener("change", function (event) {
-    return document.querySelector("#zoom_pion .arme_principale").click();
+  document.querySelector("#div_pion .arme_principale").addEventListener("change", function (event) {
+    return document.querySelector("#div_pion .arme_principale").click();
   });
 
-  document.querySelector("#zoom_pion .arme_principale").addEventListener("click", function (event) {
+  document.querySelector("#div_pion .arme_principale").addEventListener("click", function (event) {
     // Vérifier si la souris est au-dessus du select au moment du clic
-    const arme1 = document.querySelector("#zoom_pion .arme_principale");
-    const arme2 = document.querySelector("#zoom_pion .arme_secondaire");
+    const arme1 = document.querySelector("#div_pion .arme_principale");
+    const arme2 = document.querySelector("#div_pion .arme_secondaire");
     const rect = arme1.getBoundingClientRect();
     const isClickInside =
       event.clientX >= rect.left &&
@@ -575,91 +481,175 @@ function initialise_pion() {
   });
 
   // Mise à jour de l'arme secondaire
-  document.querySelector("#zoom_pion .arme_secondaire").addEventListener("change", function (event) {
+  document.querySelector("#div_pion .arme_secondaire").addEventListener("change", function (event) {
     m_pion.Arme2 = event.target.value;
     info_armes();
   });
 
   // Mise à jour de la note
-  document.querySelector("#zoom_pion .note").addEventListener("input", function (event) {
+  document.querySelector("#div_pion .note").addEventListener("input", function (event) {
     m_pion.Note = event.target.value;
   });
 
   // Action sur le bouton de duplication du personnage
-  document.querySelector("#zoom_pion .dupliquer").addEventListener("click", function (event) {
+  document.querySelector("#div_pion .dupliquer").addEventListener("click", function (event) {
     m_pion.dupliquer();
+  });
+
+  // On fige les dimensions des zooms du pion, des div_model_0, div_model_1 et div_model_2
+  window.addEventListener("load", function () {
+    const pion = document.getElementById("div_pion");
+    const model = document.getElementById("div_model");
+    const div0 = document.getElementById("div_model_0");
+    const div1 = document.getElementById("div_model_1");
+    const div2 = document.getElementById("div_model_2");
+    const div3 = document.getElementById("div_model_3");
+
+    // Sauvegarde des styles actuels
+    const disp = pion.style.display;
+    const dism = model.style.display;
+    const dis0 = div0.style.display;
+    const dis1 = div1.style.display;
+    const dis2 = div2.style.display;
+    const dis3 = div3.style.display;
+
+    // Uniformisation de la largeur des panels
+    [pion, model, div0, div1, div2, div3].forEach((panel) => {
+      panel.style.display = "block";
+      panel.style.width = "auto";
+    });
+
+    let largeur = pion.offsetWidth;
+    if (model.offsetWidth > largeur) largeur = model.offsetWidth;
+    if (div0.offsetWidth > largeur) largeur = div0.offsetWidth;
+    if (div1.offsetWidth > largeur) largeur = div1.offsetWidth;
+    if (div2.offsetWidth > largeur) largeur = div2.offsetWidth;
+    if (div3.offsetWidth > largeur) largeur = div3.offsetWidth;
+
+    [pion, model].forEach((panel) => {
+      panel.style.width = largeur + "px";
+    });
+
+    // Uniformisation de la largeur des panels
+    // Masquage des capacités du monstre et des divers communs
+    div1.querySelector(".capacites_monstre").style.display = "none";
+    div2.querySelector(".div_divers_communs").style.display = "none";
+
+    [div0, div1, div2, div3].forEach((panel) => {
+      panel.style.display = "none";
+      panel.style.height = "auto";
+    });
+
+    let hauteur = pion.offsetHeight;
+    [div0, div1, div2, div3].forEach((panel) => {
+      panel.style.display = "block";
+      if (model.offsetHeight > hauteur) hauteur = model.offsetHeight;
+      panel.style.display = "none";
+    });
+
+    div1.style.display = "block";
+    const h1 = model.offsetHeight;
+    div1.style.display = "none";
+
+    div2.style.display = "block";
+    const h2 = model.offsetHeight;
+    div2.style.display = "none";
+
+    [pion, model].forEach((panel) => {
+      panel.style.height = (hauteur + 28) + "px"; // Pourquoi le +28 est nécessaire ?
+    });
+
+    // Réaffichage des capacités du monstre et des divers communs
+    div1.querySelector(".capacites_monstre").style.height = (hauteur - h1 - 9) + "px";
+    div1.querySelector(".capacites_monstre").style.display = "";
+    div2.querySelector(".div_divers_communs").style.height = (hauteur - h2 - 9) + "px";
+    div2.querySelector(".div_divers_communs").style.display = "";
+
+    // Mise à jour de la largeur des zones de blessures : input de largeur selon la taille du texte
+    ["general", "tete", "poitrine", "brasg", "brasd", "abdomen", "jambeg", "jambed"].forEach((el) => {
+      pion.querySelector("." + el).style.width = '0';
+      pion.querySelector("." + el).style.width = (pion.querySelector("." + el).scrollWidth + 8) + 'px';
+    });
+
+    // Restauration des styles sauvegardés
+    pion.style.display = disp;
+    model.style.display = dism;
+    div0.style.display = dis0;
+    div1.style.display = dis1;
+    div2.style.display = dis2;
+    div3.style.display = dis3;
   });
 }
 
 function set_nb_blessures() {
   const model_object = Models.find((x) => x.Nom_model === m_pion.Model);
-  const seuil_blessures = model_object.get_seuil_blessures();
+  const seuil_blessures = model_object.get("seuil_blessures");
   let nb_blessures = 0;
 
   ["general", "tete", "brasg", "brasd", "poitrine", "abdomen", "jambeg", "jambed"].forEach(zone => {
-    if (document.querySelector("#zoom_pion ." + zone + "_pdv").value >= seuil_blessures) {
-      document.querySelector("#zoom_pion ." + zone + "_X1").checked = true;
+    if (document.querySelector("#div_pion ." + zone + "_pdv").value >= seuil_blessures) {
+      document.querySelector("#div_pion ." + zone + "_X1").checked = true;
       nb_blessures++;
     }
     else {
-      document.querySelector("#zoom_pion ." + zone + "_X1").checked = false;
+      document.querySelector("#div_pion ." + zone + "_X1").checked = false;
     }
 
-    if (document.querySelector("#zoom_pion ." + zone + "_pdv").value >= 2 * seuil_blessures) {
-      document.querySelector("#zoom_pion ." + zone + "_X2").checked = true;
+    if (document.querySelector("#div_pion ." + zone + "_pdv").value >= 2 * seuil_blessures) {
+      document.querySelector("#div_pion ." + zone + "_X2").checked = true;
       nb_blessures++;
     }
     else {
-      document.querySelector("#zoom_pion ." + zone + "_X2").checked = false;
+      document.querySelector("#div_pion ." + zone + "_X2").checked = false;
     }
 
     if (zone === "general") {
-      if (document.querySelector("#zoom_pion .general_pdv").value >= 3 * seuil_blessures) {
-        document.querySelector("#zoom_pion .general_X3").checked = true;
+      if (document.querySelector("#div_pion .general_pdv").value >= 3 * seuil_blessures) {
+        document.querySelector("#div_pion .general_X3").checked = true;
         nb_blessures++;
       }
       else {
-        document.querySelector("#zoom_pion .general_X3").checked = false;
+        document.querySelector("#div_pion .general_X3").checked = false;
       }
     }
 
     // Mise à jour de la couleur de la zone
-    if (document.querySelector("#zoom_pion ." + zone + "_pdv").value == 0) {
-      document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'white';
+    if (document.querySelector("#div_pion ." + zone + "_pdv").value == 0) {
+      document.querySelector("#div_pion ." + zone).style.backgroundColor = 'white';
     }
-    else if (document.querySelector("#zoom_pion ." + zone + "_pdv").value < seuil_blessures) {
-      document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'lightgreen';
+    else if (document.querySelector("#div_pion ." + zone + "_pdv").value < seuil_blessures) {
+      document.querySelector("#div_pion ." + zone).style.backgroundColor = 'lightgreen';
     }
-    else if (document.querySelector("#zoom_pion ." + zone + "_pdv").value < 2 * seuil_blessures) {
+    else if (document.querySelector("#div_pion ." + zone + "_pdv").value < 2 * seuil_blessures) {
       if (zone === "general") {
-        document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'rgb(192, 192, 255)';
+        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'rgb(192, 192, 255)';
       }
       else {
-        document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'lightcoral';
+        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'lightcoral';
       }
     }
-    else if (document.querySelector("#zoom_pion ." + zone + "_pdv").value < 3 * seuil_blessures) {
+    else if (document.querySelector("#div_pion ." + zone + "_pdv").value < 3 * seuil_blessures) {
       if (zone === "general") {
-        document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'lightcoral';
+        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'lightcoral';
       }
       else {
-        document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'black';
+        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'black';
       }
     }
     else {
-      document.querySelector("#zoom_pion ." + zone).style.backgroundColor = 'black';
+      document.querySelector("#div_pion ." + zone).style.backgroundColor = 'black';
     }
   });
 
   // Vérification de l'aptitude au combat
   let apte = nb_blessures < model_object.Nb_blessures_max;
 
-  if (document.querySelector("#zoom_pion .tete_X2").checked) apte = false;
-  if (document.querySelector("#zoom_pion .poitrine_X2").checked) apte = false;
-  if (document.querySelector("#zoom_pion .abdomen_X2").checked) apte = false;
+  if (document.querySelector("#div_pion .tete_X2").checked) apte = false;
+  if (document.querySelector("#div_pion .poitrine_X2").checked) apte = false;
+  if (document.querySelector("#div_pion .abdomen_X2").checked) apte = false;
 
-  document.querySelector("#zoom_pion .msg_aptitude").textContent = apte ? "Apte au combat" : "Inapte au combat";
-  document.querySelector("#zoom_pion .msg_aptitude").style.color = apte ? "blue" : "red";
+  document.querySelector("#div_pion .msg_aptitude").textContent = apte ? "Apte au combat" : "Inapte au combat";
+  document.querySelector("#div_pion .msg_aptitude").style.color = apte ? "blue" : "red";
 }
 
 /**
@@ -678,57 +668,57 @@ function affiche_pion(col = null, row = null) {
   const model_object = Models.find((x) => x.Nom_model === m_pion.Model);
 
   // Mise à jour des seuils de blessures, nombre de blessures max et aptitude
-  document.querySelector("#zoom_pion .seuil_blessures").value = model_object.get_seuil_blessures();
-  document.querySelector("#zoom_pion .nb_blessures_max").value = model_object.Nb_blessures_max;
+  document.querySelector("#div_pion .seuil_blessures").value = model_object.get("seuil_blessures");
+  document.querySelector("#div_pion .nb_blessures_max").value = model_object.Nb_blessures_max;
 
   // Mise à jour des points de vie et de l'armure (général)
-  document.querySelector("#zoom_pion .general_pdv").value = m_pion.General;
-  document.querySelector("#zoom_pion .general_armure").value = m_pion.armure_generale();
+  document.querySelector("#div_pion .general_pdv").value = m_pion.General;
+  document.querySelector("#div_pion .general_armure").value = m_pion.armure_generale();
 
   // Mise à jour des points de vie et de l'armure (tête)
-  document.querySelector("#zoom_pion .tete_pdv").value = m_pion.Tete;
-  document.querySelector("#zoom_pion .tete_armure").value = m_pion.Armure_tete;
+  document.querySelector("#div_pion .tete_pdv").value = m_pion.Tete;
+  document.querySelector("#div_pion .tete_armure").value = m_pion.Armure_tete;
 
   // Mise à jour des points de vie et de l'armure (bras gauche)
-  document.querySelector("#zoom_pion .brasg_pdv").value = m_pion.Brasg;
-  document.querySelector("#zoom_pion .brasg_armure").value = m_pion.Armure_brasg;
+  document.querySelector("#div_pion .brasg_pdv").value = m_pion.Brasg;
+  document.querySelector("#div_pion .brasg_armure").value = m_pion.Armure_brasg;
 
   // Mise à jour des points de vie et de l'armure (bras droit)
-  document.querySelector("#zoom_pion .brasd_pdv").value = m_pion.Brasd;
-  document.querySelector("#zoom_pion .brasd_armure").value = m_pion.Armure_brasd;
+  document.querySelector("#div_pion .brasd_pdv").value = m_pion.Brasd;
+  document.querySelector("#div_pion .brasd_armure").value = m_pion.Armure_brasd;
 
   // Mise à jour des points de vie et de l'armure (poitrine)
-  document.querySelector("#zoom_pion .poitrine_pdv").value = m_pion.Poitrine;
-  document.querySelector("#zoom_pion .poitrine_armure").value = m_pion.Armure_poitrine;
+  document.querySelector("#div_pion .poitrine_pdv").value = m_pion.Poitrine;
+  document.querySelector("#div_pion .poitrine_armure").value = m_pion.Armure_poitrine;
 
   // Mise à jour des points de vie et de l'armure (abdomen)
-  document.querySelector("#zoom_pion .abdomen_pdv").value = m_pion.Abdomen;
-  document.querySelector("#zoom_pion .abdomen_armure").value = m_pion.Armure_abdomen;
+  document.querySelector("#div_pion .abdomen_pdv").value = m_pion.Abdomen;
+  document.querySelector("#div_pion .abdomen_armure").value = m_pion.Armure_abdomen;
 
   // Mise à jour des points de vie et de l'armure (jambes gauche)
-  document.querySelector("#zoom_pion .jambeg_pdv").value = m_pion.Jambeg;
-  document.querySelector("#zoom_pion .jambeg_armure").value = m_pion.Armure_jambeg;
+  document.querySelector("#div_pion .jambeg_pdv").value = m_pion.Jambeg;
+  document.querySelector("#div_pion .jambeg_armure").value = m_pion.Armure_jambeg;
 
   // Mise à jour des points de vie et de l'armure (jambes droite)
-  document.querySelector("#zoom_pion .jambed_pdv").value = m_pion.Jambed;
-  document.querySelector("#zoom_pion .jambed_armure").value = m_pion.Armure_jambed;
+  document.querySelector("#div_pion .jambed_pdv").value = m_pion.Jambed;
+  document.querySelector("#div_pion .jambed_armure").value = m_pion.Armure_jambed;
 
   set_nb_blessures();
 
   // Mise à jour de la concentration et de la fatigue
-  document.querySelector("#zoom_pion .concentration").value = m_pion.Concentration;
-  document.querySelector("#zoom_pion .concentration_max").value = model_object.Concentration;
-  document.querySelector("#zoom_pion .fatigue").value = m_pion.Fatigue;
-  document.querySelector("#zoom_pion .fatigue_max").value = model_object.get_fatigue();
+  document.querySelector("#div_pion .concentration").value = m_pion.Concentration;
+  document.querySelector("#div_pion .concentration_max").value = model_object.Concentration;
+  document.querySelector("#div_pion .fatigue").value = m_pion.Fatigue;
+  document.querySelector("#div_pion .fatigue_max").value = model_object.get("fatigue");
 
   // Mise à jour du nom
-  document.querySelector("#zoom_pion .nom").value = m_pion.Titre;
+  document.querySelector("#div_pion .nom").value = m_pion.Titre;
 
   // Mise à jour de l'allié
-  document.querySelector("#zoom_pion .allie").checked = m_pion.Type === "allies";
+  document.querySelector("#div_pion .allie").checked = m_pion.Type === "allies";
 
   // Mise à jour du modèle
-  const model = document.querySelector("#zoom_pion .modele");
+  const model = document.querySelector("#div_pion .modele");
   model.innerHTML = "";
   for (let i = 0; i < Models.length; i++) {
     let nouvelleOption = document.createElement("option");
@@ -739,10 +729,10 @@ function affiche_pion(col = null, row = null) {
   model.value = model_object.Nom_model;
 
   // Mise à jour de l'auto
-  document.querySelector("#zoom_pion .auto").checked = m_pion.Auto;
+  document.querySelector("#div_pion .auto").checked = m_pion.Auto;
 
   // Mise à jour de l'arme principale
-  const arme1 = document.querySelector("#zoom_pion .arme_principale");
+  const arme1 = document.querySelector("#div_pion .arme_principale");
 
   // Nettoyage des options existantes
   while (arme1.options.length > 0) arme1.removeChild(arme1.lastChild);
@@ -774,7 +764,7 @@ function affiche_pion(col = null, row = null) {
   arme1.value = m_pion.Arme1;
 
   // Mise à jour de l'arme secondaire
-  const arme2 = document.querySelector("#zoom_pion .arme_secondaire");
+  const arme2 = document.querySelector("#div_pion .arme_secondaire");
 
   // Nettoyage et ajout d'une option vide
   while (arme2.options.length > 0) arme2.removeChild(arme2.lastChild);
@@ -818,7 +808,7 @@ function affiche_pion(col = null, row = null) {
   info_armes();
 
   // Mise à jour de la note
-  document.querySelector("#zoom_pion .note").value = m_pion.Note;
+  document.querySelector("#div_pion .note").value = m_pion.Note;
 
   // Mise à jour du sortilège sélectionné
   if (m_pion.Nom_sort &&
@@ -831,29 +821,29 @@ function affiche_pion(col = null, row = null) {
       s.Nom_liste === m_pion.Nom_liste &&
       s.Nom_sort === m_pion.Nom_sort);
 
-    document.querySelector("#zoom_pion .info_secondaire").style.display = "none";
+    document.querySelector("#div_pion .info_secondaire").style.display = "none";
     arme2.style.display = "none";
 
-    document.querySelector("#zoom_pion .liste").textContent = sort.Nom_liste;
-    document.querySelector("#zoom_pion .liste").style.display = "";
-    document.querySelector("#zoom_pion .sort").textContent = sort.Nom_sort;
-    document.querySelector("#zoom_pion .sort").style.display = "";
-    document.querySelector("#zoom_pion .incantation").textContent =
+    document.querySelector("#div_pion .liste").textContent = sort.Nom_liste;
+    document.querySelector("#div_pion .liste").style.display = "";
+    document.querySelector("#div_pion .sort").textContent = sort.Nom_sort;
+    document.querySelector("#div_pion .sort").style.display = "";
+    document.querySelector("#div_pion .incantation").textContent =
       "(" + m_pion.Incantation + " s / " + expurger_temps_sort(sort.Incantation) + ")";
-    document.querySelector("#zoom_pion .incantation").style.display = "";
-    document.querySelector("#zoom_pion .info_principale").textContent = "";
-    document.querySelector("#zoom_pion .info_secondaire").textContent = "";
+    document.querySelector("#div_pion .incantation").style.display = "";
+    document.querySelector("#div_pion .info_principale").textContent = "";
+    document.querySelector("#div_pion .info_secondaire").textContent = "";
   }
   else {
-    document.querySelector("#zoom_pion .info_secondaire").style.display = "";
+    document.querySelector("#div_pion .info_secondaire").style.display = "";
     arme2.style.display = "";
-    document.querySelector("#zoom_pion .liste").style.display = "none";
-    document.querySelector("#zoom_pion .sort").style.display = "none";
-    document.querySelector("#zoom_pion .incantation").style.display = "none";
+    document.querySelector("#div_pion .liste").style.display = "none";
+    document.querySelector("#div_pion .sort").style.display = "none";
+    document.querySelector("#div_pion .incantation").style.display = "none";
   }
 
   // Mise à jour des états temporaires
-  const etats = document.querySelector("#zoom_pion .etats");
+  const etats = document.querySelector("#div_pion .etats");
   etats.innerHTML = "";
   const colgroup = document.createElement("colgroup");
   colgroup.innerHTML = `<col style="width: 1px;">
@@ -922,18 +912,15 @@ function affiche_pion(col = null, row = null) {
   }
 
   // Action sur le bouton de duplication du personnage
-  document.querySelector("#zoom_pion .dupliquer").disabled = model_object.Is_joueur;
+  document.querySelector("#div_pion .dupliquer").disabled = model_object.Is_joueur;
 
-  // Affichage de la figurine
-  const fig = document.querySelector('#zoom_pion .figurine');
+  // Affichage de la figurine du modèle
+  const fig = document.querySelector('#div_pion .figurine');
   fig.style.display = 'block';
+  fig.onload = function () { Map.generateHexMap(); Map.drawHexMap(); };
   if (m_model) fig.src = 'images/Figurines/' + m_model.Nom_model + '.png' + "?t=" + new Date().getTime();
   else if (m_pion) fig.src = 'images/Figurines/' + m_pion.Model + '.png' + "?t=" + new Date().getTime();
   else fig.style.display = 'none';
-  fig.onload = function () {
-    Map.generateHexMap();
-    Map.drawHexMap();
-  };
 }
 
 /**
@@ -2303,7 +2290,7 @@ function affiche_param_sort(sort) {
   dialog_sort_1.querySelector(".nom_sort").textContent = sort.Nom_sort;
   dialog_sort_1.querySelector(".fatigue_actuelle").value = m_pion.Fatigue;
   dialog_sort_1.querySelector(".concentration_actuelle").value = m_pion.Concentration;
-  dialog_sort_1.querySelector(".fatigue_max").textContent = model_object.get_fatigue();
+  dialog_sort_1.querySelector(".fatigue_max").textContent = model_object.get("fatigue");
   dialog_sort_1.querySelector(".concentration_max").textContent = model_object.Concentration;
   dialog_sort_1.querySelector(".fatigue_cout").value = sort.Niveau;
   dialog_sort_1.querySelector(".concentration_cout").value = sort.Niveau;
@@ -2540,7 +2527,11 @@ function affiche_confirm_sort() {
 function initialise_model_sub(competence) {
   const tr = document.createElement("tr");
   tr.style.height = "5px";
+
   let td = document.createElement("td");
+  tr.appendChild(td);
+
+  td = document.createElement("td");
 
   if (competence.Competence_majeure) {
     td.style.textAlign = "right";
@@ -2572,20 +2563,46 @@ function initialise_model_sub(competence) {
         .replace(/['`’\/]/g, '_')
         .replace(/\p{Diacritic}/gu, '')
         .toLowerCase()
-        .replace(" ", "_") + "_competence";
+        .replaceAll(" ", "_") + "_competence";
     td.appendChild(input);
   }
 
   td.style.padding = "0";
   tr.appendChild(td);
 
-  document.getElementById("div_model_2").querySelector(".table_divers_communs").appendChild(tr);
+  td = document.createElement("td");
+
+  if (competence.Nom_competence !== "Compétences mineures") {
+    const input = document.createElement("input");
+    if (!competence.Competence_majeure) {
+      td.style.paddingTop = "3px";
+      input.style.border = "2px solid black";
+    }
+    td.style.textAlign = "center";
+    input.type = "text";
+    input.style.textAlign = "center";
+    input.style.width = "17px";
+    input.disabled = true;
+    input.className =
+      competence.Nom_competence
+        .normalize('NFD')
+        .replace(/['`’\/]/g, '_')
+        .replace(/\p{Diacritic}/gu, '')
+        .toLowerCase()
+        .replaceAll(" ", "_") + "_competence_score";
+    td.appendChild(input);
+  }
+
+  td.style.padding = "0";
+  tr.appendChild(td);
+
+  document.querySelector("#div_model_2 .table_divers_communs").appendChild(tr);
 }
 
 /**
  * Initialisation du modèle PJ
  */
-initialise_model();
+// initialise_model();
 function initialise_model() {
   // Remplissage de la liste des compétences connues avec les degrés du modèle
   Competences.forEach((competence) => {
@@ -2598,11 +2615,11 @@ function initialise_model() {
   // Ajout d'un trait horizontal pour séparer les compétences majeures des compétences mineures
   const tr = document.createElement("tr");
   const td = document.createElement("td");
-  td.colSpan = "2";
+  td.colSpan = "4";
   td.style.padding = "0";
   td.innerHTML = "<hr>";
   tr.appendChild(td);
-  document.getElementById("div_model_2").querySelector(".table_divers_communs").appendChild(tr);
+  document.querySelector("#div_model_2 .table_divers_communs").appendChild(tr);
 
   // Ajout des compétences mineures
   Competences.forEach((competence) => {
@@ -2612,134 +2629,80 @@ function initialise_model() {
     initialise_model_sub(competence);
   });
 
-  // Centre tous les inputs & met à jour les ajustements
-  for (i = 0; i < 3; i++) {
-    document.getElementById("div_model_" + i).querySelectorAll("input").forEach((input) => {
-      input.style.fontSize = "x-small";
-      if (input.disabled) input.style.backgroundColor = "lightgray";
-
-      if (input.className.includes("_experience") ||
-        input.className.includes("_race") ||
-        input.className.includes("_ajustement") ||
-        input.className.includes("_score") ||
-        input.className.includes("_monstre") ||
-        input.className.includes("_divers_communs")) {
-        input.style.textAlign = "center";
-        input.style.width = "17px";
-        input.closest("td").style.textAlign = "center";
-      }
-    });
-  }
-
-  // Positionnement des divs horizontalement
-  document.getElementById("div_model_0").style.left = 250 + 'px';
-  document.getElementById("div_model_1").style.left = 250 + 'px';
-  document.getElementById("div_model_2").style.left = 250 + 'px';
-  document.getElementById('div_buttons_dupliquer_model').style.left = 250 + 'px';
-  document.getElementById("div_buttons_model").style.left = 7 + 'px';
-
-  // Positionnement des divs verticalement
-  document.getElementById("div_model_0").style.top = 7 + 'px';
-  document.getElementById("div_model_1").style.top = 7 + 'px';
-  document.getElementById("div_model_2").style.top = 7 + 'px';
-  document.getElementById("div_buttons_model").style.top = 7 + 'px';
-  document.getElementById('div_buttons_dupliquer_model').style.bottom = 7 + 'px';
-
   // Gestion du changement du nom du modèle
-  document.getElementById("div_buttons_model").querySelector(".nom_model").addEventListener("input", function (event) {
-    const model_exists = Models.find((m) => m.Nom_model === this.value);
-    if (model_exists || this.value === "") {
-      this.style.backgroundColor = "rgb(255, 32, 32)";
-      event.stopPropagation();
-      return;
-    }
+  document.querySelectorAll(".nom_model").forEach((nom_model) => {
+    nom_model.addEventListener("input", function (event) {
+      const model_exists = Models.find((m) => m.Nom_model === this.value);
+      if (model_exists || this.value === "") {
+        this.style.backgroundColor = "rgb(255, 32, 32)";
+        event.stopPropagation();
+        return;
+      }
 
-    this.style.backgroundColor = "white";
-    Pions.forEach((pion) => {
-      if (pion.Model === m_model.Nom_model) pion.Model = this.value;
+      this.style.backgroundColor = "white";
+      Pions.forEach((pion) => {
+        if (pion.Model === m_model.Nom_model) pion.Model = this.value;
+      });
+
+      // Synchronisation avec le serveur
+      m_model.sendMessage("set_Nom_model", this.value);
+      setTimeout(() => { m_model.Image.src = "Images/Figurines/" + this.value + ".png"; }, 100);
+      m_model.Nom_model = this.value;
+
+      // Remplissage de la liste des modèles (à jour avec le nouveau nom du modèle)
+      const sel = this.closest("div").querySelector(".model_select");
+      sel.innerHTML = "";
+      Models.forEach((model) => {
+        const option = document.createElement("option");
+        option.value = model.Nom_model;
+        option.textContent = model.Nom_model;
+        sel.appendChild(option);
+      });
+      sel.value = m_model.Nom_model;
     });
-
-    // Synchronisation avec le serveur
-    m_model.sendMessage("set_Nom_model", this.value);
-    setTimeout(() => { m_model.Image.src = "Images/Figurines/" + this.value + ".png"; }, 100);
-    m_model.Nom_model = this.value;
-
-    // Remplissage de la liste des modèles (à jour avec le nouveau nom du modèle)
-    div_buttons_model.querySelector(".model_select").innerHTML = "";
-    Models.forEach((model) => {
-      const option = document.createElement("option");
-      option.value = model.Nom_model;
-      option.textContent = model.Nom_model;
-      div_buttons_model.querySelector(".model_select").appendChild(option);
-    });
-    div_buttons_model.querySelector(".model_select").value = m_model.Nom_model;
   });
 
   // Quand on change la race dans le modèle, on met à jour les attributs _race
-  document.getElementById("div_model_0").querySelector(".race_select").addEventListener("change", function () {
-    const div = document.getElementById("div_model_0");
-    const race = div.querySelector(".race_select").value;
+  document.querySelector("#div_model_0 .race_select").addEventListener("change", function () {
+    const race = document.querySelector("#div_model_0 .race_select").value;
     const attr = attributs_races[race];
 
     // Remplir les champs *_race de la modale
-    div.querySelector(".force_race").value = attr.force;
-    div.querySelector(".constitution_race").value = attr.constitution;
-    div.querySelector(".vivacite_physique_race").value = attr.vivacite_physique;
-    div.querySelector(".perception_race").value = attr.perception;
+    ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribute) => {
+      const val = attr[attribute];
+      document.querySelector("#div_model_0 ." + attribute + "_race").value = val > 0 ? "+" + val : (val < 0 ? val : "-");
+    });
 
-    div.querySelector(".vivacite_mentale_race").value = attr.vivacite_mentale;
-    div.querySelector(".volonte_race").value = attr.volonte;
-    div.querySelector(".abstraction_race").value = attr.abstraction;
-    div.querySelector(".charisme_race").value = attr.charisme;
-
-    div.querySelector(".adaptation_race").value = attr.adaptation;
-    div.querySelector(".combat_race").value = attr.combat;
-    div.querySelector(".foi_race").value = attr.foi;
-    div.querySelector(".magie_race").value = attr.magie;
-    div.querySelector(".memoire_race").value = attr.memoire;
-    div.querySelector(".telepathie_race").value = attr.telepathie;
+    // Simule un changement de base pour mettre à jour les autres champs
+    ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribut) => {
+      const event = new Event("input", { bubbles: true });
+      document.querySelector("#div_model_0 ." + attribut + "_base").dispatchEvent(event);
+    });
 
     m_model.Race = race;
     m_model.sendMessage("set_Race", race);
-
-    // Score en fond blanc/bleu/rouge selon les valeurs des attributs de la race
-    document.getElementById("div_model_0").querySelectorAll("input").forEach((input) => {
-      if (!input.className.includes("_race")) return;
-
-      const score_object = document.getElementById("div_model_0").querySelector(
-        `.${input.className.replace("_race", "_score")}`);
-
-      let event = new Event("input", { bubbles: true });
-      score_object.dispatchEvent(event);
-    });
-  });
-
-  document.getElementById("div_model_0").querySelector(".ambidextre").closest("td").addEventListener("click", function (event) {
-    m_model.Ambidextre = !m_model.Ambidextre;
-    m_model.sendMessage("set_Ambidextre", m_model.Ambidextre ? 1 : 0);
-    document.getElementById("div_model_0").querySelector(".ambidextre").checked = m_model.Ambidextre;
   });
 
   // Sélection manuelle de la parade 1
-  document.getElementById("div_model_1").querySelector(".bool_parade_1_monstre").addEventListener("change", function (event) {
+  document.querySelector("#div_model_1 .bool_parade_1_monstre").addEventListener("change", function (event) {
     const div = document.getElementById("div_model_1");
     div.querySelector(".parade_1_monstre").disabled = !event.target.checked;
   });
 
   // Sélection manuelle de la parade 1
-  document.getElementById("div_model_1").querySelector(".bool_parade_2_monstre").addEventListener("change", function (event) {
+  document.querySelector("#div_model_1 .bool_parade_2_monstre").addEventListener("change", function (event) {
     const div = document.getElementById("div_model_1");
     div.querySelector(".parade_2_monstre").disabled = !event.target.checked;
   });
 
   // Sélection manuelle de la parade 1
-  document.getElementById("div_model_1").querySelector(".capacites_monstre").addEventListener("input", function (event) {
+  document.querySelector("#div_model_1 .capacites_monstre").addEventListener("input", function (event) {
     m_model.Capacites = event.target.value;
     m_model.sendMessage("set_Capacites", m_model.Capacites);
   });
 
   // sélection manuelle de l'attaque 2
-  document.getElementById("div_model_1").querySelector(".bool_attaque_2_monstre").addEventListener("change", function (event) {
+  document.querySelector("#div_model_1 .bool_attaque_2_monstre").addEventListener("change", function (event) {
     const div = document.getElementById("div_model_1");
     div.querySelector(".attaque_2_monstre").disabled = !event.target.checked;
     div.querySelector(".bool_parade_2_monstre").disabled = !event.target.checked;
@@ -2750,41 +2713,33 @@ function initialise_model() {
   });
 
   // sélection du type de magie
-  document.getElementById("div_model_2").querySelector(".type_de_magie").addEventListener("change", function (event) {
+  document.querySelector("#div_model_2 .type_de_magie").addEventListener("change", function (event) {
     const div = document.getElementById("div_model_2");
-
-    let maxHeight = 290;
-    switch (event.target.value) {
-      case "classique":
-        div.querySelector(".liste_pretre").closest("tr").style.display = "";
-        maxHeight += div.querySelector(".liste_pretre").closest("tr").offsetHeight;
-
-        div.querySelector(".liste_pretre").closest("tr").style.display = "none";
-        div.querySelector(".concentration_divers_communs").closest("tr").style.display = "";
-        break;
-      case "religieuse":
-        div.querySelector(".liste_pretre").closest("tr").style.display = "";
-        div.querySelector(".concentration_divers_communs").closest("tr").style.display = "";
-        maxHeight += 0;
-        break;
-      case "sans":
-        div.querySelector(".liste_pretre").closest("tr").style.display = "";
-        div.querySelector(".concentration_divers_communs").closest("tr").style.display = "";
-        maxHeight += div.querySelector(".liste_pretre").closest("tr").offsetHeight;
-        maxHeight += div.querySelector(".concentration_divers_communs").closest("tr").offsetHeight;
-
-        div.querySelector(".liste_pretre").closest("tr").style.display = "none";
-        div.querySelector(".concentration_divers_communs").closest("tr").style.display = "none";
-        break;
-    }
-    div.querySelector(".div_divers_communs").style.maxHeight = maxHeight + "px";
-
     m_model.Magie_type = event.target.value;
     m_model.sendMessage("set_Magie_type", m_model.Magie_type);
+    div.querySelector(".concentration_divers_communs").value = m_model.get("concentration");
+
+    switch (event.target.value) {
+      case "classique":
+        div.querySelector(".liste_pretre").closest("tr").style.visibility = "hidden";
+        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "visible";
+        div.querySelector(".concentration_divers_communs").disabled = true;
+
+        break;
+      case "religieuse":
+        div.querySelector(".liste_pretre").closest("tr").style.visibility = "visible";
+        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "visible";
+        div.querySelector(".concentration_divers_communs").disabled = false;
+        break;
+      case "sans":
+        div.querySelector(".liste_pretre").closest("tr").style.visibility = "hidden";
+        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "hidden";
+        break;
+    }
   });
 
   // sélection du liste prêtre
-  document.getElementById("div_model_2").querySelector(".liste_pretre").addEventListener("change", function (event) {
+  document.querySelector("#div_model_2 .liste_pretre").addEventListener("change", function (event) {
     if (event.target.value === "") {
       m_model.Liste_pretre = "";
     }
@@ -2795,12 +2750,10 @@ function initialise_model() {
     m_model.sendMessage("set_Liste_pretre", m_model.Liste_pretre);
   });
 
-  // Gestion du changement des scores et des expériences
-  for (i = 0; i < 3; i++) {
+  // Gestion du changement des valeurs de champs
+  for (i = 0; i < 4; i++) {
     document.getElementById("div_model_" + i).addEventListener("input", function (event) {
-      const div = event.target.closest("div");
-
-      if (!event.target.className.includes("_score") &&
+      if (!event.target.className.includes("_base") &&
         !event.target.className.includes("_experience") &&
         !event.target.className.includes("_monstre") &&
         !event.target.className.includes("_divers_communs") &&
@@ -2834,26 +2787,21 @@ function initialise_model() {
       let value = parseInt(event.target.value);
       if (isNaN(value)) value = 0;
 
-      attribut = "";
-      if (event.target.className.includes("_score")) {
-        attribut = event.target.className.replace("_score", "");
-      }
-      else if (event.target.className.includes("_monstre")) {
-        attribut = event.target.className.replace("_monstre", "");
-      }
-      else if (event.target.className.includes("_divers_communs")) {
-        attribut = event.target.className.replace("_divers_communs", "");
-      }
-      else if (event.target.className.includes("_experience")) {
-        attribut = event.target.className;
-      }
-      attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-      m_model.sendMessage("set_" + attribut, value);
+      attribut = event.target.className;
+      attribut = attribut.replace("_base", "");
+      attribut = attribut.replace("_monstre", "");
+      attribut = attribut.replace("_divers_communs", "");
 
-      if (!event.target.disabled && attribut !== "") {
-        if (attribut in m_model) m_model[attribut] = value;
-        else console.error("Attribut non trouvé : ", attribut);
+      let att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+      m_model.sendMessage("set_" + att_name, value);
+
+      if (!event.target.disabled && att_name !== "" && !event.target.className.includes("_competence")) {
+        if (att_name in m_model) m_model[att_name] = value;
+        else console.error("Attribut non trouvé : ", att_name);
       }
+
+      attribut = attribut.replace("_base", "");
+      attribut = attribut.replace("_experience", "");
 
       // Traitement des input de competence majeure et mineure
       if (event.target.className.includes("_competence")) {
@@ -2865,7 +2813,7 @@ function initialise_model() {
               .replace(/['`’\/]/g, '_')
               .replace(/\p{Diacritic}/gu, '')
               .toLowerCase()
-              .replace(" ", "_") + "_competence") {
+              .replaceAll(" ", "_") + "_competence") {
             Nom_competence = competence.Nom_competence;
           }
         });
@@ -2886,108 +2834,119 @@ function initialise_model() {
           m_model.sendMessage("set_Degres", competence_connue);
           competence_connue.Degres = event.target.value;
         }
+
+        // On met à jour le score de la compétence connue et de ses descendants s'il y en a
+        document.querySelector("#div_model_2 ." +
+          Nom_competence.normalize('NFD')
+            .replace(/['`’\/]/g, '_')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .replaceAll(" ", "_") + "_competence_score"
+        ).value = m_model.get_score(Nom_competence);
+        Competences.filter((c) => c.Competence_majeure === Nom_competence).forEach((c) => {
+          document.querySelector("#div_model_2 ." +
+            c.Nom_competence.normalize('NFD')
+              .replace(/['`’\/]/g, '_')
+              .replace(/\p{Diacritic}/gu, '')
+              .toLowerCase()
+              .replaceAll(" ", "_") + "_competence_score"
+          ).value = m_model.get_score(c.Nom_competence);
+        });
       }
 
-      // La suite ne s'applique que si c'est un score (div0)
-      if (!event.target.className.includes("_score")) return;
+      // La suite ne s'applique que si c'est une base ou une experience (div0)
+      if (!event.target.className.includes("_base") && !event.target.className.includes("_experience")) return;
 
-      // On affiche en bleu les valeurs inférieure à 3 (avec race), en rouge les valeurs supérieure à 18 (avec race)
-      const ajustement_race_object = div.querySelector(
-        `.${event.target.className.replace("_score", "_race")}`);
-      if (!ajustement_race_object) return;
+      // On affiche en bleu les valeurs inférieure à 3, en rouge les valeurs supérieure à 18
+      const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
+      let val1 = parseInt(target_base.value || 0);
 
-      const score = parseInt(event.target.value);
-      const ajustement_race = parseInt(ajustement_race_object.value);
-      if (score - ajustement_race < 3) event.target.style.backgroundColor = "rgb(128, 128, 255)";
-      else if (score - ajustement_race > 18) event.target.style.backgroundColor = "rgb(255, 32, 32)";
-      else event.target.style.backgroundColor = "white";
+      if (val1 < 3) target_base.style.backgroundColor = "rgb(128, 128, 255)";
+      else if (val1 > 18) target_base.style.backgroundColor = "rgb(255, 32, 32)";
+      else target_base.style.backgroundColor = "";
 
-      // On calcule l'ajustement
-      div.querySelector(`.${event.target.className.replace("_score", "_ajustement")}`).value =
-        Math.floor((parseInt(event.target.value) - 10) / 2);
+      if (["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme"].includes(attribut)) {
+        const target_exp = document.querySelector("#div_model_0 ." + attribut + "_experience");
+        const delta = parseInt(target_exp.value || 0);
+        const val2 = val1 + delta;
+        if (val2 > 18 && delta > 0) target_exp.style.backgroundColor = "rgb(255, 32, 32)";
+        else if (val2 < 3 && delta < 0) target_exp.style.backgroundColor = "rgb(128, 128, 255)";
+        else target_exp.style.backgroundColor = "";
+      }
+
+      // On met à jour le score de l'attribut
+      document.querySelector("#div_model_0 ." + attribut + "_score").value =
+        (parseInt(document.querySelector("#div_model_0 ." + attribut + "_base").value) || 0) +
+        (parseInt(document.querySelector("#div_model_0 ." + attribut + "_race").value) || 0);
+
+      if (["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme"].includes(attribut)) {
+        document.querySelector("#div_model_0 ." + attribut + "_score").value =
+          (parseInt(document.querySelector("#div_model_0 ." + attribut + "_score").value) || 0) +
+          (parseInt(document.querySelector("#div_model_0 ." + attribut + "_experience").value) || 0);
+      }
 
       // On met à jour les 4 éléments calculés et leur 4 ajustements
-      div.querySelector(".niveau_physique_score").value = Math.round((
-        parseInt(div.querySelector(".force_score").value) +
-        parseInt(div.querySelector(".constitution_score").value) +
-        parseInt(div.querySelector(".vivacite_physique_score").value) +
-        parseInt(div.querySelector(".perception_score").value)) / 4);
+      document.querySelector("#div_model_0 .niveau_physique_score").value = Math.round((
+        parseInt(document.querySelector("#div_model_0 .force_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .constitution_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .vivacite_physique_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .perception_score").value || 0)) / 4);
 
-      div.querySelector(".niveau_physique_ajustement").value = Math.floor((
-        div.querySelector(".niveau_physique_score").value - 10) / 2);
+      document.querySelector("#div_model_0 .niveau_mental_score").value = Math.round((
+        parseInt(document.querySelector("#div_model_0 .volonte_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .abstraction_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .vivacite_mentale_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .charisme_score").value || 0)) / 4);
 
-      div.querySelector(".niveau_mental_score").value = Math.round((
-        parseInt(div.querySelector(".volonte_score").value) +
-        parseInt(div.querySelector(".abstraction_score").value) +
-        parseInt(div.querySelector(".vivacite_mentale_score").value) +
-        parseInt(div.querySelector(".charisme_score").value)) / 4);
+      document.querySelector("#div_model_0 .coordination_score").value = Math.round((
+        parseInt(document.querySelector("#div_model_0 .vivacite_physique_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .perception_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .vivacite_mentale_score").value || 0)) / 3);
 
-      div.querySelector(".niveau_mental_ajustement").value = Math.floor((
-        div.querySelector(".niveau_mental_score").value - 10) / 2);
+      document.querySelector("#div_model_0 .sixieme_sens_score").value = Math.round((
+        parseInt(document.querySelector("#div_model_0 .adaptation_score").value || 0) +
+        parseInt(document.querySelector("#div_model_0 .perception_score").value || 0)) / 2);
+    });
 
-      div.querySelector(".coordination_score").value = Math.round((
-        parseInt(div.querySelector(".vivacite_physique_score").value) +
-        parseInt(div.querySelector(".perception_score").value) +
-        parseInt(div.querySelector(".vivacite_mentale_score").value)) / 3);
-
-      div.querySelector(".coordination_ajustement").value = Math.floor((
-        div.querySelector(".coordination_score").value - 10) / 2);
-
-      div.querySelector(".sixieme_sens_score").value = Math.round((
-        parseInt(div.querySelector(".adaptation_score").value) +
-        parseInt(div.querySelector(".perception_score").value)) / 2);
-
-      div.querySelector(".sixieme_sens_ajustement").value = Math.floor((
-        div.querySelector(".sixieme_sens_score").value - 10) / 2);
+    // Bouton de switch entre humanoide et monstre
+    if (i < 2) document.getElementById("div_model_" + i).querySelector(".switch_type_model").addEventListener("click", function (event) {
+      const div = document.getElementById("div_model");
+      m_model.Is_monster = !m_model.Is_monster;
+      if (!m_model.Is_monster) {
+        div.querySelector(".humanoid").style.display = 'none';
+        div.querySelector(".monstre").style.display = 'block';
+        div.querySelector(".humanoid").click();
+      }
+      else {
+        div.querySelector(".humanoid").style.display = 'block';
+        div.querySelector(".monstre").style.display = 'none';
+        div.querySelector(".monstre").click();
+      }
     });
   }
 
   // Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
-  document.getElementById("div_buttons_model").querySelector(".model_select").addEventListener("change", function (event) {
+  document.getElementById("div_model").querySelector(".model_select").addEventListener("change", function (event) {
     m_model = Models.find((m) => m.Nom_model === event.target.value);
     affiche_model();
   });
 
   // Bouton de retour au pion
-  document.getElementById("div_buttons_model").querySelector(".retour").addEventListener("click", function () {
+  document.getElementById("div_model").querySelector(".retour").addEventListener("click", function () {
     m_model = null;
     affiche_pion();
   });
 
-  // Bouton de switch entre humanoide et monstre
-  document.getElementById("div_buttons_model").querySelector(".switch_type_model").addEventListener("click", function (event) {
-    m_model.Is_monster = !m_model.Is_monster;
-
-    if (m_model.Is_monster) {
-      event.target.textContent = "Humanoides";
-      event.target.style.backgroundColor = "rgb(128, 128, 255)";
-      document.getElementById("tab-zoom-pion-humanoid").style.display = 'none';
-      document.getElementById("tab-zoom-pion-monstre").style.display = 'block';
-
-      if (document.getElementById("tab-zoom-pion-humanoid").classList.contains("active")) {
-        document.getElementById("tab-zoom-pion-monstre").click();
-      }
-    } else {
-      event.target.textContent = "Monstres";
-      event.target.style.backgroundColor = "rgb(255, 32, 32)";
-      document.getElementById("tab-zoom-pion-humanoid").style.display = 'block';
-      document.getElementById("tab-zoom-pion-monstre").style.display = 'none';
-
-      if (document.getElementById("tab-zoom-pion-monstre").classList.contains("active")) {
-        document.getElementById("tab-zoom-pion-humanoid").click();
-      }
-    }
-  });
-
   // Gestion des onglets du modèle
-  document.getElementById("zoom_pion_tabs").querySelectorAll(".tab-zoom-pion").forEach((tab) => {
+  document.querySelectorAll(".tab-model").forEach((tab) => {
     tab.addEventListener("click", function () {
       const tab_index = tab.dataset.tab;
       // tab_index === 0 : Carac. Humanoides
       // tab_index === 1 : Caract. Monstres
       // tab_index === 2 : Magie & Compétences
+      // tab_index === 3 : Avantages & Coûts
 
-      document.getElementById("zoom_pion_tabs").querySelectorAll(".tab-zoom-pion").forEach((tab) => {
+      document.querySelectorAll(".tab-model").forEach((tab) => {
         tab.classList.remove("active");
         if (tab.dataset.tab === tab_index) {
           tab.classList.add("active");
@@ -2997,6 +2956,14 @@ function initialise_model() {
       document.getElementById('div_model_0').style.display = 'none';
       document.getElementById('div_model_1').style.display = 'none';
       document.getElementById('div_model_2').style.display = 'none';
+      document.getElementById('div_model_3').style.display = 'none';
+
+      document.getElementById('div_model').style.display = 'block';
+
+      if (tab_index === "2") {
+        document.getElementById('div_model').querySelector(".humanoid").style.display = m_model.Is_monster ? 'none' : 'block';
+        document.getElementById('div_model').querySelector(".monstre").style.display = m_model.Is_monster ? 'block' : 'none';
+      }
 
       switch (tab_index) {
         case "0": // Carac. Humanoides
@@ -3008,69 +2975,75 @@ function initialise_model() {
         case "2": // Divers & Communs
           document.getElementById('div_model_2').style.display = 'block';
           break;
+        case "3": // Avantages & Coûts
+          document.getElementById('div_model_3').style.display = 'block';
+          break;
       }
     });
   });
 
   // Action sur le bouton de duplication du modèle
-  document.getElementById('div_buttons_dupliquer_model').querySelector(".dupliquer").addEventListener("click", function (event) {
-    m_model = m_model.dupliquer();
-    affiche_model();
+  document.querySelectorAll('.dupliquer').forEach((dupliquer) => {
+    dupliquer.addEventListener("click", function (event) {
+      m_model = m_model.dupliquer();
+      affiche_model();
+    });
   });
 
   // Gestion du changement de la figurine du modèle
-  const figImg = document.querySelector('#zoom_pion .figurine');
-  const inputFigurine = document.querySelector('#zoom_pion .input_figurine');
-  figImg.addEventListener("click", function () {
-    inputFigurine.click();
+  document.querySelectorAll('.figurine').forEach((figurine) => {
+    figurine.addEventListener("click", function () {
+      const inputFigurine = this.closest("div").querySelector(".input_figurine");
+      inputFigurine.click();
+    });
   });
-  inputFigurine.addEventListener("change", function () {
-    // Récupération du fichier sélectionné
-    const file = this.files[0];
-    if (!file || !file.type.startsWith("image/")) return;
-    // Libération de l'URL blob précédente pour éviter les fuites mémoire
-    const prevSrc = figImg.src;
-    if (prevSrc && prevSrc.startsWith("blob:")) URL.revokeObjectURL(prevSrc);
-    // Création d'une nouvelle URL blob pour l'image sélectionnée
-    const blobUrl = URL.createObjectURL(file);
-    figImg.src = blobUrl;
-    // Réinitialisation de l'input pour permettre de reselectionner le même fichier ou un autre
-    this.value = "";
 
-    // Upload de l'image sur le serveur
-    const nomModel = m_model ? m_model.Nom_model : (m_pion ? m_pion.Model : null);
-    if (nomModel) {
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("nom", nomModel);
-      fetch("upload.php", { method: "POST", body: formData })
-        .then((r) => r.text())
-        .then((text) => {
-          let data;
-          try {
-            data = JSON.parse(text);
-          } catch (e) {
-            console.warn("Upload figurine: le serveur n'a pas renvoyé du JSON. Réponse:", text.slice(0, 300));
+  document.querySelectorAll('.input_figurine').forEach((inputFigurine) => {
+    inputFigurine.addEventListener("change", function () {
+      // Récupération du fichier sélectionné
+      const file = this.files[0];
+      if (!file || !file.type.startsWith("image/")) return;
+      // Libération de l'URL blob précédente pour éviter les fuites mémoire
+      const prevSrc = figImg.src;
+      if (prevSrc && prevSrc.startsWith("blob:")) URL.revokeObjectURL(prevSrc);
+      // Création d'une nouvelle URL blob pour l'image sélectionnée
+      const blobUrl = URL.createObjectURL(file);
+      figImg.src = blobUrl;
+      // Réinitialisation de l'input pour permettre de reselectionner le même fichier ou un autre
+      this.value = "";
+
+      // Upload de l'image sur le serveur
+      const nomModel = m_model ? m_model.Nom_model : (m_pion ? m_pion.Model : null);
+      if (nomModel) {
+        const formData = new FormData();
+        formData.append("image", file);
+        formData.append("nom", nomModel);
+        fetch("upload.php", { method: "POST", body: formData })
+          .then((r) => r.text())
+          .then((text) => {
+            let data;
+            try {
+              data = JSON.parse(text);
+            } catch (e) {
+              console.warn("Upload figurine: le serveur n'a pas renvoyé du JSON. Réponse:", text.slice(0, 300));
+              URL.revokeObjectURL(blobUrl);
+              return;
+            }
+            if (data.ok) {
+              const m = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
+              m.Image = new Image();
+              m.Image.onload = function () { Map.generateHexMap(); Map.drawHexMap(); };
+              m.Image.src = data.path + "?t=" + new Date().getTime();
+              figImg.src = data.path + "?t=" + new Date().getTime();
+              URL.revokeObjectURL(blobUrl);
+            } else console.warn("Upload figurine:", data.message);
+          })
+          .catch((e) => {
+            console.warn("Upload figurine:", e);
             URL.revokeObjectURL(blobUrl);
-            return;
-          }
-          if (data.ok) {
-            const m = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
-            m.Image = new Image();
-            m.Image.onload = function () {
-              Map.generateHexMap();
-              Map.drawHexMap();
-            };
-            m.Image.src = data.path + "?t=" + new Date().getTime();
-            figImg.src = data.path + "?t=" + new Date().getTime();
-            URL.revokeObjectURL(blobUrl);
-          } else console.warn("Upload figurine:", data.message);
-        })
-        .catch((e) => {
-          console.warn("Upload figurine:", e);
-          URL.revokeObjectURL(blobUrl);
-        });
-    }
+          });
+      }
+    });
   });
 }
 
@@ -3078,52 +3051,35 @@ function initialise_model() {
  * Affichage du modèle PJ
  */
 function affiche_model() {
-  const div0 = document.getElementById("div_model_0");
-  const div1 = document.getElementById("div_model_1");
-  const div2 = document.getElementById("div_model_2");
-  const div_buttons_model = document.getElementById("div_buttons_model");
-
   // Masquage des éléments du zoom du pion
   switch_pion_model(false);
 
-  // Masquage du contenu des autres onglets
-  if (m_model.Is_monster) {
-    document.getElementById("tab-zoom-pion-monstre").style.display = 'block';
-    document.getElementById("tab-zoom-pion-humanoid").style.display = 'none';
-    document.getElementById("tab-zoom-pion-monstre").click();
-    div_buttons_model.querySelector(".switch_type_model").textContent = "Humanoides";
-    div_buttons_model.querySelector(".switch_type_model").style.backgroundColor = "rgb(128, 128, 255)";
-  }
-  else {
-    document.getElementById("tab-zoom-pion-humanoid").style.display = 'block';
-    document.getElementById("tab-zoom-pion-monstre").style.display = 'none';
-    document.getElementById("tab-zoom-pion-humanoid").click();
-    div_buttons_model.querySelector(".switch_type_model").textContent = "Monstre";
-    div_buttons_model.querySelector(".switch_type_model").style.backgroundColor = "rgb(255, 32, 32)";
-  }
+  m_model = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
 
   // Remplissage de la liste des modèles
-  div_buttons_model.querySelector(".model_select").innerHTML = "";
+  const model_select = document.querySelector("#div_model .model_select");
+  model_select.innerHTML = "";
   Models.forEach((model) => {
     const option = document.createElement("option");
     option.value = model.Nom_model;
     option.textContent = model.Nom_model;
-    div_buttons_model.querySelector(".model_select").appendChild(option);
+    model_select.appendChild(option);
   });
-  div_buttons_model.querySelector(".model_select").value = m_model.Nom_model;
+  model_select.value = m_model.Nom_model;
 
   // Réinitialisation du fond du champ de texte du nom du modèle
-  document.getElementById("div_buttons_model").querySelector(".nom_model").style.backgroundColor = "white";
+  const nom_model = document.querySelector("#div_model .nom_model");
+  nom_model.style.backgroundColor = "white";
+  nom_model.value = m_model.Nom_model;
 
   // Remplissage des champs du modèle
-  div_buttons_model.querySelector(".nom_model").value = m_model.Nom_model;
-  div0.querySelector(".race_select").value = m_model.Race.toLowerCase();
-  div1.querySelector(".capacites_monstre").value = m_model.Capacites;
-  div2.querySelector(".type_de_magie").value = m_model.Magie_type.toLowerCase();
+  document.querySelector("#div_model_0 .race_select").value = m_model.Race.toLowerCase();
+  document.querySelector("#div_model_1 .capacites_monstre").value = m_model.Capacites;
+  document.querySelector("#div_model_2 .type_de_magie").value = m_model.Magie_type.toLowerCase();
 
-  for (i = 0; i < 3; i++) {
+  for (i = 0; i < 4; i++) {
     document.getElementById("div_model_" + i).querySelectorAll("input").forEach((input) => {
-      if (!input.className.includes("_score") &&
+      if (!input.className.includes("_base") &&
         !input.className.includes("_experience") &&
         !input.className.includes("_monstre") &&
         !input.className.includes("_divers_communs") &&
@@ -3145,34 +3101,33 @@ function affiche_model() {
 
       if (input.type !== "text") return;
 
-      // Affectation de la valeur à l'attribut correspondant
-      attribut = "";
-      if (input.className.includes("_score")) {
-        attribut = input.className.replace("_score", "");
-      }
-      else if (input.className.includes("_experience")) {
-        attribut = input.className;
-      }
-      else if (input.className.includes("_divers_communs")) {
-        attribut = input.className.replace("_divers_communs", "");
-      }
-      else if (input.className.includes("_monstre")) {
-        attribut = input.className.replace("_monstre", "");
-      }
+      attribut = input.className;
+      attribut = attribut.replace("_base", "");
+      attribut = attribut.replace("_divers_communs", "");
+      attribut = attribut.replace("_monstre", "");
 
-      if (attribut !== "") {
-        attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-        if (!["Niveau_physique",
-          "Niveau_mental",
-          "Coordination",
-          "Sixieme_sens"].includes(attribut)) {
-          if (attribut in m_model) input.value = m_model[attribut];
-          else console.error("Attribut non trouvé : ", attribut);
-        }
+      // Affectation de la valeur à l'attribut correspondant
+      if (input.className.includes("_base") || input.className.includes("_experience")) {
+        let att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+        if (att_name in m_model) input.value = m_model[att_name];
+        else console.error("Attribut non trouvé : ", att_name);
       }
 
       // Traitement des input de competence majeure et mineure
-      if (input.className.includes("_competence")) {
+      if (input.className.includes("_competence_score")) {
+        Competences.forEach((competence) => {
+          if (input.className ===
+            competence.Nom_competence
+              .normalize('NFD')
+              .replace(/['`’\/]/g, '_')
+              .replace(/\p{Diacritic}/gu, '')
+              .toLowerCase()
+              .replaceAll(" ", "_") + "_competence_score") {
+            input.value = m_model.get_score(competence.Nom_competence);
+          }
+        });
+      }
+      else if (input.className.includes("_competence")) {
         let Nom_competence = "";
         Competences.forEach((competence) => {
           if (input.className ===
@@ -3181,7 +3136,7 @@ function affiche_model() {
               .replace(/['`’\/]/g, '_')
               .replace(/\p{Diacritic}/gu, '')
               .toLowerCase()
-              .replace(" ", "_") + "_competence") {
+              .replaceAll(" ", "_") + "_competence") {
             Nom_competence = competence.Nom_competence;
           }
         });
@@ -3202,34 +3157,23 @@ function affiche_model() {
     });
   }
 
-  div0.querySelector(".ambidextre").checked = m_model.Ambidextre;
+  // Simule un changement de race pour mettre à jour les attributs _race
+  let event = new Event("change", { bubbles: true });
+  document.querySelector("#div_model_0 .race_select").dispatchEvent(event);
 
-  div2.querySelector(".type_de_magie").value = m_model.Magie_type.toLowerCase();
+  document.querySelector("#div_model_2 .type_de_magie").value = m_model.Magie_type.toLowerCase();
 
   if (m_model.Liste_pretre) {
-    div2.querySelector(".liste_pretre").value = getShortName(m_model.Liste_pretre).toLowerCase();
+    document.querySelector("#div_model_2 .liste_pretre").value = getShortName(m_model.Liste_pretre).toLowerCase();
   }
   else {
-    div2.querySelector(".liste_pretre").value = "";
+    document.querySelector("#div_model_2 .liste_pretre").value = "";
   }
-  div2.querySelector(".concentration_divers_communs").value = m_model.Concentration;
+  document.querySelector("#div_model_2 .concentration_divers_communs").value = m_model.get("concentration");
 
   // Simule un changement de type de magie pour mettre à jour les autres champs
-  let event = new Event("change", { bubbles: true });
-  div2.querySelector(".type_de_magie").dispatchEvent(event);
-
-  // Centre tous les inputs & met à jour les ajustements
-  div0.querySelectorAll("input").forEach((input) => {
-    if (input.className.includes("_score")) {
-      // Simule un changement de score pour mettre à jour les ajustements
-      const event = new Event("input", { bubbles: true });
-      input.dispatchEvent(event);
-    }
-  });
-
-  // Simule un changement de race pour mettre à jour les attributs _race
   event = new Event("change", { bubbles: true });
-  div0.querySelector(".race_select").dispatchEvent(event);
+  document.querySelector("#div_model_2 .type_de_magie").dispatchEvent(event);
 
   Competences.forEach((competence) => {
     const class_name =
@@ -3238,8 +3182,8 @@ function affiche_model() {
         .replace(/['`’\/]/g, '_')
         .replace(/\p{Diacritic}/gu, '')
         .toLowerCase()
-        .replace(" ", "_") + "_divers_communs";
-    const input = div2.querySelector(class_name);
+        .replaceAll(" ", "_") + "_divers_communs";
+    const input = document.querySelector("#div_model_2 ." + class_name);
 
     if (input === null || typeof input === "undefined") return;
 
@@ -3252,15 +3196,44 @@ function affiche_model() {
   });
 
   // Affichage de la figurine du modèle
-  const fig = document.getElementById('zoom_pion').querySelector('.figurine');
-  fig.style.display = 'block';
-  if (m_model) fig.src = 'images/Figurines/' + m_model.Nom_model + '.png' + "?t=" + new Date().getTime();
-  else if (m_pion) fig.src = 'images/Figurines/' + m_pion.Model + '.png' + "?t=" + new Date().getTime();
-  else fig.style.display = 'none';
-  fig.onload = function () {
-    Map.generateHexMap();
-    Map.drawHexMap();
-  };
+  const figurine = document.querySelector("#div_model .figurine");
+  figurine.style.display = 'block';
+  figurine.onload = function () { Map.generateHexMap(); Map.drawHexMap(); };
+  if (m_model) figurine.src = 'images/Figurines/' + m_model.Nom_model + '.png' + "?t=" + new Date().getTime();
+  else if (m_pion) figurine.src = 'images/Figurines/' + m_pion.Model + '.png' + "?t=" + new Date().getTime();
+  else figurine.style.display = 'none';
+
+  document.querySelector("#div_model_3 .attributs_creation_cout").textContent = m_model.get_cout_attributs_creation();
+  document.querySelector("#div_model_3 .attributs_cout").textContent = m_model.get_cout_attributs();
+  document.querySelector("#div_model_3 .dons_creation_cout").textContent = m_model.get_cout_dons_creation();
+  document.querySelector("#div_model_3 .avantages_creation_cout").textContent = 0; // Création
+  document.querySelector("#div_model_3 .avantages_cout").textContent = 0; // Final
+  document.querySelector("#div_model_3 .competences_cout").textContent = m_model.get_cout_competences();
+  document.querySelector("#div_model_3 .magie_classique_cout").textContent = m_model.get_cout_sorts();
+  document.querySelector("#div_model_3 .magie_religieuse_cout").textContent = m_model.get_cout_concentration();
+
+  const total_creation_cout =
+    m_model.get_cout_attributs_creation() +
+    m_model.get_cout_dons_creation() +
+    0 + // Avantages/Désavantages Création
+    -2000;
+  document.querySelector("#div_model_3 .total_creation_cout").textContent = total_creation_cout;
+
+  const total_cout =
+    m_model.get_cout_attributs() +
+    m_model.get_cout_dons_creation() +
+    0 + // Avantages/Désavantages Final
+    m_model.get_cout_competences() +
+    m_model.get_cout_sorts() +
+    m_model.get_cout_concentration() +
+    -2000;
+  document.querySelector("#div_model_3 .total_cout").textContent = total_cout;
+
+  const cout_attributs = m_model.get_cout_attributs() - m_model.get_cout_attributs_creation();
+  document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = cout_attributs > total_cout * 0.25 ? "block" : "none";
+
+  const cout_avantages = 0 - 0; // Final - Création
+  document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = cout_avantages > total_cout * 0.25 ? "block" : "none";
 }
 
 // === ÉVÉNEMENTS GÉNÉRAUX ===

@@ -96,6 +96,26 @@ const shortName = Object.freeze({
   Harmonie: "Liste de l'harmonie",
 });
 
+// Tableau global contenant les don directeurs des listes de magie
+const don_directeur = Object.freeze({
+  Air: "magie",
+  Controle: "telepathie",
+  Surnaturelles: "foi",
+  Magie: "magie",
+  Metamorphoses: "adaptation",
+  Nature: "magie",
+  Terre: "magie",
+  Lumiere: "magie",
+  Detections: "telepathie",
+  Illusions: "magie",
+  Esprits: "magie",
+  Isolement: "memoire",
+  Feu: "magie",
+  Froid: "magie",
+  Eau: "magie",
+  Harmonie: "foi",
+});
+
 /**
  * Récupère le nom court d'une liste de magie à partir de son nom complet
  * @param {string} Nom_liste - Le nom de la liste de magie
@@ -108,6 +128,15 @@ function getShortName(Nom_liste) {
     }
   }
   return null;
+}
+
+/**
+ * Récupère le don directeur d'une liste de magie à partir de son nom complet
+ * @param {string} Nom_liste - Le nom de la liste de magie
+ * @returns {string} Le don directeur de la liste de magie
+ */
+function getDonDirecteur(Nom_liste) {
+  return don_directeur[getShortName(Nom_liste)];
 }
 
 /**
