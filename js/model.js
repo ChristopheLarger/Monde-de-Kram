@@ -185,40 +185,6 @@ const parametres_couts = {
   25: { cout: 1220, ajustement: 7, degres_gen: 8, degres_spe: 3, },
 };
 
-// Avantages
-const avantages = {
-  "Ambidextrie": { creation: false, cout: 2, },
-  "Beauté": { creation: true, cout: 3, },
-  "Bon sens": { creation: false, cout: 2, },
-  "Chance": { creation: false, cout: 3, },
-  "Combat contre plusieurs adversaires": { creation: false, cout: 6, },
-  "Don pour les langues": { creation: false, cout: 3, }, // Avec options
-  "Don pour la musique": { creation: false, cout: 2, }, // Avec options
-  "Double tir": { creation: false, cout: 6, },
-  "Empathie animale": { creation: true, cout: 2, },
-  "Guérison rapide": { creation: true, cout: 3, },
-  "Maitre": { creation: false, cout: -1, }, // Avec options
-  "Vue perçante": { creation: true, cout: 1, },
-  "Ouïe fine": { creation: true, cout: 1, },
-  "Odorat et goût supérieurs": { creation: true, cout: 1, },
-  "Orientation": { creation: false, cout: 2, },
-  "Prestance": { creation: false, cout: 3, },
-  "Race non-humaine": { creation: false, cout: -1, }, // Avec options
-  "Réflexes de combat": { creation: false, cout: 5, },
-  "Renommée": { creation: false, cout: -1, },
-  "Résistance à la douleur": { creation: false, cout: 5, },
-  "Résistance à la magie": { creation: false, cout: -1, }, // Avec options
-  "Richesse": { creation: false, cout: -1, }, // Avec options
-  "Roc mental": { creation: false, cout: 3, },
-  "Santé de fer": { creation: true, cout: 2, },
-  "Sens du danger": { creation: false, cout: 6, },
-  "Sens du temps": { creation: false, cout: 2, },
-  "Sixième sens": { creation: false, cout: -1, }, // Avec options
-  "Sort naturel": { creation: false, cout: -1, }, // Avec options
-  "Vision nocturne": { creation: true, cout: 4, },
-  "Vision périphérique": { creation: true, cout: 2, },
-};
-
 /**
  * Classe représentant un modèle de personnage
  */
@@ -408,7 +374,7 @@ class Model {
     });
     return res;
   }
-  
+
   /**
   * Calcul le coût des caractéristiques de base
   * @returns {number} - Coût des caractéristiques de base
@@ -426,13 +392,52 @@ class Model {
   * Calcul le coût des caractéristiques d'expérience
   * @returns {number} - Coût des caractéristiques d'expérience
   */
-  get_cout_attributs() {
-    let res = this.get_cout_attributs_creation();
+  get_cout_attributs_experience() {
+    let res = 0;
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme"].forEach((attrib) => {
       const att_name = attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase();
       res += 2 * (parametres_couts[this.get(attrib)].cout - parametres_couts[this[att_name]].cout);
     });
     return res;
+  }
+
+  /**
+ * Calcul du coût des avantages/désavantages de la création
+ */
+  get_cout_avantages_creation() {
+    let nb_points_cre = 0;
+    m_model = this;
+    document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
+      if (tr.querySelector(".selection_creation") === null) return;
+      if (!tr.querySelector(".selection_creation").checked) return;
+      nb_points_cre += parseInt(tr.querySelector(".cout").textContent);
+    });
+    return nb_points_cre;
+  }
+
+  /**
+   * Calcul du coût des avantages/désavantages de l'expérience
+   */
+  get_cout_avantages_experience() {
+    let nb_points_exp = 0;
+    m_model = this;
+    document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
+      if (tr.querySelector(".selection_experience") === null) return;
+      if (!tr.querySelector(".selection_experience").checked) return;
+      nb_points_exp += parseInt(tr.querySelector(".cout").textContent);
+    });
+    return nb_points_exp;
+  }
+
+  get_cout_desavantages_creation() {
+    let nb_points_cre = 0;
+    m_model = this;
+    document.querySelectorAll("#div_model_6 tr").forEach((tr) => {
+      if (tr.querySelector(".selection_creation") === null) return;
+      if (!tr.querySelector(".selection_creation").checked) return;
+      nb_points_cre += parseInt(tr.querySelector(".cout").textContent);
+    });
+    return nb_points_cre;
   }
 
   /**
@@ -478,13 +483,13 @@ class Model {
     return Math.round((this.get("vivacite_physique") + this.get("perception") + this.get("vivacite_mentale")) / 3);
   }
 
-    /**
-  * Calcul la coordination
-  * @returns {number} - Coordination
-  */
-    #get_niveau_physique() {
-      return Math.round((this.get("force") + this.get("constitution") + this.get("vivacite_physique") + this.get("perception")) / 4);
-    }
+  /**
+* Calcul la coordination
+* @returns {number} - Coordination
+*/
+  #get_niveau_physique() {
+    return Math.round((this.get("force") + this.get("constitution") + this.get("vivacite_physique") + this.get("perception")) / 4);
+  }
 
   /**
   * Récupère la valeur d'un attribut
@@ -498,14 +503,15 @@ class Model {
     if (attribute === "coordination") return this.#get_coordination();
     if (attribute === "niveau_physique") return this.#get_niveau_physique();
 
-    let value = this[attribute.slice(0, 1).toUpperCase() + attribute.slice(1).toLowerCase()];
+    let value = parseInt(this[attribute.slice(0, 1).toUpperCase() + attribute.slice(1).toLowerCase()]) || 0;
 
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attrib) => {
       if (attribute === attrib) {
-        value += this[attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase() + "_experience"];
-        value += attributs_races[this.Race][attrib];
+        value += parseInt(this[attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase() + "_experience"]) || 0;
+        value += parseInt(attributs_races[this.Race][attrib]) || 0;
       }
     });
+  
     return value;
   }
 
@@ -623,7 +629,7 @@ class Model {
       const cmp_majeure_connue = CompetencesConnues.find(comp => comp.Nom_model === this.Nom_model && comp.Nom_competence === cmp.Competence_majeure);
       let degres_majeure = 0;
       if (cmp_majeure_connue !== null && typeof cmp_majeure_connue !== "undefined") degres_majeure = parseInt(cmp_majeure_connue.Degres || 0);
-  
+
       switch (cmp_majeure.Attribut) {
         case "Co":
           return degres + degres_majeure + parametres_couts[this.get("coordination")].ajustement + cmp.Base + cmp_majeure.Base;
@@ -655,6 +661,88 @@ class Model {
     }
 
     return null;
+  }
+
+  /**
+  * Calcul l'ajustement d'un attribut
+  * @param {string} attribut - Attribut à ajuster
+  * @returns {number} - Ajustement de l'attribut
+  */
+  #get_ajustement(attribut) {
+    switch (attribut) {
+      case "Co":
+        return parametres_couts[this.get("coordination")].ajustement;
+      case "Co+VM":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_mentale")) / 2)].ajustement;
+      case "Co+VP":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_physique")) / 2)].ajustement;
+      case "Co+P":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("perception")) / 2)].ajustement;
+      case "Co+F":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("force")) / 2)].ajustement;
+      case "NP":
+        return parametres_couts[this.get("niveau_physique")].ajustement;
+      case "Ab":
+        return parametres_couts[this.get("abstraction")].ajustement;
+      case "V":
+        return parametres_couts[this.get("volonte")].ajustement;
+      case "VP":
+        return parametres_couts[this.get("vivacite_physique")].ajustement;
+      case "P+VM":
+        return parametres_couts[Math.round((this.get("perception") + this.get("vivacite_mentale")) / 2)].ajustement;
+      case "Ch":
+        return parametres_couts[this.get("charisme")].ajustement;
+      case "Co+V":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("volonte")) / 2)].ajustement;
+      case "Co+Ch":
+        return parametres_couts[Math.round((this.get("coordination") + this.get("charisme")) / 2)].ajustement;
+      default:
+        return 0;
+    }
+  }
+
+  /**
+  * Calcul le score d'une compétence
+  * @param {string} Nom_competence - Nom de la compétence
+  * @returns {number} - Score de la compétence
+  */
+  get_competence_score(Nom_competence) {
+    const classe = Nom_competence.normalize('NFD').replace(/\p{Diacritic}/gu, '').replaceAll(" ", "_").replaceAll("'", "_").toLowerCase();
+    let classe_maitre = null;
+    let tr = null;
+    let tr_maitre = null;
+
+    document.querySelectorAll("#div_model_5 tr").forEach((element) => {
+      if (element.classList.item(0) !== classe) return;
+      tr = element;
+      classe_maitre = element.classList.item(1);
+    });
+
+    document.querySelectorAll("#div_model_5 tr").forEach((element) => {
+      if (element.classList.item(0) !== classe_maitre) return;
+      tr_maitre = element;
+    });
+
+    const degres = tr.querySelector(".degres").value;
+    let attribut = tr.querySelectorAll("td")[2].textContent;
+    let base = tr.querySelectorAll("td")[4].textContent;
+
+    if (base === "" || base === "-") base = 0;
+    if (attribut === "") attribut = 0;
+
+    let score = parseInt(base) + parseInt(degres) + this.#get_ajustement(attribut);
+
+    if (classe_maitre !== null) {
+      const degres_maitre = tr_maitre.querySelector(".degres").value;
+      let attribut_maitre = tr_maitre.querySelectorAll("td")[2].textContent;
+      let base_maitre = tr_maitre.querySelectorAll("td")[4].textContent;
+
+      if (base_maitre === "" || base_maitre === "-") base_maitre = 0;
+      if (attribut_maitre === "") attribut_maitre = 0;
+
+      score += parseInt(base_maitre) + parseInt(degres_maitre) + this.#get_ajustement(attribut_maitre);
+    }
+    return score;
   }
 }
 

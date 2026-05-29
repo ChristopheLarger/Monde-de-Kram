@@ -33,7 +33,7 @@ class Sort {
     this.Sauvegarde = data.Sauvegarde || "";
     this.Zone = data.Zone || "";
     this.Description = data.Description || "";
-    this.Col = data.Col || 0;
+    this.Col = data.Col || 0; // Pour l'affichage du treeview
   }
 }
 

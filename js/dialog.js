@@ -309,17 +309,19 @@ function switch_pion_model(visible) {
     m_model = null;
     document.getElementById('div_pion').style.display = 'block';
     document.getElementById('div_model').style.display = 'none';
-    document.getElementById('div_model_0').style.display = 'none';
-    document.getElementById('div_model_1').style.display = 'none';
-    document.getElementById('div_model_2').style.display = 'none';
-    document.getElementById('div_model_3').style.display = 'none';
   }
   else {
     m_model = Models.find((m) => m.Nom_model === m_pion.Model);
     document.getElementById('div_pion').style.display = 'none';
     document.getElementById('div_model').style.display = 'block';
-    if (m_model.Is_monster) document.getElementById('div_model_1').style.display = 'block';
-    else document.getElementById('div_model_0').style.display = 'block';
+    if (m_model.Is_monster) {
+      document.getElementById('div_model_0').style.display = 'none';
+      document.getElementById('div_model_1').style.display = 'block';
+    }
+    else {
+      document.getElementById('div_model_0').style.display = 'block';
+      document.getElementById('div_model_1').style.display = 'none';
+    }
   }
 }
 
@@ -496,74 +498,73 @@ function initialise_pion() {
     m_pion.dupliquer();
   });
 
-  // On fige les dimensions des zooms du pion, des div_model_0, div_model_1 et div_model_2
+  // On fige les dimensions des zooms du pion, des div_model_X
   window.addEventListener("load", function () {
     const pion = document.getElementById("div_pion");
     const model = document.getElementById("div_model");
-    const div0 = document.getElementById("div_model_0");
-    const div1 = document.getElementById("div_model_1");
-    const div2 = document.getElementById("div_model_2");
-    const div3 = document.getElementById("div_model_3");
+    let divX = [];
+    for (let i = 0; i < 7; i++) divX.push(document.getElementById("div_model_" + i));
 
     // Sauvegarde des styles actuels
     const disp = pion.style.display;
     const dism = model.style.display;
-    const dis0 = div0.style.display;
-    const dis1 = div1.style.display;
-    const dis2 = div2.style.display;
-    const dis3 = div3.style.display;
+    let disX = [];
+    divX.forEach((div) => {
+      disX.push(div.style.display);
+    });
+
+    // Masquage des capacités du monstre et des divers communs
+    model.querySelector(".capacites_monstre").style.display = "none";
+    model.querySelector(".div_divers_communs").style.display = "none";
+    document.getElementById("div_model_4").querySelector(".avantages").style.display = "none";
+    document.getElementById("div_model_6").querySelector(".desavantages").style.display = "none";
 
     // Uniformisation de la largeur des panels
-    [pion, model, div0, div1, div2, div3].forEach((panel) => {
+    [pion, model, ...divX].forEach((panel) => {
       panel.style.display = "block";
       panel.style.width = "auto";
     });
 
     let largeur = pion.offsetWidth;
-    if (model.offsetWidth > largeur) largeur = model.offsetWidth;
-    if (div0.offsetWidth > largeur) largeur = div0.offsetWidth;
-    if (div1.offsetWidth > largeur) largeur = div1.offsetWidth;
-    if (div2.offsetWidth > largeur) largeur = div2.offsetWidth;
-    if (div3.offsetWidth > largeur) largeur = div3.offsetWidth;
+    [model, ...divX].forEach((div) => {
+      if (div.offsetWidth > largeur) largeur = div.offsetWidth;
+    });
 
     [pion, model].forEach((panel) => {
       panel.style.width = largeur + "px";
     });
 
     // Uniformisation de la largeur des panels
-    // Masquage des capacités du monstre et des divers communs
-    div1.querySelector(".capacites_monstre").style.display = "none";
-    div2.querySelector(".div_divers_communs").style.display = "none";
-
-    [div0, div1, div2, div3].forEach((panel) => {
+    [...divX].forEach((panel) => {
       panel.style.display = "none";
       panel.style.height = "auto";
     });
 
+    let h = [];
     let hauteur = pion.offsetHeight;
-    [div0, div1, div2, div3].forEach((panel) => {
+    divX.forEach((panel) => {
       panel.style.display = "block";
+      h.push(model.offsetHeight);
       if (model.offsetHeight > hauteur) hauteur = model.offsetHeight;
       panel.style.display = "none";
     });
 
-    div1.style.display = "block";
-    const h1 = model.offsetHeight;
-    div1.style.display = "none";
-
-    div2.style.display = "block";
-    const h2 = model.offsetHeight;
-    div2.style.display = "none";
-
     [pion, model].forEach((panel) => {
-      panel.style.height = (hauteur + 28) + "px"; // Pourquoi le +28 est nécessaire ?
+      panel.style.height = (hauteur + 34) + "px"; // Pourquoi le +34 est-il nécessaire ?
     });
 
     // Réaffichage des capacités du monstre et des divers communs
-    div1.querySelector(".capacites_monstre").style.height = (hauteur - h1 - 9) + "px";
-    div1.querySelector(".capacites_monstre").style.display = "";
-    div2.querySelector(".div_divers_communs").style.height = (hauteur - h2 - 9) + "px";
-    div2.querySelector(".div_divers_communs").style.display = "";
+    model.querySelector(".capacites_monstre").style.display = "";
+    model.querySelector(".capacites_monstre").style.height = (hauteur - h[1] - 3) + "px";
+
+    model.querySelector(".div_divers_communs").style.display = "";
+    model.querySelector(".div_divers_communs").style.height = (hauteur - h[2] + 34 - 9) + "px";
+
+    document.getElementById("div_model_4").querySelector(".avantages").style.display = "";
+    document.getElementById("div_model_4").querySelector(".avantages").style.height = (hauteur - h[4] - 9) + "px";
+
+    document.getElementById("div_model_6").querySelector(".desavantages").style.display = "";
+    document.getElementById("div_model_6").querySelector(".desavantages").style.height = (hauteur - h[6] - 9) + "px";
 
     // Mise à jour de la largeur des zones de blessures : input de largeur selon la taille du texte
     ["general", "tete", "poitrine", "brasg", "brasd", "abdomen", "jambeg", "jambed"].forEach((el) => {
@@ -574,10 +575,7 @@ function initialise_pion() {
     // Restauration des styles sauvegardés
     pion.style.display = disp;
     model.style.display = dism;
-    div0.style.display = dis0;
-    div1.style.display = dis1;
-    div2.style.display = dis2;
-    div3.style.display = dis3;
+    for (let i = 0; i < divX.length; i++) divX[i].style.display = disX[i];
   });
 }
 
@@ -2522,345 +2520,231 @@ function affiche_confirm_sort() {
 }
 
 /**
- * Initialisation du modèle (compétences majeures & mineures)
+ * Initialise les événements de l'en-tête du modèle
  */
-function initialise_model_sub(competence) {
-  const tr = document.createElement("tr");
-  tr.style.height = "5px";
+function initialise_model_X() {
+  document.querySelector("#div_model").addEventListener("change", function (event) {
+    update_cout_total();
+  });
 
-  let td = document.createElement("td");
-  tr.appendChild(td);
-
-  td = document.createElement("td");
-
-  if (competence.Competence_majeure) {
-    td.style.textAlign = "right";
-  }
-  else {
-    td.style.fontWeight = "bold";
-    td.style.paddingTop = "3px";
-  }
-  td.textContent = competence.Nom_competence;
-  td.innerHTML += "&nbsp;:&nbsp;";
-  td.style.padding = "0";
-  tr.appendChild(td);
-
-  td = document.createElement("td");
-
-  if (competence.Nom_competence !== "Compétences mineures") {
-    const input = document.createElement("input");
-    if (!competence.Competence_majeure) {
-      td.style.paddingTop = "3px";
-      input.style.border = "2px solid black";
+  document.querySelector("#div_model .nom_model").addEventListener("input", function (event) {
+    const model_exists = Models.find((m) => m.Nom_model === this.value);
+    if (model_exists || this.value === "") {
+      this.style.backgroundColor = "rgb(255, 32, 32)";
+      event.stopPropagation();
+      return;
     }
-    td.style.textAlign = "center";
-    input.type = "text";
-    input.style.textAlign = "center";
-    input.style.width = "17px";
-    input.className =
-      competence.Nom_competence
-        .normalize('NFD')
-        .replace(/['`’\/]/g, '_')
-        .replace(/\p{Diacritic}/gu, '')
-        .toLowerCase()
-        .replaceAll(" ", "_") + "_competence";
-    td.appendChild(input);
-  }
 
-  td.style.padding = "0";
-  tr.appendChild(td);
+    this.style.backgroundColor = "white";
+    Pions.forEach((pion) => {
+      if (pion.Model === m_model.Nom_model) pion.Model = this.value;
+    });
 
-  td = document.createElement("td");
+    // Synchronisation avec le serveur
+    m_model.sendMessage("set_Nom_model", this.value);
+    setTimeout(() => { m_model.Image.src = "Images/Figurines/" + this.value + ".png"; }, 100);
+    m_model.Nom_model = this.value;
 
-  if (competence.Nom_competence !== "Compétences mineures") {
-    const input = document.createElement("input");
-    if (!competence.Competence_majeure) {
-      td.style.paddingTop = "3px";
-      input.style.border = "2px solid black";
+    // Remplissage de la liste des modèles (à jour avec le nouveau nom du modèle)
+    const sel = document.querySelector("#div_model .model_select");
+    sel.innerHTML = "";
+    Models.forEach((model) => {
+      const option = document.createElement("option");
+      option.value = model.Nom_model;
+      option.textContent = model.Nom_model;
+      sel.appendChild(option);
+    });
+    sel.value = m_model.Nom_model;
+  });
+
+  document.querySelector("#div_model .model_select").addEventListener("change", function (event) {
+    m_model = Models.find((m) => m.Nom_model === event.target.value);
+    affiche_model();
+  });
+
+  document.querySelector("#div_model .retour").addEventListener("click", function () {
+    m_model = null;
+    affiche_pion();
+  });
+
+  // Gestion des onglets du modèle
+  document.querySelectorAll("#div_model .tab-model").forEach((tab) => {
+    tab.addEventListener("click", function () {
+      const tab_index = tab.dataset.tab;
+
+      document.querySelectorAll("#div_model .tab-model").forEach((tab) => {
+        tab.classList.remove("active");
+        if (tab.dataset.tab === tab_index) {
+          tab.classList.add("active");
+        }
+      });
+
+      document.querySelector("#div_model").style.display = 'block';
+
+      document.querySelector("#div_model_0").style.display = 'none';
+      document.querySelector("#div_model_1").style.display = 'none';
+      document.querySelector("#div_model_2").style.display = 'none';
+      document.querySelector("#div_model_3").style.display = 'none';
+      document.querySelector("#div_model_4").style.display = 'none';
+      document.querySelector("#div_model_5").style.display = 'none';
+      document.querySelector("#div_model_6").style.display = 'none';
+
+      document.querySelector("#div_model .humanoid").style.display = m_model.Is_monster ? 'none' : 'block';
+      document.querySelector("#div_model .monstre").style.display = m_model.Is_monster ? 'block' : 'none';
+
+      if (tab_index === "0" || tab_index === "1") {
+        document.getElementById('div_model_' + (m_model.Is_monster ? '1' : '0')).style.display = 'block';
+      }
+      else {
+        document.getElementById('div_model_' + tab_index).style.display = 'block';
+      }
+    });
+  });
+
+  document.querySelector('#div_model .dupliquer').addEventListener("click", function (event) {
+    m_model = m_model.dupliquer();
+    affiche_model();
+  });
+
+  document.querySelector('#div_model .figurine').addEventListener("click", function (event) {
+    document.querySelector("#div_model .input_figurine").click();
+  });
+
+  document.querySelector('#div_model .input_figurine').addEventListener("change", function (event) {
+    const file = this.files[0];
+    if (!file || !file.type.startsWith("image/")) return;
+
+    // Libération de l'URL blob précédente pour éviter les fuites mémoire
+    const prevSrc = document.querySelector("#div_model .figurine").src;
+    if (prevSrc && prevSrc.startsWith("blob:")) URL.revokeObjectURL(prevSrc);
+
+    // Création d'une nouvelle URL blob pour l'image sélectionnée
+    const blobUrl = URL.createObjectURL(file);
+    document.querySelector("#div_model .figurine").src = blobUrl;
+
+    // Réinitialisation de l'input pour permettre de reselectionner le même fichier ou un autre
+    this.value = "";
+
+    // Upload de l'image sur le serveur
+    const nomModel = m_model ? m_model.Nom_model : (m_pion ? m_pion.Model : null);
+    if (nomModel) {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("nom", nomModel);
+      fetch("upload.php", { method: "POST", body: formData })
+        .then((r) => r.text())
+        .then((text) => {
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.warn("Upload figurine: le serveur n'a pas renvoyé du JSON. Réponse:", text.slice(0, 300));
+            URL.revokeObjectURL(blobUrl);
+            return;
+          }
+          if (data.ok) {
+            const m = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
+            m.Image = new Image();
+            m.Image.onload = function () { Map.generateHexMap(); Map.drawHexMap(); };
+            m.Image.src = data.path + "?t=" + new Date().getTime();
+            figImg.src = data.path + "?t=" + new Date().getTime();
+            URL.revokeObjectURL(blobUrl);
+          } else console.warn("Upload figurine:", data.message);
+        })
+        .catch((e) => {
+          console.warn("Upload figurine:", e);
+          URL.revokeObjectURL(blobUrl);
+        });
     }
-    td.style.textAlign = "center";
-    input.type = "text";
-    input.style.textAlign = "center";
-    input.style.width = "17px";
-    input.disabled = true;
-    input.className =
-      competence.Nom_competence
-        .normalize('NFD')
-        .replace(/['`’\/]/g, '_')
-        .replace(/\p{Diacritic}/gu, '')
-        .toLowerCase()
-        .replaceAll(" ", "_") + "_competence_score";
-    td.appendChild(input);
-  }
+  });
 
-  td.style.padding = "0";
-  tr.appendChild(td);
+  document.querySelectorAll("#div_model input[type=text]").forEach((input) => {
+    input.addEventListener("input", function (event) {
+      if (input.className.includes("coefficient_")) {
+        event.target.value = event.target.value.replace(/[^0-9\-\.]/g, ""); // Float
+      }
+      else {
+        event.target.value = event.target.value.replace(/[^0-9\-]/g, ""); // Integer
+      }
 
-  document.querySelector("#div_model_2 .table_divers_communs").appendChild(tr);
+      let attribut = event.target.className.replace("_base", "");
+      attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+
+      if (!event.target.disabled && attribut !== "") { // Tophy : competence, avantages, désavantages ?
+        if (attribut in m_model) {
+          m_model[attribut] = event.target.value;
+          m_model.sendMessage("set_" + attribut, event.target.value);
+        }
+        else console.error("Attribut du modèle non trouvé : ", attribut);
+      }
+    });
+  });
 }
 
 /**
- * Initialisation du modèle PJ
+ * Initialise les événements de la section Humanoides du modèle
  */
-// initialise_model();
-function initialise_model() {
-  // Remplissage de la liste des compétences connues avec les degrés du modèle
-  Competences.forEach((competence) => {
-    if (competence.Nom_competence === "Compétences mineures" ||
-      competence.Competence_majeure === "Compétences mineures") return;
-
-    initialise_model_sub(competence);
-  });
-
-  // Ajout d'un trait horizontal pour séparer les compétences majeures des compétences mineures
-  const tr = document.createElement("tr");
-  const td = document.createElement("td");
-  td.colSpan = "4";
-  td.style.padding = "0";
-  td.innerHTML = "<hr>";
-  tr.appendChild(td);
-  document.querySelector("#div_model_2 .table_divers_communs").appendChild(tr);
-
-  // Ajout des compétences mineures
-  Competences.forEach((competence) => {
-    if (competence.Nom_competence !== "Compétences mineures" &&
-      competence.Competence_majeure !== "Compétences mineures") return;
-
-    initialise_model_sub(competence);
-  });
-
-  // Gestion du changement du nom du modèle
-  document.querySelectorAll(".nom_model").forEach((nom_model) => {
-    nom_model.addEventListener("input", function (event) {
-      const model_exists = Models.find((m) => m.Nom_model === this.value);
-      if (model_exists || this.value === "") {
-        this.style.backgroundColor = "rgb(255, 32, 32)";
-        event.stopPropagation();
-        return;
-      }
-
-      this.style.backgroundColor = "white";
-      Pions.forEach((pion) => {
-        if (pion.Model === m_model.Nom_model) pion.Model = this.value;
-      });
-
-      // Synchronisation avec le serveur
-      m_model.sendMessage("set_Nom_model", this.value);
-      setTimeout(() => { m_model.Image.src = "Images/Figurines/" + this.value + ".png"; }, 100);
-      m_model.Nom_model = this.value;
-
-      // Remplissage de la liste des modèles (à jour avec le nouveau nom du modèle)
-      const sel = this.closest("div").querySelector(".model_select");
-      sel.innerHTML = "";
-      Models.forEach((model) => {
-        const option = document.createElement("option");
-        option.value = model.Nom_model;
-        option.textContent = model.Nom_model;
-        sel.appendChild(option);
-      });
-      sel.value = m_model.Nom_model;
-    });
-  });
-
+function initialise_model_0() {
   // Quand on change la race dans le modèle, on met à jour les attributs _race
-  document.querySelector("#div_model_0 .race_select").addEventListener("change", function () {
-    const race = document.querySelector("#div_model_0 .race_select").value;
+  document.querySelector("#div_model_0 .race_select").addEventListener("change", function (event) {
+    const race = event.target.value;
     const attr = attributs_races[race];
 
-    // Remplir les champs *_race de la modale
+    // Remplir les champs *_race de la modale et simuler un changement pour mettre à jour les autres champs
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribute) => {
       const val = attr[attribute];
       document.querySelector("#div_model_0 ." + attribute + "_race").value = val > 0 ? "+" + val : (val < 0 ? val : "-");
-    });
 
-    // Simule un changement de base pour mettre à jour les autres champs
-    ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribut) => {
       const event = new Event("input", { bubbles: true });
-      document.querySelector("#div_model_0 ." + attribut + "_base").dispatchEvent(event);
+      document.querySelector("#div_model_0 ." + attribute + "_base").dispatchEvent(event);
     });
 
     m_model.Race = race;
     m_model.sendMessage("set_Race", race);
   });
 
-  // Sélection manuelle de la parade 1
-  document.querySelector("#div_model_1 .bool_parade_1_monstre").addEventListener("change", function (event) {
-    const div = document.getElementById("div_model_1");
-    div.querySelector(".parade_1_monstre").disabled = !event.target.checked;
+  document.querySelector("#div_model_0 .switch_to_monster").addEventListener("click", function (event) {
+    m_model.Is_monster = true;
+    m_model.sendMessage("set_Is_monster", m_model.Is_monster);
+    document.querySelector("#div_model .humanoid").style.display = 'none';
+    document.querySelector("#div_model .monstre").style.display = 'block';
+    document.querySelector("#div_model .humanoid").click();
   });
 
-  // Sélection manuelle de la parade 1
-  document.querySelector("#div_model_1 .bool_parade_2_monstre").addEventListener("change", function (event) {
-    const div = document.getElementById("div_model_1");
-    div.querySelector(".parade_2_monstre").disabled = !event.target.checked;
-  });
+  document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
+    input.addEventListener("input", function (event) {
+      const attribut = event.target.className.replace("_base", "").replace("_experience", "");
+      const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
 
-  // Sélection manuelle de la parade 1
-  document.querySelector("#div_model_1 .capacites_monstre").addEventListener("input", function (event) {
-    m_model.Capacites = event.target.value;
-    m_model.sendMessage("set_Capacites", m_model.Capacites);
-  });
+      const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
+      const target_exp = document.querySelector("#div_model_0 ." + attribut + "_experience");
 
-  // sélection manuelle de l'attaque 2
-  document.querySelector("#div_model_1 .bool_attaque_2_monstre").addEventListener("change", function (event) {
-    const div = document.getElementById("div_model_1");
-    div.querySelector(".attaque_2_monstre").disabled = !event.target.checked;
-    div.querySelector(".bool_parade_2_monstre").disabled = !event.target.checked;
-    div.querySelector(".parade_2_monstre").disabled = !event.target.checked ||
-      !div.querySelector(".bool_parade_2_monstre").checked;
-    div.querySelector(".coefficient_dommages_2_monstre").disabled = !event.target.checked;
-    div.querySelector(".bonus_dommages_2_monstre").disabled = !event.target.checked;
-  });
+      // Les champs ne peuvent pas être inférieur à 0 ou supérieur à 25
+      if (event.target.className.includes("_base") || event.target.className.includes("_experience")) {
+        if (target_base.value < 0) target_base.value = 0;
+        else if (target_base.value > 25) target_base.value = 25;
 
-  // sélection du type de magie
-  document.querySelector("#div_model_2 .type_de_magie").addEventListener("change", function (event) {
-    const div = document.getElementById("div_model_2");
-    m_model.Magie_type = event.target.value;
-    m_model.sendMessage("set_Magie_type", m_model.Magie_type);
-    div.querySelector(".concentration_divers_communs").value = m_model.get("concentration");
+        if (att_name in m_model) {
+          m_model[att_name] = target_base.value;
+          m_model.sendMessage("set_" + att_name, target_base.value);
+        }
+        else console.error("Attribut du modèle non trouvé : ", att_name);
 
-    switch (event.target.value) {
-      case "classique":
-        div.querySelector(".liste_pretre").closest("tr").style.visibility = "hidden";
-        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "visible";
-        div.querySelector(".concentration_divers_communs").disabled = true;
+        // Idem pour le cumul avec l'expérience
+        if (target_exp !== null) {
+          if (target_exp.value < 0) target_exp.value = 0;
+          else if (parseInt(target_exp.value) + parseInt(target_base.value) > 25) target_exp.value = 25 - target_base.value;
 
-        break;
-      case "religieuse":
-        div.querySelector(".liste_pretre").closest("tr").style.visibility = "visible";
-        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "visible";
-        div.querySelector(".concentration_divers_communs").disabled = false;
-        break;
-      case "sans":
-        div.querySelector(".liste_pretre").closest("tr").style.visibility = "hidden";
-        div.querySelector(".concentration_divers_communs").closest("span").style.visibility = "hidden";
-        break;
-    }
-  });
-
-  // sélection du liste prêtre
-  document.querySelector("#div_model_2 .liste_pretre").addEventListener("change", function (event) {
-    if (event.target.value === "") {
-      m_model.Liste_pretre = "";
-    }
-    else {
-      m_model.Liste_pretre =
-        shortName[event.target.value.slice(0, 1).toUpperCase() + event.target.value.slice(1).toLowerCase()];
-    }
-    m_model.sendMessage("set_Liste_pretre", m_model.Liste_pretre);
-  });
-
-  // Gestion du changement des valeurs de champs
-  for (i = 0; i < 4; i++) {
-    document.getElementById("div_model_" + i).addEventListener("input", function (event) {
-      if (!event.target.className.includes("_base") &&
-        !event.target.className.includes("_experience") &&
-        !event.target.className.includes("_monstre") &&
-        !event.target.className.includes("_divers_communs") &&
-        !event.target.className.includes("_competence")) {
-        return;
-      }
-
-      let attribut = "";
-      if (event.target.className.includes("bool_")) {
-        attribut = event.target.className.replace("_monstre", "");
-        attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-        m_model.sendMessage("set_" + attribut, event.target.checked ? 1 : 0);
-
-        if (attribut in m_model) m_model[attribut] = event.target.checked ? 1 : 0;
-        else console.error("Attribut non trouvé : ", attribut);
-
-        return;
-      }
-
-      if (event.target.type !== "text") return;
-
-      // On garde seulement les chiffres
-      if (event.target.className.includes("coefficient_")) { // S'agit d'un float
-        event.target.value = event.target.value.replace(/[^0-9\-\.]/g, "");
-      }
-      else {// S'agit d'un int
-        event.target.value = event.target.value.replace(/[^0-9\-]/g, "");
-      }
-
-      // Affectation de la valeur à l'attribut correspondant
-      let value = parseInt(event.target.value);
-      if (isNaN(value)) value = 0;
-
-      attribut = event.target.className;
-      attribut = attribut.replace("_base", "");
-      attribut = attribut.replace("_monstre", "");
-      attribut = attribut.replace("_divers_communs", "");
-
-      let att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-      m_model.sendMessage("set_" + att_name, value);
-
-      if (!event.target.disabled && att_name !== "" && !event.target.className.includes("_competence")) {
-        if (att_name in m_model) m_model[att_name] = value;
-        else console.error("Attribut non trouvé : ", att_name);
-      }
-
-      attribut = attribut.replace("_base", "");
-      attribut = attribut.replace("_experience", "");
-
-      // Traitement des input de competence majeure et mineure
-      if (event.target.className.includes("_competence")) {
-        let Nom_competence = "";
-        Competences.forEach((competence) => {
-          if (event.target.className ===
-            competence.Nom_competence
-              .normalize('NFD')
-              .replace(/['`’\/]/g, '_')
-              .replace(/\p{Diacritic}/gu, '')
-              .toLowerCase()
-              .replaceAll(" ", "_") + "_competence") {
-            Nom_competence = competence.Nom_competence;
+          if (att_name + "_experience" in m_model) {
+            m_model[att_name + "_experience"] = target_exp.value;
+            m_model.sendMessage("set_" + att_name + "_experience", target_exp.value);
           }
-        });
-
-        let competence_connue = CompetencesConnues.find((competence) =>
-          competence.Nom_competence === Nom_competence &&
-          competence.Nom_model === m_model.Nom_model);
-        if (competence_connue === null || typeof competence_connue === "undefined") {
-          competence_connue = new CompetenceConnue({
-            Nom_competence: Nom_competence,
-            Nom_model: m_model.Nom_model,
-            Degres: event.target.value
-          });
-          m_model.sendMessage("set_Degres", competence_connue);
-          CompetencesConnues.push(competence_connue);
+          else console.error("Attribut du modèle non trouvé : ", att_name + "_experience");
         }
-        else {
-          m_model.sendMessage("set_Degres", competence_connue);
-          competence_connue.Degres = event.target.value;
-        }
-
-        // On met à jour le score de la compétence connue et de ses descendants s'il y en a
-        document.querySelector("#div_model_2 ." +
-          Nom_competence.normalize('NFD')
-            .replace(/['`’\/]/g, '_')
-            .replace(/\p{Diacritic}/gu, '')
-            .toLowerCase()
-            .replaceAll(" ", "_") + "_competence_score"
-        ).value = m_model.get_score(Nom_competence);
-        Competences.filter((c) => c.Competence_majeure === Nom_competence).forEach((c) => {
-          document.querySelector("#div_model_2 ." +
-            c.Nom_competence.normalize('NFD')
-              .replace(/['`’\/]/g, '_')
-              .replace(/\p{Diacritic}/gu, '')
-              .toLowerCase()
-              .replaceAll(" ", "_") + "_competence_score"
-          ).value = m_model.get_score(c.Nom_competence);
-        });
       }
-
-      // La suite ne s'applique que si c'est une base ou une experience (div0)
-      if (!event.target.className.includes("_base") && !event.target.className.includes("_experience")) return;
 
       // On affiche en bleu les valeurs inférieure à 3, en rouge les valeurs supérieure à 18
-      const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
       let val1 = parseInt(target_base.value || 0);
-
       if (val1 < 3) target_base.style.backgroundColor = "rgb(128, 128, 255)";
       else if (val1 > 18) target_base.style.backgroundColor = "rgb(255, 32, 32)";
       else target_base.style.backgroundColor = "";
@@ -2907,151 +2791,301 @@ function initialise_model() {
         parseInt(document.querySelector("#div_model_0 .adaptation_score").value || 0) +
         parseInt(document.querySelector("#div_model_0 .perception_score").value || 0)) / 2);
     });
+  });
+}
 
-    // Bouton de switch entre humanoide et monstre
-    if (i < 2) document.getElementById("div_model_" + i).querySelector(".switch_type_model").addEventListener("click", function (event) {
-      const div = document.getElementById("div_model");
-      m_model.Is_monster = !m_model.Is_monster;
-      if (!m_model.Is_monster) {
-        div.querySelector(".humanoid").style.display = 'none';
-        div.querySelector(".monstre").style.display = 'block';
-        div.querySelector(".humanoid").click();
-      }
-      else {
-        div.querySelector(".humanoid").style.display = 'block';
-        div.querySelector(".monstre").style.display = 'none';
-        div.querySelector(".monstre").click();
+/**
+ * Initialise les événements de la section Monstres du modèle
+ */
+function initialise_model_1() {
+
+  document.querySelector("#div_model_1 .bool_parade_1_monstre").addEventListener("change", function (event) {
+    document.querySelector("#div_model_1 .parade_1_monstre").disabled = !event.target.checked;
+  });
+
+  document.querySelector("#div_model_1 .bool_parade_2_monstre").addEventListener("change", function (event) {
+    document.querySelector("#div_model_1 .parade_2_monstre").disabled = !event.target.checked;
+  });
+
+  document.querySelector("#div_model_1 .capacites_monstre").addEventListener("input", function (event) {
+    m_model.Capacites = event.target.value;
+    m_model.sendMessage("set_Capacites", m_model.Capacites);
+  });
+
+  document.querySelector("#div_model_1 .bool_attaque_2_monstre").addEventListener("change", function (event) {
+    document.querySelector("#div_model_1 .attaque_2_monstre").disabled = !event.target.checked;
+    document.querySelector("#div_model_1 .bool_parade_2_monstre").disabled = !event.target.checked;
+    document.querySelector("#div_model_1 .parade_2_monstre").disabled = !event.target.checked || !document.querySelector("#div_model_1 .bool_parade_2_monstre").checked;
+    document.querySelector("#div_model_1 .coefficient_dommages_2_monstre").disabled = !event.target.checked;
+    document.querySelector("#div_model_1 .bonus_dommages_2_monstre").disabled = !event.target.checked;
+  });
+
+  document.querySelector("#div_model_1 .switch_to_humanoid").addEventListener("click", function (event) {
+    m_model.Is_monster = false;
+    m_model.sendMessage("set_Is_monster", m_model.Is_monster);
+    document.querySelector("#div_model .humanoid").style.display = 'block';
+    document.querySelector("#div_model .monstre").style.display = 'none';
+    document.querySelector("#div_model .monstre").click();
+  });
+
+  document.querySelectorAll("#div_model_1 input[type=checkbox]").forEach((input) => {
+    input.addEventListener("change", function (event) {
+      let attribut = event.target.className.replace("_monstre", "");
+      attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+
+      m_model.sendMessage("set_" + attribut, event.target.checked ? 1 : 0);
+
+      if (attribut in m_model) m_model[attribut] = event.target.checked ? 1 : 0;
+      else console.error("Attribut du modèle non trouvé : ", attribut);
+    });
+  });
+}
+
+/**
+ * Initialise les événements de la section Magie du modèle
+ */
+function initialise_model_2() {
+  document.querySelector("#div_model_2 .type_de_magie").addEventListener("change", function (event) {
+    switch (event.target.value) {
+      case "classique":
+        document.querySelector("#div_model_2 .liste_pretre").closest("tr").style.visibility = "hidden";
+        document.querySelector("#div_model_2 .concentration_divers_communs").closest("span").style.visibility = "visible";
+        document.querySelector("#div_model_2 .concentration_divers_communs").disabled = true;
+
+        break;
+      case "religieuse":
+        document.querySelector("#div_model_2 .liste_pretre").closest("tr").style.visibility = "visible";
+        document.querySelector("#div_model_2 .concentration_divers_communs").closest("span").style.visibility = "visible";
+        document.querySelector("#div_model_2 .concentration_divers_communs").disabled = false;
+        break;
+      case "sans":
+        document.querySelector("#div_model_2 .liste_pretre").closest("tr").style.visibility = "hidden";
+        document.querySelector("#div_model_2 .concentration_divers_communs").closest("span").style.visibility = "hidden";
+        break;
+    }
+    m_model.Magie_type = event.target.value;
+    m_model.sendMessage("set_Magie_type", m_model.Magie_type);
+    document.querySelector("#div_model_2 .concentration_divers_communs").value = m_model.get("concentration");
+
+  });
+
+  document.querySelector("#div_model_2 .liste_pretre").addEventListener("change", function (event) {
+    if (event.target.value === "") {
+      m_model.Liste_pretre = "";
+    }
+    else {
+      m_model.Liste_pretre = shortName[event.target.value.slice(0, 1).toUpperCase() + event.target.value.slice(1).toLowerCase()];
+    }
+    m_model.sendMessage("set_Liste_pretre", m_model.Liste_pretre);
+  });
+}
+
+/**
+ * Initialise les événements de la section Avantages du modèle
+ */
+function initialise_model_4() {
+  Competences.filter((c) => !c.Competence_majeure && c.Nom_competence !== "Compétences mineures").forEach((c) => {
+    const nouvelleOption = document.createElement("option");
+    nouvelleOption.value = c.Nom_competence;
+    nouvelleOption.textContent = c.Nom_competence;
+    document.querySelector("#div_model_4 .maitre_de_compétence_majeure_1").querySelector(".option").appendChild(nouvelleOption);
+    document.querySelector("#div_model_4 .maitre_de_compétence_majeure_2").querySelector(".option").appendChild(nouvelleOption.cloneNode(true));
+    document.querySelector("#div_model_4 .maitre_de_compétence_majeure_3").querySelector(".option").appendChild(nouvelleOption.cloneNode(true));
+  });
+
+  Competences.filter((c) => c.Competence_majeure === "Compétences mineures").forEach((c) => {
+    const nouvelleOption = document.createElement("option");
+    nouvelleOption.value = c.Nom_competence;
+    nouvelleOption.textContent = c.Nom_competence;
+    document.querySelector("#div_model_4 .maitre_de_compétence_mineure_1").querySelector(".option").appendChild(nouvelleOption);
+    document.querySelector("#div_model_4 .maitre_de_compétence_mineure_2").querySelector(".option").appendChild(nouvelleOption.cloneNode(true));
+    document.querySelector("#div_model_4 .maitre_de_compétence_mineure_3").querySelector(".option").appendChild(nouvelleOption.cloneNode(true));
+  });
+
+  Sorts.filter((s) => s.Niveau <= 4).forEach((s) => {
+    // Les sorts à coût variable ne sont pas candidats
+    if (s.Nom_sort === "Dissiper la fatigue" || s.Nom_sort === "Soigner les blessures légères") return;
+    const nouvelleOption = document.createElement("option");
+    nouvelleOption.value = getShortName(s.Nom_liste) + " - " + s.Nom_sort;
+    nouvelleOption.textContent = getShortName(s.Nom_liste) + " - " + s.Nom_sort;
+    document.querySelector("#div_model_4 .sort_naturel").querySelector(".option").appendChild(nouvelleOption);
+  });
+
+  document.querySelectorAll("#div_model_4 .niveau").forEach((niveau) => {
+    niveau.addEventListener("change", function (event) {
+      switch (event.target.closest("tr").classList.item(0)) {
+        case "maitre_de_magie":
+        case "guide_spirituel":
+          event.target.closest("tr").querySelector(".cout").textContent = 10 + 3 * event.target.value;
+          break;
+        case "maitre_d_armes":
+          event.target.closest("tr").querySelector(".cout").textContent = 6 * event.target.value;
+          break;
+        case "maitre_de_compétence_majeure_1":
+        case "maitre_de_compétence_majeure_2":
+        case "maitre_de_compétence_majeure_3":
+          event.target.closest("tr").querySelector(".cout").textContent = 3 * event.target.value;
+          break;
+        case "resistance_a_la_magie":
+          event.target.closest("tr").querySelector(".cout").textContent = 5 * event.target.value;
+          break;
+        case "richesse":
+          event.target.closest("tr").querySelector(".cout").textContent = 2 * event.target.value + 2;
+          break;
+        default:
+          event.target.closest("tr").querySelector(".cout").textContent = event.target.value;
+          break;
       }
     });
-  }
-
-  // Quand on change la race dans la modale modèle PJ, on met à jour les attributs _race
-  document.getElementById("div_model").querySelector(".model_select").addEventListener("change", function (event) {
-    m_model = Models.find((m) => m.Nom_model === event.target.value);
-    affiche_model();
+    const event = new Event("change", { bubbles: true });
+    niveau.dispatchEvent(event);
   });
 
-  // Bouton de retour au pion
-  document.getElementById("div_model").querySelector(".retour").addEventListener("click", function () {
-    m_model = null;
-    affiche_pion();
+  document.querySelectorAll("#div_model_4 .option").forEach((option) => {
+    option.addEventListener("change", function (event) {
+      switch (event.target.closest("tr").classList.item(0)) {
+        case "race_non_humaine":
+          event.target.closest("tr").querySelector(".cout").textContent = event.target.value.includes("evolue") ? 12 : 8;
+          break;
+        case "sort_naturel":
+          const Nom_liste = shortName[event.target.value.split(" - ")[0]];
+          const Nom_sort = event.target.value.split(" - ")[1];
+          event.target.closest("tr").querySelector(".cout").textContent = 2 * Sorts.find((s) => s.Nom_sort === Nom_sort && s.Nom_liste === Nom_liste).Niveau;
+          break;
+        default:
+          if (event.target.closest("tr").querySelector(".niveau")) {
+            event.target.closest("tr").querySelector(".cout").textContent = event.target.closest("tr").querySelector(".niveau").value;
+          }
+          break;
+      }
+    });
+    const event = new Event("change", { bubbles: true });
+    option.dispatchEvent(event);
+
   });
 
-  // Gestion des onglets du modèle
-  document.querySelectorAll(".tab-model").forEach((tab) => {
-    tab.addEventListener("click", function () {
-      const tab_index = tab.dataset.tab;
-      // tab_index === 0 : Carac. Humanoides
-      // tab_index === 1 : Caract. Monstres
-      // tab_index === 2 : Magie & Compétences
-      // tab_index === 3 : Avantages & Coûts
+  document.querySelector("#div_model_4").addEventListener("change", function (event) {
+    if (event.target.classList.contains("selection_creation")) {
+      if (event.target.checked) event.target.closest("tr").querySelector(".selection_experience").checked = false;
+    }
+    if (event.target.classList.contains("selection_experience")) {
+      if (event.target.checked) event.target.closest("tr").querySelector(".selection_creation").checked = false;
+    }
+    document.querySelector("#div_model_4 .nb_points_creation").textContent = m_model.get_cout_avantages_creation();
+    document.querySelector("#div_model_4 .nb_points_experience").textContent = m_model.get_cout_avantages_experience();
+  });
+}
 
-      document.querySelectorAll(".tab-model").forEach((tab) => {
-        tab.classList.remove("active");
-        if (tab.dataset.tab === tab_index) {
-          tab.classList.add("active");
-        }
+/**
+ * Initialise les événements de la section Compétences du modèle
+ */
+function initialise_model_5() {
+  document.querySelectorAll("#div_model_5 .degres").forEach((degres) => {
+    degres.addEventListener("change", function (event) {
+      const Nom_competence = event.target.closest("tr").classList.item(0);
+
+      event.target.closest("tr").querySelector(".score").value = m_model.get_competence_score(Nom_competence);
+
+      document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
+        if (tr.classList.item(1) !== Nom_competence) return;
+        tr.querySelector(".score").value = m_model.get_competence_score(tr.classList.item(0));
       });
+    });
+  });
+}
 
-      document.getElementById('div_model_0').style.display = 'none';
-      document.getElementById('div_model_1').style.display = 'none';
-      document.getElementById('div_model_2').style.display = 'none';
-      document.getElementById('div_model_3').style.display = 'none';
+/**
+ * Initialise les événements de la section Désavantages du modèle
+ */
+function initialise_model_6() {
 
-      document.getElementById('div_model').style.display = 'block';
-
-      if (tab_index === "2") {
-        document.getElementById('div_model').querySelector(".humanoid").style.display = m_model.Is_monster ? 'none' : 'block';
-        document.getElementById('div_model').querySelector(".monstre").style.display = m_model.Is_monster ? 'block' : 'none';
+  document.querySelectorAll("#div_model_6 niveau").forEach((niveau) => {
+    niveau.addEventListener("change", function (event) {
+      switch (event.target.closest("tr").classList.item(0)) {
+        case "jeunesse":
+        case "vieillesse":
+          event.target.closest("tr").querySelector(".cout").textContent = 2 * event.target.value;
+          break;
+        case "laideur":
+          event.target.closest("tr").querySelector(".cout").textContent = 4 * event.target.value;
+          break;
+        case "vulnerabilite_a_la_magie":
+          event.target.closest("tr").querySelector(".cout").textContent = 6 * event.target.value;
+          break;
+        case "pacifisme":
+          event.target.closest("tr").querySelector(".cout").textContent = 10 * event.target.value;
+          break;
+        default:
+          event.target.closest("tr").querySelector(".cout").textContent = event.target.value;
+          break;
       }
-
-      switch (tab_index) {
-        case "0": // Carac. Humanoides
-          document.getElementById('div_model_0').style.display = 'block';
-          break;
-        case "1": // Caract. Monstres
-          document.getElementById('div_model_1').style.display = 'block';
-          break;
-        case "2": // Divers & Communs
-          document.getElementById('div_model_2').style.display = 'block';
-          break;
-        case "3": // Avantages & Coûts
-          document.getElementById('div_model_3').style.display = 'block';
-          break;
-      }
+      document.querySelector("#div_model_6 .nb_points_creation").textContent = m_model.get_cout_desavantages_creation();
     });
   });
 
-  // Action sur le bouton de duplication du modèle
-  document.querySelectorAll('.dupliquer').forEach((dupliquer) => {
-    dupliquer.addEventListener("click", function (event) {
-      m_model = m_model.dupliquer();
-      affiche_model();
-    });
+  document.querySelector("#div_model_6").addEventListener("change", function (event) {
+    document.querySelector("#div_model_6 .nb_points_creation").textContent = m_model.get_cout_desavantages_creation();
   });
+}
 
-  // Gestion du changement de la figurine du modèle
-  document.querySelectorAll('.figurine').forEach((figurine) => {
-    figurine.addEventListener("click", function () {
-      const inputFigurine = this.closest("div").querySelector(".input_figurine");
-      inputFigurine.click();
-    });
-  });
+/**
+ * Initialisation du modèle PJ
+ * @returns {void}
+ */
+function initialise_model() {
+  initialise_model_X();
+  initialise_model_0();
+  initialise_model_1();
+  initialise_model_2();
+  initialise_model_4();
+  initialise_model_5();
+  initialise_model_6();
 
-  document.querySelectorAll('.input_figurine').forEach((inputFigurine) => {
-    inputFigurine.addEventListener("change", function () {
-      // Récupération du fichier sélectionné
-      const file = this.files[0];
-      if (!file || !file.type.startsWith("image/")) return;
-      // Libération de l'URL blob précédente pour éviter les fuites mémoire
-      const prevSrc = figImg.src;
-      if (prevSrc && prevSrc.startsWith("blob:")) URL.revokeObjectURL(prevSrc);
-      // Création d'une nouvelle URL blob pour l'image sélectionnée
-      const blobUrl = URL.createObjectURL(file);
-      figImg.src = blobUrl;
-      // Réinitialisation de l'input pour permettre de reselectionner le même fichier ou un autre
-      this.value = "";
+}
 
-      // Upload de l'image sur le serveur
-      const nomModel = m_model ? m_model.Nom_model : (m_pion ? m_pion.Model : null);
-      if (nomModel) {
-        const formData = new FormData();
-        formData.append("image", file);
-        formData.append("nom", nomModel);
-        fetch("upload.php", { method: "POST", body: formData })
-          .then((r) => r.text())
-          .then((text) => {
-            let data;
-            try {
-              data = JSON.parse(text);
-            } catch (e) {
-              console.warn("Upload figurine: le serveur n'a pas renvoyé du JSON. Réponse:", text.slice(0, 300));
-              URL.revokeObjectURL(blobUrl);
-              return;
-            }
-            if (data.ok) {
-              const m = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
-              m.Image = new Image();
-              m.Image.onload = function () { Map.generateHexMap(); Map.drawHexMap(); };
-              m.Image.src = data.path + "?t=" + new Date().getTime();
-              figImg.src = data.path + "?t=" + new Date().getTime();
-              URL.revokeObjectURL(blobUrl);
-            } else console.warn("Upload figurine:", data.message);
-          })
-          .catch((e) => {
-            console.warn("Upload figurine:", e);
-            URL.revokeObjectURL(blobUrl);
-          });
-      }
-    });
-  });
+/**
+ * Mise à jour du total des coûts
+ */
+function update_cout_total() {
+
+  if (!m_model) return;
+
+  document.querySelector("#div_model_3 .attributs_creation_cout").textContent = m_model.get_cout_attributs_creation();
+  document.querySelector("#div_model_3 .attributs_cout").textContent = m_model.get_cout_attributs_creation() + m_model.get_cout_attributs_experience();
+  document.querySelector("#div_model_3 .dons_creation_cout").textContent = m_model.get_cout_dons_creation();
+  document.querySelector("#div_model_3 .avantages_creation_cout").textContent = 25 * (m_model.get_cout_avantages_creation() - m_model.get_cout_desavantages_creation());
+  document.querySelector("#div_model_3 .avantages_cout").textContent = 25 * m_model.get_cout_avantages_creation() + 50 * m_model.get_cout_avantages_experience();
+  document.querySelector("#div_model_3 .competences_cout").textContent = m_model.get_cout_competences();
+  document.querySelector("#div_model_3 .magie_classique_cout").textContent = m_model.get_cout_sorts();
+  document.querySelector("#div_model_3 .magie_religieuse_cout").textContent = m_model.get_cout_concentration();
+
+  const total_creation_cout =
+    m_model.get_cout_attributs_creation() +
+    m_model.get_cout_dons_creation() +
+    25 * (m_model.get_cout_avantages_creation() - m_model.get_cout_desavantages_creation());
+  document.querySelector("#div_model_3 .total_creation_cout").textContent = total_creation_cout;
+
+  const total_cout =
+    m_model.get_cout_attributs_creation() + m_model.get_cout_attributs_experience() +
+    m_model.get_cout_dons_creation() +
+    25 * (m_model.get_cout_avantages_creation() - m_model.get_cout_desavantages_creation()) + 50 * m_model.get_cout_avantages_experience() +
+    m_model.get_cout_competences() +
+    m_model.get_cout_sorts() +
+    m_model.get_cout_concentration() +
+    -2000;
+  document.querySelector("#div_model_3 .total_cout").textContent = total_cout;
+
+  const cout_attributs_experience = m_model.get_cout_attributs_experience();
+  document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = cout_attributs_experience > total_cout * 0.25 ? "block" : "none";
+
+  const cout_avantages = m_model.get_cout_avantages_experience();
+  document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = cout_avantages > total_cout * 0.25 ? "block" : "none";
 }
 
 /**
  * Affichage du modèle PJ
  */
 function affiche_model() {
-  // Masquage des éléments du zoom du pion
   switch_pion_model(false);
 
   m_model = m_model ? m_model : Models.find((m) => m.Nom_model === m_pion.Model);
@@ -3077,103 +3111,108 @@ function affiche_model() {
   document.querySelector("#div_model_1 .capacites_monstre").value = m_model.Capacites;
   document.querySelector("#div_model_2 .type_de_magie").value = m_model.Magie_type.toLowerCase();
 
-  for (i = 0; i < 4; i++) {
-    document.getElementById("div_model_" + i).querySelectorAll("input").forEach((input) => {
-      if (!input.className.includes("_base") &&
-        !input.className.includes("_experience") &&
-        !input.className.includes("_monstre") &&
-        !input.className.includes("_divers_communs") &&
-        !input.className.includes("_competence"))
-        return;
+  document.querySelectorAll("#div_model input").forEach((input) => {
+    if (!input.className.includes("_base") &&
+      !input.className.includes("_experience") &&
+      !input.className.includes("_monstre") &&
+      !input.className.includes("_divers_communs") &&
+      !input.className.includes("_competence"))
+      return;
 
-      let attribut = "";
-      if (input.className.includes("bool_")) {
-        attribut = input.className.replace("_monstre", "");
-        attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-        if (attribut in m_model) input.checked = m_model[attribut];
-        else console.error("Attribut non trouvé : ", attribut);
+    let attribut = "";
+    if (input.className.includes("bool_")) {
+      attribut = input.className.replace("_monstre", "");
+      attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+      if (attribut in m_model) input.checked = m_model[attribut];
+      else console.error("Attribut non trouvé : ", attribut);
 
-        const event = new Event("change", { bubbles: true });
-        input.dispatchEvent(event);
+      const event = new Event("change", { bubbles: true });
+      input.dispatchEvent(event);
 
-        return;
-      }
+      return;
+    }
 
-      if (input.type !== "text") return;
+    if (input.type !== "text") return;
 
-      attribut = input.className;
-      attribut = attribut.replace("_base", "");
-      attribut = attribut.replace("_divers_communs", "");
-      attribut = attribut.replace("_monstre", "");
+    attribut = input.className;
+    attribut = attribut.replace("_base", "");
+    attribut = attribut.replace("_divers_communs", "");
+    attribut = attribut.replace("_monstre", "");
 
-      // Affectation de la valeur à l'attribut correspondant
-      if (input.className.includes("_base") || input.className.includes("_experience")) {
-        let att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-        if (att_name in m_model) input.value = m_model[att_name];
-        else console.error("Attribut non trouvé : ", att_name);
-      }
+    // Affectation de la valeur à l'attribut correspondant
+    if (input.className.includes("_base") || input.className.includes("_experience")) {
+      let att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+      if (att_name in m_model) input.value = m_model[att_name];
+      else console.error("Attribut non trouvé : ", att_name);
+    }
 
-      // Traitement des input de competence majeure et mineure
-      if (input.className.includes("_competence_score")) {
-        Competences.forEach((competence) => {
-          if (input.className ===
-            competence.Nom_competence
-              .normalize('NFD')
-              .replace(/['`’\/]/g, '_')
-              .replace(/\p{Diacritic}/gu, '')
-              .toLowerCase()
-              .replaceAll(" ", "_") + "_competence_score") {
-            input.value = m_model.get_score(competence.Nom_competence);
-          }
-        });
-      }
-      else if (input.className.includes("_competence")) {
-        let Nom_competence = "";
-        Competences.forEach((competence) => {
-          if (input.className ===
-            competence.Nom_competence
-              .normalize('NFD')
-              .replace(/['`’\/]/g, '_')
-              .replace(/\p{Diacritic}/gu, '')
-              .toLowerCase()
-              .replaceAll(" ", "_") + "_competence") {
-            Nom_competence = competence.Nom_competence;
-          }
-        });
-
-        const competence_connue = CompetencesConnues.find((competence) =>
-          competence.Nom_competence === Nom_competence &&
-          competence.Nom_model === m_model.Nom_model);
-
-        if (competence_connue !== null &&
-          typeof competence_connue !== "undefined" &&
-          competence_connue.Degres > 0) {
-          input.value = competence_connue.Degres;
+    // Traitement des input de competence majeure et mineure
+    if (input.className.includes("_competence_score")) {
+      Competences.forEach((competence) => {
+        if (input.className ===
+          competence.Nom_competence
+            .normalize('NFD')
+            .replace(/['`’\/]/g, '_')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .replaceAll(" ", "_") + "_competence_score") {
+          input.value = m_model.get_score(competence.Nom_competence);
         }
-        else {
-          input.value = "";
+      });
+    }
+    else if (input.className.includes("_competence")) {
+      let Nom_competence = "";
+      Competences.forEach((competence) => {
+        if (input.className ===
+          competence.Nom_competence
+            .normalize('NFD')
+            .replace(/['`’\/]/g, '_')
+            .replace(/\p{Diacritic}/gu, '')
+            .toLowerCase()
+            .replaceAll(" ", "_") + "_competence") {
+          Nom_competence = competence.Nom_competence;
         }
+      });
+
+      const competence_connue = CompetencesConnues.find((competence) =>
+        competence.Nom_competence === Nom_competence &&
+        competence.Nom_model === m_model.Nom_model);
+
+      if (competence_connue !== null &&
+        typeof competence_connue !== "undefined" &&
+        competence_connue.Degres > 0) {
+        input.value = competence_connue.Degres;
       }
-    });
-  }
+      else {
+        input.value = "";
+      }
+    }
+  });
 
   // Simule un changement de race pour mettre à jour les attributs _race
   let event = new Event("change", { bubbles: true });
-  document.querySelector("#div_model_0 .race_select").dispatchEvent(event);
+  document.querySelector("#div_model .race_select").dispatchEvent(event);
 
-  document.querySelector("#div_model_2 .type_de_magie").value = m_model.Magie_type.toLowerCase();
+  document.querySelector("#div_model .type_de_magie").value = m_model.Magie_type.toLowerCase();
 
   if (m_model.Liste_pretre) {
-    document.querySelector("#div_model_2 .liste_pretre").value = getShortName(m_model.Liste_pretre).toLowerCase();
+    document.querySelector("#div_model .liste_pretre").value = getShortName(m_model.Liste_pretre).toLowerCase();
   }
   else {
-    document.querySelector("#div_model_2 .liste_pretre").value = "";
+    document.querySelector("#div_model .liste_pretre").value = "";
   }
-  document.querySelector("#div_model_2 .concentration_divers_communs").value = m_model.get("concentration");
+  document.querySelector("#div_model .concentration_divers_communs").value = m_model.get("concentration");
 
   // Simule un changement de type de magie pour mettre à jour les autres champs
   event = new Event("change", { bubbles: true });
-  document.querySelector("#div_model_2 .type_de_magie").dispatchEvent(event);
+  document.querySelector("#div_model .type_de_magie").dispatchEvent(event);
+
+  // Simule un changement pour mettre à jour les champs (desavantages)
+  event = new Event("change", { bubbles: true });
+  document.querySelectorAll("#div_model_6 tr").forEach((tr) => {
+    if (tr.querySelector(".niveau") === null) return;
+    tr.querySelector(".niveau").dispatchEvent(event);
+  });
 
   Competences.forEach((competence) => {
     const class_name =
@@ -3183,7 +3222,7 @@ function affiche_model() {
         .replace(/\p{Diacritic}/gu, '')
         .toLowerCase()
         .replaceAll(" ", "_") + "_divers_communs";
-    const input = document.querySelector("#div_model_2 ." + class_name);
+    const input = document.querySelector("#div_model ." + class_name);
 
     if (input === null || typeof input === "undefined") return;
 
@@ -3203,37 +3242,8 @@ function affiche_model() {
   else if (m_pion) figurine.src = 'images/Figurines/' + m_pion.Model + '.png' + "?t=" + new Date().getTime();
   else figurine.style.display = 'none';
 
-  document.querySelector("#div_model_3 .attributs_creation_cout").textContent = m_model.get_cout_attributs_creation();
-  document.querySelector("#div_model_3 .attributs_cout").textContent = m_model.get_cout_attributs();
-  document.querySelector("#div_model_3 .dons_creation_cout").textContent = m_model.get_cout_dons_creation();
-  document.querySelector("#div_model_3 .avantages_creation_cout").textContent = 0; // Création
-  document.querySelector("#div_model_3 .avantages_cout").textContent = 0; // Final
-  document.querySelector("#div_model_3 .competences_cout").textContent = m_model.get_cout_competences();
-  document.querySelector("#div_model_3 .magie_classique_cout").textContent = m_model.get_cout_sorts();
-  document.querySelector("#div_model_3 .magie_religieuse_cout").textContent = m_model.get_cout_concentration();
-
-  const total_creation_cout =
-    m_model.get_cout_attributs_creation() +
-    m_model.get_cout_dons_creation() +
-    0 + // Avantages/Désavantages Création
-    -2000;
-  document.querySelector("#div_model_3 .total_creation_cout").textContent = total_creation_cout;
-
-  const total_cout =
-    m_model.get_cout_attributs() +
-    m_model.get_cout_dons_creation() +
-    0 + // Avantages/Désavantages Final
-    m_model.get_cout_competences() +
-    m_model.get_cout_sorts() +
-    m_model.get_cout_concentration() +
-    -2000;
-  document.querySelector("#div_model_3 .total_cout").textContent = total_cout;
-
-  const cout_attributs = m_model.get_cout_attributs() - m_model.get_cout_attributs_creation();
-  document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = cout_attributs > total_cout * 0.25 ? "block" : "none";
-
-  const cout_avantages = 0 - 0; // Final - Création
-  document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = cout_avantages > total_cout * 0.25 ? "block" : "none";
+  event = new Event("change", { bubbles: true });
+  document.querySelector("#div_model").dispatchEvent(event);
 }
 
 // === ÉVÉNEMENTS GÉNÉRAUX ===

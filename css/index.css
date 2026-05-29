@@ -243,37 +243,26 @@ input:checked+.slider:before {
 }
 
 #div_pion input,
-#div_model_0 input,
-#div_model_1 input,
-#div_model_2 input {
+#div_model input {
     font-size: x-small;
     width: 17px;
     text-align: center;
 }
 
-#div_model_3 input {
+#div_pion input:disabled,
+#div_model input:disabled,
+#div_pion select:disabled,
+#div_model select:disabled,
+#div_pion textarea:disabled,
+#div_model textarea:disabled {
+    background-color: lightgray;
+}
+
+#div_cout input {
     font-size: x-small;
     width: 34px;
     text-align: right;
     padding-right: 5px;
-}
-
-#pion input:disabled,
-#div_model_0 input:disabled,
-#div_model_1 input:disabled,
-#div_model_2 input:disabled,
-#div_model_3 input:disabled,
-#pion select:disabled,
-#div_model_0 select:disabled,
-#div_model_1 select:disabled,
-#div_model_2 select:disabled,
-#div_model_3 select:disabled,
-#pion textarea:disabled,
-#div_model_0 textarea:disabled,
-#div_model_1 textarea:disabled,
-#div_model_2 textarea:disabled,
-#div_model_3 textarea:disabled {
-    background-color: lightgray;
 }
 
 #div_cout td {
@@ -281,4 +270,52 @@ input:checked+.slider:before {
     border: 1px solid black;
     text-align: right;
     padding: 0px 5px 0px 5px;
+}
+
+#div_model_4 td:nth-child(3),
+#div_model_5 td:nth-child(1),
+#div_model_6 td:nth-child(3) {
+    text-align: left;
+    font-weight: bold;
+}
+
+#div_model_4 td:not(:nth-child(3)),
+#div_model_5 td:not(:nth-child(1)),
+#div_model_6 td:not(:nth-child(3)) {
+    text-align: center;
+}
+
+#div_model_4 td:nth-child(1),
+#div_model_6 td:nth-child(2),
+#div_model_4 td:nth-child(2) {
+    padding-left: 1px;
+    padding-right: 1px;
+}
+
+#div_model_4 td:nth-child(1) input[type="checkbox"],
+#div_model_6 td:nth-child(2) input[type="checkbox"],
+#div_model_4 td:nth-child(2) input[type="checkbox"] {
+    margin: 0;
+}
+
+#div_model_4 input,
+#div_model_6 input,
+#div_model_4 select,
+#div_model_6 select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#div_model_4 table tr:nth-child(even) td,
+#div_model_5 table tr:nth-child(even) td,
+#div_model_6 table tr:nth-child(even) td {
+    background-color: #eaf3ff; /* bleu clair */
+}
+
+#div_model_4 table tr:nth-child(odd) td,
+#div_model_5 table tr:nth-child(odd) td,
+#div_model_6 table tr:nth-child(odd) td,
+#div_model_5 table tr td:nth-child(1),  /* première colonne du tableau en blanc */
+#div_model_6 table tr td:nth-child(1) {
+    background-color: white;
 }

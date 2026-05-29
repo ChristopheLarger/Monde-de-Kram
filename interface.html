@@ -505,17 +505,27 @@
 
     <div id="div_model"
         style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: white; border: 3px solid black;">
-        <div class="div_model_tabs" style="display: flex; justify-content: space-between;">
-            <button type="button" class="tab-model humanoid" data-tab="0"
-                style="display: block; width: 33%; background-color: rgb(128, 128, 255);">Caractéristiques<br>Humanoides</button>
-            <button type="button" class="tab-model monstre" data-tab="1"
-                style="display: none; width: 33%; background-color: rgb(255, 32, 32);">Caractéristiques<br>Monstres</button>
-            <button type="button" class="tab-model avantages" data-tab="3"
-                style="width: 33%; background-color: rgb(255, 128, 255);">Avantages<br>& Coûts</button>
-            <button type="button" class="tab-model divers" data-tab="2"
-                style="width: 33%; background-color: rgb(255, 255, 64);">Magie, Armures<br>& Compétences</button>
+        <div class="div_model_tabs">
+            <div style="display: flex; justify-content: space-between;">
+                <button type="button" class="tab-model humanoid" data-tab="0"
+                    style="display: block; width: 33.33%; background-color: rgb(128, 128, 255);">Caractéristiques<br>Humanoides</button>
+                <button type="button" class="tab-model monstre" data-tab="1"
+                    style="display: none; width: 33.33%; background-color: rgb(255, 32, 32);">Caractéristiques<br>Monstres</button>
+                <button type="button" class="tab-model" data-tab="4"
+                    style="width: 33.33%; background-color: rgb(255, 255, 64);">Avantages</button>
+                <button type="button" class="tab-model" data-tab="6"
+                    style="width: 33.33%; background-color: rgb(255, 128, 64);">Désavantages</button>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <button type="button" class="tab-model" data-tab="5"
+                    style="width: 33.33%; background-color: rgb(128, 255, 128);">Compétences</button>
+                <button type="button" class="tab-model" data-tab="2"
+                    style="width: 33.33%; background-color: rgb(128, 255, 255);">Magie</button>
+                <button type="button" class="tab-model" data-tab="3"
+                    style="width: 33.33%; background-color: rgb(255, 128, 255);">Coûts &<br>Armures</button>
+            </div>
         </div>
-        <table class="div_model_table" style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
                 <col style="width: 100px;">
                 <col style="width: 1px;">
@@ -552,8 +562,9 @@
             </tr>
         </table>
 
+        <!-- Caractéristiques Humanoides -->
         <div id="div_model_0" style="display: none; z-index: 1025; background-color: white;">
-            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
                     <col style="width: 1px;">
@@ -567,7 +578,7 @@
                 </colgroup>
                 <tr>
                     <td colspan="9">
-                        <div style="display: flex; justify-content: space-between;">
+                        <div style="display: flex; justify-content: right;">
                             <span>Race :&nbsp;<select class="race_select"
                                     style="font-size: x-small; box-sizing: border-box;">
                                     <option value="humain">Humain</option>
@@ -580,7 +591,8 @@
                                     <option value="toutlisse">Toutlisse</option>
                                     <option value="autre">Autre</option>
                                 </select></span>
-                            <button class="switch_type_model"
+                            &nbsp;&nbsp;
+                            <button class="switch_to_monster"
                                 style="font-size: x-small; background-color: rgb(255, 32, 32);">Convertir
                                 en Monstre</button>
                         </div>
@@ -794,6 +806,7 @@
             </table>
         </div>
 
+        <!-- Caractéristiques Monstres -->
         <div id="div_model_1" style="display: none; z-index: 1025; background-color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
@@ -804,7 +817,7 @@
                 </colgroup>
                 <tr>
                     <td colspan="4" style="vertical-align: bottom; text-align: right;">
-                        <button class="switch_type_model"
+                        <button class="switch_to_humanoid"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px; background-color: rgb(128, 128, 255);">Convertir
                             en Humanoide</button>
                     </td>
@@ -905,6 +918,7 @@
             </table>
         </div>
 
+        <!-- Magie -->
         <div id="div_model_2" style="display: none; z-index: 1025; background-color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
@@ -948,9 +962,26 @@
                         </select>
                     </td>
                 </tr>
+            </table>
+        </div>
+
+        <!-- Coûts & Armures -->
+        <div id="div_model_3" style="display: none; z-index: 1025; background-color: white;">
+            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <colgroup>
+                    <col style="width: 100px;">
+                    <col style="width: 1px;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                    <col style="width: auto;">
+                </colgroup>
                 <tr>
                     <td colspan="2">
                         <hr>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
                         <table
                             style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                             <colgroup>
@@ -1017,41 +1048,7 @@
                                 </td>
                             </tr>
                         </table>
-                        <hr>
                     </td>
-                </tr>
-                <tr>
-                    <td colspan="2">
-                        <div class="div_divers_communs" style="overflow-y: auto;">
-                            <table class="table_divers_communs" style="box-sizing: border-box;">
-                                <colgroup>
-                                    <col style="width: 100%;">
-                                    <col style="width: 1px;">
-                                    <col style="width: 1px;">
-                                    <col style="width: 1px;">
-                                </colgroup>
-                                <tr>
-                                    <th></th>
-                                    <th></th>
-                                    <th style="text-align: center;">Degrés</th>
-                                    <th style="text-align: center;">Score</th>
-                                </tr>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <div id="div_model_3" style="display: none; z-index: 1025; background-color: white;">
-            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-                <colgroup>
-                    <col style="width: 100px;">
-                    <col style="width: 1px;">
-                    <col style="width: auto;">
-                    <col style="width: auto;">
-                    <col style="width: auto;">
-                </colgroup>
                 <tr>
                     <td colspan="2">
                         <hr>
@@ -1065,7 +1062,7 @@
                                 <tr>
                                     <td style="border-left: none; border-top: none;"></td>
                                     <td style="font-weight: bold;">Création</td>
-                                    <td style="font-weight: bold;">&nbsp;&nbsp;Final&nbsp;&nbsp;</td>
+                                    <td style="font-weight: bold;">&nbsp;&nbsp;&nbsp;Final&nbsp;&nbsp;&nbsp;</td>
                                 </tr>
                                 <tr>
                                     <td>Attributs :</td>
@@ -1099,8 +1096,8 @@
                                 </tr>
                                 <tr>
                                     <td>Départ :</td>
-                                    <td>-2000</td>
                                     <td style="background-color: lightgray;"></td>
+                                    <td>-2000</td>
                                 </tr>
                                 <tr>
                                     <td>Total :</td>
@@ -1124,6 +1121,2437 @@
                     </td>
                 </tr>
             </table>
+        </div>
+
+        <!-- Avantages -->
+        <div id="div_model_4" style="display: none; z-index: 1025; background-color: white;">
+            <div class="avantages"
+                style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <div style="text-align: right;">
+                    Nb points à la création : <span class="nb_points_creation">0</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;Nb points par l'expérience : <span class="nb_points_experience">0</span>
+                </div>
+                <table
+                    style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                    <colgroup>
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: auto;">
+                        <col style="width: 1px;">
+                    </colgroup>
+                    <tr>
+                        <th>Cré</th>
+                        <th>Exp</th>
+                        <th style="text-align: left;">&nbsp;Avantage</th>
+                        <th colspan="2" style="text-align: left;">Options</th>
+                        <th>Cout</th>
+                    </tr>
+                    <tr class="ambidextrie">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Ambidextrie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="beaute">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Beauté :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="bon_sens">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Bon sens :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="combat_contre_plusieurs_adversaires">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Combat contre plusieurs :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="don_pour_la_musique_1">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour la musique 1 :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="don_pour_la_musique_2">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour la musique 2 :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="don_pour_la_musique_3">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour la musique 3 :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="don_pour_les_langues_1">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour les langues 1 :&nbsp;</td>
+                        <td colspan="2"><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="">--</option>
+                                <option value="humain">Humain</option>
+                                <option value="aquante">Aquante</option>
+                                <option value="elfe">Elfe</option>
+                                <option value="gnome">Gnome</option>
+                                <option value="nain">Nain</option>
+                                <option value="orc">Orc</option>
+                                <option value="troll">Troll</option>
+                                <option value="toutlisse">Toutlisse</option>
+                            </select></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="don_pour_les_langues_2">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour les langues 2 :&nbsp;</td>
+                        <td colspan="2"><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="">--</option>
+                                <option value="humain">Humain</option>
+                                <option value="aquante">Aquante</option>
+                                <option value="elfe">Elfe</option>
+                                <option value="gnome">Gnome</option>
+                                <option value="nain">Nain</option>
+                                <option value="orc">Orc</option>
+                                <option value="troll">Troll</option>
+                                <option value="toutlisse">Toutlisse</option>
+                            </select></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="don_pour_les_langues_3">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Don pour les langues 3 :&nbsp;</td>
+                        <td colspan="2"><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="">--</option>
+                                <option value="humain">Humain</option>
+                                <option value="aquante">Aquante</option>
+                                <option value="elfe">Elfe</option>
+                                <option value="gnome">Gnome</option>
+                                <option value="nain">Nain</option>
+                                <option value="orc">Orc</option>
+                                <option value="troll">Troll</option>
+                                <option value="toutlisse">Toutlisse</option>
+                            </select></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="double_tir">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Double tir :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="empathie_animale">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Empathie animale :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="guerison_rapide">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Guérison rapide :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="maitre_de_magie">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre de magie :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box; width: auto;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="guide_spirituel">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Guide spirituel :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_d_armes">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre d'armes :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_majeure_1">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. majeure 1 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_majeure_2">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. majeure 2 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_majeure_3">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. majeure 3 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_mineure_1">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. mineure 1 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_mineure_2">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. mineure 2 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="maitre_de_compétence_mineure_3">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Maitre cmp. mineure 3 :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="vue_percante">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Vue perçante :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">1</span></td>
+                    </tr>
+                    <tr class="ouïe_fine">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Ouïe fine :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">1</span></td>
+                    </tr>
+                    <tr class="odorat_et_goût_supérieurs">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Odorat et goût sup. :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">1</span></td>
+                    </tr>
+                    <tr class="orientation">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Orientation :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="prestance">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Prestance :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="race_non_humaine">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Race non-humaine :&nbsp;</td>
+                        <td colspan="2"><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="aquante">Aquante</option>
+                                <option value="aquante_evolue">Aquante évolué</option>
+                                <option value="elfe">Elfe</option>
+                                <option value="elfe_evolue">Elfe évolué</option>
+                                <option value="gnome">Gnome</option>
+                                <option value="gnome_evolue">Gnome évolué</option>
+                                <option value="nain">Nain</option>
+                                <option value="nain_evolue">Nain évolué</option>
+                                <option value="orc">Orc</option>
+                                <option value="orc_evolue">Orc évolué</option>
+                                <option value="troll">Troll</option>
+                                <option value="troll_evolue">Troll évolué</option>
+                                <option value="toutlisse">Toutlisse</option>
+                                <option value="toutlisse_evolue">Toutlisse évolué</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="reflexes_de_combat">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Réflexes de combat :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="renommee">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Renommée :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="resistance_a_la_douleur">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Résistance à la douleur :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="resistance_a_la_magie">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Résistance à la magie :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="richesse">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Richesse :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="roc_mental">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Roc mental :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="sante_de_fer">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Santé de fer :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="Sens_du_danger">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Sens du danger :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="sens_du_temps">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Sens du temps :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                    <tr class="sixieme_sens">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Sixième sens :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="sort_naturel">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td>Sort naturel :&nbsp;</td>
+                        <td colspan="2"><select class="option"
+                                style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="vision_nocturne">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Vision nocturne :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="vision_peripherique">
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td>Vision périphérique :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><span class="cout">2</span></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Compétences -->
+        <div id="div_model_5" style="display: none; z-index: 1025; background-color: white;">
+            <div class="div_divers_communs"
+                style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <table
+                    style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                    <colgroup>
+                        <col style="width: auto;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                    </colgroup>
+                    <tr>
+                        <th style="text-align: left;">Compétence</th>
+                        <th style="text-align: center;">Don</th>
+                        <th style="text-align: center;">Attribut</th>
+                        <th style="text-align: center;">Degrés</th>
+                        <th style="text-align: center;">Base</th>
+                        <th style="text-align: center;">Score</th>
+                    </tr>
+                    <tr class="feinte_de_corps">
+                        <td>Feinte de corps :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="esquive">
+                        <td>Esquive :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co+VM</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parade_bouclier">
+                        <td>Parade bouclier :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="escrime">
+                        <td>Escrime :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="tranchantes">
+                        <td>Tranchantes :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co+VP</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="epee tranchantes">
+                        <td>Epée :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="dague tranchantes">
+                        <td>Dague :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="couteau tranchantes">
+                        <td>Couteau :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="hache tranchantes">
+                        <td>Hache :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="contondantes_ou_d_estoc">
+                        <td>Contondantes ou d'estoc :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co+VP</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-3</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="marteau contondantes_ou_d_estoc">
+                        <td>Marteau :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="fleau contondantes_ou_d_estoc">
+                        <td>Fléau :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="lance contondantes_ou_d_estoc">
+                        <td>Lance :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="baton contondantes_ou_d_estoc">
+                        <td>Bâton :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="etoile_du_matin contondantes_ou_d_estoc">
+                        <td>Etoile du matin :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="projectiles">
+                        <td>Projectiles :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co+P</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="arc projectiles">
+                        <td>Arc :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="arbalete projectiles">
+                        <td>Arbalête :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="baliste projectiles">
+                        <td>Baliste :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="fronde projectiles">
+                        <td>Fronde :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="armes_de_jet">
+                        <td>Armes de jet :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>Co+F</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="couteau_lancer armes_de_jet">
+                        <td>Couteau de lancer :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="hache_lancer armes_de_jet">
+                        <td>Hache de lancer :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="javelot armes_de_jet">
+                        <td>Javelot :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="armes_de_melee">
+                        <td>Armes de mêlée :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="combat_mains_nues">
+                        <td>Combat mains nues :&nbsp;</td>
+                        <td>Cmb</td>
+                        <td>NP</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="attaque_mains_nues combat_mains_nues">
+                        <td>Attaque mains nues :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="corps_a_corps combat_mains_nues">
+                        <td>Corps à corps :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_des_arcanes">
+                        <td>Connaissance des arcanes :&nbsp;</td>
+                        <td>Mag</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="maitriser_la_magie connaissance_des_arcanes">
+                        <td>Maîtriser la magie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_de_l_occulte">
+                        <td>Connaissance de l'occulte :&nbsp;</td>
+                        <td>Foi</td>
+                        <td>V</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="theognosie connaissance_de_l_occulte">
+                        <td>Théognosie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_des_religions connaissance_de_l_occulte">
+                        <td>Connaissance des Religions :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-1</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="creatures_surnaturelles connaissance_de_l_occulte">
+                        <td>Créatures surnaturelles :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="deplacement_dans_la_nature">
+                        <td>Déplacement dans la nature :&nbsp;</td>
+                        <td>Adp</td>
+                        <td>VP</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="equilibre deplacement_dans_la_nature">
+                        <td>Equilibre :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="grimper deplacement_dans_la_nature">
+                        <td>Grimper :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="nager deplacement_dans_la_nature">
+                        <td>Nager :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="sauter deplacement_dans_la_nature">
+                        <td>Sauter :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="tomber deplacement_dans_la_nature">
+                        <td>Tomber :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="acrobatie deplacement_dans_la_nature">
+                        <td>Acrobatie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="survie_dans_la_nature">
+                        <td>Survie dans la nature :&nbsp;</td>
+                        <td>Adp</td>
+                        <td>P+VM</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-3</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="se_reperer survie_dans_la_nature">
+                        <td>Se repérer :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_des_animaux survie_dans_la_nature">
+                        <td>Connaissance des animaux :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_des_plantes survie_dans_la_nature">
+                        <td>Connaissance des plantes :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="pister survie_dans_la_nature">
+                        <td>Pister :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="chasser survie_dans_la_nature">
+                        <td>Chasser :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="predire_le_temps survie_dans_la_nature">
+                        <td>Prédire le temps :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="connaissance_des_mecanismes">
+                        <td>Connaissance des mécanismes :&nbsp;</td>
+                        <td>Adp+Mem</td>
+                        <td>Co+VM</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="detecter_piege_secret connaissance_des_mecanismes">
+                        <td>Détecter Piège / Secret :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="desamorcer_un_piege connaissance_des_mecanismes">
+                        <td>(Dés)amorcer un piège :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="crocheter connaissance_des_mecanismes">
+                        <td>Crocheter :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="discretion">
+                        <td>Discrétion :&nbsp;</td>
+                        <td>Adp+Thp</td>
+                        <td>P+VM</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-2</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="camouflage discretion">
+                        <td>Comouflage :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="embuscade discretion">
+                        <td>Mener une embuscade :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="se_cacher discretion">
+                        <td>Se cacher :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="relations_avec_les_autres">
+                        <td>Relations avec les autres :&nbsp;</td>
+                        <td>Thp</td>
+                        <td>Ch</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-3</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="detecter_le_mensonge relations_avec_les_autres">
+                        <td>Détecter le mensonge :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="psychologie relations_avec_les_autres">
+                        <td>Psychologie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="eloquence relations_avec_les_autres">
+                        <td>Eloquence :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="marchander relations_avec_les_autres">
+                        <td>Marchander :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="seduire relations_avec_les_autres">
+                        <td>Séduire :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="torturer relations_avec_les_autres">
+                        <td>Torturer :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="commander relations_avec_les_autres">
+                        <td>Commander :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="feindre_abuser_les_autres">
+                        <td>Feindre / Abuser les autres :&nbsp;</td>
+                        <td>Thp</td>
+                        <td>Ch</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-3</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="mentir feindre_abuser_les_autres">
+                        <td>Mentir :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="se_deguiser feindre_abuser_les_autres">
+                        <td>Se déguiser :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="jouer_la_comedie feindre_abuser_les_autres">
+                        <td>Jouer la comédie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="erudition">
+                        <td>Erudition :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-3</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="lire_et_ecrire erudition">
+                        <td>Lire et écrire :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="lois_et_rites erudition">
+                        <td>Lois et rites :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="bureaucratie erudition">
+                        <td>Bureaucratie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="histoire_et_legendes erudition">
+                        <td>Histoire et Légendes :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="astro_alchimie_geologie erudition">
+                        <td>Astro / Alchimie / Géologie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="medecine erudition">
+                        <td>Médecine :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="pedagogie erudition">
+                        <td>Pédagogie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="maitrise_des_poisons erudition">
+                        <td>Maitrise des poisons :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="philosophie erudition">
+                        <td>Philosophie :&nbsp;</td>
+                        <td></td>
+                        <td></td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td>-</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="equitation compétences_mineures">
+                        <td>Equitation :&nbsp;</td>
+                        <td>Adp</td>
+                        <td>Co+V</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="premiers_soins compétences_mineures">
+                        <td>Premiers soins :&nbsp;</td>
+                        <td>Adp</td>
+                        <td>Co+V</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_humain compétences_mineures">
+                        <td>Parler Humain :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-4</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_elfe compétences_mineures">
+                        <td>Parler Elfe :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-6</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_gnome compétences_mineures">
+                        <td>Parler Gnome :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_aquante compétences_mineures">
+                        <td>Parler Aquante :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_nain compétences_mineures">
+                        <td>Parler Nain :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-6</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_orc compétences_mineures">
+                        <td>Parler Orc :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-7</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_troll compétences_mineures">
+                        <td>Parler Troll :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-6</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="parler_toutlisse compétences_mineures">
+                        <td>Parler Toutlisse :&nbsp;</td>
+                        <td>Mem</td>
+                        <td>Ab</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-7</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="manoeuvrer_un_bateau compétences_mineures">
+                        <td>Manœuvrer un bateau :&nbsp;</td>
+                        <td>Adp</td>
+                        <td>NP</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="jouer_instrument_1 compétences_mineures">
+                        <td>Jouer (Instrument 1) :&nbsp;</td>
+                        <td>Adp+Thp</td>
+                        <td>Co+Ch</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="jouer_instrument_2 compétences_mineures">
+                        <td>Jouer (Instrument 2) :&nbsp;</td>
+                        <td>Adp+Thp</td>
+                        <td>Co+Ch</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                    <tr class="jouer_instrument_3 compétences_mineures">
+                        <td>Jouer (Instrument 3) :&nbsp;</td>
+                        <td>Adp+Thp</td>
+                        <td>Co+Ch</td>
+                        <td><select class="degres" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                            </select></td>
+                        <td>-5</td>
+                        <td><input type="text" class="score" value="" disabled></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Désavantages -->
+        <div id="div_model_6" style="display: none; z-index: 1025; background-color: white;">
+            <div class="desavantages"
+                style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                <div style="text-align: right;">
+                    Nb points de revenu : <span class="nb_points_creation">0</span>
+                </div>
+                <table
+                    style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                    <colgroup>
+                        <col style="width: auto;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
+                    </colgroup>
+                    <tr>
+                        <th></th>
+                        <th style="text-align: right;">Sel</th>
+                        <th style="text-align: left;">&nbsp;Désavantage</th>
+                        <th style="text-align: left;">Niveau</th>
+                        <th>&nbsp;&nbsp;Rev&nbsp;&nbsp;</th>
+                    </tr>
+                    <tr class="albinisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Albinisme :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="addiction">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Addiction :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="arrogant">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Arrogant :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="autoritarisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Autoritarisme :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="avarice">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Avarice :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="begaiement">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Bégaiement :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="boiterie">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Boiterie :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">12</span></td>
+                    </tr>
+                    <tr class="borgne">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Borgne :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">12</span></td>
+                    </tr>
+                    <tr class="code_de_l_honneur">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Code de l'honneur :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="confiance_en_soi_excessive">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Confiance en soi excessive :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="cupidite">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Cupidité :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="curiosite_maladive">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Curiosité maladive :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="daltonisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Daltonisme :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="douillet">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Douillet :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="dur_d_oreille">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Dur d'oreille :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="dyslexie">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Dyslexie :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="emporte">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Emporté :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="ennemis">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Ennemis :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="eunuque">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Eunuque :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="flambeur">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Flambeur :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="frimeur">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Frimeur :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="gigantisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Gigantisme :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="gourmandise">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Gourmandise :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="hemophilie">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Hémophilie :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">20</span></td>
+                    </tr>
+                    <tr class="impulsivite">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Impulsivité :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="jeunesse">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Jeunesse :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="lachete">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Lâcheté :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="laideur">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Laideur :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="libertinage">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Libertinage :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="maigreur">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Maigreur :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="malchance">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Malchance :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="manchot_d_un_bras">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Manchot d'un bras :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">20</span></td>
+                    </tr>
+                    <tr class="manchot_d_une_main">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Manchot d'une main :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">10</span></td>
+                    </tr>
+                    <tr class="manque_de_confiance_en_soi">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Manque de confiance en soi :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="mauvaise_reputation">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Mauvaise réputation :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="mauvaise_vue">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Mauvaise vue :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="menteur_invetere">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Menteur invétéré :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="muet">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Muet :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">20</span></td>
+                    </tr>
+                    <tr class="naivete">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Naïveté :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">8</span></td>
+                    </tr>
+                    <tr class="nanisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Nanisme :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">15</span></td>
+                    </tr>
+                    <tr class="obesite">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Obésité :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="obstination">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Obstination :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="pacifisme">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Pacifisme :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="paralysie_violence">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Paralysie face à la violence :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">20</span></td>
+                    </tr>
+                    <tr class="personne_a_charge">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Personne à charge :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="phobies">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Phobies :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="pulsion">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Pulsion :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="rage">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Rage :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">10</span></td>
+                    </tr>
+                    <tr class="sans_odorat_et_gout">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Sans odorat et goût :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">3</span></td>
+                    </tr>
+                    <tr class="sarcastique">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Sarcastique :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">4</span></td>
+                    </tr>
+                    <tr class="sens_devoir">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Sens du devoir :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="sincerite">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Sincérité :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">5</span></td>
+                    </tr>
+                    <tr class="timidite">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Timidité :&nbsp;</td>
+                        <td></td>
+                        <td><span class="cout">6</span></td>
+                    </tr>
+                    <tr class="vieillesse">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Vieillesse :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="voeu">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Voeu :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                    <tr class="vulnerabilite_a_la_magie">
+                        <td></td>
+                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td>Vulnérabilité à la magie :&nbsp;</td>
+                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                            </select></td>
+                        <td><span class="cout">-1</span></td>
+                    </tr>
+                </table>
+            </div>
         </div>
     </div>
 </div>
