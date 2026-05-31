@@ -16,7 +16,7 @@
     <!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
     <script src="js/model.js"></script> <!-- Classes de base pour les modèles de personnages -->
     <script src="js/arme.js"></script> <!-- Classes pour les armes -->
-    <script src="js/competence.js"></script> <!-- Classes pour les armes -->
+    <script src="js/divers.js"></script> <!-- Classes diverses -->
     <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
     <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
@@ -34,9 +34,9 @@
         {
             switch ($type) {
                 case 'int':
-                    return is_null($value) ? "null" : "parseInt('0" . $value . "', 10)";
+                    return is_null($value) ? "null" : "parseInt('0" . $value . "')";
                 case 'int2':
-                    return is_null($value) ? "null" : "parseInt('" . $value . "', 10)";
+                    return is_null($value) ? "null" : "parseInt('" . $value . "')";
                 case 'bool':
                     return ($value === '1' || $value === 1 || $value === true || strtolower($value) === 'true') ? "true" : "false";
                 case 'null':
@@ -55,9 +55,6 @@
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
             $js .= "    Is_joueur: " . toJS($row['Is_joueur'], 'bool') . ",\n";
             $js .= "    Is_monster: " . toJS($row['Is_monster'], 'bool') . ",\n";
-
-            $js .= "    Race: " . toJS($row['Race']) . ",\n";
-            $js .= "    Ambidextre: " . toJS($row['Ambidextre'], 'bool') . ",\n";
 
             $js .= "    Force: " . toJS($row['Force'], 'int') . ",\n";
             $js .= "    Constitution: " . toJS($row['Constitution'], 'int') . ",\n";
@@ -211,30 +208,45 @@
             return $js;
         }
 
-                /**
+        /**
          * Génère le code JavaScript pour initialiser les compétences
          */
         function generateCompetenceJS($row, $index)
         {
             $js = "Competences[$index] = new Competence({\n";
-            $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
-            $js .= "    Competence_majeure: " . toJS($row['Competence_majeure']) . ",\n";
-            $js .= "    Don: " . toJS($row['Don'], 'null') . ",\n";
-            $js .= "    Attribut: " . toJS($row['Attribut'], 'null') . ",\n";
-            $js .= "    Base: " . toJS($row['Base'], 'int2') . "\n";
+            $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
+            $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
+            $js .= "    Degres: " . toJS($row['Degres'], 'int') . "\n";
             $js .= "});\n";
             return $js;
         }
 
         /**
-         * Génère le code JavaScript pour initialiser les compétences connues
+         * Génère le code JavaScript pour initialiser les désavantages
          */
-        function generateCompetenceConnueJS($row, $index)
+        function generateAvantageJS($row, $index)
         {
-            $js = "CompetencesConnues[$index] = new CompetenceConnue({\n";
-            $js .= "    Nom_competence: " . toJS($row['Nom_competence']) . ",\n";
+            $js = "Avantages[$index] = new Avantage({\n";
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
-            $js .= "    Degres: " . toJS($row['Degres'], 'int') . "\n";
+            $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
+            $js .= "    Selection_creation: " . toJS($row['Selection_creation'], 'bool') . ",\n";
+            $js .= "    Selection_experience: " . toJS($row['Selection_experience'], 'bool') . ",\n";
+            $js .= "    Niveau: " . toJS($row['Niveau'], 'int') . ",\n";
+            $js .= "    Parametre: " . toJS($row['Parametre']) . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
+        /**
+         * Génère le code JavaScript pour initialiser les désavantages
+         */
+        function generateDesavantageJS($row, $index)
+        {
+            $js = "Desavantages[$index] = new Desavantage({\n";
+            $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
+            $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
+            $js .= "    Selection: " . toJS($row['Selection'], 'bool') . ",\n";
+            $js .= "    Niveau: " . toJS($row['Niveau'], 'int') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -350,7 +362,7 @@
             }
 
             // === CHARGEMENT DES COMPÉTENCES ===
-            $query = "SELECT * FROM competence ORDER BY CASE WHEN Competence_majeure IS NULL THEN Nom_competence ELSE Competence_majeure END ASC, Competence_majeure ASC, Nom_competence ASC";
+            $query = "SELECT * FROM competence ORDER BY Nom_model ASC, Nom ASC";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
@@ -361,14 +373,26 @@
                 }
             }
 
-            // === CHARGEMENT DES COMPÉTENCES CONNUES ===
-            $query = "SELECT * FROM comp_connue ORDER BY Nom_model ASC, Nom_competence ASC";
+            // === CHARGEMENT DES AVANTAGES ===
+            $query = "SELECT * FROM avantage ORDER BY Nom_model ASC, Nom ASC";
             $result = $conn->query($query);
 
             if ($result->num_rows > 0) {
                 $ligne = 0;
                 while ($row = $result->fetch_assoc()) {
-                    echo generateCompetenceConnueJS($row, $ligne);
+                    echo generateAvantageJS($row, $ligne);
+                    $ligne++;
+                }
+            }
+
+            // === CHARGEMENT DES DESAVANTAGES ===
+            $query = "SELECT * FROM desavantage ORDER BY Nom_model ASC, Nom ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateDesavantageJS($row, $ligne);
                     $ligne++;
                 }
             }

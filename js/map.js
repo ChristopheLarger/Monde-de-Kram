@@ -1082,11 +1082,11 @@ class Pion extends Map {
      * Calcul le malus de la 2nde main
      * @returns {number} - Malus de la 2nde main
      */
-    malus_2nde_main() {
-        const model = Models.find(m => m.Nom_model === this.Model);
-        if (model.Ambidextre) return 0;
-        return Math.floor((18 - this.coordination()) / 2);
-    }
+    // malus_2nde_main() {
+    //     const model = Models.find(m => m.Nom_model === this.Model);
+    //     if (model.Ambidextre) return 0;
+    //     return Math.floor((18 - this.coordination()) / 2);
+    // }
 
     /**
      * Calcul la coordination
@@ -1127,8 +1127,10 @@ class Pion extends Map {
      */
     #get_score_sub(competence) {
         const model = Models.find(m => m.Nom_model === this.Model);
-        const comp = Competences.find(comp => comp.Nom_competence === competence);
+        const comp = Competences.find(comp => comp.Nom_model === this.Model && comp.Nom === competence);
 
+        if (comp === null || typeof comp === "undefined") return null;
+        
         // Calcul de l'attribut
         let attribut = 0;
         if (!model.Is_monster) {
@@ -1181,13 +1183,13 @@ class Pion extends Map {
         }
 
         // Ajout des degrés de la compétence connue
-        const comp_connue = CompetencesConnues.find(comp =>
-            comp.Nom_model === this.Model &&
-            comp.Nom_competence === competence);
+        // const comp_connue = CompetencesConnues.find(comp =>
+        //     comp.Nom_model === this.Model &&
+        //     comp.Nom_competence === competence);
 
-        if (comp_connue !== null && typeof comp_connue !== "undefined") {
-            return comp.Base + attribut + comp_connue.Degres;
-        }
+        // if (comp_connue !== null && typeof comp_connue !== "undefined") {
+        //     return comp.Base + attribut + comp_connue.Degres;
+        // }
 
         return comp.Base + attribut;
     }
@@ -1242,12 +1244,12 @@ class Pion extends Map {
         const score = this.#get_score_sub(competence);
         if (score === null) return null;
 
-        // Calcul de la compétence majeure
-        const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
-        if (comp_majeure === null) return Math.round(score * ratio);
+        // // Calcul de la compétence majeure
+        // const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
+        // if (comp_majeure === null) return Math.round(score * ratio);
 
-        // Calcul du score total
-        return Math.round((score + this.#get_score_sub(comp_majeure)) * ratio);
+        // // Calcul du score total
+        // return Math.round((score + this.#get_score_sub(comp_majeure)) * ratio);
     }
 
     /**

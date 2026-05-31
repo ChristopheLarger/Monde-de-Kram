@@ -621,17 +621,17 @@ let SelectRectangle = new Forme("Rectangle", { color: "rgb(64, 64, 255)" }); // 
 // Clic droit sur le bouton rectangle : ouvre le dialogue de dimensions
 document.getElementById("rectangle").addEventListener("contextmenu", function (event) {
     event.preventDefault();
-    afficher_dim_rectangle();
+    affiche_dim_rectangle();
 });
 
 // Clic droit sur le bouton mur : ouvre le dialogue de dimensions
 document.getElementById("mur").addEventListener("contextmenu", function (event) {
     event.preventDefault();
-    afficher_dim_mur();
+    affiche_dim_mur();
 });
 
 // Clic droit sur le bouton ellipse : ouvre le dialogue de dimensions
 document.getElementById("ellipse").addEventListener("contextmenu", function (event) {
     event.preventDefault();
-    afficher_dim_ellipse();
+    affiche_dim_ellipse();
 });

@@ -60,21 +60,22 @@ class ChatServer implements MessageComponentInterface
      * @param string $msg - Message reçu
      */
     public function onMessage(ConnectionInterface $from, $msg) {
+        echo "Msg : " . $msg . "\n";
+        if (function_exists('ob_flush')) { @ob_flush(); }
+        @flush();
+
         $this->Set_champs($msg);
         $this->Bascule_sort_connu($msg);
         $this->Set_Model($msg);
         $this->Set_Nom_model($msg);
         $this->Set_Degres($msg);
+        $this->Set_Avantage($msg);
+        $this->Set_Desavantage($msg);
         $this->Copy_Figurine($msg);
 
         // === DIFFUSION DU MESSAGE ===
-        // Parcourir tous les clients connectés
         foreach ($this->clients as $client) {
-            echo "Msg : " . $msg . "\n";
-            // Ne pas renvoyer le message à l'expéditeur
             if ($from != $client) {
-
-                // Envoyer le message aux clients
                 $client->send($msg);
             }
         }
@@ -100,8 +101,8 @@ class ChatServer implements MessageComponentInterface
         } else {
             // Changement du nom du modèle dans la base de données
             $sql = "INSERT INTO `model` (
-                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`,
-                `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
+                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Puissance_mentale`, `Puissance_physique`,
+                `Fatigue`, `Concentration`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
                 `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
                 `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`,
                 `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`,
@@ -111,8 +112,8 @@ class ChatServer implements MessageComponentInterface
                 `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`)
                 SELECT
                 ?,
-                `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`,
-                `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
+                `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Puissance_mentale`, `Puissance_physique`,
+                `Fatigue`, `Concentration`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
                 `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
                 `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`,
                 `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`,
@@ -229,6 +230,99 @@ class ChatServer implements MessageComponentInterface
     }
 
     /**
+     * FONCTION DE CHANGEMENT D'UN DESAVANTAGE DU MODELE
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Set_Avantage($msg) {
+        $regex = "/^MJ: Set_Avantage ([^@]+)@([^@]+)@([^@]+)@([^@]+)@([^@]+)@([^@]*)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $nom_model = $result[1];
+        $nom = $result[2];
+        $selection_creation = $result[3];
+        $selection_experience = $result[4];
+        $niveau = $result[5];
+        $param = $result[6];
+
+        echo "Nom_model : " . $nom_model . "\n";
+        echo "Nom : " . $nom . "\n";
+        echo "Selection_creation : " . $selection_creation . "\n";
+        echo "Selection_experience : " . $selection_experience . "\n";
+        echo "Niveau : " . $niveau . "\n";
+        echo "Parametre : " . $param . "\n";
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            $query = "SELECT * FROM avantage WHERE Nom_model = ? AND Nom = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ss", $nom_model, $nom);
+            $stmt->execute();
+            $resultMysql = $stmt->get_result();
+
+            if ($resultMysql->num_rows > 0) {
+                $sql = "UPDATE avantage SET Selection_creation = ?, Selection_experience = ?, Niveau = ?, Parametre = ? WHERE Nom_model = ? AND Nom = ?";
+            } else {
+                $sql = "INSERT INTO avantage (Selection_creation, Selection_experience, Niveau, Parametre, Nom_model, Nom) VALUES (?, ?, ?, ?, ?, ?)";
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iiisss", $selection_creation, $selection_experience, $niveau, $param, $nom_model, $nom);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+    /**
+     * FONCTION DE CHANGEMENT D'UN DESAVANTAGE DU MODELE
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Set_Desavantage($msg) {
+        $regex = "/^MJ: Set_Desavantage ([^@]+)@([^@]+)@([^@]+)@([^@]+)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $nom_model = $result[1];
+        $nom = $result[2];
+        $selection = $result[3];
+        $niveau = $result[4];
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            $query = "SELECT * FROM desavantage WHERE Nom_model = ? AND Nom = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ss", $nom_model, $nom);
+            $stmt->execute();
+            $resultMysql = $stmt->get_result();
+
+            if ($resultMysql->num_rows > 0) {
+                $sql = "UPDATE desavantage SET Selection = ?, Niveau = ? WHERE Nom_model = ? AND Nom = ?";
+            } else {
+                $sql = "INSERT INTO desavantage (Selection, Niveau, Nom_model, Nom) VALUES (?, ?, ?, ?)";
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("iiss", $selection, $niveau, $nom_model, $nom);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+    /**
      * FONCTION DE BASCULE DES SORTS CONNUS
      * ====================================
      * @param string $msg - Message contenant les données
@@ -277,8 +371,8 @@ class ChatServer implements MessageComponentInterface
 
         if (! preg_match($regex, $msg, $result)) return false;
 
-        $nom_competence = $result[1];
-        $nom_model = $result[2];
+        $nom_model = $result[1];
+        $nom = $result[2];
         $degres = $result[3];
 
         // Connexion à la base de données MySQL
@@ -288,19 +382,19 @@ class ChatServer implements MessageComponentInterface
             echo "Echec de connexion à la base de données.\n";
             die("Échec de la connexion : " . $conn->connect_error);
         } else {
-            $query = "SELECT * FROM comp_connue WHERE Nom_competence = ? AND Nom_model = ?";
+            $query = "SELECT * FROM competence WHERE Nom_model = ? AND Nom = ?";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("ss", $nom_competence, $nom_model);
+            $stmt->bind_param("ss", $nom_model, $nom);
             $stmt->execute();
             $resultMysql = $stmt->get_result();
 
             if ($resultMysql->num_rows > 0) {
-                $sql = "UPDATE comp_connue SET Degres = ? WHERE Nom_competence = ? AND Nom_model = ?";
+                $sql = "UPDATE competence SET Degres = ? WHERE Nom_model = ? AND Nom = ?";
             } else {
-                $sql = "INSERT INTO comp_connue (Degres, Nom_competence, Nom_model) VALUES (?, ?, ?)";
+                $sql = "INSERT INTO competence (Degres, Nom_model, Nom) VALUES (?, ?, ?)";
             }
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("sss", $degres, $nom_competence, $nom_model);
+            $stmt->bind_param("iss", $degres, $nom_model, $nom);
             $stmt->execute();
             $stmt->close();
         }

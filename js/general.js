@@ -10,6 +10,22 @@
 // const ws = new WebSocket('ws://93.19.210.23:8080');  // Serveur distant
 const ws = new WebSocket('ws://localhost:8080');        // Serveur local
 
+ws.onopen = function () {
+    console.log("WebSocket connecté (ws://localhost:8080)");
+};
+
+ws.onclose = function (event) {
+    if (event.wasClean) {
+        console.log("WebSocket fermé proprement");
+    } else {
+        console.warn("WebSocket déconnecté (code " + event.code + ") — vérifiez que php server.php tourne et que la base MySQL est à jour");
+    }
+};
+
+ws.onerror = function () {
+    console.warn("WebSocket : impossible de se connecter à ws://localhost:8080");
+};
+
 /**
  * Gestionnaire des messages WebSocket entrants
  */
@@ -47,6 +63,10 @@ ws.onmessage = function (event) {
  * @param {boolean} copyToChat - Si true, affiche dans le chat local
  */
 function send(header, content, copyToChat = false) {
+    if (ws.readyState !== WebSocket.OPEN) {
+        console.warn("WebSocket non connecté, message ignoré :", header, content);
+        return;
+    }
     const player = document.getElementById("joueur").value;
     const message = `${player}: ${header} ${content}`;
     ws.send(message);

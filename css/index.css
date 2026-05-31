@@ -249,6 +249,11 @@ input:checked+.slider:before {
     text-align: center;
 }
 
+#div_model_5 .don,
+#div_model_5 .attribut {
+    width: 50px;
+}
+
 #div_pion input:disabled,
 #div_model input:disabled,
 #div_pion select:disabled,
@@ -299,7 +304,6 @@ input:checked+.slider:before {
 }
 
 #div_model_4 input,
-#div_model_6 input,
 #div_model_4 select,
 #div_model_6 select {
     width: 100%;
@@ -307,15 +311,20 @@ input:checked+.slider:before {
 }
 
 #div_model_4 table tr:nth-child(even) td,
-#div_model_5 table tr:nth-child(even) td,
 #div_model_6 table tr:nth-child(even) td {
     background-color: #eaf3ff; /* bleu clair */
 }
 
 #div_model_4 table tr:nth-child(odd) td,
-#div_model_5 table tr:nth-child(odd) td,
 #div_model_6 table tr:nth-child(odd) td,
-#div_model_5 table tr td:nth-child(1),  /* première colonne du tableau en blanc */
 #div_model_6 table tr td:nth-child(1) {
     background-color: white;
+}
+
+#div_model select {
+    text-overflow: ellipsis;
+}
+
+#div_model .niveau {
+    text-overflow: clip;
 }
