@@ -230,28 +230,33 @@ class ChatServer implements MessageComponentInterface
     }
 
     /**
-     * FONCTION DE CHANGEMENT D'UN DESAVANTAGE DU MODELE
+     * FONCTION DE CHANGEMENT D'UN AVANTAGE DU MODELE
      * ==============================================
      * @param string $msg - Message contenant les données
      * @return bool - true si la modification de l'attribut a réussi
      */
     private function Set_Avantage($msg) {
-        $regex = "/^MJ: Set_Avantage ([^@]+)@([^@]+)@([^@]+)@([^@]+)@([^@]+)@([^@]*)$/";
+        echo "Set_Avantage : Appel de la fonction\n";
+
+        $regex = "/^MJ: Set_Avantage ([^@]+)@([^@]+)@([^@]+)@([^@]*)@([^@]*)@([^@]*)@([^@]*)$/";
         if (! preg_match($regex, $msg, $result)) return false;
+        echo "Set_Avantage : Regex valide\n";
 
         $nom_model = $result[1];
         $nom = $result[2];
-        $selection_creation = $result[3];
-        $selection_experience = $result[4];
-        $niveau = $result[5];
-        $param = $result[6];
+        $selection = $result[3];
+        $parametre = $result[4];
+        $type = $result[5];
+        $niveau_creation = $result[6];
+        $niveau_experience = $result[7];
 
-        echo "Nom_model : " . $nom_model . "\n";
-        echo "Nom : " . $nom . "\n";
-        echo "Selection_creation : " . $selection_creation . "\n";
-        echo "Selection_experience : " . $selection_experience . "\n";
-        echo "Niveau : " . $niveau . "\n";
-        echo "Parametre : " . $param . "\n";
+        echo "nom_model : " . $nom_model . "\n";
+        echo "nom : " . $nom . "\n";
+        echo "selection : " . $selection . "\n";
+        echo "parametre : " . $parametre . "\n";
+        echo "type : " . $type . "\n";
+        echo "niveau_creation : " . $niveau_creation . "\n";
+        echo "niveau_experience : " . $niveau_experience . "\n";
 
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
@@ -266,13 +271,15 @@ class ChatServer implements MessageComponentInterface
             $stmt->execute();
             $resultMysql = $stmt->get_result();
 
+            echo "resultMysql : " . $resultMysql->num_rows . "\n";
+
             if ($resultMysql->num_rows > 0) {
-                $sql = "UPDATE avantage SET Selection_creation = ?, Selection_experience = ?, Niveau = ?, Parametre = ? WHERE Nom_model = ? AND Nom = ?";
+                $sql = "UPDATE avantage SET Selection = ?, Parametre = ?, `Type` = ?, Niveau_creation = ?, Niveau_experience = ? WHERE Nom_model = ? AND Nom = ?";
             } else {
-                $sql = "INSERT INTO avantage (Selection_creation, Selection_experience, Niveau, Parametre, Nom_model, Nom) VALUES (?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO avantage (Selection, Parametre, `Type`, Niveau_creation, Niveau_experience, Nom_model, Nom) VALUES (?, ?, ?, ?, ?, ?, ?)";
             }
             $stmt = $conn->prepare($sql);
-            $stmt->bind_param("iiisss", $selection_creation, $selection_experience, $niveau, $param, $nom_model, $nom);
+            $stmt->bind_param("issssss", $selection, $parametre, $type, $niveau_creation, $niveau_experience, $nom_model, $nom);
             $stmt->execute();
             $stmt->close();
         }

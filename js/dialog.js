@@ -532,7 +532,7 @@ function initialise_pion() {
 
     // Réaffichage des zone à scroll vertical et dimensionnement du textarea
     document.querySelector("#div_model_1 .capacites_monstre").style.display = "";
-    document.querySelector("#div_model_1 .capacites_monstre").style.height = (hauteur - h[1] - 3) + "px";
+    document.querySelector("#div_model_1 .capacites_monstre").style.height = (hauteur - h[1] + 34 - 9) + "px";
 
     document.querySelector("#div_model_5 .competences").style.display = "";
     document.querySelector("#div_model_5 .competences").style.height = (hauteur - h[2] + 34 - 9) + "px";
@@ -2502,10 +2502,6 @@ function affiche_confirm_sort() {
  * Initialise les événements de l'en-tête du modèle
  */
 function initialise_model_X() {
-  document.querySelector("#div_model").addEventListener("change", function (event) {
-    update_cout_total();
-  });
-
   document.querySelector("#div_model .nom_model").addEventListener("input", function (event) {
     const model_exists = Models.find((m) => m.Nom_model === this.value);
     if (model_exists || this.value === "") {
@@ -2573,6 +2569,10 @@ function initialise_model_X() {
 
       if (tab_index === "0" || tab_index === "1") {
         document.getElementById('div_model_' + (m_model.Is_monster ? '1' : '0')).style.display = 'block';
+      }
+      else if (tab_index === "3") {
+        update_cout_total();
+        document.getElementById('div_model_3').style.display = 'block';
       }
       else {
         document.getElementById('div_model_' + tab_index).style.display = 'block';
@@ -2646,10 +2646,9 @@ function initialise_model_X() {
         event.target.value = event.target.value.replace(/[^0-9\-]/g, ""); // Integer
       }
 
-      let attribut = event.target.className.replace("_base", "");
+      let attribut = event.target.className.replace("_base", "").replace("_divers_communs", "");
       attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-
-      if (!event.target.disabled && attribut !== "") { // Tophy : competence, avantages, désavantages ?
+      if (!event.target.disabled && attribut !== "") {
         if (attribut in m_model) {
           m_model[attribut] = event.target.value;
           m_model.sendMessage("set_" + attribut, event.target.value);
@@ -2674,7 +2673,7 @@ function initialise_model_0() {
 
   document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
     input.addEventListener("input", function (event) {
-      const attribut = event.target.className.replace("_base", "").replace("_experience", "");
+      const attribut = event.target.className.replace("_base", "").replace("_experience", "").replace("_race", "");
       const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
 
       const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
@@ -2748,9 +2747,16 @@ function initialise_model_0() {
         parseInt(document.querySelector("#div_model_0 .perception_score").value || 0) +
         parseInt(document.querySelector("#div_model_0 .vivacite_mentale_score").value || 0)) / 3);
 
+      let bonus_sixieme_sens = 0;
+      let av = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Sixième sens" && avantage.Selection);
+      if (av !== null && av !== undefined) {
+        bonus_sixieme_sens =
+          (av.Niveau_creation === "-" ? 0 : parseInt(av.Niveau_creation)) +
+          (av.Niveau_experience === "-" ? 0 : parseInt(av.Niveau_experience));
+      }
       document.querySelector("#div_model_0 .sixieme_sens_score").value = Math.round((
         parseInt(document.querySelector("#div_model_0 .adaptation_score").value || 0) +
-        parseInt(document.querySelector("#div_model_0 .perception_score").value || 0)) / 2);
+        parseInt(document.querySelector("#div_model_0 .perception_score").value || 0)) / 2) + bonus_sixieme_sens;
     });
   });
 }
@@ -2841,48 +2847,86 @@ function initialise_model_2() {
   });
 }
 
+function set_competences_bornes(competence, min, max) {
+  if (competence === null || competence === undefined || competence === "") return;
+
+  const classe = competence.normalize('NFD').replace(/\p{Diacritic}/gu, '').replaceAll(" ", "_").replaceAll("'", "_").toLowerCase();
+  const tr = Array.from(document.querySelectorAll("#div_model_5 tr")).find(tr => tr.classList.item(0) === classe);
+
+  if (m_model !== null && m_model !== undefined) {
+    let av = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Parametre === competence && avantage.Selection);
+    if (av !== null && av !== undefined) {
+      const base = (av.Niveau_creation === "-" ? 0 : parseInt(av.Niveau_creation)) +
+        (av.Niveau_experience === "-" ? 0 : parseInt(av.Niveau_experience));
+      max += base;
+    }
+
+    const is_mineure = tr.classList.item(1) === "competences_mineures";
+    if (is_mineure) {
+      if (max > 13) max = 13;
+    }
+    else {
+      if (max > 9) max = 9;
+    }
+
+    let jeunesse = Desavantages.find(desavantage => desavantage.Nom_model === m_model.Nom_model && desavantage.Nom === "Jeunesse" && desavantage.Selection);
+    if (jeunesse !== null && jeunesse !== undefined) {
+      if (jeunesse.Niveau === "1" || jeunesse.Niveau === "2") max -= (is_mineure ? 2 : 1);
+      if (jeunesse.Niveau === "3" || jeunesse.Niveau === "4") max -= (is_mineure ? 4 : 2);
+      if (max < 0) max = 0;
+      if (max < min) max = min;
+    }
+  }
+
+  const degres = document.querySelector("#div_model_5 ." + classe).querySelector(".degres");
+  if (degres === null || degres === undefined) return;
+
+  if (degres.value < min) degres.value = min;
+  if (degres.value > max) degres.value = max;
+
+  const old_value = degres.value;
+
+  degres.innerHTML = "";
+  for (let i = min; i <= max; i++) {
+    let nouvelleOption = document.createElement("option");
+    nouvelleOption.value = i;
+    nouvelleOption.textContent = i;
+    degres.appendChild(nouvelleOption);
+  }
+  degres.value = old_value;
+
+  degres.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 /**
  * Initialise les événements de la section Avantages du modèle
  */
 function initialise_model_4() {
+
+  // Chargement de la liste des parametres des compétences majeures et mineures
   document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
     if (tr.querySelectorAll("td")[0] === null || tr.querySelectorAll("td")[0] === undefined) return;
 
     const Nom_competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
     if (Nom_competence === null || Nom_competence === undefined) return;
 
-    if (tr.classList.item(1) !== null && tr.classList.item(1) !== undefined) return;
-
-    if (Nom_competence === "competences mineures") return;
-
     const nouvelleOption = document.createElement("option");
     nouvelleOption.value = Nom_competence;
     nouvelleOption.textContent = Nom_competence;
 
-    document.querySelector("#div_model_4 .maitre_de_competence_majeure_1").querySelector(".parametre").appendChild(nouvelleOption);
-    document.querySelector("#div_model_4 .maitre_de_competence_majeure_2").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
-    document.querySelector("#div_model_4 .maitre_de_competence_majeure_3").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
+    if (tr.classList.item(1) === "competences_mineures") {
+      document.querySelector("#div_model_4 .maitre_de_competence_mineure_1").querySelector(".parametre").appendChild(nouvelleOption);
+      document.querySelector("#div_model_4 .maitre_de_competence_mineure_2").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
+      document.querySelector("#div_model_4 .maitre_de_competence_mineure_3").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
+    }
+    else if (tr.classList.item(1) === null || tr.classList.item(1) === undefined) {
+      document.querySelector("#div_model_4 .maitre_de_competence_majeure_1").querySelector(".parametre").appendChild(nouvelleOption);
+      document.querySelector("#div_model_4 .maitre_de_competence_majeure_2").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
+      document.querySelector("#div_model_4 .maitre_de_competence_majeure_3").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
+    }
   });
 
-  document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
-    if (tr.querySelectorAll("td")[0] === null || tr.querySelectorAll("td")[0] === undefined) return;
-
-    const Nom_competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
-    if (Nom_competence === null || Nom_competence === undefined) return;
-
-    if (tr.classList.item(1) !== "competences_mineures") return;
-
-    if (Nom_competence === "competences mineures") return;
-
-    const nouvelleOption = document.createElement("option");
-    nouvelleOption.value = Nom_competence;
-    nouvelleOption.textContent = Nom_competence;
-
-    document.querySelector("#div_model_4 .maitre_de_competence_mineure_1").querySelector(".parametre").appendChild(nouvelleOption);
-    document.querySelector("#div_model_4 .maitre_de_competence_mineure_2").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
-    document.querySelector("#div_model_4 .maitre_de_competence_mineure_3").querySelector(".parametre").appendChild(nouvelleOption.cloneNode(true));
-  });
-
+  // Chargement de la liste des parametres des sorts naturels
   Sorts.filter((s) => s.Niveau <= 4).forEach((s) => {
     // Les sorts à coût variable ne sont pas candidats
     if (s.Nom_sort === "Dissiper la fatigue" || s.Nom_sort === "Soigner les blessures légères") return;
@@ -2892,116 +2936,233 @@ function initialise_model_4() {
     document.querySelector("#div_model_4 .sort_naturel").querySelector(".parametre").appendChild(nouvelleOption);
   });
 
-  document.querySelectorAll("#div_model_4 .niveau").forEach((niveau) => {
-    niveau.addEventListener("change", function (event) {
-      switch (event.target.closest("tr").classList.item(0)) {
-        case "maitre_de_magie":
-        case "guide_spirituel":
-          event.target.closest("tr").querySelector(".cout").value = 10 + 3 * event.target.value;
-          break;
-        case "maitre_d_armes":
-          event.target.closest("tr").querySelector(".cout").value = 6 * event.target.value;
-          break;
-        case "maitre_de_competence_majeure_1":
-        case "maitre_de_competence_majeure_2":
-        case "maitre_de_competence_majeure_3":
-          event.target.closest("tr").querySelector(".cout").value = 3 * event.target.value;
-          break;
-        case "resistance_a_la_magie":
-          event.target.closest("tr").querySelector(".cout").value = 5 * event.target.value;
-          break;
-        case "richesse":
-          event.target.closest("tr").querySelector(".cout").value = 2 * event.target.value + 2;
-          break;
-        default:
-          event.target.closest("tr").querySelector(".cout").value = event.target.value;
-          break;
-      }
-
-      if (m_model === null || typeof m_model === "undefined") return;
-
-      const Nom_avantage = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
-      const avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === Nom_avantage);
-      if (avantage === null || typeof avantage === "undefined") return;
-      avantage.Niveau = event.target.value;
-      avantage.sendMessage("set_Avantage");
-    });
-    const event = new Event("change", { bubbles: true });
-    niveau.dispatchEvent(event);
-  });
-
-  document.querySelectorAll("#div_model_4 .parametre").forEach((option) => {
-    option.addEventListener("change", function (event) {
-      switch (event.target.closest("tr").classList.item(0)) {
-        case "race_non_humaine":
-          event.target.closest("tr").querySelector(".cout").value = event.target.value.includes("evolue") ? 12 : 8;
-          break;
-        case "sort_naturel":
-          const Nom_liste = shortName[event.target.value.split(" - ")[0]];
-          const Nom_sort = event.target.value.split(" - ")[1];
-          event.target.closest("tr").querySelector(".cout").value = 2 * Sorts.find((s) => s.Nom_sort === Nom_sort && s.Nom_liste === Nom_liste).Niveau;
-          break;
-        default:
-          if (event.target.closest("tr").querySelector(".niveau")) {
-            event.target.closest("tr").querySelector(".cout").value = event.target.closest("tr").querySelector(".niveau").value;
-          }
-          break;
-      }
-
-      if (m_model === null || typeof m_model === "undefined") return;
-
-      const Nom_avantage = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
-      const avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === Nom_avantage);
-      if (avantage === null || typeof avantage === "undefined") return;
-      avantage.Parametre = event.target.value;
-      avantage.sendMessage("set_Avantage");
-    });
-    const event = new Event("change", { bubbles: true });
-    option.dispatchEvent(event);
-  });
-
-  document.querySelector("#div_model_4 .race_non_humaine").querySelector(".parametre").addEventListener("change", function (event) {
-    ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribute) => {
-      const race = event.target.value.replace("_evolue", "");
-      const val = attributs_races[race][attribute];
-      document.querySelector("#div_model_0 ." + attribute + "_race").value = val > 0 ? "+" + val : (val < 0 ? val : "-");
-      document.querySelector("#div_model_0 ." + attribute + "_base").dispatchEvent(new Event("input", { bubbles: true }));
-    });
-  });
-
-  document.querySelector("#div_model_4").addEventListener("change", function (event) {
-    if (event.target.classList.contains("selection_creation")) {
-      if (event.target.checked) event.target.closest("tr").querySelector(".selection_experience").checked = false;
-    }
-    if (event.target.classList.contains("selection_experience")) {
-      if (event.target.checked) event.target.closest("tr").querySelector(".selection_creation").checked = false;
-    }
-    
-    document.querySelector("#div_model_4 .nb_points_creation").textContent = m_model.get_cout_avantages_creation();
-    document.querySelector("#div_model_4 .nb_points_experience").textContent = m_model.get_cout_avantages_experience();
-  });
-
-  document.querySelectorAll("#div_model_4 input[type=checkbox], #div_model_4 select").forEach(element => {
+  document.querySelectorAll("#div_model_4 .avantages").forEach((element) => {
     element.addEventListener("change", function (event) {
-      const Nom_avantage_full = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
-      let avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === Nom_avantage_full);
+      if (m_model === null || typeof m_model === "undefined") return;
+
+      const selection = event.target.closest("tr").querySelector(".selection");
+      const parametre = event.target.closest("tr").querySelector(".parametre");
+      const type = event.target.closest("tr").querySelector(".type");
+      const niveau_creation = event.target.closest("tr").querySelector(".niveau_creation");
+      const niveau_experience = event.target.closest("tr").querySelector(".niveau_experience");
+      const cout = event.target.closest("tr").querySelector(".cout");
+
+      const nom_avantage = event.target.closest("tr").querySelectorAll("td")[1].textContent.split(" :")[0];
+      let avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === nom_avantage);
+
       if (avantage === null || typeof avantage === "undefined") {
-        avantage = new Avantage({
-          Nom_model: m_model.Nom_model,
-          Nom: Nom_avantage_full,
-          Selection_creation: false,
-          Selection_experience: false,
-          Niveau: 1,
-          Parametre: null
-        });
+        avantage = new Avantage();
+        avantage.Nom_model = m_model.Nom_model;
+        avantage.Nom = nom_avantage;
+        avantage.Selection = false;
+        avantage.Parametre = null;
+        avantage.Type = null;
+        avantage.Niveau_creation = null;
+        avantage.Niveau_experience = null;
         Avantages.push(avantage);
       }
 
-      if (event.target.classList.contains("selection_creation")) avantage.Selection_creation = event.target.checked;
-      if (event.target.classList.contains("selection_experience")) avantage.Selection_experience = event.target.checked;
-      if (event.target.classList.contains("niveau")) avantage.Niveau = event.target.value;
-      if (event.target.classList.contains("parametre")) avantage.Parametre = event.target.value;
+      // Traitement de la sélection
+      if (selection !== null && selection !== undefined) {
+        switch (nom_avantage) {
+          case "Maitre de magie":
+            if (selection.checked) {
+              document.querySelector("#div_model_4 .guide_spirituel").querySelector(".selection").checked = false;
+              document.querySelector("#div_model_4 .guide_spirituel").dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            break;
+          case "Guide spirituel":
+            if (selection.checked) {
+              document.querySelector("#div_model_4 .maitre_de_magie").querySelector(".selection").checked = false;
+              document.querySelector("#div_model_4 .maitre_de_magie").dispatchEvent(new Event("change", { bubbles: true }));
+            }
+            break;
+        }
+        avantage.Selection = selection.checked;
+      }
+
+      // Traitement du paramètre
+      if (parametre !== null && parametre !== undefined) {
+        avantage.Parametre = parametre.value;
+      }
+
+      // Traitement du type
+      if (type !== null && type !== undefined) {
+        avantage.Type = type.value;
+      }
+
+      // Traitement des niveaux de création et d'expérience
+      if (niveau_creation !== null && niveau_creation !== undefined) {
+        let opt = [];
+        switch (nom_avantage) {
+          case "Maitre de magie":
+          case "Guide spirituel":
+            opt = ["-", "0", "1", "2", "3", "4", "5"];
+            break;
+          case "Maitre d'armes":
+          case "Maitre de competence majeure 1":
+          case "Maitre de competence majeure 2":
+          case "Maitre de competence majeure 3":
+          case "Maitre de competence mineure 1":
+          case "Maitre de competence mineure 2":
+          case "Maitre de competence mineure 3":
+            opt = ["-", "1", "2", "3", "4", "5"];
+            break;
+          case "Richesse":
+            opt = ["-", "1", "2", "3", "4"];
+            break;
+          default:
+            opt = ["-", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+            break;
+        }
+
+        const old_cre = niveau_creation.value == "" ? "-" : niveau_creation.value;
+        niveau_creation.innerHTML = "";
+        opt.forEach((i) => {
+          const nouvelleOption = document.createElement("option");
+          nouvelleOption.value = i;
+          nouvelleOption.textContent = i;
+          niveau_creation.appendChild(nouvelleOption);
+        });
+        niveau_creation.value = old_cre;
+
+        const old_exp = niveau_experience.value == "" ? "-" : niveau_experience.value;
+
+        let max_exp = 0;
+        max_exp = parseInt(opt.at(-1)) - parseInt(old_cre == "-" ? 0 : old_cre);
+        if (max_exp < 0) max_exp = 0;
+
+        niveau_experience.innerHTML = "";
+        opt.forEach((i) => {
+          if (i > max_exp) return;
+          if (i === "0" && niveau_creation.value !== "-") return;
+
+          const nouvelleOption = document.createElement("option");
+          nouvelleOption.value = i;
+          nouvelleOption.textContent = i;
+          niveau_experience.appendChild(nouvelleOption);
+        });
+
+        if (old_exp === "-") niveau_experience.value = "-";
+        else if (parseInt(old_exp) <= max_exp) niveau_experience.value = old_exp;
+        else niveau_experience.value = max_exp;
+
+        if (niveau_experience.value === "") niveau_experience.value = "-";
+
+        avantage.Niveau_creation = niveau_creation.value;
+        avantage.Niveau_experience = niveau_experience.value;
+      }
+
+      // Traitement du coût
+      if (cout !== null && cout !== undefined) {
+        cout.value = avantage.get_cout("Création") + avantage.get_cout("Expérience");
+      }
+
       avantage.sendMessage("set_Avantage");
+
+      document.querySelector("#div_model_4 .nb_points_creation").textContent = m_model.get_cout_avantages_creation();
+      document.querySelector("#div_model_4 .nb_points_experience").textContent = m_model.get_cout_avantages_experience();
+
+      // Cas spécifique pour les avantages concernant les langues et la musique
+      if (nom_avantage.includes("Don pour les langues") || nom_avantage.includes("Don pour la musique")) {
+        let av = [];
+        if (nom_avantage.includes("Don pour les langues")) {
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour les langues 1" && avantage.Selection));
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour les langues 2" && avantage.Selection));
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour les langues 3" && avantage.Selection));
+          ["Humain", "Elfe", "Nain", "Gnome", "Orc", "Aquante", "Troll", "Toutlisse"].forEach((langue) => {
+            set_competences_bornes("Parler " + langue, 0, 8);
+          });
+        }
+        else if (nom_avantage.includes("Don pour la musique")) {
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour la musique 1" && avantage.Selection));
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour la musique 2" && avantage.Selection));
+          av.push(Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Don pour la musique 3" && avantage.Selection));
+          ["Instrument 1", "Instrument 2", "Instrument 3"].forEach((instrument) => {
+            set_competences_bornes("Jouer " + instrument, 0, 8);
+          });
+        }
+        av.forEach((avantage) => {
+          if (avantage !== null && avantage !== undefined && avantage.Parametre !== "--") {
+            let competence = "";
+            if (nom_avantage.includes("Don pour les langues")) competence = "Parler " + avantage.Parametre;
+            if (nom_avantage.includes("Don pour la musique")) competence = "Jouer " + avantage.Parametre;
+            const classe = competence.normalize('NFD').replace(/\p{Diacritic}/gu, '').replaceAll(" ", "_").replaceAll("'", "_").toLowerCase();
+            const degres = document.querySelector("#div_model_5 ." + classe).querySelector(".degres");
+            if (degres.value < 6) degres.value = 6;
+            set_competences_bornes(competence, 6, 8);
+            degres.dispatchEvent(new Event("change", { bubbles: true }));
+          }
+        });
+      }
+
+      // Cas spécifique pour les avantages concernant la race non humaine
+      if (nom_avantage === "Race non humaine") {
+        let race = "humain";
+        if (selection.checked) race = parametre.value.replace("_evolue", "");
+        ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attribute) => {
+          const val = attributs_races[race][attribute];
+          document.querySelector("#div_model_0 ." + attribute + "_race").value = val > 0 ? "+" + val : (val < 0 ? val : "-");
+          document.querySelector("#div_model_0 ." + attribute + "_race").dispatchEvent(new Event("input", { bubbles: true }));
+        });
+      }
+
+      // Avantages améliorant le nombre de degrés des compétences
+      let competences = [];
+      let max_degres = 4;
+      switch (nom_avantage) {
+        case "Maitre de magie":
+          competences.push("Connaissance des arcanes");
+          if (avantage.Niveau_creation === "-" && avantage.Niveau_experience === "-") max_degres = 0;
+          if (avantage.Niveau_creation !== "-") max_degres += parseInt(avantage.Niveau_creation);
+          if (avantage.Niveau_experience !== "-") max_degres += parseInt(avantage.Niveau_experience);
+          if (!avantage.Selection) max_degres = 0;
+          break;
+        case "Guide spirituel":
+          competences.push("Connaissance de l'occulte");
+          if (avantage.Niveau_creation === "-" && avantage.Niveau_experience === "-") max_degres = 0;
+          if (avantage.Niveau_creation !== "-") max_degres += parseInt(avantage.Niveau_creation);
+          if (avantage.Niveau_experience !== "-") max_degres += parseInt(avantage.Niveau_experience);
+          if (!avantage.Selection) max_degres = 0;
+          break;
+        case "Maitre d'armes":
+          competences.push("Feinte de corps", "Esquive", "Parade bouclier", "Escrime", "Tranchantes", "Contondantes ou d'estoc", "Projectiles", "Armes de jet", "Combat mains nues");
+          if (avantage.Niveau_creation !== "-") max_degres += parseInt(avantage.Niveau_creation);
+          if (avantage.Niveau_experience !== "-") max_degres += parseInt(avantage.Niveau_experience);
+          if (!avantage.Selection) max_degres = 4;
+          break;
+        case "Maitre de competence majeure 1":
+        case "Maitre de competence majeure 2":
+        case "Maitre de competence majeure 3":
+          competences.push(avantage.Parametre);
+          if (avantage.Niveau_creation !== "-") max_degres += parseInt(avantage.Niveau_creation);
+          if (avantage.Niveau_experience !== "-") max_degres += parseInt(avantage.Niveau_experience);
+          if (!avantage.Selection) max_degres = 4;
+          break;
+        case "Maitre de competence mineure 1":
+        case "Maitre de competence mineure 2":
+        case "Maitre de competence mineure 3":
+          competences.push(avantage.Parametre);
+          max_degres = 8;
+          if (avantage.Niveau_creation !== "-") max_degres += parseInt(avantage.Niveau_creation);
+          if (avantage.Niveau_experience !== "-") max_degres += parseInt(avantage.Niveau_experience);
+          if (!avantage.Selection) max_degres = 8;
+          break;
+      }
+      competences.forEach((competence) => {
+        const classe = competence.normalize('NFD').replace(/\p{Diacritic}/gu, '').replaceAll(" ", "_").replaceAll("'", "_").toLowerCase();
+        document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
+          if (tr.classList.item(1) !== classe) return;
+          const competences_fille = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
+          set_competences_bornes(competences_fille, 0, max_degres);
+        });
+        set_competences_bornes(competence, 0, max_degres);
+      });
+
+      // Cas spécifique pour les avantages concernant le sixième_sens
+      if (nom_avantage === "Sixième sens") {
+        document.querySelector("#div_model_0 .perception_base").dispatchEvent(new Event("input", { bubbles: true }));
+      }
     });
   });
 }
@@ -3013,13 +3174,11 @@ function initialise_model_5() {
   document.querySelectorAll("#div_model_5 tr").forEach(tr => {
     if (tr.querySelector(".degres") === null) return;
 
-    const degres_max = tr.classList.item(1) === "competences_mineures" ? 8 : 4;
-    for (let i = 0; i <= degres_max; i++) {
-      let nouvelleOption = document.createElement("option");
-      nouvelleOption.value = i;
-      nouvelleOption.textContent = i;
-      tr.querySelector(".degres").appendChild(nouvelleOption);
-    }
+    const competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
+    const degres_max = tr.classList.item(1) === "competences_mineures" ? 13 : 8; // Base +5 d'avantage potentiel
+
+    set_competences_bornes(competence, 0, degres_max);
+
     if (tr.querySelector(".don").value === "") tr.querySelector(".don").style.visibility = "hidden";
     if (tr.querySelector(".attribut").value === "") tr.querySelector(".attribut").style.visibility = "hidden";
 
@@ -3030,7 +3189,7 @@ function initialise_model_5() {
       tr.querySelectorAll("td")[0].style.textAlign = "right";
     }
   });
-  
+
   document.querySelectorAll("#div_model_5 .degres").forEach((degres) => {
     degres.addEventListener("change", function (event) {
       const Nom_competence = event.target.closest("tr").classList.item(0);
@@ -3062,57 +3221,31 @@ function initialise_model_5() {
  * Initialise les événements de la section Désavantages du modèle
  */
 function initialise_model_6() {
-  document.querySelectorAll("#div_model_6 .selection_creation").forEach(sel => {
-    sel.addEventListener("change", function (event) {
-      const Nom_desavantage_full = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
-      let des = Desavantages.find(des => des.Nom_model === m_model.Nom_model && des.Nom === Nom_desavantage_full);
+  document.querySelectorAll("#div_model_6 .desavantages").forEach(element => {
+    element.addEventListener("change", function (event) {
+      const Nom_desavantage = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
+      let des = Desavantages.find(des => des.Nom_model === m_model.Nom_model && des.Nom === Nom_desavantage);
+
+      const selection = event.target.closest("tr").querySelector(".selection");
+      const niveau = event.target.closest("tr").querySelector(".niveau");
+      const rev = event.target.closest("tr").querySelector(".rev");
 
       if (des === null || typeof des === "undefined") {
-        des = new Desavantage({ Nom_model: m_model.Nom_model, Nom: Nom_desavantage_full, Niveau: 1, Selection: false });
+        des = new Desavantage({ Nom_model: m_model.Nom_model, Nom: Nom_desavantage, Niveau: null, Selection: false });
         Desavantages.push(des);
       }
 
-      des.Selection = event.target.checked;
+      des.Selection = selection.checked;
+
+      if (niveau !== null && niveau !== undefined) des.Niveau = niveau.value;
+
+      rev.value = des.get_cout();
+
       des.sendMessage("set_Desavantage");
+
+      document.querySelector("#div_model_6 .nb_points_creation").textContent = m_model.get_cout_desavantages_creation();
+
     });
-  });
-
-  document.querySelectorAll("#div_model_6 .niveau").forEach(niveau => {
-    niveau.addEventListener("change", function (event) {
-      switch (event.target.closest("tr").classList.item(0)) {
-        case "jeunesse":
-        case "vieillesse":
-          event.target.closest("tr").querySelector(".rev").value = 2 * event.target.value;
-          break;
-        case "laideur":
-          event.target.closest("tr").querySelector(".rev").value = 4 * event.target.value;
-          break;
-        case "vulnerabilite_a_la_magie":
-          event.target.closest("tr").querySelector(".rev").value = 6 * event.target.value;
-          break;
-        case "pacifisme":
-          event.target.closest("tr").querySelector(".rev").value = 10 * event.target.value;
-          break;
-        default:
-          event.target.closest("tr").querySelector(".rev").value = event.target.value;
-          break;
-      }
-
-      const Nom_desavantage_full = event.target.closest("tr").querySelectorAll("td")[2].textContent.split(" :")[0];
-      let des = Desavantages.find(des => des.Nom_model === m_model.Nom_model && des.Nom === Nom_desavantage_full);
-
-      if (des === null || typeof des === "undefined") {
-        des = new Desavantage({ Nom_model: m_model.Nom_model, Nom: Nom_desavantage_full, Niveau: 0, Selection: false });
-        Desavantages.push(des);
-      }
-
-      des.Niveau = event.target.value;
-      des.sendMessage("set_Desavantage");
-    });
-  });
-
-  document.querySelector("#div_model_6").addEventListener("change", function (event) {
-    document.querySelector("#div_model_6 .nb_points_creation").textContent = m_model.get_cout_desavantages_creation();
   });
 }
 
@@ -3137,20 +3270,23 @@ function update_cout_total() {
 
   if (!m_model) return;
 
-  document.querySelector("#div_model_3 .attributs_creation_cout").textContent = m_model.get_cout_attributs_creation();
-  document.querySelector("#div_model_3 .attributs_cout").textContent = m_model.get_cout_attributs_creation() + m_model.get_cout_attributs_experience();
-  document.querySelector("#div_model_3 .dons_creation_cout").textContent = m_model.get_cout_dons_creation();
-  document.querySelector("#div_model_3 .avantages_creation_cout").textContent = 25 * (m_model.get_cout_avantages_creation() - m_model.get_cout_desavantages_creation());
-  document.querySelector("#div_model_3 .avantages_cout").textContent = 25 * m_model.get_cout_avantages_creation() + 50 * m_model.get_cout_avantages_experience();
-  document.querySelector("#div_model_3 .competences_cout").textContent = m_model.get_cout_competences();
-  document.querySelector("#div_model_3 .magie_classique_cout").textContent = m_model.get_cout_sorts();
-  document.querySelector("#div_model_3 .magie_religieuse_cout").textContent = m_model.get_cout_concentration();
+  document.querySelector("#div_model_3 .attributs_creation_cout").value = m_model.get_cout_attributs_creation();
+  document.querySelector("#div_model_3 .attributs_cout").value = m_model.get_cout_attributs_creation() + m_model.get_cout_attributs_experience();
+  document.querySelector("#div_model_3 .dons_creation_cout").value = m_model.get_cout_dons_creation();
+  document.querySelector("#div_model_3 .dons_cout").value = m_model.get_cout_dons_creation();
+  document.querySelector("#div_model_3 .avantages_creation_cout").value = 25 * m_model.get_cout_avantages_creation();
+  document.querySelector("#div_model_3 .avantages_cout").value = 25 * m_model.get_cout_avantages_creation() + 50 * m_model.get_cout_avantages_experience();
+  document.querySelector("#div_model_3 .desavantages_creation_cout").value = - 25 * m_model.get_cout_desavantages_creation();
+  document.querySelector("#div_model_3 .desavantages_cout").value = - 25 * m_model.get_cout_desavantages_creation();
+  document.querySelector("#div_model_3 .competences_cout").value = m_model.get_cout_competences();
+  document.querySelector("#div_model_3 .magie_classique_cout").value = m_model.get_cout_sorts();
+  document.querySelector("#div_model_3 .magie_religieuse_cout").value = m_model.get_cout_concentration();
 
   const total_creation_cout =
     m_model.get_cout_attributs_creation() +
     m_model.get_cout_dons_creation() +
     25 * (m_model.get_cout_avantages_creation() - m_model.get_cout_desavantages_creation());
-  document.querySelector("#div_model_3 .total_creation_cout").textContent = total_creation_cout;
+  document.querySelector("#div_model_3 .total_creation_cout").value = total_creation_cout;
 
   const total_cout =
     m_model.get_cout_attributs_creation() + m_model.get_cout_attributs_experience() +
@@ -3160,7 +3296,7 @@ function update_cout_total() {
     m_model.get_cout_sorts() +
     m_model.get_cout_concentration() +
     -2000;
-  document.querySelector("#div_model_3 .total_cout").textContent = total_cout;
+  document.querySelector("#div_model_3 .total_cout").value = total_cout;
 
   const cout_attributs_experience = m_model.get_cout_attributs_experience();
   document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = cout_attributs_experience > total_cout * 0.25 ? "block" : "none";
@@ -3229,6 +3365,7 @@ function affiche_model() {
     const Nom_competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
     const cmp = Competences.find(comp => comp.Nom_model === m_model.Nom_model && comp.Nom === Nom_competence);
     if (cmp === null || typeof cmp === "undefined") return;
+
     tr.querySelector(".degres").value = cmp.Degres;
 
     tr.querySelector(".degres").dispatchEvent(new Event("change", { bubbles: true }));
@@ -3236,32 +3373,61 @@ function affiche_model() {
 
   // Remplissage des champs du modèle avantages
   document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
-    if (tr.querySelector(".selection_creation") === null) return;
-    const Nom_avantage = tr.querySelectorAll("td")[2].textContent.split(" :")[0];
-    const avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === Nom_avantage);
-    if (avantage === null || typeof avantage === "undefined") return;
-    tr.querySelector(".selection_creation").checked = avantage.Selection_creation;
-    tr.querySelector(".selection_experience").checked = avantage.Selection_experience;
-    if (tr.querySelector(".parametre") !== null) tr.querySelector(".parametre").value = avantage.Parametre;
-    if (tr.querySelector(".niveau") !== null) tr.querySelector(".niveau").value = avantage.Niveau;
+    if (tr.querySelector(".selection") === null) return;
 
-    tr.querySelector(".selection_creation").dispatchEvent(new Event("change", { bubbles: true }));
-    if (avantage.Nom === "Race non humaine") {
-      tr.querySelector(".parametre").dispatchEvent(new Event("change", { bubbles: true }));
+    const Nom_avantage = tr.querySelectorAll("td")[1].textContent.split(" :")[0];
+    const avantage = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === Nom_avantage);
+
+    if (avantage !== null && typeof avantage !== "undefined") {
+      tr.querySelector(".selection").checked = avantage.Selection;
+      if (tr.querySelector(".parametre") !== null) tr.querySelector(".parametre").value = avantage.Parametre;
+      if (avantage.Type === null || avantage.Type === undefined || avantage.Type === "") avantage.Type = "Création";
+      if (tr.querySelector(".type") !== null) tr.querySelector(".type").value = avantage.Type;
+      if (tr.querySelector(".niveau_creation") !== null) {
+        ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].forEach((niveau) => {
+          const option = document.createElement("option");
+          option.value = niveau;
+          option.textContent = niveau;
+          tr.querySelector(".niveau_creation").appendChild(option);
+        });
+
+        tr.querySelector(".niveau_creation").value = avantage.Niveau_creation;
+      }
+      if (tr.querySelector(".niveau_experience") !== null) {
+        ["-", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].forEach((niveau) => {
+          const option = document.createElement("option");
+          option.value = niveau;
+          option.textContent = niveau;
+          tr.querySelector(".niveau_experience").appendChild(option);
+        });
+        tr.querySelector(".niveau_experience").value = avantage.Niveau_experience;
+      }
     }
+    else {
+      tr.querySelector(".selection").checked = false;
+      if (tr.querySelector(".parametre") !== null) tr.querySelector(".parametre").selectedIndex = 0;
+      if (tr.querySelector(".type") !== null) tr.querySelector(".type").value = "Expérience";
+      if (tr.querySelector(".niveau_creation") !== null) tr.querySelector(".niveau_creation").selectedIndex = 0;
+      if (tr.querySelector(".niveau_experience") !== null) tr.querySelector(".niveau_experience").selectedIndex = 0;
+    }
+
+    tr.querySelector(".selection").dispatchEvent(new Event("change", { bubbles: true }));
   });
 
   // Remplissage des champs du modèle desavantages
   document.querySelectorAll("#div_model_6 tr").forEach((tr) => {
-    if (tr.querySelector(".selection_creation") === null) return;
+    if (tr.querySelector(".selection") === null) return;
     const Nom_desavantage = tr.querySelectorAll("td")[2].textContent.split(" :")[0];
-    const desavantage = Desavantages.find(desavantage => desavantage.Nom_model === m_model.Nom_model && desavantage.Nom === Nom_desavantage);
-    if (desavantage === null || typeof desavantage === "undefined") return;
-    tr.querySelector(".selection_creation").checked = desavantage.Selection;
-    if (tr.querySelector(".niveau") === null) return;
-    tr.querySelector(".niveau").value = desavantage.Niveau;
 
-    tr.querySelector(".niveau").dispatchEvent(new Event("change", { bubbles: true }));
+    if (tr.querySelector(".niveau") !== null) tr.querySelector(".niveau").value = 1;
+
+    const desavantage = Desavantages.find(desavantage => desavantage.Nom_model === m_model.Nom_model && desavantage.Nom === Nom_desavantage);
+    if (desavantage !== null && typeof desavantage !== "undefined") {
+      tr.querySelector(".selection").checked = desavantage.Selection;
+      if (tr.querySelector(".niveau") !== null) tr.querySelector(".niveau").value = desavantage.Niveau;
+    }
+
+    tr.querySelector(".selection").dispatchEvent(new Event("change", { bubbles: true }));
   });
 
   // Remplissage des champs select du modèle magie

@@ -508,9 +508,9 @@
         <div class="div_model_tabs">
             <div style="display: flex; justify-content: space-between;">
                 <button type="button" class="tab-model humanoid" data-tab="0"
-                    style="display: block; width: 33.33%; background-color: rgb(128, 128, 255);">Caractéristiques<br>Humanoides</button>
+                    style="display: block; width: 33.33%; background-color: rgb(128, 128, 255);">Caractéristiques</button>
                 <button type="button" class="tab-model monstre" data-tab="1"
-                    style="display: none; width: 33.33%; background-color: rgb(255, 32, 32);">Caractéristiques<br>Monstres</button>
+                    style="display: none; width: 33.33%; background-color: rgb(255, 32, 32);">Caractéristiques</button>
                 <button type="button" class="tab-model" data-tab="4"
                     style="width: 33.33%; background-color: rgb(255, 255, 64);">Avantages</button>
                 <button type="button" class="tab-model" data-tab="6"
@@ -522,7 +522,7 @@
                 <button type="button" class="tab-model" data-tab="2"
                     style="width: 33.33%; background-color: rgb(128, 255, 255);">Magie</button>
                 <button type="button" class="tab-model" data-tab="3"
-                    style="width: 33.33%; background-color: rgb(255, 128, 255);">Coûts &<br>Armures</button>
+                    style="width: 33.33%; background-color: rgb(255, 128, 255);">Armures & Coûts</button>
             </div>
         </div>
         <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
@@ -919,8 +919,7 @@
                                 <option value="religieuse">Religieuse</option>
                                 <option value="sans">Sans magie</option>
                             </select>
-                            <span>Concentration :&nbsp;<input type="text" class="concentration"
-                                    disabled></span>
+                            <span>Concentration :&nbsp;<input type="text" class="concentration" disabled></span>
                         </div>
                     </td>
                 </tr>
@@ -1042,55 +1041,63 @@
                 <tr>
                     <td></td>
                     <td>
-                        <div id="div_cout" style="width: 100%; display: flex; justify-content: flex-end;">
-                            <table style="border-collapse: collapse; border-spacing: 0px; margin-right: 5px;">
+                            <table id="couts_table" style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                                <colgroup>
+                                    <col style="width: auto;">
+                                    <col style="width: 1px;">
+                                    <col style="width: 1px;">
+                                </colgroup>
                                 <tr>
-                                    <td style="border-left: none; border-top: none;"></td>
-                                    <td style="font-weight: bold;">Création</td>
-                                    <td style="font-weight: bold;">&nbsp;&nbsp;&nbsp;Final&nbsp;&nbsp;&nbsp;</td>
+                                    <th></th>
+                                    <th>Création</th>
+                                    <th>&nbsp;&nbsp;&nbsp;Final&nbsp;&nbsp;&nbsp;</th>
                                 </tr>
                                 <tr>
                                     <td>Attributs :</td>
-                                    <td class="attributs_creation_cout"></td>
-                                    <td class="attributs_cout"></td>
+                                    <td><input type="text" class="attributs_creation_cout" disabled></td>
+                                    <td><input type="text" class="attributs_cout" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Dons :</td>
-                                    <td class="dons_creation_cout"></td>
-                                    <td style="background-color: lightgray;"></td>
+                                    <td><input type="text" class="dons_creation_cout" disabled></td>
+                                    <td><input type="text" class="dons_cout" disabled></td>
                                 </tr>
                                 <tr>
-                                    <td>Avantages / Désavantages :</td>
-                                    <td class="avantages_creation_cout"></td>
-                                    <td class="avantages_cout"></td>
+                                    <td>Avantages :</td>
+                                    <td><input type="text" class="avantages_creation_cout" disabled></td>
+                                    <td><input type="text" class="avantages_cout" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td>Désavantages :</td>
+                                    <td><input type="text" class="desavantages_creation_cout" disabled></td>
+                                    <td><input type="text" class="desavantages_cout" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Compétences :</td>
-                                    <td style="background-color: lightgray;"></td>
-                                    <td class="competences_cout"></td>
+                                    <td></td>
+                                    <td><input type="text" class="competences_cout" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Magie classique :</td>
-                                    <td style="background-color: lightgray;"></td>
-                                    <td class="magie_classique_cout"></td>
+                                    <td></td>
+                                    <td><input type="text" class="magie_classique_cout" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Magie religieuse :</td>
-                                    <td style="background-color: lightgray;"></td>
-                                    <td class="magie_religieuse_cout"></td>
+                                    <td></td>
+                                    <td><input type="text" class="magie_religieuse_cout" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Départ :</td>
-                                    <td style="background-color: lightgray;"></td>
-                                    <td>-2000</td>
+                                    <td></td>
+                                    <td><input type="text" class="depart_cout" value="-2000" disabled></td>
                                 </tr>
                                 <tr>
                                     <td>Total :</td>
-                                    <td class="total_creation_cout"></td>
-                                    <td class="total_cout"></td>
+                                    <td><input type="text" class="total_creation_cout" disabled></td>
+                                    <td><input type="text" class="total_cout" disabled></td>
                                 </tr>
                             </table>
-                        </div>
                     </td>
                 </tr>
                 <tr>
@@ -1122,81 +1129,108 @@
                     <colgroup>
                         <col style="width: 1px;">
                         <col style="width: 1px;">
-                        <col style="width: 1px;">
-                        <col style="width: 1px;">
                         <col style="width: auto;">
+                        <col style="width: 1px;">
+                        <col style="width: 1px;">
                         <col style="width: 1px;">
                     </colgroup>
                     <tr>
+                        <th>Sel</th>
+                        <th style="text-align: left;">&nbsp;Avantage</th>
+                        <th style="text-align: left;">Paramètre</th>
                         <th>Cré</th>
                         <th>Exp</th>
-                        <th style="text-align: left;">&nbsp;Avantage</th>
-                        <th colspan="2" style="text-align: left;">Options</th>
                         <th>Cout</th>
                     </tr>
                     <tr class="ambidextrie">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Ambidextrie :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="beaute">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Beauté :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="bon_sens">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Bon sens :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="combat_contre_plusieurs_adversaires">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Combat contre plusieurs :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="6" disabled></td>
                     </tr>
                     <tr class="don_pour_la_musique_1">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 1 :&nbsp;</td>
-                        <td></td>
-                        <td></td>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                            <option value="--">--</option>
+                            <option value="instrument_1">Instrument 1</option>
+                            <option value="instrument_2">Instrument 2</option>
+                            <option value="instrument_3">Instrument 3</option>
+                        </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="don_pour_la_musique_2">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 2 :&nbsp;</td>
-                        <td></td>
-                        <td></td>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                            <option value="--">--</option>
+                            <option value="instrument_1">Instrument 1</option>
+                            <option value="instrument_2">Instrument 2</option>
+                            <option value="instrument_3">Instrument 3</option>
+                        </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="don_pour_la_musique_3">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 3 :&nbsp;</td>
-                        <td></td>
-                        <td></td>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                            <option value="--">--</option>
+                            <option value="instrument_1">Instrument 1</option>
+                            <option value="instrument_2">Instrument 2</option>
+                            <option value="instrument_3">Instrument 3</option>
+                        </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="don_pour_les_langues_1">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour les langues 1 :&nbsp;</td>
-                        <td colspan="2"><select class="parametre"
-                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                                <option value="">--</option>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="--">--</option>
                                 <option value="humain">Humain</option>
                                 <option value="aquante">Aquante</option>
                                 <option value="elfe">Elfe</option>
@@ -1205,16 +1239,18 @@
                                 <option value="orc">Orc</option>
                                 <option value="troll">Troll</option>
                                 <option value="toutlisse">Toutlisse</option>
+                            </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
                             </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="don_pour_les_langues_2">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour les langues 2 :&nbsp;</td>
-                        <td colspan="2"><select class="parametre"
-                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                                <option value="">--</option>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="--">--</option>
                                 <option value="humain">Humain</option>
                                 <option value="aquante">Aquante</option>
                                 <option value="elfe">Elfe</option>
@@ -1223,16 +1259,18 @@
                                 <option value="orc">Orc</option>
                                 <option value="troll">Troll</option>
                                 <option value="toutlisse">Toutlisse</option>
+                            </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
                             </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="don_pour_les_langues_3">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Don pour les langues 3 :&nbsp;</td>
-                        <td colspan="2"><select class="parametre"
-                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                                <option value="">--</option>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="--">--</option>
                                 <option value="humain">Humain</option>
                                 <option value="aquante">Aquante</option>
                                 <option value="elfe">Elfe</option>
@@ -1242,212 +1280,169 @@
                                 <option value="troll">Troll</option>
                                 <option value="toutlisse">Toutlisse</option>
                             </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="double_tir">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Double tir :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="6" disabled></td>
                     </tr>
                     <tr class="empathie_animale">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Empathie animale :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="guerison_rapide">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Guérison rapide :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="maitre_de_magie">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de magie :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box; width: auto;">
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="guide_spirituel">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Guide spirituel :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="0">0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_d_armes">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre d'armes :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_1">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence majeure 1 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_2">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence majeure 2 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_3">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence majeure 3 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_1">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence mineure 1 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_2">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence mineure 2 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_3">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de competence mineure 3 :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select></td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="vue_percante">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Vue perçante :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
                     </tr>
                     <tr class="ouïe_fine">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Ouïe fine :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
                     </tr>
                     <tr class="odorat_et_goût_supérieurs">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Odorat et goût sup. :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
                     </tr>
                     <tr class="orientation">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Orientation :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="prestance">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Prestance :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="race_non_humaine">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Race non humaine :&nbsp;</td>
-                        <td colspan="2"><select class="parametre"
-                                style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
                                 <option value="aquante">Aquante</option>
                                 <option value="aquante_evolue">Aquante évolué</option>
                                 <option value="elfe">Elfe</option>
@@ -1463,148 +1458,121 @@
                                 <option value="toutlisse">Toutlisse</option>
                                 <option value="toutlisse_evolue">Toutlisse évolué</option>
                             </select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="reflexes_de_combat">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Réflexes de combat :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="5" disabled></td>
                     </tr>
-                    <tr class="renommee">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
-                        <td>Renommée :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select></td>
-                        <td></td>
-                        <td><input type="text" class="cout" value="-1" disabled></td>
-                    </tr>
                     <tr class="resistance_a_la_douleur">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Résistance à la douleur :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="5" disabled></td>
                     </tr>
                     <tr class="resistance_a_la_magie">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Résistance à la magie :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="richesse">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Richesse :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="roc_mental">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Roc mental :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
                     </tr>
                     <tr class="sante_de_fer">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Santé de fer :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="Sens_du_danger">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sens du danger :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="6" disabled></td>
                     </tr>
                     <tr class="sens_du_temps">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sens du temps :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                     <tr class="sixieme_sens">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sixième sens :&nbsp;</td>
-                        <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
-                            </select></td>
                         <td></td>
+                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="sort_naturel">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sort naturel :&nbsp;</td>
-                        <td colspan="2"><select class="parametre"
+                        <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
+                                <option value="Création">Création</option>
+                                <option value="Expérience" selected>Expérience</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="vision_nocturne">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Vision nocturne :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="4" disabled></td>
                     </tr>
                     <tr class="vision_peripherique">
-                        <td><input type="checkbox" class="selection_creation"></td>
-                        <td><input type="checkbox" class="selection_experience" disabled></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Vision périphérique :&nbsp;</td>
                         <td></td>
-                        <td></td>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                                <option value="Création" selected>Création</option>
+                            </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
                     </tr>
                 </table>
@@ -1823,7 +1791,7 @@
                         <td><input type="text" class="base" value="-" disabled></td>
                         <td><input type="text" class="score" value="" disabled></td>
                     </tr>
-                    <tr class="armes_de_melee">
+                    <tr class="armes_de_melee armes_de_jet">
                         <td>Armes de mêlée :&nbsp;</td>
                         <td><input type="text" class="don" value="" disabled></td>
                         <td><input type="text" class="attribut" value="" disabled></td>
@@ -2396,126 +2364,126 @@
                     </tr>
                     <tr class="albinisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Albinisme :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="addiction">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Addiction :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="arrogant">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Arrogant :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="autoritarisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Autoritarisme :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="avarice">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Avarice :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="begaiement">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Bégaiement :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="boiterie">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Boiterie :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="12" disabled></td>
                     </tr>
                     <tr class="borgne">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Borgne :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="12" disabled></td>
                     </tr>
                     <tr class="code_de_l_honneur">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Code de l'honneur :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="confiance_en_soi_excessive">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Confiance en soi excessive :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="cupidite">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Cupidité :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="curiosite_maladive">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Curiosité maladive :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="daltonisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Daltonisme :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="3" disabled></td>
                     </tr>
                     <tr class="douillet">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Douillet :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="dur_d_oreille">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Dur d'oreille :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="dyslexie">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Dyslexie :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="emporte">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Emporté :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="ennemis">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Ennemis :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2543,56 +2511,56 @@
                     </tr>
                     <tr class="eunuque">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Eunuque :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="flambeur">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Flambeur :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="frimeur">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Frimeur :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="gigantisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Gigantisme :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="gourmandise">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Gourmandise :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="3" disabled></td>
                     </tr>
                     <tr class="hemophilie">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Hémophilie :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="20" disabled></td>
                     </tr>
                     <tr class="impulsivite">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Impulsivité :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="jeunesse">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Jeunesse :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2604,14 +2572,14 @@
                     </tr>
                     <tr class="lachete">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Lâcheté :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="laideur">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Laideur :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2622,49 +2590,49 @@
                     </tr>
                     <tr class="libertinage">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Libertinage :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="maigreur">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Maigreur :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="malchance">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Malchance :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="manchot_d_un_bras">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Manchot d'un bras :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="20" disabled></td>
                     </tr>
                     <tr class="manchot_d_une_main">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Manchot d'une main :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="10" disabled></td>
                     </tr>
                     <tr class="manque_de_confiance_en_soi">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Manque de confiance en soi :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="mauvaise_reputation">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Mauvaise réputation :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2678,56 +2646,56 @@
                     </tr>
                     <tr class="mauvaise_vue">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Mauvaise vue :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="menteur_invetere">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Menteur invétéré :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="muet">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Muet :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="20" disabled></td>
                     </tr>
                     <tr class="naivete">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Naïveté :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="8" disabled></td>
                     </tr>
                     <tr class="nanisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Nanisme :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="15" disabled></td>
                     </tr>
                     <tr class="obesite">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Obésité :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="obstination">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Obstination :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="3" disabled></td>
                     </tr>
                     <tr class="pacifisme">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Pacifisme :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2737,14 +2705,14 @@
                     </tr>
                     <tr class="paralysie_violence">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Paralysie face à la violence :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="20" disabled></td>
                     </tr>
                     <tr class="personne_a_charge">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Personne à charge :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2772,7 +2740,7 @@
                     </tr>
                     <tr class="phobies">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Phobies :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2790,7 +2758,7 @@
                     </tr>
                     <tr class="pulsion">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Pulsion :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2808,28 +2776,28 @@
                     </tr>
                     <tr class="rage">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Rage :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="10" disabled></td>
                     </tr>
                     <tr class="sans_odorat_et_gout">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sans odorat et goût :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="3" disabled></td>
                     </tr>
                     <tr class="sarcastique">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sarcastique :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="4" disabled></td>
                     </tr>
                     <tr class="sens_devoir">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sens du devoir :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2857,21 +2825,21 @@
                     </tr>
                     <tr class="sincerite">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Sincérité :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="5" disabled></td>
                     </tr>
                     <tr class="timidite">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Timidité :&nbsp;</td>
                         <td></td>
                         <td><input type="text" class="rev" value="6" disabled></td>
                     </tr>
                     <tr class="vieillesse">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Vieillesse :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2884,7 +2852,7 @@
                     </tr>
                     <tr class="voeu">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Voeu :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>
@@ -2912,7 +2880,7 @@
                     </tr>
                     <tr class="vulnerabilite_a_la_magie">
                         <td></td>
-                        <td><input type="checkbox" class="selection_creation"></td>
+                        <td><input type="checkbox" class="selection"></td>
                         <td>Vulnérabilité à la magie :&nbsp;</td>
                         <td><select class="niveau" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="1">1</option>

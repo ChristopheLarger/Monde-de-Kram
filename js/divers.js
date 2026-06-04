@@ -109,6 +109,87 @@ class Competence {
 
         return score;
     }
+
+    get_cout() {
+        let res = null;
+        document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
+            if (tr.querySelectorAll("td")[0] === null || tr.querySelectorAll("td")[0] === undefined) return;
+            if (tr.querySelectorAll("td")[0].textContent.split(" :")[0] !== this.Nom) return;
+
+            let don = tr.querySelector(".don").value;
+            if (tr.classList.item(1) !== null && tr.classList.item(1) !== undefined && tr.classList.item(1) !== "competences_mineures") {
+                const tr_maitre = Array.from(document.querySelectorAll("#div_model_5 tr")).find(element => element.classList.item(0) === tr.classList.item(1));
+                don = tr_maitre.querySelector(".don").value;
+            }
+
+            let coeff = null;
+            switch (don) {
+                case "Cmb":
+                    coeff = parametres_couts[m_model.Combat]; break;
+                case "Mag":
+                    coeff = parametres_couts[m_model.Magie]; break;
+                case "Foi":
+                    coeff = parametres_couts[m_model.Foi]; break;
+                case "Adp":
+                    coeff = parametres_couts[m_model.Adaptation]; break;
+                case "Thp":
+                    coeff = parametres_couts[m_model.Telepathie]; break;
+                case "Mem":
+                    coeff = parametres_couts[m_model.Memoire]; break;
+                case "Adp+Mem":
+                    coeff = parametres_couts[Math.round((m_model.Adaptation + m_model.Memoire) / 2)]; break;
+                case "Adp+Thp":
+                    coeff = parametres_couts[Math.round((m_model.Adaptation + m_model.Telepathie) / 2)]; break;
+                default:
+                    return;
+            }
+
+            if (this.Nom.includes("Jouer Instrument ")) {
+                const av = Avantages.filter(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom.includes("Don pour la musique ") && avantage.Selection);
+                av.forEach(avantage => {
+                    if (avantage.Parametre === "--") coeff = parametres_couts["20"];
+                });
+            }
+
+            if (this.Nom.includes("Parler ")) {
+                const av = Avantages.filter(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom.includes("Don pour les langues ") && avantage.Selection);
+                av.forEach(avantage => {
+                    if (avantage.Parametre === "--") coeff = parametres_couts["20"];
+                });
+            }
+
+            if (tr.classList.item(1) === null || tr.classList.item(1) === undefined) {
+                res = parseInt(this.Degres) * (parseInt(this.Degres) + 1) / 2 * coeff.degres_gen;
+            }
+            else {
+                res = parseInt(this.Degres) * (parseInt(this.Degres) + 1) / 2 * coeff.degres_spe;
+            }
+
+            if (this.Nom.includes("Jouer Instrument ")) {
+                const av = Avantages.filter(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom.includes("Don pour la musique ") && avantage.Selection);
+                let bonus = 0;
+                 av.forEach(avantage => {
+                    if ((this.Nom.includes("1") && avantage.Parametre.includes("1")) ||
+                        (this.Nom.includes("2") && avantage.Parametre.includes("2")) ||
+                        (this.Nom.includes("3") && avantage.Parametre.includes("3"))
+                    ) bonus = 6 * (6 + 1) / 2 * coeff.degres_spe;
+                });
+                res -= bonus;
+            }
+
+            if (this.Nom.includes("Parler ")) {
+                const av = Avantages.filter(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom.includes("Don pour les langues ") && avantage.Selection);
+                let bonus = 0;
+                 av.forEach(avantage => {
+                    if (this.Nom.toLowerCase().includes(avantage.Parametre)) bonus = 6 * (6 + 1) / 2 * coeff.degres_spe;
+                });
+                res -= bonus;
+            }
+        });
+        if (this.Nom === "Feinte de corps") return 2 * res;
+
+        return res;
+    }
 }
 
 // Tableau global contenant toutes les compétences
@@ -172,19 +253,73 @@ class Avantage {
         // Propriétés de base
         this.Nom_model = data.Nom_model || null;
         this.Nom = data.Nom || null;
-        this.Selection_creation = data.Selection_creation || false;
-        this.Selection_experience = data.Selection_experience || false;
-        this.Niveau = data.Niveau || 1;
+        this.Selection = data.Selection || false;
         this.Parametre = data.Parametre || null;
+        this.Type = data.Type || null;
+        this.Niveau_creation = data.Niveau_creation || null;
+        this.Niveau_experience = data.Niveau_experience || null;
     }
 
     sendMessage(tag) {
         switch (tag.toLowerCase()) {
             case "set_avantage":
                 sendMessage(`Set_Avantage`,
-                    `${this.Nom_model}@${this.Nom}@${this.Selection_creation ? 1 : 0}@${this.Selection_experience ? 1 : 0}@${this.Niveau}@${this.Parametre || ""}`);
+                    `${this.Nom_model}@${this.Nom}@${this.Selection ? 1 : 0}@${this.Parametre || ""}@` +
+                    `${this.Type || ""}@${this.Niveau_creation || ""}@${this.Niveau_experience || ""}`);
                 break;
         }
+    }
+
+    get_cout(type) {
+        let niveau = this.Niveau_experience;
+        if (type === "Création") niveau = this.Niveau_creation;
+
+        if (niveau === "-") {
+            return 0;
+        }
+        else if (this.Nom === "Race non humaine" && type === this.Type) {
+            if (this.Parametre.includes("_evolue")) return 12;
+            return 8;
+        }
+        else if (this.Nom === "Sort naturel" && type === this.Type) {
+            const nom_liste = shortName[this.Parametre.split(" - ")[0]];
+            const nom_sort = this.Parametre.split(" - ")[1];
+            const sort = Sorts.find(sort => sort.Nom_liste === nom_liste && sort.Nom_sort === nom_sort);
+            return 2 * parseInt(sort.Niveau);
+        }
+        else if (niveau !== null && niveau !== undefined) {
+            const base_cout = (niveau === "-" ? 0 : parseInt(niveau));
+            switch (this.Nom) {
+                case "Maitre de magie":
+                case "Guide spirituel":
+                    if (type === "Expérience" && this.Niveau_creation !== "-") return 3 * base_cout;
+                    return 10 + 3 * base_cout;
+                case "Maitre d'armes":
+                    return 6 * base_cout;
+                case "Maitre de competence majeure 1":
+                case "Maitre de competence majeure 2":
+                case "Maitre de competence majeure 3":
+                    return 3 * base_cout;
+                case "Résistance à la magie":
+                    return 5 * base_cout;
+                case "Richesse":
+                    return 2 * base_cout + 2;
+                default:
+                    return base_cout;
+            }
+        }
+        else { // if (type === this.Type) {
+            let res = null;
+            document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
+                if (tr.querySelectorAll("td")[1] === null || tr.querySelectorAll("td")[1] === undefined) return;
+                if (tr.querySelectorAll("td")[1].textContent.split(" :")[0] === this.Nom) {
+                    res = parseInt(tr.querySelector(".cout").value);
+                }
+            });
+            return res;
+        }
+
+        return null;
     }
 }
 
@@ -208,7 +343,7 @@ class Desavantage {
         this.Nom_model = data.Nom_model || null;
         this.Nom = data.Nom || null;
         this.Selection = data.Selection || false;
-        this.Niveau = data.Niveau || 0;
+        this.Niveau = data.Niveau || null;
     }
 
     sendMessage(tag) {
@@ -217,6 +352,31 @@ class Desavantage {
                 sendMessage(`Set_Desavantage`, `${this.Nom_model}@${this.Nom}@${this.Selection ? 1 : 0}@${this.Niveau}`);
                 break;
         }
+    }
+
+    get_cout() {
+        switch (this.Nom) {
+            case "Jeunesse":
+            case "Vieillesse":
+                return 2 * this.Niveau;
+            case "Laideur":
+                return 4 * this.Niveau;
+            case "Vulnérabilité à la magie":
+                return 6 * this.Niveau;
+            case "Pacifisme":
+                return 10 * this.Niveau;
+        }
+
+        if (this.Niveau !== null && this.Niveau !== undefined) return this.Niveau;
+
+        let res = null;
+        document.querySelectorAll("#div_model_6 tr").forEach((tr) => {
+            if (tr.querySelectorAll("td")[2] === null || tr.querySelectorAll("td")[2] === undefined) return;
+            if (tr.querySelectorAll("td")[2].textContent.split(" :")[0] === this.Nom) {
+                res = parseInt(tr.querySelector(".rev").value);
+            }
+        });
+        return res;
     }
 }
 

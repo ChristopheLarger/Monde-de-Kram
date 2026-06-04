@@ -372,48 +372,51 @@ class Model {
     let res = 0;
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme"].forEach((attrib) => {
       const att_name = attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase();
-      res += 2 * (parametres_couts[this.get(attrib)].cout - parametres_couts[this[att_name]].cout);
+      const base = parseInt(this[att_name]);
+      const experience = parseInt(this[att_name + "_experience"]);
+      res += 2 * (parametres_couts[base + experience].cout - parametres_couts[base].cout);
     });
     return res;
   }
 
   /**
- * Calcul du coût des avantages/désavantages de la création
+ * Calcul du coût des avantages de la création
  */
   get_cout_avantages_creation() {
-    let nb_points_cre = 0;
-    m_model = this;
+    let nb_points = 0;
     document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
-      if (tr.querySelector(".selection_creation") === null) return;
-      if (!tr.querySelector(".selection_creation").checked) return;
-      nb_points_cre += parseInt(tr.querySelector(".cout").value);
+      if (tr.querySelectorAll("td")[1] === null || tr.querySelectorAll("td")[1] === undefined) return;
+
+      const nom_avantage = tr.querySelectorAll("td")[1].textContent.split(" :")[0];
+      let avantage = Avantages.find(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom === nom_avantage && avantage.Selection);
+      if (avantage !== null && typeof avantage !== "undefined") nb_points += avantage.get_cout("Création");
     });
-    return nb_points_cre;
+    return nb_points;
   }
 
   /**
-   * Calcul du coût des avantages/désavantages de l'expérience
+   * Calcul du coût des avantages de l'expérience
    */
   get_cout_avantages_experience() {
-    let nb_points_exp = 0;
-    m_model = this;
+    let nb_points = 0;
     document.querySelectorAll("#div_model_4 tr").forEach((tr) => {
-      if (tr.querySelector(".selection_experience") === null) return;
-      if (!tr.querySelector(".selection_experience").checked) return;
-      nb_points_exp += parseInt(tr.querySelector(".cout").value);
+      if (tr.querySelectorAll("td")[1] === null || tr.querySelectorAll("td")[1] === undefined) return;
+      const nom_avantage = tr.querySelectorAll("td")[1].textContent.split(" :")[0];
+      let avantage = Avantages.find(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom === nom_avantage && avantage.Selection);
+      if (avantage !== null && typeof avantage !== "undefined") nb_points += avantage.get_cout("Expérience");
     });
-    return nb_points_exp;
+    return nb_points;
   }
 
   get_cout_desavantages_creation() {
-    let nb_points_cre = 0;
-    m_model = this;
+    let nb_points = 0;
     document.querySelectorAll("#div_model_6 tr").forEach((tr) => {
-      if (tr.querySelector(".selection_creation") === null) return;
-      if (!tr.querySelector(".selection_creation").checked) return;
-      nb_points_cre += parseInt(tr.querySelector(".rev").value);
+      if (tr.querySelectorAll("td")[2] === null || tr.querySelectorAll("td")[2] === undefined) return;
+      const nom_desavantage = tr.querySelectorAll("td")[2].textContent.split(" :")[0];
+      let desavantage = Desavantages.find(desavantage => desavantage.Nom_model === this.Nom_model && desavantage.Nom === nom_desavantage && desavantage.Selection);
+      if (desavantage !== null && typeof desavantage !== "undefined") nb_points += desavantage.get_cout();
     });
-    return nb_points_cre;
+    return nb_points;
   }
 
   /**
@@ -430,14 +433,17 @@ class Model {
   }
 
   /**
-  * Calcul le coût des compétences connues
-  * @returns {number} - Coût des compétences connues
+  * Calcul le coût des compétences
+  * @returns {number} - Coût des compétences
   */
   get_cout_competences() {
     let res = 0;
-    // CompetencesConnues.filter((comp) => comp.Nom_model === this.Nom_model).forEach((comp) => {
-    //   res += this.get_cout(comp.Nom_competence);
-    // });
+    document.querySelectorAll("#div_model_5 tr").forEach((tr) => {
+      if (tr.querySelectorAll("td")[2] === null || tr.querySelectorAll("td")[2] === undefined) return;
+      const nom_competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
+      let competence = Competences.find(competence => competence.Nom_model === this.Nom_model && competence.Nom === nom_competence);
+      if (competence !== null && typeof competence !== "undefined") res += competence.get_cout();
+    });
     return res;
   }
 
@@ -484,8 +490,10 @@ class Model {
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attrib) => {
       if (attribute === attrib) {
         value += parseInt(this[attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase() + "_experience"]) || 0;
-        const race_param = Avantages.find(avantage => avantage.Nom_model === this.Nom_model && avantage.Nom === "Race non humaine").Parametre.replace("_evolue", "");
-        if (race_param !== null && typeof race_param !== "undefined" && race_param !== "") {
+        let race_param = "humain";
+        const avantage = Avantages.find(avantage => avantage.Nom_model === this.Nom_model && avantage.Selection && avantage.Nom === "Race non humaine");
+        if (avantage !== null && typeof avantage !== "undefined") race_param = avantage.Parametre.replace("_evolue", "");
+        if (race_param !== "humain") {
           value += parseInt(attributs_races[race_param][attrib]) || 0;
         }
       }
@@ -493,154 +501,6 @@ class Model {
 
     return value;
   }
-
-  /**
-  * Calcul le coût d'une compétence
-  * @param {string} Nom_competence - Nom de la compétence
-  * @returns {number} - Coût de la compétence
-  */
-  // get_cout(Nom_competence) {
-  //   const degres = CompetencesConnues.find(comp => comp.Nom_model === this.Nom_model && comp.Nom_competence === Nom_competence).Degres;
-  //   let cmp = Competences.find(comp => comp.Nom_competence === Nom_competence);
-  //   let don = cmp.Don;
-
-  //   if (Nom_competence === "Compétences mineures") return 0;
-
-  //   if (don !== null && cmp.Competence_majeure !== "Compétences mineures") {
-  //     // Calcul du coût de la compétence majeure
-  //     switch (don) {
-  //       case "Cmbx2":
-  //         return degres * (degres + 1) / 1 * parametres_couts[this.get("combat")].degres_gen;
-  //       case "Cmb":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("combat")].degres_gen;
-  //       case "Mag":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("magie")].degres_gen;
-  //       case "Foi":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("foi")].degres_gen;
-  //       case "Adp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("adaptation")].degres_gen;
-  //       case "Adp+Mem":
-  //         return degres * (degres + 1) / 2 * parametres_couts[Math.round((this.get("adaptation") + this.get("memoire")) / 2)].degres_gen;
-  //       case "Adp+Thp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[Math.round((this.get("adaptation") + this.get("telepathie")) / 2)].degres_gen;
-  //       case "Thp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("telepathie")].degres_gen;
-  //       case "Mem":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("memoire")].degres_gen;
-  //     }
-  //   }
-  //   else {
-  //     // Calcul du coût de la compétence mineure
-  //     if (cmp.Competence_majeure !== "Compétences mineures") don = Competences.find(comp => comp.Nom_competence === cmp.Competence_majeure).Don;
-
-  //     switch (don) {
-  //       case "Cmbx2":
-  //         return degres * (degres + 1) / 1 * parametres_couts[this.get("combat")].degres_spe;
-  //       case "Cmb":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("combat")].degres_spe;
-  //       case "Mag":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("magie")].degres_spe;
-  //       case "Foi":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("foi")].degres_spe;
-  //       case "Adp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("adaptation")].degres_spe;
-  //       case "Adp+Mem":
-  //         return degres * (degres + 1) / 2 * parametres_couts[Math.round((this.get("adaptation") + this.get("memoire")) / 2)].degres_spe;
-  //       case "Adp+Thp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[Math.round((this.get("adaptation") + this.get("telepathie")) / 2)].degres_spe;
-  //       case "Thp":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("telepathie")].degres_spe;
-  //       case "Mem":
-  //         return degres * (degres + 1) / 2 * parametres_couts[this.get("memoire")].degres_spe;
-  //     }
-  //   }
-
-  //   return null;
-  // }
-
-  /**
-  * Calcul le score d'une compétence
-  * @param {string} Nom_competence - Nom de la compétence
-  * @returns {number} - Score de la compétence
-  */
-  // get_score(Nom_competence) {
-  //   const cmp = Competences.find(comp => comp.Nom_competence === Nom_competence);
-  //   const cmp_connue = CompetencesConnues.find(comp => comp.Nom_model === this.Nom_model && comp.Nom_competence === Nom_competence);
-  //   let degres = 0;
-  //   if (cmp_connue !== null && typeof cmp_connue !== "undefined") degres = parseInt(cmp_connue.Degres || 0);
-
-  //   if (Nom_competence === "Compétences mineures") return 0;
-
-  //   if (cmp.Attribut !== null) {
-  //     // Calcul du score de la compétence majeure
-  //     switch (cmp.Attribut) {
-  //       case "Co":
-  //         return degres + parametres_couts[this.get("coordination")].ajustement + cmp.Base;
-  //       case "Co+VM":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_mentale")) / 2)].ajustement + cmp.Base;
-  //       case "Co+VP":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_physique")) / 2)].ajustement + cmp.Base;
-  //       case "Co+P":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("perception")) / 2)].ajustement + cmp.Base;
-  //       case "Co+F":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("force")) / 2)].ajustement + cmp.Base;
-  //       case "NP":
-  //         return degres + parametres_couts[this.get("niveau_physique")].ajustement + cmp.Base;
-  //       case "Ab":
-  //         return degres + parametres_couts[this.get("abstraction")].ajustement + cmp.Base;
-  //       case "V":
-  //         return degres + parametres_couts[this.get("volonte")].ajustement + cmp.Base;
-  //       case "VP":
-  //         return degres + parametres_couts[this.get("vivacite_physique")].ajustement + cmp.Base;
-  //       case "P+VM":
-  //         return degres + parametres_couts[Math.round((this.get("perception") + this.get("vivacite_mentale")) / 2)].ajustement + cmp.Base;
-  //       case "Ch":
-  //         return degres + parametres_couts[this.get("charisme")].ajustement + cmp.Base;
-  //       case "Co+V":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("volonte")) / 2)].ajustement + cmp.Base;
-  //       case "Co+Ch":
-  //         return degres + parametres_couts[Math.round((this.get("coordination") + this.get("charisme")) / 2)].ajustement + cmp.Base;
-  //     }
-  //   }
-  //   else {
-  //     // Calcul du score de la compétence mineure
-  //     const cmp_majeure = Competences.find(comp => comp.Nom_competence === cmp.Competence_majeure);
-  //     const cmp_majeure_connue = CompetencesConnues.find(comp => comp.Nom_model === this.Nom_model && comp.Nom_competence === cmp.Competence_majeure);
-  //     let degres_majeure = 0;
-  //     if (cmp_majeure_connue !== null && typeof cmp_majeure_connue !== "undefined") degres_majeure = parseInt(cmp_majeure_connue.Degres || 0);
-
-  //     switch (cmp_majeure.Attribut) {
-  //       case "Co":
-  //         return degres + degres_majeure + parametres_couts[this.get("coordination")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+VM":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_mentale")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+VP":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("vivacite_physique")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+P":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("perception")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+F":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("force")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "NP":
-  //         return degres + degres_majeure + parametres_couts[this.get("niveau_physique")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Ab":
-  //         return degres + degres_majeure + parametres_couts[this.get("abstraction")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "V":
-  //         return degres + degres_majeure + parametres_couts[this.get("volonte")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "VP":
-  //         return degres + degres_majeure + parametres_couts[this.get("vivacite_physique")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "P+VM":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("perception") + this.get("vivacite_mentale")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Ch":
-  //         return degres + degres_majeure + parametres_couts[this.get("charisme")].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+V":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("volonte")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //       case "Co+Ch":
-  //         return degres + degres_majeure + parametres_couts[Math.round((this.get("coordination") + this.get("charisme")) / 2)].ajustement + cmp.Base + cmp_majeure.Base;
-  //     }
-  //   }
-
-  //   return null;
-  // }
 }
 
 // Tableau global contenant tous les modèles de personnages

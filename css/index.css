@@ -250,8 +250,14 @@ input:checked+.slider:before {
 }
 
 #div_model_5 .don,
-#div_model_5 .attribut {
+#div_model_5 .attribut,
+#couts_table input {
     width: 50px;
+}
+
+#couts_table input {
+    text-align: right;
+    padding-right: 5px;
 }
 
 #div_pion input:disabled,
@@ -263,28 +269,16 @@ input:checked+.slider:before {
     background-color: lightgray;
 }
 
-#div_cout input {
-    font-size: x-small;
-    width: 34px;
-    text-align: right;
-    padding-right: 5px;
-}
-
-#div_cout td {
-    border-width: 0px;
-    border: 1px solid black;
-    text-align: right;
-    padding: 0px 5px 0px 5px;
-}
-
-#div_model_4 td:nth-child(3),
+#couts_table td:nth-child(1),
+#div_model_4 td:nth-child(2),
 #div_model_5 td:nth-child(1),
 #div_model_6 td:nth-child(3) {
     text-align: left;
     font-weight: bold;
 }
 
-#div_model_4 td:not(:nth-child(3)),
+#couts_table td:not(:nth-child(1)),
+#div_model_4 td:not(:nth-child(2)),
 #div_model_5 td:not(:nth-child(1)),
 #div_model_6 td:not(:nth-child(3)) {
     text-align: center;
@@ -298,23 +292,26 @@ input:checked+.slider:before {
 }
 
 #div_model_4 td:nth-child(1) input[type="checkbox"],
-#div_model_6 td:nth-child(2) input[type="checkbox"],
-#div_model_4 td:nth-child(2) input[type="checkbox"] {
+#div_model_4 td:nth-child(2) input[type="checkbox"],
+#div_model_6 td:nth-child(2) input[type="checkbox"] {
     margin: 0;
 }
 
 #div_model_4 input,
 #div_model_4 select,
+#div_model_5 select,
 #div_model_6 select {
     width: 100%;
     box-sizing: border-box;
 }
 
+#couts_table tr:nth-child(even) td,
 #div_model_4 table tr:nth-child(even) td,
 #div_model_6 table tr:nth-child(even) td {
     background-color: #eaf3ff; /* bleu clair */
 }
 
+#couts_table tr:nth-child(odd) td,
 #div_model_4 table tr:nth-child(odd) td,
 #div_model_6 table tr:nth-child(odd) td,
 #div_model_6 table tr td:nth-child(1) {
@@ -325,6 +322,7 @@ input:checked+.slider:before {
     text-overflow: ellipsis;
 }
 
-#div_model .niveau {
+#div_model .niveau,
+#div_model_4 .type {
     text-overflow: clip;
 }

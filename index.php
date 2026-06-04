@@ -229,10 +229,11 @@
             $js = "Avantages[$index] = new Avantage({\n";
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
             $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
-            $js .= "    Selection_creation: " . toJS($row['Selection_creation'], 'bool') . ",\n";
-            $js .= "    Selection_experience: " . toJS($row['Selection_experience'], 'bool') . ",\n";
-            $js .= "    Niveau: " . toJS($row['Niveau'], 'int') . ",\n";
-            $js .= "    Parametre: " . toJS($row['Parametre']) . "\n";
+            $js .= "    Selection: " . toJS($row['Selection'], 'bool') . ",\n";
+            $js .= "    Parametre: " . toJS($row['Parametre'], 'null') . ",\n";
+            $js .= "    Type: " . toJS($row['Type'], 'null') . ",\n";
+            $js .= "    Niveau_creation: " . toJS($row['Niveau_creation'], 'null') . ",\n";
+            $js .= "    Niveau_experience: " . toJS($row['Niveau_experience'], 'null') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -246,7 +247,7 @@
             $js .= "    Nom_model: " . toJS($row['Nom_model']) . ",\n";
             $js .= "    Nom: " . toJS($row['Nom']) . ",\n";
             $js .= "    Selection: " . toJS($row['Selection'], 'bool') . ",\n";
-            $js .= "    Niveau: " . toJS($row['Niveau'], 'int') . "\n";
+            $js .= "    Niveau: " . toJS($row['Niveau'], 'null') . "\n";
             $js .= "});\n";
             return $js;
         }
