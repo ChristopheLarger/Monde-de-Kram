@@ -1182,15 +1182,6 @@ class Pion extends Map {
             attribut = Math.round((attribut - 10) / 2);
         }
 
-        // Ajout des degrés de la compétence connue
-        // const comp_connue = CompetencesConnues.find(comp =>
-        //     comp.Nom_model === this.Model &&
-        //     comp.Nom_competence === competence);
-
-        // if (comp_connue !== null && typeof comp_connue !== "undefined") {
-        //     return comp.Base + attribut + comp_connue.Degres;
-        // }
-
         return comp.Base + attribut;
     }
 

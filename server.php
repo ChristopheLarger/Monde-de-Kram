@@ -101,42 +101,43 @@ class ChatServer implements MessageComponentInterface
         } else {
             // Changement du nom du modèle dans la base de données
             $sql = "INSERT INTO `model` (
-                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Puissance_mentale`, `Puissance_physique`,
-                `Fatigue`, `Concentration`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
-                `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
-                `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`,
-                `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`,
-                `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`,
-                `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`,
-                `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`,
-                `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`)
+                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`)
                 SELECT
-                ?,
-                `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Puissance_mentale`, `Puissance_physique`,
-                `Fatigue`, `Concentration`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`,
-                `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`,
-                `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`,
-                `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`,
-                `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`,
-                `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`,
-                `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `PdV`
+                ?, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`
                 FROM `model`
                 WHERE `Nom_model` = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
 
-            $sql = "INSERT INTO `comp_connue` (`Nom_model`, `Nom_competence`, `Degres`)
-                SELECT ?, `Nom_competence`, `Degres`
-                FROM `comp_connue`
+            $sql = "INSERT INTO `competence` (`Nom_model`, `Nom`, `Degres`)
+                SELECT ?, `Nom`, `Degres`
+                FROM `competence`
                 WHERE `Nom_model` = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
-            $sql = "INSERT INTO `sort_connu` (`Nom_model`, `Nom_liste`, `Nom_sort`)
-                SELECT ?, `Nom_liste`, `Nom_sort`
-                FROM `sort_connu`
+
+            $sql = "INSERT INTO `avantage` (`Nom_model`, `Nom`, `Selection`, `Parametre`, `Type`, `Niveau_creation`, `Niveau_experience`)
+                SELECT ?, `Nom`, `Selection`, `Parametre`, `Type`, `Niveau_creation`, `Niveau_experience`
+                FROM `avantage`
                 WHERE `Nom_model` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+
+            $sql = "INSERT INTO `desavantage` (`Nom_model`, `Nom`, `Selection`, `Niveau`)
+                SELECT ?, `Nom`, `Selection`, `Niveau`
+                FROM `desavantage`
+                WHERE `Nom_model` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ss", $result[2], $result[1]);
+            $stmt->execute();
+
+            $sql = "INSERT INTO `sort_connu` (`Nom_model`, `Nom_liste`, `Nom_sort`)
+            SELECT ?, `Nom_liste`, `Nom_sort`
+            FROM `sort_connu`
+            WHERE `Nom_model` = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
@@ -236,11 +237,8 @@ class ChatServer implements MessageComponentInterface
      * @return bool - true si la modification de l'attribut a réussi
      */
     private function Set_Avantage($msg) {
-        echo "Set_Avantage : Appel de la fonction\n";
-
         $regex = "/^MJ: Set_Avantage ([^@]+)@([^@]+)@([^@]+)@([^@]*)@([^@]*)@([^@]*)@([^@]*)$/";
         if (! preg_match($regex, $msg, $result)) return false;
-        echo "Set_Avantage : Regex valide\n";
 
         $nom_model = $result[1];
         $nom = $result[2];
@@ -249,14 +247,6 @@ class ChatServer implements MessageComponentInterface
         $type = $result[5];
         $niveau_creation = $result[6];
         $niveau_experience = $result[7];
-
-        echo "nom_model : " . $nom_model . "\n";
-        echo "nom : " . $nom . "\n";
-        echo "selection : " . $selection . "\n";
-        echo "parametre : " . $parametre . "\n";
-        echo "type : " . $type . "\n";
-        echo "niveau_creation : " . $niveau_creation . "\n";
-        echo "niveau_experience : " . $niveau_experience . "\n";
 
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
@@ -270,8 +260,6 @@ class ChatServer implements MessageComponentInterface
             $stmt->bind_param("ss", $nom_model, $nom);
             $stmt->execute();
             $resultMysql = $stmt->get_result();
-
-            echo "resultMysql : " . $resultMysql->num_rows . "\n";
 
             if ($resultMysql->num_rows > 0) {
                 $sql = "UPDATE avantage SET Selection = ?, Parametre = ?, `Type` = ?, Niveau_creation = ?, Niveau_experience = ? WHERE Nom_model = ? AND Nom = ?";

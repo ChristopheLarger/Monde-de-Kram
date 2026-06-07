@@ -124,7 +124,6 @@ h2 {
 
 .arrow-label-left {
   --angle: 270deg;
-  --radius: clamp(115px, 30vmin, 200px);
 }
 
 .arrow-label-top-right {

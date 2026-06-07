@@ -447,7 +447,7 @@
             }
         }
 
-        // Initialisation du pion et du modèle lorsque les compétences sont chargées
+        // Initialisation du pion et du modèle lorsque les interfaces sont chargées
         initialise_pion();
         initialise_model();
 

@@ -504,7 +504,7 @@
     </script>
 
     <div id="div_model"
-        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: white; border: 3px solid black;">
+        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: black; color: white; border: 3px solid black;">
         <div class="div_model_tabs">
             <div style="display: flex; justify-content: space-between;">
                 <button type="button" class="tab-model humanoid" data-tab="0"
@@ -518,11 +518,11 @@
             </div>
             <div style="display: flex; justify-content: space-between;">
                 <button type="button" class="tab-model" data-tab="5"
-                    style="width: 33.33%; background-color: rgb(128, 255, 128);">Compétences</button>
+                    style="width: 50%; background-color: rgb(128, 255, 128);">Compétences</button>
                 <button type="button" class="tab-model" data-tab="2"
-                    style="width: 33.33%; background-color: rgb(128, 255, 255);">Magie</button>
+                    style="display: none; width: 50%; background-color: rgb(128, 255, 255);">Div 2</button>
                 <button type="button" class="tab-model" data-tab="3"
-                    style="width: 33.33%; background-color: rgb(255, 128, 255);">Armures & Coûts</button>
+                    style="width: 50%; background-color: rgb(255, 128, 255);">Divers</button>
             </div>
         </div>
         <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
@@ -536,7 +536,7 @@
                     <input type="file" class="input_figurine" accept="image/*"
                         style="display: none; width: 100%; height: 100%;">
                     <img class="figurine" alt="Figurine du pion" title="Cliquer pour charger une autre image"
-                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: white; cursor: pointer;">
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: black; cursor: pointer;">
                 </td>
                 <td>Modèle :</td>
                 <td><select class="model_select" style="font-size: x-small; box-sizing: border-box; width: 100%;">
@@ -549,21 +549,21 @@
                         style="font-size: x-small; box-sizing: border-box; width: 100%; text-align: left;"> </td>
             </tr>
             <tr>
-                <td colspan="2">
+                <td></td>
+                <td>
                     <div style="width: 100%; display: flex; justify-content: space-between;">
                         <button class="retour"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Retour</button>
                         <button class="dupliquer"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Dupliquer</button>
-                        <button class="supprimer"
-                            style="font-size: x-small; margin-top: 5px; margin-bottom: 5px;">Supprimer</button>
                     </div>
                 </td>
             </tr>
         </table>
+        <hr>
 
         <!-- Caractéristiques Humanoides -->
-        <div id="div_model_0" style="display: none; z-index: 1025; background-color: white;">
+        <div id="div_model_0" style="display: none; z-index: 1025; background-color: black; color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
@@ -581,7 +581,6 @@
                         <button class="switch_to_monster"
                             style="font-size: x-small; background-color: rgb(255, 32, 32);">Convertir
                             en Monstre</button>
-                        <hr>
                     </td>
                 </tr>
                 <tr>
@@ -792,7 +791,7 @@
         </div>
 
         <!-- Caractéristiques Monstres -->
-        <div id="div_model_1" style="display: none; z-index: 1025; background-color: white;">
+        <div id="div_model_1" style="display: none; z-index: 1025; background-color: black; color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
@@ -805,11 +804,6 @@
                         <button class="switch_to_humanoid"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px; background-color: rgb(128, 128, 255);">Convertir
                             en Humanoide</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4">
-                        <hr>
                     </td>
                 </tr>
                 <tr>
@@ -897,76 +891,79 @@
                 <tr>
                     <td colspan="4" style="text-align: center;">
                         <textarea class="capacites_monstre" placeholder="Capacites..."
-                            style="width: 99%; box-sizing: border-box; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0; overflow-y: auto;"></textarea>
+                            style="width: 99%; box-sizing: border-box; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0; overflow-y: auto; background-color: black; color: white;"></textarea>
                     </td>
                 </tr>
             </table>
         </div>
 
-        <!-- Magie -->
-        <div id="div_model_2" style="display: none; z-index: 1025; background-color: white;">
+        <!-- Div 2 : libre pour le moment -->
+        <div id="div_model_2" style="display: none; z-index: 1025; background-color: black; color: white;">
+        </div>
+
+        <!-- Divers -->
+        <div id="div_model_3" style="display: none; z-index: 1025; background-color: black; color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
-                    <col style="width: 1px;">
                     <col style="width: auto;">
+                    <col style="width: 1px;">
                 </colgroup>
                 <tr>
-                    <td>Type de magie :&nbsp;</td>
+                    <td></td>
                     <td>
-                        <div style="display: flex; justify-content: space-between;">
-                            <select class="magie_type" style="font-size: x-small; box-sizing: border-box;">
-                                <option value="classique">Classique</option>
-                                <option value="religieuse">Religieuse</option>
-                                <option value="sans">Sans magie</option>
-                            </select>
-                            <span>Concentration :&nbsp;<input type="text" class="concentration" disabled></span>
-                        </div>
+                        <table id="cout_magie_table"
+                            style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                            <colgroup>
+                                <col style="width: auto;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                            </colgroup>
+                            <tr>
+                                <td></td>
+                                <td colspan="3">
+                                    <div style="display: flex; justify-content: space-between;">
+                                        <span>Concentration :&nbsp;<input type="text" class="concentration"
+                                                disabled></span>
+                                        <button class="arbre_magie"
+                                            style="font-size: x-small; background-color: rgb(128, 128, 255);">Arbre de
+                                            magie</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Coût</th>
+                                <th>&nbsp;&nbsp;&nbsp;Maximum</th>
+                            <tr>
+                                <td></td>
+                                <td>Coût des listes de magie :&nbsp;</td>
+                                <td><input style="text-align: right; padding-right: 5px; width: 50px;" type="text"
+                                        class="cout_listes_magie" disabled></td>
+                                <td> / <input style="text-align: right; padding-right: 5px; width: 50px;" type="text"
+                                        class="cout_listes_magie_max" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Coût des sorts connus :&nbsp;</td>
+                                <td><input style="text-align: right; padding-right: 5px; width: 50px;" type="text"
+                                        class="cout_sorts_connus" disabled></td>
+                                <td> / <input style="text-align: right; padding-right: 5px; width: 50px;" type="text"
+                                        class="cout_sorts_connus_max" disabled></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
-                <tr>
-                    <td>Liste de prêtre :&nbsp;</td>
-                    <td><select class="liste_pretre" style="font-size: x-small; box-sizing: border-box;">
-                            <option value="">--</option>
-                            <option value="air">Air</option>
-                            <option value="controle">Contrôle de soi</option>
-                            <option value="surnaturelles">Créatures surnaturelles</option>
-                            <option value="detections">Détections</option>
-                            <option value="eau">Eau</option>
-                            <option value="feu">Feu</option>
-                            <option value="froid">Froid</option>
-                            <option value="harmonie">Harmonie</option>
-                            <option value="illusions">Illusion</option>
-                            <option value="isolement">Isolement</option>
-                            <option value="lumiere">Lumière et électricité</option>
-                            <option value="magie">Magie pure</option>
-                            <option value="esprits">Maîtrise des esprits</option>
-                            <option value="metamorphoses">Métamorphose</option>
-                            <option value="nature">Nature</option>
-                            <option value="terre">Terre</option>
-                        </select>
-                    </td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Coûts & Armures -->
-        <div id="div_model_3" style="display: none; z-index: 1025; background-color: white;">
-            <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-                <colgroup>
-                    <col style="width: 100px;">
-                    <col style="width: 1px;">
-                    <col style="width: auto;">
-                    <col style="width: auto;">
-                    <col style="width: auto;">
-                </colgroup>
                 <tr>
                     <td colspan="2">
                         <hr>
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2">
-                        <table
+                    <td></td>
+                    <td>
+                        <table id="armures_table"
                             style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                             <colgroup>
                                 <col style="width: auto;">
@@ -1041,63 +1038,86 @@
                 <tr>
                     <td></td>
                     <td>
-                            <table id="couts_table" style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
-                                <colgroup>
-                                    <col style="width: auto;">
-                                    <col style="width: 1px;">
-                                    <col style="width: 1px;">
-                                </colgroup>
-                                <tr>
-                                    <th></th>
-                                    <th>Création</th>
-                                    <th>&nbsp;&nbsp;&nbsp;Final&nbsp;&nbsp;&nbsp;</th>
-                                </tr>
-                                <tr>
-                                    <td>Attributs :</td>
-                                    <td><input type="text" class="attributs_creation_cout" disabled></td>
-                                    <td><input type="text" class="attributs_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Dons :</td>
-                                    <td><input type="text" class="dons_creation_cout" disabled></td>
-                                    <td><input type="text" class="dons_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Avantages :</td>
-                                    <td><input type="text" class="avantages_creation_cout" disabled></td>
-                                    <td><input type="text" class="avantages_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Désavantages :</td>
-                                    <td><input type="text" class="desavantages_creation_cout" disabled></td>
-                                    <td><input type="text" class="desavantages_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Compétences :</td>
-                                    <td></td>
-                                    <td><input type="text" class="competences_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Magie classique :</td>
-                                    <td></td>
-                                    <td><input type="text" class="magie_classique_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Magie religieuse :</td>
-                                    <td></td>
-                                    <td><input type="text" class="magie_religieuse_cout" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Départ :</td>
-                                    <td></td>
-                                    <td><input type="text" class="depart_cout" value="-2000" disabled></td>
-                                </tr>
-                                <tr>
-                                    <td>Total :</td>
-                                    <td><input type="text" class="total_creation_cout" disabled></td>
-                                    <td><input type="text" class="total_cout" disabled></td>
-                                </tr>
-                            </table>
+                        <table id="couts_table"
+                            style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+                            <colgroup>
+                                <col style="width: auto;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                                <col style="width: 1px;">
+                            </colgroup>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th>Création</th>
+                                <th>Expérience</th>
+                                <th>&nbsp;&nbsp;&nbsp;Final&nbsp;&nbsp;&nbsp;</th>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Attributs :</td>
+                                <td><input type="text" class="attributs_creation_cout" disabled></td>
+                                <td><input type="text" class="attributs_experience_cout" disabled></td>
+                                <td><input type="text" class="attributs_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Dons :</td>
+                                <td><input type="text" class="dons_creation_cout" disabled></td>
+                                <td></td>
+                                <td><input type="text" class="dons_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Avantages :</td>
+                                <td><input type="text" class="avantages_creation_cout" disabled></td>
+                                <td><input type="text" class="avantages_experience_cout" disabled></td>
+                                <td><input type="text" class="avantages_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Désavantages :</td>
+                                <td><input type="text" class="desavantages_creation_cout" disabled></td>
+                                <td></td>
+                                <td><input type="text" class="desavantages_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Compétences :</td>
+                                <td></td>
+                                <td></td>
+                                <td><input type="text" class="competences_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Magie classique :</td>
+                                <td></td>
+                                <td></td>
+                                <td><input type="text" class="magie_classique_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Magie religieuse :</td>
+                                <td></td>
+                                <td></td>
+                                <td><input type="text" class="magie_religieuse_cout" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Départ :</td>
+                                <td></td>
+                                <td></td>
+                                <td><input type="text" class="depart_cout" value="-2000" disabled></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td>Total :</td>
+                                <td><input type="text" class="total_creation_cout" disabled></td>
+                                <td><input type="text" class="total_experience_cout" disabled></td>
+                                <td><input type="text" class="total_cout" disabled></td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
                 <tr>
@@ -1107,7 +1127,8 @@
                                 Le coût de l'amélioration des attributs par l'expérience doit être inférieur ou égal à
                                 25% du coût total.</span>
                             <span class="remarques_cout_avantages" style="display: none; color: rgb(255, 32, 32);">
-                                Le coût de l'achat d'avantages doit être inférieur ou égal à 25% du coût total.</span>
+                                Le coût de l'achat d'avantages par l'expériencedoit être inférieur ou égal à 25% du coût
+                                total.</span>
                         </div>
                         <hr>
                     </td>
@@ -1116,13 +1137,14 @@
         </div>
 
         <!-- Avantages -->
-        <div id="div_model_4" style="display: none; z-index: 1025; background-color: white;">
+        <div id="div_model_4" style="display: none; z-index: 1025; background-color: black; color: white;">
             <div class="avantages"
                 style="overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <div style="text-align: right;">
                     Nb points à la création : <span class="nb_points_creation">0</span>
                     &nbsp;&nbsp;&nbsp;&nbsp;
                     Nb points par l'expérience : <span class="nb_points_experience">0</span>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
                 </div>
                 <table
                     style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
@@ -1156,7 +1178,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Beauté :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
@@ -1185,11 +1208,11 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 1 :&nbsp;</td>
                         <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                            <option value="--">--</option>
-                            <option value="instrument_1">Instrument 1</option>
-                            <option value="instrument_2">Instrument 2</option>
-                            <option value="instrument_3">Instrument 3</option>
-                        </select></td>
+                                <option value="--">--</option>
+                                <option value="instrument_1">Instrument 1</option>
+                                <option value="instrument_2">Instrument 2</option>
+                                <option value="instrument_3">Instrument 3</option>
+                            </select></td>
                         <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="Création">Création</option>
                                 <option value="Expérience" selected>Expérience</option>
@@ -1200,11 +1223,11 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 2 :&nbsp;</td>
                         <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                            <option value="--">--</option>
-                            <option value="instrument_1">Instrument 1</option>
-                            <option value="instrument_2">Instrument 2</option>
-                            <option value="instrument_3">Instrument 3</option>
-                        </select></td>
+                                <option value="--">--</option>
+                                <option value="instrument_1">Instrument 1</option>
+                                <option value="instrument_2">Instrument 2</option>
+                                <option value="instrument_3">Instrument 3</option>
+                            </select></td>
                         <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="Création">Création</option>
                                 <option value="Expérience" selected>Expérience</option>
@@ -1215,11 +1238,11 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Don pour la musique 3 :&nbsp;</td>
                         <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
-                            <option value="--">--</option>
-                            <option value="instrument_1">Instrument 1</option>
-                            <option value="instrument_2">Instrument 2</option>
-                            <option value="instrument_3">Instrument 3</option>
-                        </select></td>
+                                <option value="--">--</option>
+                                <option value="instrument_1">Instrument 1</option>
+                                <option value="instrument_2">Instrument 2</option>
+                                <option value="instrument_3">Instrument 3</option>
+                            </select></td>
                         <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;">
                                 <option value="Création">Création</option>
                                 <option value="Expérience" selected>Expérience</option>
@@ -1300,7 +1323,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Empathie animale :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
@@ -1309,7 +1333,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Guérison rapide :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="3" disabled></td>
@@ -1318,24 +1343,47 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Maitre de magie :&nbsp;</td>
                         <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="guide_spirituel">
                         <td><input type="checkbox" class="selection"></td>
                         <td>Guide spirituel :&nbsp;</td>
-                        <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="parametre" style="font-size: x-small; box-sizing: border-box; width: 100%;">
+                                <option value="air">Air</option>
+                                <option value="controle">Contrôle de soi</option>
+                                <option value="surnaturelles">Créatures surnaturelles</option>
+                                <option value="detections">Détections</option>
+                                <option value="eau">Eau</option>
+                                <option value="feu">Feu</option>
+                                <option value="froid">Froid</option>
+                                <option value="harmonie">Harmonie</option>
+                                <option value="illusions">Illusion</option>
+                                <option value="isolement">Isolement</option>
+                                <option value="lumiere">Lumière et électricité</option>
+                                <option value="magie">Magie pure</option>
+                                <option value="esprits">Maîtrise des esprits</option>
+                                <option value="metamorphoses">Métamorphose</option>
+                                <option value="nature">Nature</option>
+                                <option value="terre">Terre</option>
+                            </select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_d_armes">
                         <td><input type="checkbox" class="selection"></td>
                         <td>Maitre d'armes :&nbsp;</td>
                         <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_1">
@@ -1343,8 +1391,10 @@
                         <td>Maitre de competence majeure 1 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_2">
@@ -1352,8 +1402,10 @@
                         <td>Maitre de competence majeure 2 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_majeure_3">
@@ -1361,8 +1413,10 @@
                         <td>Maitre de competence majeure 3 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_1">
@@ -1370,8 +1424,10 @@
                         <td>Maitre de competence mineure 1 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_2">
@@ -1379,8 +1435,10 @@
                         <td>Maitre de competence mineure 2 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="maitre_de_competence_mineure_3">
@@ -1388,15 +1446,18 @@
                         <td>Maitre de competence mineure 3 :&nbsp;</td>
                         <td><select class="parametre"
                                 style="font-size: x-small; box-sizing: border-box; width: 100%;"></select></td>
-                                <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                            <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="vue_percante">
                         <td><input type="checkbox" class="selection"></td>
                         <td>Vue perçante :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
@@ -1405,7 +1466,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Ouïe fine :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
@@ -1414,7 +1476,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Odorat et goût sup. :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="1" disabled></td>
@@ -1458,7 +1521,8 @@
                                 <option value="toutlisse">Toutlisse</option>
                                 <option value="toutlisse_evolue">Toutlisse évolué</option>
                             </select></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
@@ -1487,16 +1551,20 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Résistance à la magie :&nbsp;</td>
                         <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="richesse">
                         <td><input type="checkbox" class="selection"></td>
                         <td>Richesse :&nbsp;</td>
                         <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="roc_mental">
@@ -1513,7 +1581,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Santé de fer :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
@@ -1542,8 +1611,10 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Sixième sens :&nbsp;</td>
                         <td></td>
-                        <td><select class="niveau_creation" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
-                    <td><select class="niveau_experience" style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_creation"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
+                        <td><select class="niveau_experience"
+                                style="font-size: x-small; box-sizing: border-box; width: 35px;"></select></td>
                         <td><input type="text" class="cout" value="-1" disabled></td>
                     </tr>
                     <tr class="sort_naturel">
@@ -1561,7 +1632,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Vision nocturne :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="4" disabled></td>
@@ -1570,7 +1642,8 @@
                         <td><input type="checkbox" class="selection"></td>
                         <td>Vision périphérique :&nbsp;</td>
                         <td></td>
-                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;" disabled>
+                        <td colspan="2"><select class="type" style="font-size: x-small; box-sizing: border-box;"
+                                disabled>
                                 <option value="Création" selected>Création</option>
                             </select></td>
                         <td><input type="text" class="cout" value="2" disabled></td>
@@ -1580,7 +1653,7 @@
         </div>
 
         <!-- Compétences -->
-        <div id="div_model_5" style="display: none; z-index: 1025; background-color: white;">
+        <div id="div_model_5" style="display: none; z-index: 1025; background-color: black; color: white;">
             <div class="competences"
                 style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <table
@@ -2340,7 +2413,7 @@
         </div>
 
         <!-- Désavantages -->
-        <div id="div_model_6" style="display: none; z-index: 1025; background-color: white;">
+        <div id="div_model_6" style="display: none; z-index: 1025; background-color: black; color: white;">
             <div class="desavantages"
                 style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <div style="text-align: right;">

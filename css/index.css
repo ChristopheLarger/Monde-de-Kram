@@ -269,7 +269,7 @@ input:checked+.slider:before {
     background-color: lightgray;
 }
 
-#couts_table td:nth-child(1),
+#couts_table td:nth-child(2),
 #div_model_4 td:nth-child(2),
 #div_model_5 td:nth-child(1),
 #div_model_6 td:nth-child(3) {
@@ -277,7 +277,7 @@ input:checked+.slider:before {
     font-weight: bold;
 }
 
-#couts_table td:not(:nth-child(1)),
+#couts_table td:not(:nth-child(2)),
 #div_model_4 td:not(:nth-child(2)),
 #div_model_5 td:not(:nth-child(1)),
 #div_model_6 td:not(:nth-child(3)) {
@@ -308,14 +308,16 @@ input:checked+.slider:before {
 #couts_table tr:nth-child(even) td,
 #div_model_4 table tr:nth-child(even) td,
 #div_model_6 table tr:nth-child(even) td {
-    background-color: #eaf3ff; /* bleu clair */
+    background-color: lightgray;
+    color: black;
 }
 
 #couts_table tr:nth-child(odd) td,
 #div_model_4 table tr:nth-child(odd) td,
 #div_model_6 table tr:nth-child(odd) td,
 #div_model_6 table tr td:nth-child(1) {
-    background-color: white;
+    background-color: black;
+    color: white;
 }
 
 #div_model select {

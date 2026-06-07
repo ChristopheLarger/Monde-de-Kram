@@ -271,12 +271,14 @@ class Avantage {
     }
 
     get_cout(type) {
-        let niveau = this.Niveau_experience;
+        let niveau = null;
         if (type === "Création") niveau = this.Niveau_creation;
+        if (type === "Expérience") niveau = this.Niveau_experience;
 
-        if (niveau === "-") {
+        if (type === "Création" && this.Type === "Expérience")
             return 0;
-        }
+        else if (type === "Expérience" && this.Type === "Création")
+            return 0;
         else if (this.Nom === "Race non humaine" && type === this.Type) {
             if (this.Parametre.includes("_evolue")) return 12;
             return 8;
@@ -286,6 +288,9 @@ class Avantage {
             const nom_sort = this.Parametre.split(" - ")[1];
             const sort = Sorts.find(sort => sort.Nom_liste === nom_liste && sort.Nom_sort === nom_sort);
             return 2 * parseInt(sort.Niveau);
+        }
+        if (niveau === "-") {
+            return 0;
         }
         else if (niveau !== null && niveau !== undefined) {
             const base_cout = (niveau === "-" ? 0 : parseInt(niveau));

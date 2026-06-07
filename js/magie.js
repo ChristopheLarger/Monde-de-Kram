@@ -1,4 +1,26 @@
 /**
+ * Objet contenant les coûts des listes de magie pour les magiciens
+ */
+const cout_liste_magicien = Object.freeze({
+  0: 0,
+  1: 6,
+  2: 8,
+  3: 11,
+  4: 16,
+  5: 22,
+  6: 30,
+  7: 40,
+  8: 52,
+  9: 66,
+  10: 85,
+  12: 125,
+  15: 200,
+  20: 200,
+  25: 200,
+  30: 200
+});
+
+/**
  * Classe représentant une liste de magie
  */
 class Liste {
@@ -169,44 +191,37 @@ function affiche_roue_magie() {
   });
 
   // Mettre en vert les listes des sorts connus du personnage sélectionné
-  SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
-    const element = document.getElementById(getShortName(x.Nom_liste));
-    if (element) {
-      element.style.color = "white";
-      element.style.backgroundColor = "green";
-    }
-  });
-
-  const p_selected = Models.find((p) => p.Nom_model === m_pion.Model);
-
-  // Mettre en vert la liste de prêtre et sa liste jumelée si le personnage sélectionné en a une
-  if (p_selected && p_selected.Liste_pretre) {
-    // Trouver la liste de prêtre dans le tableau Listes
-    const listePretre = Listes.find((l) => l.Nom_liste === p_selected.Liste_pretre);
-
-    if (listePretre) {
-      // Mettre en vert le bouton de la liste de prêtre
-      const shortNamePretre = getShortName(p_selected.Liste_pretre);
-      if (shortNamePretre) {
-        const elementPretre = document.getElementById(shortNamePretre);
-        if (elementPretre) {
-          elementPretre.style.color = "white";
-          elementPretre.style.backgroundColor = "green";
-        }
+  if (m_model.Magie_type === "classique") {
+    SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
+      const element = document.getElementById(getShortName(x.Nom_liste));
+      if (element) {
+        element.style.color = "white";
+        element.style.backgroundColor = "green";
       }
+    });
 
-      // Mettre en vert le bouton de la liste jumelée si elle existe
-      if (listePretre.Nom_jumelee && listePretre.Nom_jumelee !== "") {
-        const shortNameJumelee = getShortName(listePretre.Nom_jumelee);
-        if (shortNameJumelee) {
-          const elementJumelee = document.getElementById(shortNameJumelee);
-          if (elementJumelee) {
-            elementJumelee.style.color = "white";
-            elementJumelee.style.backgroundColor = "green";
-          }
-        }
-      }
-    }
+    document.querySelectorAll(".magic-button").forEach((button) => {
+      let niveau_max = 0;
+      SortsConnus.filter((s) => s.Nom_model === m_pion.Model && s.Nom_liste === shortName[button.id]).forEach((l) => {
+        const sort = Sorts.find((s) => s.Nom_sort === l.Nom_sort && s.Nom_liste === l.Nom_liste);
+        if (sort.Niveau > niveau_max) niveau_max = sort.Niveau;
+      });
+      button.innerHTML = button.id;
+      if (niveau_max > 0) button.innerHTML += " (" + niveau_max + ")";
+    });
+  
+  }
+  else if (m_model.Magie_type === "religieuse") {
+    const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
+    const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+    const liste_pretre = document.getElementById(nom_liste_pretre);
+    liste_pretre.style.color = "white";
+    liste_pretre.style.backgroundColor = "green";
+
+    const nom_liste_jumelee = Listes.find((l) => l.Nom_liste === shortName[nom_liste_pretre]).Nom_jumelee;
+    const liste_jumelee = document.getElementById(getShortName(nom_liste_jumelee));
+    liste_jumelee.style.color = "white";
+    liste_jumelee.style.backgroundColor = "green";
   }
 }
 
@@ -218,6 +233,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function closeModal() {
     if (modal) modal.style.display = "none";
+    if(document.getElementById('div_model_3').style.display === 'block') {
+      update_cout_total();
+      update_cout_magie();
+    }
   }
 
   if (closeBtn) {
@@ -561,6 +580,7 @@ function createListeModal(Nom_liste) {
   closeBtn.id = "close";
   closeBtn.className = "close";
   closeBtn.innerHTML = "&times;";
+  closeBtn.addEventListener("click", function () { affiche_roue_magie(); });
 
   // Titre
   const title = document.createElement("h1");
@@ -615,38 +635,27 @@ function createListeModal(Nom_liste) {
       spellNode.classList.add(`col-${sort.Col + 1}`);
 
       // Vérifier si le sort est connu par le joueur sélectionné
-      if (
-        typeof m_pion !== "undefined" &&
-        m_pion !== null &&
-        m_pion.Model
-      ) {
-        let isKnown = SortsConnus.some(
-          (sc) =>
+      if (typeof m_pion !== "undefined" && m_pion !== null && m_pion.Model) {
+        let isKnown = false;
+        if (m_model.Magie_type === "classique") {
+          isKnown = SortsConnus.some(sc =>
             sc.Nom_model === m_pion.Model &&
             sc.Nom_liste === Nom_liste &&
-            sc.Nom_sort === sort.Nom_sort
-        );
-        const model = Models.find((m) => m.Nom_model === m_pion.Model);
-        
-        if (m_pion.get_score("Théognosie") !== null && m_pion.get_score("Théognosie") !== undefined) {
-          // Vérifier si c'est la liste de prêtre du personnage
-          if (model.Liste_pretre === Nom_liste && sort.Niveau <= m_pion.get_score("Théognosie")) {
+            sc.Nom_sort === sort.Nom_sort);
+        }
+        else if (m_model.Magie_type === "religieuse") {
+          const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
+          const theognosie = Competences.find((c) => c.Nom_model === m_model.Nom_model && c.Nom === "Théognosie").get_score();
+          const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+          if (shortName[nom_liste_pretre] === Nom_liste && sort.Niveau <= theognosie) {
             isKnown = true;
           }
-          // Vérifier si c'est la liste jumelée de la liste de prêtre
-          else if (model.Liste_pretre) {
-            const listePretre = Listes.find(
-              (l) => l.Nom_liste === model.Liste_pretre
-            );
-            if (listePretre && listePretre.Nom_jumelee === Nom_liste) {
-              // Pour la liste jumelée, limite à 2/3 de Théognosie (arrondi)
-              const limiteJumelee = Math.floor((2 * m_pion.get_score("Théognosie")) / 3);
-              if (sort.Niveau <= limiteJumelee) {
-                isKnown = true;
-              }
-            }
+          const nom_liste_jumelee = Listes.find((l) => l.Nom_liste === shortName[nom_liste_pretre]).Nom_jumelee;
+          if (nom_liste_jumelee === Nom_liste && sort.Niveau <= Math.round(2 / 3 * theognosie)) {
+            isKnown = true;
           }
         }
+
         if (isKnown) {
           spellNode.style.color = "white";
           spellNode.style.backgroundColor = "green";
@@ -743,9 +752,9 @@ function createListeModal(Nom_liste) {
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
       // Si Ctrl est pressé, ne pas ouvrir les informations du sort
-      if (e.ctrlKey) {
+      if (e.ctrlKey && m_model.Magie_type === "classique") {
         e.preventDefault();
-        // Alterner entre vert et blanc (couleur par défaut)
+        // Basculer entre vert et blanc (couleur par défaut)
         if (e.target.style.backgroundColor === "green") {
           // Si déjà vert, remettre en blanc (ou supprimer le style pour revenir à la couleur par défaut)
           e.target.style.backgroundColor = "";
@@ -760,7 +769,7 @@ function createListeModal(Nom_liste) {
         const title = modal_content.querySelector("#title");
         const nom_liste = title.textContent;
 
-      sendMessage(
+        sendMessage(
           "Bascule_sort_connu",
           m_pion.Model + "@" + nom_liste + "@" + Nom_sort
         );
@@ -785,9 +794,7 @@ function createListeModal(Nom_liste) {
       }
 
       // Code normal pour ouvrir les informations du sort (sans Ctrl)
-      const sort = sortsListe.find(
-        (s) => s.Nom_sort === e.target.getAttribute("data-spell")
-      );
+      const sort = sortsListe.find((s) => s.Nom_sort === e.target.getAttribute("data-spell"));
       if (sort !== null && typeof sort !== "undefined") {
         // Ajouter le panneau d'information du sort au contenu de la modale
         createSpellInfo(modalContent, sort);
@@ -809,20 +816,28 @@ function createListeModal(Nom_liste) {
     document.body.removeChild(modal);
     // Mettre en vert les listes des sorts connus du personnage sélectionné
     // x = n'importe quel element de liste
-    Listes.forEach((x) => {
-      const element = document.getElementById(getShortName(x.Nom_liste));
-      if (element) {
-        element.style.color = "";
-        element.style.backgroundColor = "";
-      }
-    });
-    SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
-      const element = document.getElementById(getShortName(x.Nom_liste));
-      if (element) {
-        element.style.color = "white";
-        element.style.backgroundColor = "green";
-      }
-    });
+    // Mettre en vert les listes des sorts connus du personnage sélectionné
+    if (m_model.Magie_type === "classique") {
+      SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
+        const element = document.getElementById(getShortName(x.Nom_liste));
+        if (element) {
+          element.style.color = "white";
+          element.style.backgroundColor = "green";
+        }
+      });
+    }
+    else if (m_model.Magie_type === "religieuse") {
+      const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
+      const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+      const liste_pretre = document.getElementById(nom_liste_pretre);
+      liste_pretre.style.color = "white";
+      liste_pretre.style.backgroundColor = "green";
+
+      const nom_liste_jumelee = Listes.find((l) => l.Nom_liste === shortName[nom_liste_pretre]).Nom_jumelee;
+      const liste_jumelee = document.getElementById(getShortName(nom_liste_jumelee));
+      liste_jumelee.style.color = "white";
+      liste_jumelee.style.backgroundColor = "green";
+    }
   });
 
   modal.addEventListener("click", function (event) {

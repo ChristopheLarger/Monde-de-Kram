@@ -285,8 +285,6 @@ class Model {
  * @returns {Model} - Modèle dupliqué
  */
   dupliquer() {
-    if (this.Is_joueur) return null; // Impossible de dupliquer un modèle de joueur ???
-
     const m = new Model(this);
 
     // Set Nom_model
@@ -297,7 +295,7 @@ class Model {
 
     sendMessage("Copy_Figurine", this.Nom_model + "@" + m.Nom_model);
 
-    Models[Models.length] = m;
+    Models.push(m);
 
     return m;
   }
