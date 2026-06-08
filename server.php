@@ -71,7 +71,7 @@ class ChatServer implements MessageComponentInterface
         $this->Set_Degres($msg);
         $this->Set_Avantage($msg);
         $this->Set_Desavantage($msg);
-        $this->Copy_Figurine($msg);
+        $this->Copy_Model($msg);
 
         // === DIFFUSION DU MESSAGE ===
         foreach ($this->clients as $client) {
@@ -87,8 +87,8 @@ class ChatServer implements MessageComponentInterface
      * @param string $msg - Message contenant les données
      * @return bool - true si la copie de la figurine a réussi
      */
-    private function Copy_Figurine($msg) {
-        $regex = "/^MJ: Copy_Figurine ([^@]+)@([^@]+)$/";
+    private function Copy_Model($msg) {
+        $regex = "/^MJ: Copy_Model ([^@]+)@([^@]+)$/";
 
         if (! preg_match($regex, $msg, $result)) return false;
 
@@ -126,6 +126,8 @@ class ChatServer implements MessageComponentInterface
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
 
+            echo $sql . "\n";
+
             $sql = "INSERT INTO `desavantage` (`Nom_model`, `Nom`, `Selection`, `Niveau`)
                 SELECT ?, `Nom`, `Selection`, `Niveau`
                 FROM `desavantage`
@@ -148,9 +150,7 @@ class ChatServer implements MessageComponentInterface
         // Copie du fichier image
         $ancien = "/xampp/htdocs/Kram/Images/Figurines/" . $result[1] . ".png";
         $nouveau = "/xampp/htdocs/Kram/Images/Figurines/" . $result[2] . ".png";
-        echo copy($ancien, $nouveau);
-
-        echo "Copie de l'image de " . $result[1] . " vers " . $result[2] . "\n";
+        copy($ancien, $nouveau);
 
         return true;
     }
@@ -184,9 +184,7 @@ class ChatServer implements MessageComponentInterface
         // Changement du nom du fichier image
         $ancien = "/xampp/htdocs/Kram/Images/Figurines/" . $result[1] . ".png";
         $nouveau = "/xampp/htdocs/Kram/Images/Figurines/" . $result[2] . ".png";
-        echo rename($ancien, $nouveau);
-
-        echo "Changement de nom de l'image de " . $result[1] . " vers " . $result[2] . "\n";
+        rename($ancien, $nouveau);
 
         return true;
     }
@@ -205,10 +203,6 @@ class ChatServer implements MessageComponentInterface
         $nom_model = $result[2];
         $valeur = $result[3];
 
-        echo "Attribut : " . $attribut . "\n";
-        echo "Nom du modèle : " . $nom_model . "\n";
-        echo "Valeur : " . $valeur . "\n";
-
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
@@ -218,8 +212,6 @@ class ChatServer implements MessageComponentInterface
         } else {
             // Modification de l'attribut du modèle dans la base de données
             $sql = "UPDATE model SET `" . $attribut . "` = ? WHERE Nom_model = ?";
-
-            echo "Query : " . $sql . "\n";
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $valeur, $nom_model);
@@ -247,6 +239,8 @@ class ChatServer implements MessageComponentInterface
         $type = $result[5];
         $niveau_creation = $result[6];
         $niveau_experience = $result[7];
+
+        echo $nom_model . " " . $nom . " " . $selection . " " . $parametre . " " . $type . " " . $niveau_creation . " " . $niveau_experience . "\n";
 
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
@@ -439,7 +433,7 @@ class ChatServer implements MessageComponentInterface
             for ($i = 1; $i < count($key); $i++) {
                 $query .= " AND " . $key[$i] . " = " . $value[$i];
             }
-            // echo "Query : " . $query . "\n";
+
             $stmt = $conn->prepare($query);
             $stmt->execute();
             $stmt->close();

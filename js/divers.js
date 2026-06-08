@@ -264,8 +264,7 @@ class Avantage {
         switch (tag.toLowerCase()) {
             case "set_avantage":
                 sendMessage(`Set_Avantage`,
-                    `${this.Nom_model}@${this.Nom}@${this.Selection ? 1 : 0}@${this.Parametre || ""}@` +
-                    `${this.Type || ""}@${this.Niveau_creation || ""}@${this.Niveau_experience || ""}`);
+                    `${this.Nom_model}@${this.Nom}@${this.Selection ? 1 : 0}@${this.Parametre || ""}@${this.Type || ""}@${this.Niveau_creation || ""}@${this.Niveau_experience || ""}`);
                 break;
         }
     }
@@ -301,9 +300,9 @@ class Avantage {
                     return 10 + 3 * base_cout;
                 case "Maitre d'armes":
                     return 6 * base_cout;
-                case "Maitre de competence majeure 1":
-                case "Maitre de competence majeure 2":
-                case "Maitre de competence majeure 3":
+                case "Maitre de compétence majeure 1":
+                case "Maitre de compétence majeure 2":
+                case "Maitre de compétence majeure 3":
                     return 3 * base_cout;
                 case "Résistance à la magie":
                     return 5 * base_cout;

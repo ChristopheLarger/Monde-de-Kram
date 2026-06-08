@@ -285,19 +285,50 @@ class Model {
  * @returns {Model} - Modèle dupliqué
  */
   dupliquer() {
-    const m = new Model(this);
+    const model = new Model(this);
+    const avantages = Avantages.filter(avantage => avantage.Nom_model === this.Nom_model);
+    const desavantages = Desavantages.filter(desavantage => desavantage.Nom_model === this.Nom_model);
+    const competences = Competences.filter(competence => competence.Nom_model === this.Nom_model);
+    const sortsConnus = SortsConnus.filter(sort_connu => sort_connu.Nom_model === this.Nom_model);
 
     // Set Nom_model
     let i = 1;
-    while (Models.find(x => x.Nom_model === this.Nom_model +
-      " (" + String(i).padStart(2, '0') + ")")) i++;
-    m.Nom_model = this.Nom_model + " (" + String(i).padStart(2, '0') + ")";
+    const base_nom_model = this.Nom_model.replace(/ \([0-9]+\)$/, "");
+    while (Models.find(x => x.Nom_model === base_nom_model + " (" + String(i).padStart(2, '0') + ")")) i++;
+    const nom_model = base_nom_model + " (" + String(i).padStart(2, '0') + ")";
 
-    sendMessage("Copy_Figurine", this.Nom_model + "@" + m.Nom_model);
+    model.Nom_model = nom_model;
+    Models.push(model);
 
-    Models.push(m);
+    avantages.forEach(avantage => {
+      const av = new Avantage(avantage);
+      av.Nom_model = nom_model;
+      Avantages.push(av);
+    });
 
-    return m;
+    desavantages.forEach(desavantage => {
+      const dv = new Desavantage(desavantage);
+      dv.Nom_model = nom_model;
+      Desavantages.push(dv);
+    });
+    
+    competences.forEach(competence => {
+      const c = new Competence(competence);
+      c.Nom_model = nom_model;
+      Competences.push(c);
+    });
+
+    sortsConnus.forEach(sort_connu => {
+      const sc = new SortConnu(sort_connu);
+      sc.Nom_model = nom_model;
+      SortsConnus.push(sc);
+    });
+
+    sendMessage("Copy_Model", this.Nom_model + "@" + model.Nom_model);
+ 
+    Models.sort((a, b) => a.Nom_model.localeCompare(b.Nom_model, "fr"));
+
+    return model;
   }
 
   /**

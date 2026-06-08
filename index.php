@@ -480,6 +480,10 @@
         m_pion = guilhem;
         affiche_pion();
 
+        // Affichage des interactions possibles avec le personnage
+        if (m_model === null) m_model = Models.find((m) => m.Nom_model === m_pion.Model);
+        affiche_interactions(1, "Feinte de corps");
+
         // Régénérer la carte pour afficher les nouveaux pions
         Map.generateHexMap();
         Map.drawHexMap();
