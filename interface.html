@@ -86,23 +86,18 @@
         style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
 
     <div id="div_pion"
-        style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: white; border: 3px solid black;">
-        <table style="margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
+        style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: black; color: white; border: 3px solid black;">
+        <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
-                <col style="width: 25px;">
-                <col style="width: 25px;">
-                <col style="width: 25px;">
-                <col style="width: 25px;">
-                <col style="width: 1px;">
-                <col style="width: 1px;">
+                <col style="width: 100px;">
                 <col style="width: auto;">
             </colgroup>
             <tr>
-                <td colspan="4">
+                <td>
                     <img class="figurine" alt="Figurine du pion"
-                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: white;">
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: black;">
                 </td>
-                <td colspan="3">
+                <td>
                     <table style="width: 100%; white-space: nowrap;">
                         <tr>
                             <td>Nom :</td>
@@ -2978,7 +2973,7 @@
 <!-- === DIALOGUE DE CHOIX D'INTERACTION === -->
 <!-- Fenêtre pour afficher les interactions possibles avec le personnage -->
 <div id="div_interactions"
-    style="position: absolute; top: 0; right: 0; font-size: x-small; background-color: black; color: white;">
+    style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: x-small; background-color: black; color: white;">
     <table style="margin: 0; border-collapse: collapse;">
         <colgroup>
             <col style="width: auto;">

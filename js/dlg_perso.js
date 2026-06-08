@@ -146,7 +146,7 @@ function initialise_pion() {
     Map.drawHexMap();
   });
 
-  // Mise à jour du modele
+  // Mise à jour du lien vers le modele
   document.querySelector("#div_pion .modele_link").addEventListener("click", function (event) {
     m_model = Models.find((m) => m.Nom_model === m_pion.Model);
     affiche_model();
@@ -714,7 +714,7 @@ function affiche_new_pion(col, row) {
 
   while (model.options.length > 1) model.removeChild(model.lastChild);
 
-  // Ajout des modèles de joueurs comme options de contrôle
+  // Ajout des modèles de joueurs comme options
   Models.forEach(m => {
     if (m.Is_joueur && Pions.some((x) => x.Model === m.Nom_model)) return;
 
