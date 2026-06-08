@@ -1,8 +1,8 @@
 /**
- * FICHIER DLG_PION_MODEL.JS
+ * FICHIER DLG_PERSOS.JS
  * ==================
  * Gestion des dialogues et interfaces utilisateur pour le jeu "Le Monde de Kram"
- * Contient toutes les fonctions pour afficher et gérer les dialogues du pion et du modèle
+ * Contient toutes les fonctions pour afficher et gérer les dialogues des personnages
  */
 
 // === VARIABLES GLOBALES ===

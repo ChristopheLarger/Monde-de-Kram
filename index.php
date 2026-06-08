@@ -20,7 +20,9 @@
     <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
     <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
-    <script src="js/dialog.js"></script> <!-- Gestion des dialogues et interfaces utilisateur -->
+    <script src="js/dlg_perso.js"></script> <!-- Gestion des dialogues des personnages -->
+    <script src="js/dlg_map.js"></script> <!-- Gestion des dialogues de la carte -->
+    <script src="js/dlg_combat.js"></script> <!-- Gestion des dialogues de combat -->
     <script src="js/magie.js"></script> <!-- Système de magie -->
     <script src="js/combat.js"></script> <!-- Système de combat -->
 
