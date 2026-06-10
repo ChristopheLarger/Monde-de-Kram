@@ -281,6 +281,23 @@ class Model {
   }
 
   /**
+   * Calcul l'armure générale (moyenne des différentes parties)
+   * @returns {number} - Armure générale
+   */
+  getArmureGenerale() {
+    let a = 0;
+    a += parseInt(this.Armure_tete);
+    a += parseInt(this.Armure_poitrine);
+    a += parseInt(this.Armure_abdomen);
+    a += parseInt(this.Armure_brasg);
+    a += parseInt(this.Armure_brasd);
+    a += parseInt(this.Armure_jambeg);
+    a += parseInt(this.Armure_jambed);
+
+    return Math.floor(a / 7);
+  }
+
+  /**
  * Duplique un modèle de personnage
  * @returns {Model} - Modèle dupliqué
  */
@@ -311,7 +328,7 @@ class Model {
       dv.Nom_model = nom_model;
       Desavantages.push(dv);
     });
-    
+
     competences.forEach(competence => {
       const c = new Competence(competence);
       c.Nom_model = nom_model;
@@ -325,7 +342,7 @@ class Model {
     });
 
     sendMessage("Copy_Model", this.Nom_model + "@" + model.Nom_model);
- 
+
     Models.sort((a, b) => a.Nom_model.localeCompare(b.Nom_model, "fr"));
 
     return model;

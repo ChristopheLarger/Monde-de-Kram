@@ -27,8 +27,8 @@ function initialise_attaque() {
   dialog_attaque_1.addEventListener("keydown", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
     if (event.key === "Escape" || event.key === "Esc") {
-      attaquant.at1_att = false;
-      attaquant.at2_att = false;
+      attaquant.At1_att = false;
+      attaquant.At2_att = false;
       dialog_attaque_1.close();
       resoudre_attaque();
       setTimeout(function () {
@@ -40,8 +40,8 @@ function initialise_attaque() {
   // Sélection "Aucune arme" - annule l'attaque
   dialog_attaque_1.querySelector(".arme_radio0").addEventListener("change", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = false;
-    attaquant.at2_att = false;
+    attaquant.At1_att = false;
+    attaquant.At2_att = false;
     dialog_attaque_1.close();
     resoudre_attaque();
     setTimeout(function () {
@@ -52,8 +52,8 @@ function initialise_attaque() {
   // Sélection de l'arme principale (1ère main)
   dialog_attaque_1.querySelector(".arme_radio1").addEventListener("change", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = true;
-    attaquant.at2_att = false;
+    attaquant.At1_att = true;
+    attaquant.At2_att = false;
     dialog_attaque_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -64,8 +64,8 @@ function initialise_attaque() {
   // Sélection de l'arme secondaire (2nde main)
   dialog_attaque_1.querySelector(".arme_radio2").addEventListener("change", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
-    attaquant.at1_att = false;
-    attaquant.at2_att = true;
+    attaquant.At1_att = false;
+    attaquant.At2_att = true;
     dialog_attaque_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -77,8 +77,8 @@ function initialise_attaque() {
   dialog_attaque_2.addEventListener("keydown", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
     if (event.key === "Escape" || event.key === "Esc") {
-      attaquant.at1_att = false;
-      attaquant.at2_att = false;
+      attaquant.At1_att = false;
+      attaquant.At2_att = false;
       dialog_attaque_2.close();
       setTimeout(function () {
         canvas.focus({ preventScroll: true });
@@ -107,13 +107,13 @@ function initialise_attaque() {
       Math.floor(Math.random() * 6) + 1;
 
     // Sélection du meilleur jet (minimum 13)
-    attaquant.jet_att = Math.max(13, jet_0, jet_1, jet_2, jet_3);
+    attaquant.Jet_att = Math.max(13, jet_0, jet_1, jet_2, jet_3);
 
     // Calcul du score d'attaque
     const scr_att = calcul_scr_att();
 
     // Mise à jour de l'interface
-    dialog_attaque_2.querySelector(".jet_des").value = attaquant.jet_att;
+    dialog_attaque_2.querySelector(".jet_des").value = attaquant.Jet_att;
     dialog_attaque_2.querySelector(".scr_att").value = scr_att;
 
     // Couleur selon le résultat
@@ -255,7 +255,7 @@ function initialise_attaque() {
     const defenseur = Pions.find((m) => m.Defenseur);
 
     // Récupération de la localisation sélectionnée
-    attaquant.loc_att = dialog_attaque_3.querySelector('input[name="loc"]:checked').value;
+    attaquant.Loc_att = dialog_attaque_3.querySelector('input[name="loc"]:checked').value;
     dialog_attaque_3.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -274,8 +274,8 @@ function initialise_attaque() {
   dialog_attaque_3.addEventListener("keydown", function (event) {
     const attaquant = Pions.find((m) => m.Attaquant);
     if (event.key === "Escape" || event.key === "Esc") {
-      attaquant.at1_att = false;
-      attaquant.at2_att = false;
+      attaquant.At1_att = false;
+      attaquant.At2_att = false;
       dialog_attaque_3.close();
       setTimeout(function () {
         canvas.focus({ preventScroll: true });
@@ -378,7 +378,7 @@ function affiche_attaque(phase) {
     dialog_attaque_2.querySelector(".var_mj").value = "";
 
     // Lancement de 3D6 pour l'attaque
-    attaquant.jet_att =
+    attaquant.Jet_att =
       Math.floor(Math.random() * 6) + 1 +
       Math.floor(Math.random() * 6) + 1 +
       Math.floor(Math.random() * 6) + 1;
@@ -390,7 +390,7 @@ function affiche_attaque(phase) {
     const scr_att = calcul_scr_att();
 
     // Mise à jour de l'interface
-    dialog_attaque_2.querySelector(".jet_des").value = attaquant.jet_att;
+    dialog_attaque_2.querySelector(".jet_des").value = attaquant.Jet_att;
     dialog_attaque_2.querySelector(".fdc_def").value = fdc_def;
     dialog_attaque_2.querySelector(".scr_att").value = scr_att;
 
@@ -410,7 +410,7 @@ function affiche_attaque(phase) {
 
     // Si l'attaque a échoué, pas de localisation nécessaire
     if (scr_att < 0) {
-      attaquant.loc_att = "";
+      attaquant.Loc_att = "";
 
       // Résolution directe de l'attaque échouée
       resoudre_attaque();
@@ -418,7 +418,7 @@ function affiche_attaque(phase) {
     }
 
     // Mise à jour de l'interface avec les valeurs d'attaque
-    dialog_attaque_3.querySelector(".jet_des").value = attaquant.jet_att;
+    dialog_attaque_3.querySelector(".jet_des").value = attaquant.Jet_att;
     dialog_attaque_3.querySelector(".scr_att").value = scr_att;
 
     // Couleur selon le succès/échec
@@ -429,11 +429,11 @@ function affiche_attaque(phase) {
     }
 
     // Génération de la localisation aléatoire
-    const loc_att = genere_loc_attaque();
+    const Loc_att = genere_loc_attaque();
 
     // Configuration de l'affichage selon la localisation générée
     // Tête
-    if (loc_att === "tête") {
+    if (Loc_att === "tête") {
       dialog_attaque_3.querySelector(".tete").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".tete_rd").checked = true;
     } else {
@@ -442,7 +442,7 @@ function affiche_attaque(phase) {
     }
 
     // Poitrine
-    if (loc_att === "poitrine") {
+    if (Loc_att === "poitrine") {
       dialog_attaque_3.querySelector(".poitrine").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".poitrine_rd").checked = true;
     } else {
@@ -451,7 +451,7 @@ function affiche_attaque(phase) {
     }
 
     // Abdomen
-    if (loc_att === "abdomen") {
+    if (Loc_att === "abdomen") {
       dialog_attaque_3.querySelector(".abdomen").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".abdomen_rd").checked = true;
     } else {
@@ -460,7 +460,7 @@ function affiche_attaque(phase) {
     }
 
     // Bras gauche
-    if (loc_att === "bras gauche") {
+    if (Loc_att === "bras gauche") {
       dialog_attaque_3.querySelector(".brasg").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".brasg_rd").checked = true;
     } else {
@@ -469,7 +469,7 @@ function affiche_attaque(phase) {
     }
 
     // Bras droit
-    if (loc_att === "bras droit") {
+    if (Loc_att === "bras droit") {
       dialog_attaque_3.querySelector(".brasd").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".brasd_rd").checked = true;
     } else {
@@ -478,7 +478,7 @@ function affiche_attaque(phase) {
     }
 
     // Jambe gauche
-    if (loc_att === "jambe gauche") {
+    if (Loc_att === "jambe gauche") {
       dialog_attaque_3.querySelector(".jambeg").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".jambeg_rd").checked = true;
     } else {
@@ -487,7 +487,7 @@ function affiche_attaque(phase) {
     }
 
     // Jambe droite
-    if (loc_att === "jambe droite") {
+    if (Loc_att === "jambe droite") {
       dialog_attaque_3.querySelector(".jambed").closest("td").style.display = "";
       dialog_attaque_3.querySelector(".jambed_rd").checked = true;
     } else {
@@ -516,8 +516,8 @@ function affiche_defense_sub() {
 
   // Détermination si l'attaque est à distance
   const is_distant =
-    (attaquant.at1_att && w1_att.A_distance) ||
-    (attaquant.at2_att && w2_att.A_distance);
+    (attaquant.At1_att && w1_att.A_distance) ||
+    (attaquant.At2_att && w2_att.A_distance);
 
   // Calcul du score d'attaque
   const scr_att = calcul_scr_att();
@@ -526,8 +526,8 @@ function affiche_defense_sub() {
   let scr_def;
   if (is_distant || defenseur.Arme1 === "Lancement de sort") {
     // Esquive uniquement pour les attaques à distance ou les sorts
-    scr_def = defenseur.jet_def - 10 +
-      (defenseur.esq_def ? defenseur.get_score("Esquive") - defenseur.Nb_action : 0);
+    scr_def = defenseur.Jet_def - 10 +
+      (defenseur.Esq_def ? defenseur.get_score("Esquive") - defenseur.Nb_action : 0);
   }
   else {
     // Parade pour les attaques au corps à corps
@@ -567,19 +567,19 @@ function affiche_defense_sub() {
 
   // Génération du texte de localisation de l'attaque
   let texte_loc = "";
-  switch (attaquant.loc_att) {
+  switch (attaquant.Loc_att) {
     case "abdomen":
-      texte_loc = "à l'" + attaquant.loc_att; // "à l'abdomen"
+      texte_loc = "à l'" + attaquant.Loc_att; // "à l'abdomen"
       break;
     case "bras gauche":
     case "bras droit":
-      texte_loc = "au " + attaquant.loc_att; // "au bras gauche/droit"
+      texte_loc = "au " + attaquant.Loc_att; // "au bras gauche/droit"
       break;
     case "jambe gauche":
     case "jambe droite":
     case "poitrine":
     case "tête":
-      texte_loc = "à la " + attaquant.loc_att; // "à la jambe", "à la poitrine", etc.
+      texte_loc = "à la " + attaquant.Loc_att; // "à la jambe", "à la poitrine", etc.
       break;
   }
 
@@ -602,9 +602,9 @@ function affiche_defense_sub() {
   // Case 3 : Attaque interceptée mais attaquant garde l'avantage
   // Parade avec marge > -2 ou esquive avec marge > -4
   else if (
-    (defenseur.pr1_def && marge > -2) ||
-    (defenseur.pr2_def && marge > -2) ||
-    (defenseur.esq_def && marge > -4)
+    (defenseur.Pr1_def && marge > -2) ||
+    (defenseur.Pr2_def && marge > -2) ||
+    (defenseur.Esq_def && marge > -4)
   ) {
     dialog_defense_2.querySelector(".dommages").innerHTML = "Attaque interceptée entièrement." +
       (is_contre_attaque || is_distant ? "" : "<br>Mais l'attaquant garde l'avantage.");
@@ -639,9 +639,9 @@ function initialise_defense() {
   dialog_defense_1.addEventListener("keydown", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
     if (event.key === "Escape" || event.key === "Esc") {
-      defenseur.pr1_def = false;
-      defenseur.pr2_def = false;
-      defenseur.esq_def = false;
+      defenseur.Pr1_def = false;
+      defenseur.Pr2_def = false;
+      defenseur.Esq_def = false;
       dialog_defense_1.close();
       setTimeout(function () {
         canvas.focus({ preventScroll: true });
@@ -653,9 +653,9 @@ function initialise_defense() {
   // Sélection "Aucune défense" - annule la défense
   dialog_defense_1.querySelector(".arme_radio0").addEventListener("change", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = false;
+    defenseur.Pr1_def = false;
+    defenseur.Pr2_def = false;
+    defenseur.Esq_def = false;
     dialog_defense_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -666,9 +666,9 @@ function initialise_defense() {
   // Sélection de la parade avec arme principale
   dialog_defense_1.querySelector(".arme_radio1").addEventListener("change", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = true;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = false;
+    defenseur.Pr1_def = true;
+    defenseur.Pr2_def = false;
+    defenseur.Esq_def = false;
     dialog_defense_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -679,9 +679,9 @@ function initialise_defense() {
   // Sélection de la parade avec arme secondaire
   dialog_defense_1.querySelector(".arme_radio2").addEventListener("change", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = true;
-    defenseur.esq_def = false;
+    defenseur.Pr1_def = false;
+    defenseur.Pr2_def = true;
+    defenseur.Esq_def = false;
     dialog_defense_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -692,9 +692,9 @@ function initialise_defense() {
   // Sélection de l'esquive
   dialog_defense_1.querySelector(".arme_radio3").addEventListener("change", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
-    defenseur.pr1_def = false;
-    defenseur.pr2_def = false;
-    defenseur.esq_def = true;
+    defenseur.Pr1_def = false;
+    defenseur.Pr2_def = false;
+    defenseur.Esq_def = true;
     dialog_defense_1.close();
     setTimeout(function () {
       canvas.focus({ preventScroll: true });
@@ -722,8 +722,8 @@ function initialise_defense() {
       Math.floor(Math.random() * 6) + 1;
 
     // Sélection du meilleur jet (minimum 13)
-    defenseur.jet_def = Math.max(13, jet_0, jet_1, jet_2, jet_3);
-    dialog_defense_2.querySelector(".jet_des").value = defenseur.jet_def;
+    defenseur.Jet_def = Math.max(13, jet_0, jet_1, jet_2, jet_3);
+    dialog_defense_2.querySelector(".jet_des").value = defenseur.Jet_def;
 
     affiche_defense_sub();
   });
@@ -741,9 +741,9 @@ function initialise_defense() {
   dialog_defense_2.addEventListener("keydown", function (event) {
     const defenseur = Pions.find((m) => m.Defenseur);
     if (event.key === "Escape" || event.key === "Esc") {
-      defenseur.pr1_def = false;
-      defenseur.pr2_def = false;
-      defenseur.esq_def = false;
+      defenseur.Pr1_def = false;
+      defenseur.Pr2_def = false;
+      defenseur.Esq_def = false;
       dialog_defense_2.close();
       setTimeout(function () {
         canvas.focus({ preventScroll: true });
@@ -799,7 +799,7 @@ function affiche_defense(phase) {
   const w2_att = Armes.find((w) => w.Nom_arme === attaquant.Arme2);
 
   // Détermination si l'attaque est à distance
-  const is_distant = (attaquant.at1_att && w1_att.A_distance) || (attaquant.at2_att && w2_att.A_distance);
+  const is_distant = (attaquant.At1_att && w1_att.A_distance) || (attaquant.At2_att && w2_att.A_distance);
 
   // === PHASE 1 : CHOIX DE LA DÉFENSE ===
   if (phase === 1) {
@@ -873,18 +873,18 @@ function affiche_defense(phase) {
   else if (phase === 2) {
     // Création de l'en-tête du dialogue
     entete = defenseur.Titre + "<br>";
-    entete += defenseur.pr1_def || defenseur.pr1_def ? "Vous parez " : "";
-    entete += defenseur.esq_def ? "Vous esquivez " : "";
+    entete += defenseur.Pr1_def || defenseur.Pr1_def ? "Vous parez " : "";
+    entete += defenseur.Esq_def ? "Vous esquivez " : "";
     entete += attaquant.Titre + "<hr>";
     dialog_defense_2.querySelector(".nom").innerHTML = entete;
 
     // Lancement de 3D6 pour la défense
-    defenseur.jet_def =
+    defenseur.Jet_def =
       Math.floor(Math.random() * 6) + 1 +
       Math.floor(Math.random() * 6) + 1 +
       Math.floor(Math.random() * 6) + 1;
 
-    dialog_defense_2.querySelector(".jet_des").value = defenseur.jet_def;
+    dialog_defense_2.querySelector(".jet_des").value = defenseur.Jet_def;
 
     affiche_defense_sub();
   }
@@ -914,6 +914,8 @@ function initialise_param_confirm_sort() {
       s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
     m_pion.Fatigue_sort = sort.Niveau;
     m_pion.Concentration_sort = sort.Niveau;
+    m_pion.sendMessage("Fatigue_sort");
+    m_pion.sendMessage("Concentration_sort");
     dialog_sort_1.close();
   });
 
@@ -924,6 +926,8 @@ function initialise_param_confirm_sort() {
       s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
     m_pion.Fatigue_sort = 2 * sort.Niveau;
     m_pion.Concentration_sort = 2 * sort.Niveau;
+    m_pion.sendMessage("Fatigue_sort");
+    m_pion.sendMessage("Concentration_sort");
     dialog_sort_1.close();
   });
 
@@ -934,6 +938,8 @@ function initialise_param_confirm_sort() {
       s.Nom_sort === dialog_sort_1.querySelector(".nom_sort").textContent);
     m_pion.Fatigue_sort = 3 * sort.Niveau;
     m_pion.Concentration_sort = 3 * sort.Niveau;
+    m_pion.sendMessage("Fatigue_sort");
+    m_pion.sendMessage("Concentration_sort");
     dialog_sort_1.close();
   });
 
@@ -949,6 +955,8 @@ function initialise_param_confirm_sort() {
     // Mise à jour des points de fatigue et de concentration
     m_pion.Fatigue_sort = dialog_sort_1.querySelector(".fatigue_cout").value;
     m_pion.Concentration_sort = dialog_sort_1.querySelector(".concentration_cout").value;
+    m_pion.sendMessage("Fatigue_sort");
+    m_pion.sendMessage("Concentration_sort");
     dialog_sort_1.close();
   });
 
@@ -1487,42 +1495,42 @@ function genere_loc_attaque() {
   
     // Détermination du type d'arme (à distance ou corps à corps)
     let A_distance = null;
-    if (attaquant.at1_att) A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme1).A_distance;
-    if (attaquant.at2_att) A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme2).A_distance;
+    if (attaquant.At1_att) A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme1).A_distance;
+    if (attaquant.At2_att) A_distance = Armes.find((w) => w.Nom_arme === attaquant.Arme2).A_distance;
   
     // Génération aléatoire de la localisation
-    let loc_att = "";
+    let Loc_att = "";
     while (true) {
       const jet_loc = Math.floor(Math.random() * 20) + 1;
   
       // Table de localisation pour armes de corps à corps
       if (!A_distance) {
-        if (jet_loc < 4) loc_att = "jambe gauche";
-        else if (jet_loc < 7) loc_att = "jambe droite";
-        else if (jet_loc < 10) loc_att = "abdomen";
-        else if (jet_loc < 13) loc_att = "poitrine";
-        else if (jet_loc < 16) loc_att = "bras gauche";
-        else if (jet_loc < 19) loc_att = "bras droit";
-        else loc_att = "tête";
+        if (jet_loc < 4) Loc_att = "jambe gauche";
+        else if (jet_loc < 7) Loc_att = "jambe droite";
+        else if (jet_loc < 10) Loc_att = "abdomen";
+        else if (jet_loc < 13) Loc_att = "poitrine";
+        else if (jet_loc < 16) Loc_att = "bras gauche";
+        else if (jet_loc < 19) Loc_att = "bras droit";
+        else Loc_att = "tête";
       } else {
-        if (jet_loc < 5) loc_att = "jambe gauche";
-        else if (jet_loc < 9) loc_att = "jambe droite";
-        else if (jet_loc < 13) loc_att = "abdomen";
-        else if (jet_loc < 16) loc_att = "poitrine";
-        else if (jet_loc < 18) loc_att = "bras gauche";
-        else if (jet_loc < 20) loc_att = "bras droit";
-        else loc_att = "tête";
+        if (jet_loc < 5) Loc_att = "jambe gauche";
+        else if (jet_loc < 9) Loc_att = "jambe droite";
+        else if (jet_loc < 13) Loc_att = "abdomen";
+        else if (jet_loc < 16) Loc_att = "poitrine";
+        else if (jet_loc < 18) Loc_att = "bras gauche";
+        else if (jet_loc < 20) Loc_att = "bras droit";
+        else Loc_att = "tête";
       }
   
-      if (dialog_attaque_2.querySelector(".tete").checked && loc_att === "tête") break;
-      if (dialog_attaque_2.querySelector(".poitrine").checked && loc_att === "poitrine") break;
-      if (dialog_attaque_2.querySelector(".abdomen").checked && loc_att === "abdomen") break;
-      if (dialog_attaque_2.querySelector(".brasg").checked && loc_att === "bras gauche") break;
-      if (dialog_attaque_2.querySelector(".brasd").checked && loc_att === "bras droit") break;
-      if (dialog_attaque_2.querySelector(".jambeg").checked && loc_att === "jambe gauche") break;
-      if (dialog_attaque_2.querySelector(".jambed").checked && loc_att === "jambe droite") break;
+      if (dialog_attaque_2.querySelector(".tete").checked && Loc_att === "tête") break;
+      if (dialog_attaque_2.querySelector(".poitrine").checked && Loc_att === "poitrine") break;
+      if (dialog_attaque_2.querySelector(".abdomen").checked && Loc_att === "abdomen") break;
+      if (dialog_attaque_2.querySelector(".brasg").checked && Loc_att === "bras gauche") break;
+      if (dialog_attaque_2.querySelector(".brasd").checked && Loc_att === "bras droit") break;
+      if (dialog_attaque_2.querySelector(".jambeg").checked && Loc_att === "jambe gauche") break;
+      if (dialog_attaque_2.querySelector(".jambed").checked && Loc_att === "jambe droite") break;
     }
   
-    return loc_att;
+    return Loc_att;
   }
   

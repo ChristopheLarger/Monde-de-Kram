@@ -734,6 +734,9 @@ function createListeModal(Nom_liste) {
         m_pion.Nom_liste = sort.Nom_liste;
         m_pion.Nom_sort = sort.Nom_sort;
         m_pion.Incantation = expurger_temps_sort(sort.Incantation);
+        m_pion.sendMessage("Nom_liste");
+        m_pion.sendMessage("Nom_sort");
+        m_pion.sendMessage("Incantation");
 
         affiche_pion();
         affiche_param_sort(sort);

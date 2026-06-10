@@ -45,7 +45,7 @@ function calculateInitiative(pion, main = 0) {
     const arme2 = pion.Arme2 ? Armes.find(a => a.Nom_arme === pion.Arme2) : null;
     const init1 = arme1 ? arme1.Init : 99;
     const init2 = arme2 ? arme2.Init : 99;
-    const Vp_bonus = - Math.floor((pion.getValue("Vivacite_physique") - 10) / 2);
+    const Vp_bonus = - Math.floor((pion.get_attribut("Vivacite_physique") - 10) / 2);
     const res1 = init1 + ((arme1 && arme1.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
     const res2 = init2 + ((arme2 && arme2.A_projectile) ? 0 : Vp_bonus) + pion.get_bonus("Initiative");
 
@@ -229,11 +229,11 @@ function start_next_round() {
         pion.Arme2_engagee = false;
         pion.Esquive = false;
         pion.Est_blesse = false;
-        pion.at1_att = true;
-        pion.at2_att = true;
-        pion.pr1_def = true;
-        pion.pr2_def = true;
-        pion.esq_def = true;
+        pion.At1_att = true;
+        pion.At2_att = true;
+        pion.Pr1_def = true;
+        pion.Pr2_def = true;
+        pion.Esq_def = true;
         pion.Fatigue_down = 0;
     });
 
@@ -357,16 +357,16 @@ function next_attaque() {
 
     // Réinitialisation des états d'attaque
     if (current_attaque.Main === 1) {
-        attaquant.at1_att = true;
-        attaquant.at2_att = false;
+        attaquant.At1_att = true;
+        attaquant.At2_att = false;
     }
     else if (current_attaque.Main === 2) {
-        attaquant.at1_att = false;
-        attaquant.at2_att = true;
+        attaquant.At1_att = false;
+        attaquant.At2_att = true;
     }
     else {
-        attaquant.at1_att = false;
-        attaquant.at2_att = false;
+        attaquant.At1_att = false;
+        attaquant.At2_att = false;
     }
 
     // Gestion des lancements de sorts
@@ -595,7 +595,7 @@ function explications_fdc_def() {
  */
 function calcul_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
-    let score = attaquant.jet_att;
+    let score = attaquant.Jet_att;
 
     // Malus de base de -10
     score -= 10;
@@ -604,7 +604,7 @@ function calcul_scr_att() {
     score -= calcul_fdc_def();
 
     // Bonus de compétence d'arme
-    if (attaquant.at1_att && attaquant.Arme1) {
+    if (attaquant.At1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
             score += attaquant.get_score(Arme1.Competence);
@@ -613,7 +613,7 @@ function calcul_scr_att() {
         }
     }
 
-    if (attaquant.at2_att && attaquant.Arme2) {
+    if (attaquant.At2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
             score += attaquant.get_score(Arme2.Competence);
@@ -626,7 +626,7 @@ function calcul_scr_att() {
     score += attaquant.B_att;
 
     // Malus d'escrime pour combat à deux armes
-    if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
+    if ((attaquant.At1_att || attaquant.At2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
                 score -= Math.max(2 - attaquant.get_score("Escrime"), 0);
@@ -659,10 +659,10 @@ function explications_scr_att() {
     const attaquant = Pions.find(p => p.Attaquant);
 
     let explication = `<strong>Calcul du score d'attaque :</strong><br>`;
-    explication += `Jet de dés : ${attaquant.jet_att || 0}<br>`;
+    explication += `Jet de dés : ${attaquant.Jet_att || 0}<br>`;
     explication += `Moins la Base : -10<br>`;
     let competence = 0;
-    if (attaquant.at1_att && attaquant.Arme1) {
+    if (attaquant.At1_att && attaquant.Arme1) {
         const Arme1 = Armes.find(a => a.Nom_arme === attaquant.Arme1);
         if (Arme1 !== null) {
             competence = attaquant.get_score(Arme1.Competence);
@@ -670,7 +670,7 @@ function explications_scr_att() {
             else competence += attaquant.get_bonus("Attaque CàC");
         }
     }
-    else if (attaquant.at2_att && attaquant.Arme2) {
+    else if (attaquant.At2_att && attaquant.Arme2) {
         const Arme2 = Armes.find(a => a.Nom_arme === attaquant.Arme2);
         if (Arme2 !== null) {
             competence = attaquant.get_score(Arme2.Competence);
@@ -684,10 +684,10 @@ function explications_scr_att() {
     explication += `Moins la Feinte de corps : ${-fdc}<br>`;
     if ((attaquant.B_att || 0) !== 0) explication += `Bonus d'attaque : ${attaquant.B_att || 0}<br>`;
 
-    let scoreFinal = attaquant.jet_att - 10 + competence - fdc + (attaquant.B_att || 0);
+    let scoreFinal = attaquant.Jet_att - 10 + competence - fdc + (attaquant.B_att || 0);
 
     // Malus d'escrime pour combat à deux armes
-    if ((attaquant.at1_att || attaquant.at2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
+    if ((attaquant.At1_att || attaquant.At2_att) && attaquant.Arme1 && attaquant.Arme1 !== "" && attaquant.Arme2 && attaquant.Arme2 !== "") {
         if (attaquant.Arme1 !== "Bouclier" && attaquant.Arme2 !== "Bouclier") {
             if (attaquant.Arme1 === "Dague" || attaquant.Arme2 === "Dague") {
                 explication += `Moins le Malus d'escrime : ${Math.max(2 - attaquant.get_score("Escrime"), 0)}<br>`;
@@ -728,23 +728,23 @@ function explications_scr_att() {
  */
 function calcul_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
-    let score = defenseur.jet_def;
+    let score = defenseur.Jet_def;
     score -= 10;
 
     // Bonus de parade
-    if (defenseur.pr1_def || defenseur.pr2_def) {
+    if (defenseur.Pr1_def || defenseur.Pr2_def) {
         let competenceArme = 0;
 
         let Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
         if (typeof Arme1 === "undefined") Arme1 = null;
-        if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
+        if (defenseur.Pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
             competenceArme += Arme1.Facteur_parade * defenseur.get_score(Arme1.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
 
         let Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
         if (typeof Arme2 === "undefined") Arme2 = null;
-        if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
+        if (defenseur.Pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
             competenceArme += Arme2.Facteur_parade * defenseur.get_score(Arme2.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
@@ -753,7 +753,7 @@ function calcul_scr_def() {
     }
 
     // Bonus d'esquive
-    if (defenseur.esq_def) {
+    if (defenseur.Esq_def) {
         score += defenseur.get_score("Esquive");
         if (defenseur.Nb_action > 0) {
             score -= defenseur.Nb_action;
@@ -761,7 +761,7 @@ function calcul_scr_def() {
     }
 
     // Malus d'escrime pour combat à deux armes
-    if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
+    if ((defenseur.Pr1_def || defenseur.Pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
                 score -= Math.max(2 - defenseur.get_score("Escrime"), 0);
@@ -785,38 +785,38 @@ function explications_scr_def() {
     const defenseur = Pions.find(p => p.Defenseur);
 
     let explication = `<strong>Calcul du score de défense :</strong><br>`;
-    explication += `Jet de dés : ${defenseur.jet_def || 0}<br>`;
+    explication += `Jet de dés : ${defenseur.Jet_def || 0}<br>`;
     explication += `Moins la Base : -10<br>`;
 
     let competenceArme = 0;
     let scoreFinal = 0;
 
     // Bonus de parade
-    if (defenseur.pr1_def || defenseur.pr2_def) {
+    if (defenseur.Pr1_def || defenseur.Pr2_def) {
         const Arme1 = Armes.find(a => a.Nom_arme === defenseur.Arme1);
-        if (defenseur.pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
+        if (defenseur.Pr1_def && Arme1 !== null && Arme1.Facteur_parade !== null) {
             competenceArme += Arme1.Facteur_parade * defenseur.get_score(Arme1.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
 
         const Arme2 = Armes.find(a => a.Nom_arme === defenseur.Arme2);
-        if (defenseur.pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
+        if (defenseur.Pr2_def && Arme2 !== null && Arme2.Facteur_parade !== null) {
             competenceArme += Arme2.Facteur_parade * defenseur.get_score(Arme2.Competence);
             competenceArme += defenseur.get_bonus("Parade");
         }
         explication += `Plus la Compétence de parade : ${competenceArme}<br>`;
-        scoreFinal = defenseur.jet_def - 10 + competenceArme;
+        scoreFinal = defenseur.Jet_def - 10 + competenceArme;
     }
 
     // Bonus d'esquive
-    if (defenseur.esq_def) {
+    if (defenseur.Esq_def) {
         explication += `Plus la Compétence d'esquive : ${defenseur.get_score("Esquive")}<br>`;
         if ((defenseur.Nb_action || 0) > 0) explication += `Moins le Nombre d'actions : ${-defenseur.Nb_action}<br>`;
-        scoreFinal = defenseur.jet_def - 10 + (defenseur.get_score("Esquive") || 0) - (defenseur.Nb_action || 0);
+        scoreFinal = defenseur.Jet_def - 10 + (defenseur.get_score("Esquive") || 0) - (defenseur.Nb_action || 0);
     }
 
     // Malus d'escrime pour combat à deux armes
-    if ((defenseur.pr1_def || defenseur.pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
+    if ((defenseur.Pr1_def || defenseur.Pr2_def) && defenseur.Arme1 && defenseur.Arme1 !== "" && defenseur.Arme2 && defenseur.Arme2 !== "") {
         if (defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "Bouclier") {
             if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
                 explication += `Moins le Malus d'escrime : ${Math.max(2 - defenseur.get_score("Escrime"), 0)}<br>`;
@@ -857,8 +857,8 @@ function calcul_dommages(margin) {
 
     // Détermination de l'arme utilisée (1ère ou 2nde main)
     let arme = null;
-    if (attaquant.at1_att) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
-    if (attaquant.at2_att) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
+    if (attaquant.At1_att) arme = attaquant.Arme1 ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
+    if (attaquant.At2_att) arme = attaquant.Arme2 ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
 
     // Dommages de base = marge × facteur de l'arme + bonus fixe de l'arme
     let damage = margin * arme.Facteur + arme.Bonus;
@@ -867,7 +867,7 @@ function calcul_dommages(margin) {
     if (damage > arme.Plafond) damage = arme.Plafond;
 
     // Le coefficient de force de l'arme multiplie le modificateur de force du personnage
-    damage += arme.Coeff_force * Math.floor((attaquant.getValue("Force") - 10) / 2);
+    damage += arme.Coeff_force * Math.floor((attaquant.get_attribut("Force") - 10) / 2);
     if (arme.A_distance) damage += attaquant.get_bonus("Dommages Dist");
     else damage += attaquant.get_bonus("Dommages CàC");
 
@@ -876,7 +876,7 @@ function calcul_dommages(margin) {
 
     // Détermination de la valeur d'armure selon la localisation de l'attaque
     let armor = 0;
-    switch (attaquant.loc_att) {
+    switch (attaquant.Loc_att) {
         case "Tete": armor = defenseur.Armure_tete + defenseur.get_bonus("Tete"); break;
         case "Poitrine": armor = defenseur.Armure_poitrine + defenseur.get_bonus("Poitrine"); break;
         case "Abdomen": armor = defenseur.Armure_abdomen + defenseur.get_bonus("Abdomen"); break;
@@ -962,10 +962,10 @@ function contre_attaque_du_defenseur() {
 
     // Si l'attaqaunt a utilisé une arme à distance, on ne peut pas contre-attaquer
     let arme = null;
-    if (attaquant.at1_att) {
+    if (attaquant.At1_att) {
         arme = (attaquant.Arme1 && attaquant.Arme1 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme1) : null;
     }
-    else if (attaquant.at2_att) {
+    else if (attaquant.At2_att) {
         arme = (attaquant.Arme2 && attaquant.Arme2 !== "") ? Armes.find(a => a.Nom_arme === attaquant.Arme2) : null;
     }
     if (arme && arme.A_distance) return false;
@@ -1030,7 +1030,7 @@ function resoudre_attaque() {
     }
 
     // S'il n'y a pas d'attaque, on passe à l'attaque suivante
-    if (!attaquant.at1_att && !attaquant.at2_att) {
+    if (!attaquant.At1_att && !attaquant.At2_att) {
         contre_attaque_du_defenseur();
         next_attaque();
         return;
@@ -1065,21 +1065,21 @@ function resoudre_attaque() {
     attaquant.Nb_action++;
 
     // Marquer les armes attaquantes comme engagées (utilisées pour cette action)
-    if (attaquant.at1_att) attaquant.Arme1_engagee = true;
-    else if (attaquant.at2_att) attaquant.Arme2_engagee = true;
+    if (attaquant.At1_att) attaquant.Arme1_engagee = true;
+    else if (attaquant.At2_att) attaquant.Arme2_engagee = true;
 
     if (scr_att >= 0) {
         // Marquer les armes defenseurs comme engagées (utilisées pour cette action)
-        if (defenseur.pr1_def) defenseur.Arme1_engagee = true;
-        else if (defenseur.pr2_def) defenseur.Arme2_engagee = true;
+        if (defenseur.Pr1_def) defenseur.Arme1_engagee = true;
+        else if (defenseur.Pr2_def) defenseur.Arme2_engagee = true;
 
         // Marquer l'esquive comme utilisée (si elle a été utilisée)
-        if (defenseur.esq_def) {
+        if (defenseur.Esq_def) {
             defenseur.Esquive = true;
         }
 
         // Compter les actions de défense utilisées
-        if (defenseur.pr1_def || defenseur.pr2_def || defenseur.esq_def) {
+        if (defenseur.Pr1_def || defenseur.Pr2_def || defenseur.Esq_def) {
             defenseur.Nb_action++;
         }
     }
@@ -1093,7 +1093,7 @@ function resoudre_attaque() {
 
         // Appliquer les dégâts à la zone corporelle appropriée
         if (damage > 0) {
-            switch (attaquant.loc_att) {
+            switch (attaquant.Loc_att) {
                 case "général": defenseur.General -= damage; break;
                 case "tête": defenseur.Tete -= damage; break;
                 case "poitrine": defenseur.Poitrine -= damage; break;
@@ -1106,19 +1106,19 @@ function resoudre_attaque() {
 
             // Génération du texte de localisation de l'attaque
             let texte_loc = "";
-            switch (attaquant.loc_att) {
+            switch (attaquant.Loc_att) {
                 case "abdomen":
-                    texte_loc = "à l'" + attaquant.loc_att;  // "à l'abdomen"
+                    texte_loc = "à l'" + attaquant.Loc_att;  // "à l'abdomen"
                     break;
                 case "bras gauche":
                 case "bras droit":
-                    texte_loc = "au " + attaquant.loc_att;  // "au bras gauche/droit"
+                    texte_loc = "au " + attaquant.Loc_att;  // "au bras gauche/droit"
                     break;
                 case "jambe gauche":
                 case "jambe droite":
                 case "poitrine":
                 case "tête":
-                    texte_loc = "à la " + attaquant.loc_att;  // "à la jambe", "à la poitrine", etc.
+                    texte_loc = "à la " + attaquant.Loc_att;  // "à la jambe", "à la poitrine", etc.
                     break;
             }
 

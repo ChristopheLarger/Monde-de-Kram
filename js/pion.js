@@ -1,88 +1,77 @@
 /**
  * Classe Pion - Hérite de Map pour représenter un personnage sur la carte
- * Contient toutes les propriétés d'un personnage jouable
+ * Contient toutes les propriétés d'un personnage jouable (il se réfère à un modèle de personnage)
  */
-class Pion extends Map {
-    // === PROPRIÉTÉS DE BASE ===
-    Indice = 0;              // Indice de l'occurrence de ce modèle de personnage
+class Pion {
+    constructor(data = {}) {
+        this.Type = data.Type || "";          // Type : "allies" ou "ennemis"
+        this.Model = data.Model || "";         // Modèle de personnage
+        this.Position = data.Position || "0,0";    // Position en coordonnées hexagonales (Col, Row)
+        this.Selected = data.Selected || false;    // État de sélection
 
-    // === ÉTATS DE COMBAT ===
-    Attaquant = false;        // Le pion est attaquant
-    Defenseur = false;        // Le pion est défenseur
-    Nb_action = 0;           // Nombre d'actions dans le tour (malus à l'esquive)
-    Arme1_engagee = false;   // L'arme principale a déjà servi au combat ce tour
-    Arme2_engagee = false;   // L'arme secondaire a déjà servi au combat ce tour
-    Esquive = false;         // Une première esquive a été faite
-    Est_blesse = false;      // A été blessé dans le tour
-    Vue = 12;                // Portée de vue
+        this.Indice = data.Indice || 0;
 
-    // === PROPRIÉTÉS DE PERSONNAGE ===
-    Titre = "";              // Titre affiché du personnage
-    Arme1 = "";              // Arme principale
-    Arme2 = "";              // Arme secondaire
-    Note = "";               // Note personnalisée
+        this.Attaquant = data.Attaquant || false;
+        this.Defenseur = data.Defenseur || false;
+        this.Nb_action = data.Nb_action || 0;
+        this.Arme1_engagee = data.Arme1_engagee || false;
+        this.Arme2_engagee = data.Arme2_engagee || false;
+        this.Esquive = data.Esquive || false;
+        this.Est_blesse = data.Est_blesse || false;
+        this.Vue = data.Vue || 12;
 
-    Nom_liste = "";          // Liste du sortilège sélectionnée
-    Nom_sort = "";           // Sortilège sélectionné (dans la liste)
-    Incantation = 0;         // Temps restant d'incantation du sortilège
-    Fatigue_sort = 0;        // Nombre de points de fatigue lié au sortilège
-    Concentration_sort = 0;  // Nombre de points de concentration lié au sortilège
+        this.Titre = data.Titre || "";
+        this.Arme1 = data.Arme1 || "";
+        this.Arme2 = data.Arme2 || "";
+        this.Note = data.Note || "";
 
-    Cible_sort = false;      // Booléen indiquant si le pion est cible d'un sortilège
+        this.Nom_liste = data.Nom_liste || "";
+        this.Nom_sort = data.Nom_sort || "";
+        this.Incantation = data.Incantation || 0;
+        this.Fatigue_sort = data.Fatigue_sort || 0;
+        this.Concentration_sort = data.Concentration_sort || 0;
 
-    // === CAPACITÉS SPÉCIALES ===
-    Auto = false;            // Mode automatique (booléen)
+        this.Cible_sort = data.Cible_sort || false;
 
-    // === ÉTATS DE COMBAT ===
-    is_flying = false;       // Booléen indiquant si le pion est en vol
+        this.Auto = data.Auto || false;
 
-    // === POINTS DE VIE & Co ===
-    Fatigue = 0;             // Niveau de fatigue
-    Fatigue_down = 0;        // Nombre de points de fatigue perdus durant le round
-    Fatigue_eco = false;     // Booléen indiquant si la fatigue est économisée au corps à corps
-    Concentration = 0;       // Niveau de concentration
-    General = 0;                 // Points de vie totaux
-    Tete = 0;                // Points de vie à la tête
-    Poitrine = 0;            // Points de vie à la poitrine
-    Abdomen = 0;             // Points de vie à l'abdomen
-    Brasg = 0;               // Points de vie au bras gauche
-    Brasd = 0;               // Points de vie au bras droit
-    Jambeg = 0;              // Points de vie à la jambe gauche
-    Jambed = 0;              // Points de vie à la jambe droite
+        this.Is_flying = data.Is_flying || false;
 
-    // === ARMURES ===
-    Armure_tete = 0;         // Protection de la tête
-    Armure_poitrine = 0;     // Protection de la poitrine
-    Armure_abdomen = 0;      // Protection de l'abdomen
-    Armure_brasg = 0;        // Protection du bras gauche
-    Armure_brasd = 0;        // Protection du bras droit
-    Armure_jambeg = 0;       // Protection de la jambe gauche
-    Armure_jambed = 0;       // Protection de la jambe droite
+        this.Fatigue = data.Fatigue || 0;
+        this.Fatigue_down = data.Fatigue_down || 0;
+        this.Fatigue_eco = data.Fatigue_eco || false;
+        this.Concentration = data.Concentration || 0;
+        this.General = data.General || 0;
+        this.Tete = data.Tete || 0;
+        this.Poitrine = data.Poitrine || 0;
+        this.Abdomen = data.Abdomen || 0;
+        this.Brasg = data.Brasg || 0;
+        this.Brasd = data.Brasd || 0;
+        this.Jambeg = data.Jambeg || 0;
+        this.Jambed = data.Jambed || 0;
 
-    // === VARIABLES D'ATTAQUE ===
-    jet_att = 0;             // Jet de dés de l'attaque
-    loc_att = "";            // Localisation de l'attaque
-    at1_att = true;          // Booléen d'attaque de la 1ère main
-    at2_att = true;          // Booléen d'attaque de la 2nde main
+        this.Jet_att = data.Jet_att || 0;
+        this.Loc_att = data.Loc_att || "";
+        this.At1_att = data.At1_att || true;
+        this.At2_att = data.At2_att || true;
 
-    // === VARIABLES DE DÉFENSE ===
-    jet_def = 0;             // Jet de dés de la défense
-    pr1_def = false;         // Booléen de parade de la 1ère main
-    pr2_def = false;         // Booléen de parade de la 2nde main
-    esq_def = false;         // Booléen d'esquive
+        this.Jet_def = data.Jet_def || 0;
+        this.Pr1_def = data.Pr1_def || false;
+        this.Pr2_def = data.Pr2_def || false;
+        this.Esq_def = data.Esq_def || false;
+    }
 
     /**
-     * Constructeur d'un pion
+     * Mise à jour d'un pion
      * @param {string} type - Type de pion ("allies" ou "ennemis")
      * @param {string} model - Nom du modèle de personnage
      * @param {number} indice - Indice du pion (optionnel, -1 pour auto-assignation)
      */
-    constructor(type, model, indice = -1) {
+    mise_a_jour_pion(type, model, indice = -1) {
         let p = null;
         if (indice != -1) p = Pions.find(x => x.Type === type && x.Model === model && x.Indice === indice);
         if (p != null && typeof p != "undefined") return p;
 
-        super();
         this.Type = type;
         this.Model = model;
 
@@ -106,27 +95,18 @@ class Pion extends Map {
 
         this.Titre = this.Model + (this.Indice === 0 ? "" : (" " + this.Indice.toString().padStart(2, "0")));
 
-        this.Fatigue = m.Fatigue;
-        this.Concentration = m.Concentration;
-        this.General = 0;
-        this.Tete = 0;
-        this.Poitrine = 0;
-        this.Abdomen = 0;
-        this.Brasg = 0;
-        this.Brasd = 0;
-        this.Jambeg = 0;
-        this.Jambed = 0;
-        this.Armure_tete = m.Armure_tete;
-        this.Armure_poitrine = m.Armure_poitrine;
-        this.Armure_abdomen = m.Armure_abdomen;
-        this.Armure_brasg = m.Armure_brasg;
-        this.Armure_brasd = m.Armure_brasd;
-        this.Armure_jambeg = m.Armure_jambeg;
-        this.Armure_jambed = m.Armure_jambed;
-
         if (this.Indice !== 0) this.Auto = true;
 
-        this.setArmes();
+        this.Fatigue = m.get("fatigue");
+        this.Concentration = m.get("concentration");
+
+        if (!m.Is_monster) this.#setArmes();
+
+        Pions.push(this);
+        this.sendMessage("setall");
+
+        Map.generateHexMap();
+        Map.drawHexMap();
     }
 
     /**
@@ -134,13 +114,29 @@ class Pion extends Map {
      * @param {string} attribut - Nom de l'attribut
      * @returns {number} - Valeur de l'attribut
      */
-    getValue(attribut) {
-        const model = Models.find(m => m.Nom_model === this.Model);
-        let bonus = model[attribut];
-        if (bonus !== null && typeof bonus !== "undefined") bonus += this.get_bonus(attribut);
-        return bonus;
+    get_attribut(attribut) {
+        switch (attribut) {
+            case "coordination":
+                return Math.round((this.get_attribut("Vivacite_physique") + this.get_attribut("Perception") + this.get_attribut("Vivacite_mentale")) / 3);
+            case "niveau_mental":
+                return Math.round((this.get_attribut("Force") + this.get_attribut("Constitution") + this.get_attribut("Vivacite_physique") + this.get_attribut("Perception")) / 4);
+            case "niveau_physique":
+                return Math.round((this.get_attribut("Vivacite_mentale") + this.get_attribut("Volonte") + this.get_attribut("Abstraction") + this.get_attribut("Charisme")) / 4);
+            case "sixieme_sens":
+                return Math.round((this.get_attribut("Perception") + this.get_attribut("Adaptation")) / 2);
+            default:
+                const model = Models.find(m => m.Nom_model === this.Model);
+                let res = parseInt(model[attribut]) || 0;
+                if (res !== null && typeof res !== "undefined") res += this.get_bonus(attribut);
+                return res;
+        }
     }
 
+    /**
+     * Calcul le bonus d'un attribut
+     * @param {string} attribut - Nom de l'attribut
+     * @returns {number} - Bonus de l'attribut
+     */
     get_bonus(attribut) {
         let bonus = 0;
         Attaques.filter(a =>
@@ -155,225 +151,112 @@ class Pion extends Map {
     }
 
     /**
-     * Calcul le malus de la 2nde main
-     * @returns {number} - Malus de la 2nde main
-     */
-    // malus_2nde_main() {
-    //     const model = Models.find(m => m.Nom_model === this.Model);
-    //     if (model.Ambidextre) return 0;
-    //     return Math.floor((18 - this.coordination()) / 2);
-    // }
-
-    /**
-     * Calcul la coordination
-     * @returns {number} - Coordination
-     */
-    coordination() {
-        return Math.round((this.getValue("Vivacite_physique") + this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 3);
-    }
-
-    /**
-     * Calcul le sixième sens
-     * @returns {number} - Sixième sens
-     */
-    sixieme_sens() {
-        return Math.round((this.getValue("Perception") + this.getValue("Adaptation")) / 2);
-    }
-
-    /**
-     * Calcul le niveau mental
-     * @returns {number} - Niveau mental
-     */
-    niveau_mental() {
-        return Math.round((this.getValue("Force") + this.getValue("Constitution") + this.getValue("Vivacite_physique") + this.getValue("Perception")) / 4);
-    }
-
-    /**
-     * Calcul le niveau physique
-     * @returns {number} - Niveau physique
-     */
-    niveau_physique() {
-        return Math.round((this.getValue("Vivacite_mentale") + this.getValue("Volonte") + this.getValue("Abstraction") + this.getValue("Charisme")) / 4);
-    }
-
-    /**
-     * Calcul le score d'une compétence
-     * @param {string} competence - Nom de la compétence
-     * @returns {number} - Score de la compétence
-     */
-    #get_score_sub(competence) {
-        const model = Models.find(m => m.Nom_model === this.Model);
-        const comp = Competences.find(comp => comp.Nom_model === this.Model && comp.Nom === competence);
-
-        if (comp === null || typeof comp === "undefined") return null;
-        
-        // Calcul de l'attribut
-        let attribut = 0;
-        if (!model.Is_monster) {
-            attribut = comp.Attribut;
-            switch (attribut) {
-                case "Ab":
-                    attribut = this.getValue("Abstraction");
-                    break;
-                case "Ch":
-                    attribut = this.getValue("Charisme");
-                    break;
-                case "Co":
-                    attribut = this.coordination();
-                    break;
-                case "Co+Ch":
-                    attribut = (this.coordination() + this.getValue("Charisme")) / 2;
-                    break;
-                case "Co+F":
-                    attribut = (this.coordination() + this.getValue("Force")) / 2;
-                    break;
-                case "Co+P":
-                    attribut = (this.coordination() + this.getValue("Perception")) / 2;
-                    break;
-                case "Co+V":
-                    attribut = (this.coordination() + this.getValue("Volonte")) / 2;
-                    break;
-                case "Co+VM":
-                    attribut = (this.coordination() + this.getValue("Vivacite_mentale")) / 2;
-                    break;
-                case "Co+VP":
-                    attribut = (this.coordination() + this.getValue("Vivacite_physique")) / 2;
-                    break;
-                case "NP":
-                    attribut = this.niveau_physique();
-                    break;
-                case "P+VM":
-                    attribut = (this.getValue("Perception") + this.getValue("Vivacite_mentale")) / 2;
-                    break;
-                case "V":
-                    attribut = this.getValue("Volonte");
-                    break;
-                case "VP":
-                    attribut = this.getValue("Vivacite_physique");
-                    break;
-                default:
-                    attribut = 10; // Attribut par défaut
-                    break;
-            }
-            attribut = Math.round((attribut - 10) / 2);
-        }
-
-        return comp.Base + attribut;
-    }
-
-    /**
      * Calcul la compétence
-     * @param {string} competence - Nom de la compétence
+     * @param {string} stat_combat - Nom de la compétence
      * @returns {number} - Compétence
      */
-    get_score(competence) {
+    #get_competence(nom_competence) {
+        let cmp = Competences.find(c => c.Nom_model === this.Model && c.Nom === nom_competence);
+        if (cmp === null || typeof cmp === "undefined") {
+            cmp = new Competence({ Nom_model: this.Model, Nom: nom_competence, Degres: 0 });
+            Competences.push(cmp);
+        }
+        let score = cmp.get_score();
+        score += this.get_bonus(nom_competence);
+        return score;
+    }
+
+    /**
+     * Calcul la valeur de statistique de combat
+     * @param {string} stat_combat - Nom de la statistique de combat
+     * @returns {number} - Valeur de la statistique de combat
+     */
+    get_stat_combat(stat_combat) {
         const model = Models.find(m => m.Nom_model === this.Model);
-        let ratio = 1;
 
-        if (model.Is_monster) {
-            switch (competence) {
-                case "Esquive":
-                    return model.Esquive;
-                case "Feinte_de_corps":
-                    return model.Feinte_de_corps;
-                case "Attaque_1":
-                    return model.Attaque_1;
-                case "Parade_1":
-                    return model.Bool_parade_1 ? model.Parade_1 : null;
-                case "Attaque_2":
-                    return model.Bool_attaque_2 ? model.Attaque_2 : null;
-                case "Parade_2":
-                    return (model.Bool_attaque_2 && model.Bool_parade_2) ? model.Parade_2 : null;
-            }
+        switch (stat_combat) {
+            case "Esquive":
+                if (model.Is_monster) return model[stat_combat];
+                else return this.#get_competence("Esquive");
+            case "Feinte_de_corps":
+                if (model.Is_monster) return model[stat_combat];
+                else return this.#get_competence("Feinte de corps");
+            case "Attaque_1":
+                if (this.Arme1 !== null && typeof this.Arme1 !== "undefined" && this.Arme1 !== "") {
+                    const nom_competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
+                    return this.#get_competence(nom_competence);
+                }
+                else if (model.Is_monster) return model["Attaque_1"];
+                else return null;
+            case "Parade_1":
+                if (this.Arme1 !== null && typeof this.Arme1 !== "undefined" && this.Arme1 !== "") {
+                    const nom_competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
+                    const ratio = Armes.find(a => a.Nom_arme === this.Arme1).Facteur_parade;
+                    return Math.round(this.#get_competence(nom_competence) * ratio);
+                }
+                else if (model.Is_monster) return model.Bool_parade_1 ? model.Parade_1 : null;
+                else return null;
+            case "Attaque_2":
+                if (this.Arme2 !== null && typeof this.Arme2 !== "undefined" && this.Arme2 !== "") {
+                    const nom_competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
+                    return this.#get_competence(nom_competence);
+                }
+                else if (model.Is_monster) return model.Bool_attaque_2 ? model.Attaque_2 : null;
+                else return null;
+            case "Parade_2":
+                if (this.Arme2 !== null && typeof this.Arme2 !== "undefined" && this.Arme2 !== "") {
+                    const nom_competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
+                    const ratio = Armes.find(a => a.Nom_arme === this.Arme2).Facteur_parade;
+                    return Math.round(this.#get_competence(nom_competence) * ratio);
+                }
+                else if (model.Is_monster) return (model.Bool_attaque_2 && model.Bool_parade_2) ? model.Parade_2 : null;
+                else return null;
+            default:
+                return null;
         }
-        else {
-            switch (competence) {
-                case "Attaque_1":
-                    competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
-                    break;
-                case "Parade_1":
-                    competence = Armes.find(a => a.Nom_arme === this.Arme1).Competence;
-                    ratio = Armes.find(a => a.Nom_arme === this.Arme1).Facteur_parade;
-                    break;
-                case "Attaque_2":
-                    competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
-                    break;
-                case "Parade_2":
-                    competence = Armes.find(a => a.Nom_arme === this.Arme2).Competence;
-                    ratio = Armes.find(a => a.Nom_arme === this.Arme2).Facteur_parade;
-                    break;
-            }
-        }
-
-        if (competence === null || typeof competence === "undefined") return null;
-
-        // Calcul du score de la compétence
-        const score = this.#get_score_sub(competence);
-        if (score === null) return null;
-
-        // // Calcul de la compétence majeure
-        // const comp_majeure = Competences.find(comp => comp.Nom_competence === competence).Competence_majeure;
-        // if (comp_majeure === null) return Math.round(score * ratio);
-
-        // // Calcul du score total
-        // return Math.round((score + this.#get_score_sub(comp_majeure)) * ratio);
     }
 
     /**
      * Définit les armes du pion
      */
-    setArmes() {
-        const model = Models.find(m => m.Nom_model === this.Model);
+    #setArmes() {
+        let comp_max = -99;
+        let arme_max = "";
+        Armes.forEach(arme => {
+            if (arme.Nom_arme === "Bouclier") return;
+            const comp = this.get_stat_combat(arme.Competence);
+            if (comp !== null && comp > comp_max) {
+                comp_max = comp;
+                arme_max = arme.Nom_arme;
+            }
+        });
+        this.Arme1 = arme_max;
 
-        if (model.Is_monster) {
-            // Sélection de l'arme par défaut si le personnage est un monstre
-            this.Arme1 = this.Model;
-            if (Armes.find(a => a.Nom_arme === this.Model).Deux_mains) this.Arme2 = "";
-            else this.Arme2 = this.Model;
-        }
-        else {
-            // Sélection des armes par défaut si le personnage n'est pas un monstre
-            let comp_max = -99;
-            let arme_max = "";
-            Armes.forEach(arme => {
-                if (arme.Nom_arme === "Bouclier") return;
-                const comp = this.get_score(arme.Competence);
-                if (comp !== null && comp > comp_max) {
-                    comp_max = comp;
-                    arme_max = arme.Nom_arme;
-                }
-            });
-            this.Arme1 = arme_max;
-
-            const w = Armes.find(x => x.Nom_arme === this.Arme1);
-            if (w !== null && typeof w != "undefined" && w.Deux_main) this.Arme2 = "";
-            else this.Arme2 = "Bouclier";
-        }
+        const w = Armes.find(x => x.Nom_arme === this.Arme1);
+        if (w !== null && typeof w != "undefined" && w.Deux_main) this.Arme2 = "";
+        else this.Arme2 = "Bouclier";
     }
 
     /**
-     * Envoie un message à la carte
+     * Envoie un message au serveur pour mettre à jour un pion
      * @param {string} tag - Tag du message
      */
     sendMessage(tag) {
         const champs = Object.keys(this).filter(key => typeof this[key] != "function");
         switch (tag.toLowerCase()) {
             case "setall":
-                sendMessage("Map_Create", this.Model + "@" + this.Indice + "@" + this.Type);
-
-                champs.forEach(c => {
-                    if (["Type", "Model", "Indice"].includes(c)) return;
-                    const cmd = "Map_" + c.substring(0, 1).toUpperCase() + c.substring(1).toLowerCase();
-                    sendMessage(cmd, this.Model + "@" + this.Indice + "@" + this[c]);
+                champs.forEach(champ => {
+                    const cmd = "Set_Pion_" + champ.substring(0, 1).toUpperCase() + champ.substring(1).toLowerCase();
+                    sendMessage(cmd, this.Type + "@" + this.Model + "@" + this.Indice + "@" + this[champ]);
                 });
                 break;
-            case "clearall":
-                sendMessage("Map_ClearAll", "@@");
+            case "rmv":
+                sendMessage("Rmv_Pion", this.Type + "@" + this.Model + "@" + this.Indice);
                 break;
             default:
                 const champ = champs.find(x => x.toLowerCase() === tag.toLowerCase());
-                const cmd = "Map_" + champ.substring(0, 1).toUpperCase() + champ.substring(1).toLowerCase();
-                sendMessage(cmd, this.Model + "@" + this.Indice + "@" + this[champ]);
+                const cmd = "Set_Pion_" + champ.substring(0, 1).toUpperCase() + champ.substring(1).toLowerCase();
+                sendMessage(cmd, this.Type + "@" + this.Model + "@" + this.Indice + "@" + this[champ]);
                 break;
         }
     }
@@ -391,18 +274,20 @@ class Pion extends Map {
         const indice = parseInt("0" + result[3], 10);
         const val = result[4];
 
+        let p = null;
         switch (code.toLowerCase()) {
-            case "create":
-                Pions[Pions.length] = new Pion(val, model, indice);
-                break;
+            // case "create":
+            //     p = new Pion();
+            //     p.mise_a_jour_pion(model, val, indice);
+            //     break;
             case "clearall":
                 Pions = new Array;
                 break;
             default:
-                const p = Pions.find(x => x.Model === model && x.Indice === indice);
+                p = Pions.find(x => x.Model === model && x.Indice === indice);
                 const champs = Object.keys(p).filter(key => typeof this[key] != "function");
                 const champ = champs.find(x => x.toLowerCase() === code.toLowerCase());
-                if (["Titre", "Control", "Arme1", "Arme2", "Note", "loc_att", "Type", "Position"].includes(champ)) {
+                if (["Titre", "Control", "Arme1", "Arme2", "Note", "Loc_att", "Type", "Position"].includes(champ)) {
                     p[champ] = val;
                 }
                 else p[champ] = parseInt(val, 10);
@@ -446,28 +331,12 @@ class Pion extends Map {
     }
 
     /**
-     * Calcul l'armure générale (moyenne des différentes parties)
-     * @returns {number} - Armure générale
-     */
-    armure_generale() {
-        let a = 0;
-        a += parseInt(this.Armure_tete);
-        a += parseInt(this.Armure_poitrine);
-        a += parseInt(this.Armure_abdomen);
-        a += parseInt(this.Armure_brasg);
-        a += parseInt(this.Armure_brasd);
-        a += parseInt(this.Armure_jambeg);
-        a += parseInt(this.Armure_jambed);
-
-        return Math.floor(a / 7);
-    }
-
-    /**
      * Duplique un pion de la carte
      * @returns {Pion} - Pion dupliqué
      */
     dupliquer() {
-        const p = new Pion(this.Type, this.Model);
+        const p = new Pion();
+        p.mise_a_jour_pion(this.Type, this.Model);
         const m = Models.find(x => x.Nom_model === this.Model);
 
         if (m.Is_joueur) return null;
@@ -495,32 +364,14 @@ class Pion extends Map {
             p.Titre = this.Titre + " " + p.Indice.toString().padStart(2, "0");
         }
 
-        Pions[Pions.length] = p;
+        // Set Autres champs
+        p.Fatigue = m.get("fatigue");
+        p.Concentration = m.get("concentration");
+        p.Selected = false;
+
+        Pions.push(p);
 
         p.sendMessage("setall");
-
-        Map.generateHexMap();
-        Map.drawHexMap();
-
-        return p;
-    }
-
-    /**
-     * Ajoute un pion sur la carte
-     * @param {string} type - Type du pion
-     * @param {string} model - Modèle du pion
-     * @param {number} indice - Indice du pion
-     * @returns {Pion} - Pion ajouté
-     */
-    static add(type, model, indice = -1) {
-        let m = Models.find(x => x.Nom_model === model);
-        if (m === null || typeof m === "undefined") return null;
-
-        let p = Pions.find(x => x.Type === type && x.Model === model && x.Indice === indice);
-        if (p === null || typeof p === "undefined") {
-            Pions[Pions.length] = new Pion(type, model, indice);
-            p = Pions[Pions.length - 1];
-        }
 
         Map.generateHexMap();
         Map.drawHexMap();
@@ -532,8 +383,9 @@ class Pion extends Map {
      * Retire un pion de la carte
      */
     rmv() {
-        const index = Pions.indexOf(this);
-        Pions.splice(index, 1);
+        this.sendMessage("rmv");
+        Pions.splice(Pions.indexOf(this), 1);
+
         Map.generateHexMap();
         Map.drawHexMap();
     }
@@ -558,7 +410,7 @@ class Pion extends Map {
         let is_visible = true;
 
         // Si le pion n'est pas en vol, on tient compte des terrains qui cachent la vue
-        if (!this.is_flying) {
+        if (!this.Is_flying) {
             Terrains.filter(x => x.Model != "Eau").forEach(t => {
                 if (!is_visible) return;
 
@@ -622,7 +474,7 @@ class Pion extends Map {
      * @param {number} col_end - Colonne de la position d'arrivée
      * @param {number} row_end - Ligne de la position d'arrivée
      */
-    deplace_a(col_end, row_end) {
+    deplace_sur_la_carte(col_end, row_end) {
         const pos = this.Position.split(",");
         let col_start = parseInt(pos[0], 10);
         let row_start = parseInt(pos[1], 10);
@@ -707,19 +559,19 @@ class Pion extends Map {
             pion = Pions.find((p) => p.Attaquant); // Le magicien
         }
 
-        save = save.replace("Con", pion.getValue("Constitution"));
-        save = save.replace("Cor", pion.coordination());
-        save = save.replace("Vol", pion.getValue("Volonte"));
-        save = save.replace("Abs", pion.getValue("Abstraction"));
-        save = save.replace("Foi", pion.getValue("Foi"));
-        save = save.replace("Mag", pion.getValue("Magie"));
-        save = save.replace("6eS", pion.sixieme_sens());
-        save = save.replace("Mem", pion.getValue("Memoire"));
-        save = save.replace("NM", pion.niveau_mental());
-        save = save.replace("Per", pion.getValue("Perception"));
-        save = save.replace("Thp", pion.getValue("Telepathie"));
-        save = save.replace("VM", pion.getValue("Vivacite_mentale"));
-        save = save.replace("Cha", pion.getValue("Charisme"));
+        save = save.replace("Con", pion.get_attribut("Constitution"));
+        save = save.replace("Cor", pion.get_attribut("Coordination"));
+        save = save.replace("Vol", pion.get_attribut("Volonte"));
+        save = save.replace("Abs", pion.get_attribut("Abstraction"));
+        save = save.replace("Foi", pion.get_attribut("Foi"));
+        save = save.replace("Mag", pion.get_attribut("Magie"));
+        save = save.replace("6eS", pion.get_attribut("Sixieme_sens"));
+        save = save.replace("Mem", pion.get_attribut("Memoire"));
+        save = save.replace("NM",  pion.get_attribut("Niveau_mental"));
+        save = save.replace("Per", pion.get_attribut("Perception"));
+        save = save.replace("Thp", pion.get_attribut("Telepathie"));
+        save = save.replace("VM",  pion.get_attribut("Vivacite_mentale"));
+        save = save.replace("Cha", pion.get_attribut("Charisme"));
 
         save = eval(save);
 
@@ -755,45 +607,45 @@ class Pion extends Map {
 
         // Localisation des dégâts (si le sort est localisé)
         if (type === "localisés") {
-            let loc_att = "";
+            let Loc_att = "";
             const jet_loc = Math.floor(Math.random() * 20) + 1;
-            if (jet_loc < 5) loc_att = "jambe gauche";
-            else if (jet_loc < 9) loc_att = "jambe droite";
-            else if (jet_loc < 13) loc_att = "abdomen";
-            else if (jet_loc < 16) loc_att = "poitrine";
-            else if (jet_loc < 18) loc_att = "bras gauche";
-            else if (jet_loc < 20) loc_att = "bras droit";
-            else loc_att = "tête";
+            if (jet_loc < 5) Loc_att = "jambe gauche";
+            else if (jet_loc < 9) Loc_att = "jambe droite";
+            else if (jet_loc < 13) Loc_att = "abdomen";
+            else if (jet_loc < 16) Loc_att = "poitrine";
+            else if (jet_loc < 18) Loc_att = "bras gauche";
+            else if (jet_loc < 20) Loc_att = "bras droit";
+            else Loc_att = "tête";
 
             let texte_loc = "";
-            switch (loc_att) {
+            switch (Loc_att) {
                 case "abdomen":
                     this.Abdomen -= degats;
-                    texte_loc = "à l'" + loc_att; // "à l'abdomen"
+                    texte_loc = "à l'" + Loc_att; // "à l'abdomen"
                     break;
                 case "bras gauche":
                     this.Brasg -= degats;
-                    texte_loc = "au " + loc_att; // "au bras gauche/droit"
+                    texte_loc = "au " + Loc_att; // "au bras gauche/droit"
                     break;
                 case "bras droit":
                     this.Brasd -= degats;
-                    texte_loc = "au " + loc_att; // "au bras gauche/droit"
+                    texte_loc = "au " + Loc_att; // "au bras gauche/droit"
                     break;
                 case "jambe gauche":
                     this.Jambeg -= degats;
-                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    texte_loc = "à la " + Loc_att; // "à la jambe", "à la poitrine", etc.
                     break;
                 case "jambe droite":
                     this.Jambed -= degats;
-                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    texte_loc = "à la " + Loc_att; // "à la jambe", "à la poitrine", etc.
                     break;
                 case "poitrine":
                     this.Poitrine -= degats;
-                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    texte_loc = "à la " + Loc_att; // "à la jambe", "à la poitrine", etc.
                     break;
                 case "tête":
                     this.Tete -= degats;
-                    texte_loc = "à la " + loc_att; // "à la jambe", "à la poitrine", etc.
+                    texte_loc = "à la " + Loc_att; // "à la jambe", "à la poitrine", etc.
                     break;
             }
 

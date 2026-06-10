@@ -90,7 +90,7 @@ class Competence {
         if (base === "" || base === "-") base = 0;
         if (attribut === "") attribut = 0;
 
-        let score = parseInt(base) + parseInt(this.Degres) + parseInt(attribut);
+        let score = parseInt(base) + parseInt(this.Degres ? this.Degres : 0) + parseInt(attribut);
 
         if (classe_maitre === null) return score;
 
@@ -105,7 +105,7 @@ class Competence {
         if (base_maitre === "" || base_maitre === "-") base_maitre = 0;
         if (attribut_maitre === "") attribut_maitre = 0;
 
-        score += parseInt(base_maitre) + parseInt(cmp_maitre.Degres) + parseInt(attribut_maitre);
+        score += parseInt(base_maitre) + parseInt(cmp_maitre.Degres ? cmp_maitre.Degres : 0) + parseInt(attribut_maitre);
 
         return score;
     }

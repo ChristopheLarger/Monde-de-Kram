@@ -101,11 +101,11 @@ class Forme {
         const type = forme === "gomme" ? "gomme_f" : forme;
         const element = document.getElementById(type);
 
-        if (element.style.border === "2px solid black") {
+        if (element.style.border === "2px solid rgb(20, 20, 20)") {
             element.style.border = "none";
             this.#disableFormeMode();
         } else {
-            element.style.border = "2px solid black";
+            element.style.border = "2px solid rgb(20, 20, 20)";
             this.#enableFormeMode(forme);
         }
     }

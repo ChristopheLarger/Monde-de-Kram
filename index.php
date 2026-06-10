@@ -15,16 +15,17 @@
 
     <!-- Chargement des scripts JavaScript dans l'ordre de dépendance -->
     <script src="js/model.js"></script> <!-- Classes de base pour les modèles de personnages -->
+    <script src="js/pion.js"></script> <!-- Classes pour les pions -->
     <script src="js/arme.js"></script> <!-- Classes pour les armes -->
     <script src="js/divers.js"></script> <!-- Classes diverses -->
     <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
     <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
+    <script src="js/magie.js"></script> <!-- Système de magie -->
+    <script src="js/combat.js"></script> <!-- Système de combat -->
     <script src="js/dlg_perso.js"></script> <!-- Gestion des dialogues des personnages -->
     <script src="js/dlg_map.js"></script> <!-- Gestion des dialogues de la carte -->
     <script src="js/dlg_combat.js"></script> <!-- Gestion des dialogues de combat -->
-    <script src="js/magie.js"></script> <!-- Système de magie -->
-    <script src="js/combat.js"></script> <!-- Système de combat -->
 
     <script>
         <?php
@@ -282,6 +283,62 @@
             return $js;
         }
 
+        /**
+         * Génère le code JavaScript pour initialiser un pion
+         * Correspond intégralement et exclusivement aux propriétés du constructeur Pion (js/pion.js)
+         */
+        function generatePionJS($row, $index)
+        {
+            $js = "Pions[$index] = new Pion({\n";
+            $js .= "    Type: " . toJS($row['Type']) . ",\n";
+            $js .= "    Model: " . toJS($row['Model']) . ",\n";
+            $js .= "    Position: " . toJS($row['Position']) . ",\n";
+            $js .= "    Selected: " . toJS($row['Selected'], 'bool') . ",\n";
+            $js .= "    Indice: " . toJS($row['Indice'], 'int') . ",\n";
+            $js .= "    Attaquant: " . toJS($row['Attaquant'], 'bool') . ",\n";
+            $js .= "    Defenseur: " . toJS($row['Defenseur'], 'bool') . ",\n";
+            $js .= "    Nb_action: " . toJS($row['Nb_action'], 'int') . ",\n";
+            $js .= "    Arme1_engagee: " . toJS($row['Arme1_engagee'], 'bool') . ",\n";
+            $js .= "    Arme2_engagee: " . toJS($row['Arme2_engagee'], 'bool') . ",\n";
+            $js .= "    Esquive: " . toJS($row['Esquive'], 'bool') . ",\n";
+            $js .= "    Est_blesse: " . toJS($row['Est_blesse'], 'bool') . ",\n";
+            $js .= "    Vue: " . toJS($row['Vue'], 'int') . ",\n";
+            $js .= "    Titre: " . toJS($row['Titre']) . ",\n";
+            $js .= "    Arme1: " . toJS($row['Arme1']) . ",\n";
+            $js .= "    Arme2: " . toJS($row['Arme2']) . ",\n";
+            $js .= "    Note: " . toJS($row['Note']) . ",\n";
+            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
+            $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
+            $js .= "    Incantation: " . toJS($row['Incantation'], 'int') . ",\n";
+            $js .= "    Fatigue_sort: " . toJS($row['Fatigue_sort'], 'int') . ",\n";
+            $js .= "    Concentration_sort: " . toJS($row['Concentration_sort'], 'int') . ",\n";
+            $js .= "    Cible_sort: " . toJS($row['Cible_sort'], 'bool') . ",\n";
+            $js .= "    Auto: " . toJS($row['Auto'], 'bool') . ",\n";
+            $js .= "    Is_flying: " . toJS($row['Is_flying'], 'bool') . ",\n";
+            $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
+            $js .= "    Fatigue_down: " . toJS($row['Fatigue_down'], 'int') . ",\n";
+            $js .= "    Fatigue_eco: " . toJS($row['Fatigue_eco'], 'bool') . ",\n";
+            $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
+            $js .= "    General: " . toJS($row['General'], 'int') . ",\n";
+            $js .= "    Tete: " . toJS($row['Tete'], 'int') . ",\n";
+            $js .= "    Poitrine: " . toJS($row['Poitrine'], 'int') . ",\n";
+            $js .= "    Abdomen: " . toJS($row['Abdomen'], 'int') . ",\n";
+            $js .= "    Brasg: " . toJS($row['Brasg'], 'int') . ",\n";
+            $js .= "    Brasd: " . toJS($row['Brasd'], 'int') . ",\n";
+            $js .= "    Jambeg: " . toJS($row['Jambeg'], 'int') . ",\n";
+            $js .= "    Jambed: " . toJS($row['Jambed'], 'int') . ",\n";
+            $js .= "    Jet_att: " . toJS($row['Jet_att'], 'int') . ",\n";
+            $js .= "    Loc_att: " . toJS($row['Loc_att']) . ",\n";
+            $js .= "    At1_att: " . toJS($row['At1_att'], 'bool') . ",\n";
+            $js .= "    At2_att: " . toJS($row['At2_att'], 'bool') . ",\n";
+            $js .= "    Jet_def: " . toJS($row['Jet_def'], 'int') . ",\n";
+            $js .= "    Pr1_def: " . toJS($row['Pr1_def'], 'bool') . ",\n";
+            $js .= "    Pr2_def: " . toJS($row['Pr2_def'], 'bool') . ",\n";
+            $js .= "    Esq_def: " . toJS($row['Esq_def'], 'bool') . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
         // === CONNEXION À LA BASE DE DONNÉES ===
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
         $conn->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
@@ -423,6 +480,18 @@
                     $ligne++;
                 }
             }
+
+            // === CHARGEMENT DES PIONS ===
+            $query = "SELECT * FROM pion ORDER BY Type ASC, Model ASC, Indice ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generatePionJS($row, $ligne);
+                    $ligne++;
+                }
+            }
         }
 
         $conn->close();
@@ -430,14 +499,23 @@
 
         // === INITIALISATION DES IMAGES ===
         // Chargement des images pour tous les modèles
+        let count = 0;
         for (let i = 0; i < Models.length; i++) {
             Models[i].Image = new Image();
+            Models[i].Image.onload = function() { count++; }
             Models[i].Image.src = "Images/Figurines/" + Models[i].Nom_model + ".png";
             Models[i].Image.onerror = function() {
                 console.warn("Image non trouvée pour " + Models[i].Nom_model + ": images/Figurines/" + Models[i].Nom_model + ".png");
             };
         }
-        
+
+        (async () => { // Attendre que les images soient chargées
+            while (count < Models.length) { await sleep(100); }
+            // Régénérer la carte pour afficher les pions
+            Map.generateHexMap();
+            Map.drawHexMap();
+        })();
+
         // === INITIALISATION DE L'INTERFACE ===
         // Ajout des joueurs dans le sélecteur
         for (let i = 0; i < Models.length; i++) {
@@ -449,49 +527,17 @@
             }
         }
 
-        // Initialisation du pion et du modèle lorsque les interfaces sont chargées
-        initialise_pion();
-        initialise_model();
+        // Donner le focus à la carte
+        canvas.focus({ preventScroll: true });
 
         // === Initialisation du jeu pour les tests ===
         // ============================================
 
         // Pré-sélectionner "Maitre du Jeu" dès l'ouverture du site
         document.getElementById("joueur").value = "MJ";
-
-        // Déclencher l'événement change pour initialiser l'interface
-        const changeEvent = new Event('change', {
-            bubbles: true,
-            cancelable: true
-        });
+        const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
-        // Attendre que l'interface soit complètement initialisée
-        const christophe = Pion.add("allies", "Christophe");
-        const elemental_eau = Pion.add("allies", "Elémental d'eau");
-        const guilhem = Pion.add("ennemis", "Guilhem");
-        const elemental_air = Pion.add("ennemis", "Elémental d'air");
-
-        // Remise à zéro des portées de vue
-        Map.setPortee_vue();
-
-        // Guilhem est en vol
-        if (guilhem) guilhem.is_flying = true;
-
-        // Rafraîchir le zoom du pion selectionné
-        m_pion = guilhem;
-        affiche_pion();
-
-        // Affichage des interactions possibles avec le personnage
-        if (m_model === null) m_model = Models.find((m) => m.Nom_model === m_pion.Model);
-        affiche_interactions(1, "Feinte de corps");
-
-        // Régénérer la carte pour afficher les nouveaux pions
-        Map.generateHexMap();
-        Map.drawHexMap();
-
-        // Donner le focus à la carte
-        canvas.focus({ preventScroll: true });
     </script>
 </body>
 

@@ -79,14 +79,14 @@
 
     <!-- Canvas principal pour la carte hexagonale -->
     <canvas id="hexCanvas" tabindex="0"
-        style="position: absolute; width: 100%; height: auto; margin: 0; border: 1px solid black; cursor: default;"></canvas>
+        style="position: absolute; width: 100%; height: auto; margin: 0; border: 1px solid rgb(20, 20, 20); cursor: default;"></canvas>
 
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
         style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
 
     <div id="div_pion"
-        style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: black; color: white; border: 3px solid black;">
+        style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
         <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
                 <col style="width: 100px;">
@@ -95,7 +95,7 @@
             <tr>
                 <td>
                     <img class="figurine" alt="Figurine du pion"
-                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: black;">
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: rgb(20, 20, 20);">
                 </td>
                 <td>
                     <table style="width: 100%; white-space: nowrap;">
@@ -112,8 +112,8 @@
                         </tr>
                         <tr>
                             <td><a class="modele_link"
-                                    style="cursor: pointer; color: blue; text-decoration: underline;">Modele</a> :</td>
-                            <td><select class="modele" style="font-size: x-small; width: 100%;">
+                                    style="cursor: pointer; color: rgb(64, 64, 230); text-decoration: underline;">Modele</a> :</td>
+                            <td><select class="modele" style="font-size: x-small; width: 100%;" disabled>
                                     <option value="">--</option>
                                 </select></td>
                             <td>Auto :</td>
@@ -131,7 +131,7 @@
                                 <input type="text" class="fatigue"
                                     style="text-align: center; width: 17px; font-size: x-small;">
                                 / <input type="text" class="fatigue_max"
-                                    style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;"
+                                    style="text-align: center; width: 17px; font-size: x-small; background-color: rgb(192, 192, 192);"
                                     disabled>
                             </td>
                             <td></td>
@@ -140,7 +140,7 @@
                                 <input type="text" class="concentration"
                                     style="text-align: center; width: 17px; font-size: x-small;">
                                 / <input type="text" class="concentration_max"
-                                    style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray;"
+                                    style="text-align: center; width: 17px; font-size: x-small; background-color: rgb(192, 192, 192);"
                                     disabled>
                             </td>
                         </tr>
@@ -176,15 +176,15 @@
             </tr>
         </table>
         <div style="width: 100%; box-sizing: border-box; text-align: center;">
-            <textarea class="note" rows="4"
-                style="width: 98%; resize: vertical; font-size: x-small; box-sizing: border-box;"
+            <textarea class="note" rows="8"
+                style="width: 98%; resize: none; font-size: x-small; box-sizing: border-box;"
                 placeholder="Notes..."></textarea>
         </div>
         <div style="width: 100%; display: flex; align-items: center; justify-content: space-between;">
             <span style="font-size: x-small;">Seuil de blessures :
                 <input type="text" class="seuil_blessures" style="text-align: center; width: 17px; font-size: x-small;"
                     disabled></span>
-            <span style="font-size: x-small; color: blue; font-weight: bold;" class="msg_aptitude">Apte au combat</span>
+            <span style="font-size: x-small; color: rgb(64, 64, 230); font-weight: bold;" class="msg_aptitude">Apte au combat</span>
             <span style="font-size: x-small;">&nbsp;Nb. blessures max :
                 <input type="text" class="nb_blessures_max" style="text-align: center; width: 17px; font-size: x-small;"
                     disabled></span>
@@ -200,17 +200,17 @@
             <tr>
                 <td colspan="2" style="text-align: center;">
                     <input type="text" class="general"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Général" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="general_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="general_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="general_X1"
@@ -224,17 +224,17 @@
             <tr>
                 <td colspan="2" style="text-align: center;">
                     <input type="text" class="tete"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Tête" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="tete_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="tete_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="tete_X1" style="vertical-align: middle; width: 17px; height: 17px;">
@@ -244,17 +244,17 @@
             <tr>
                 <td colspan="2" style="text-align: center;">
                     <input type="text" class="poitrine"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Poitrine" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="poitrine_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="poitrine_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="poitrine_X1"
@@ -266,22 +266,22 @@
             <tr>
                 <td rowspan="2" style="text-align: center;">
                     <input type="text" class="brasd"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Bras droit" disabled>
                 </td>
                 <td rowspan="2" style="text-align: center;">
                     <input type="text" class="brasg"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Bras gauche" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="brasd_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="brasd_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="brasd_X1" style="vertical-align: middle; width: 17px; height: 17px;">
@@ -291,7 +291,7 @@
             <tr>
                 <td style="text-align: center;">
                     <input type="text" class="brasg_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
@@ -305,17 +305,17 @@
             <tr>
                 <td colspan="2" style="text-align: center;">
                     <input type="text" class="abdomen"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Abdomen" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="abdomen_armure"
-                        style="text-align: center; width: 17px; font-size: x-small; background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small; background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="abdomen_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="abdomen_X1" style="vertical-align: middle; width: 17px; height: 17px;"
@@ -327,22 +327,22 @@
             <tr>
                 <td rowspan="2" style="text-align: center;">
                     <input type="text" class="jambed"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Jambe droite" disabled>
                 </td>
                 <td rowspan="2" style="text-align: center;">
                     <input type="text" class="jambeg"
-                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid blue;"
+                        style="box-sizing: border-box; font-size: x-small; font-weight: bold; text-align: center; border: 2px solid rgb(64, 64, 230);"
                         value="Jambe gauche" disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="jambed_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="jambed_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="jambed_X1" style="vertical-align: middle; width: 17px; height: 17px;">
@@ -352,12 +352,12 @@
             <tr>
                 <td style="text-align: center;">
                     <input type="text" class="jambeg_armure"
-                        style="text-align: center; width: 17px; font-size: x-small;background-color: lightgray; border: 1px solid blue;"
+                        style="text-align: center; width: 17px; font-size: x-small;background-color: rgb(192, 192, 192); border: 1px solid rgb(64, 64, 230);"
                         disabled>
                 </td>
                 <td style="text-align: center;">
                     <input type="text" class="jambeg_pdv"
-                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid blue;">
+                        style="text-align: center; width: 17px; font-size: x-small; border: 1px solid rgb(64, 64, 230);">
                 </td>
                 <td>
                     <input type="checkbox" class="jambeg_X1" style="vertical-align: middle; width: 17px; height: 17px;">
@@ -366,11 +366,11 @@
             </tr>
             <tr>
                 <td colspan="7">
-                    <span class="liste" style="font-size: x-small; color: blue; font-style: italic;">Liste</span>
+                    <span class="liste" style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Liste</span>
                     <br>
-                    <span class="sort" style="font-size: x-small; color: blue; font-style: italic;">Sort</span>
+                    <span class="sort" style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Sort</span>
                     <span class="incantation"
-                        style="font-size: x-small; color: blue; font-style: italic;">Incantation</span>
+                        style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Incantation</span>
                     <table class="etats"
                         style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                         <!-- Lignes (sur 7 colonnes : 3 + 1 + 3) : Force, Hébété, Dommages CàC, Aveuglé, etc. -->
@@ -478,7 +478,7 @@
             trace_ligne_pdv(ctx, 'jambed');
             trace_ligne_pdv(ctx, 'jambeg');
 
-            ctx.strokeStyle = 'blue';
+            ctx.strokeStyle = 'rgb(64, 64, 230)';
             ctx.lineWidth = 3;
             ctx.stroke();
         }
@@ -499,7 +499,7 @@
     </script>
 
     <div id="div_model"
-        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: black; color: white; border: 3px solid black;">
+        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
         <div class="div_model_tabs">
             <div style="display: flex; justify-content: space-between;">
                 <button type="button" class="tab-model humanoid" data-tab="0"
@@ -531,7 +531,7 @@
                     <input type="file" class="input_figurine" accept="image/*"
                         style="display: none; width: 100%; height: 100%;">
                     <img class="figurine" alt="Figurine du pion" title="Cliquer pour charger une autre image"
-                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: black; cursor: pointer;">
+                        style="display: none; width: 100px; height: 100px; object-fit: contain; object-position: center; background-color: rgb(20, 20, 20); cursor: pointer;">
                 </td>
                 <td>Modèle :</td>
                 <td><select class="model_select" style="font-size: x-small; box-sizing: border-box; width: 100%;">
@@ -558,7 +558,7 @@
         <hr>
 
         <!-- Caractéristiques Humanoides -->
-        <div id="div_model_0" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_0" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
@@ -572,7 +572,8 @@
                     <col style="width: 1px;">
                 </colgroup>
                 <tr>
-                    <td colspan="9" style="vertical-align: bottom; text-align: right;">
+                    <td>Nb max de blessures :<input type="text" class="nb_blessures_max"></td>
+                    <td colspan="8" style="vertical-align: bottom; text-align: right;">
                         <button class="switch_to_monster"
                             style="font-size: x-small; background-color: rgb(255, 32, 32);">Convertir
                             en Monstre</button>
@@ -598,7 +599,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="force_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="force_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="force_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -609,7 +610,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="constitution_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="constitution_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="constitution_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -620,7 +621,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="vivacite_physique_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="vivacite_physique_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_physique_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -631,13 +632,13 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="perception_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="perception_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="perception_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td colspan="6">Niveau physique :</td>
-                    <td style="text-align: center;"><input type="text" class="niveau_physique_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="niveau_physique_score" readonly></td>
                 </tr>
                 <tr>
                     <td colspan="9">
@@ -653,7 +654,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="vivacite_mentale_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="vivacite_mentale_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -664,7 +665,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="volonte_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="volonte_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="volonte_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -675,7 +676,7 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="abstraction_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="abstraction_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="abstraction_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -686,13 +687,13 @@
                     <td></td>
                     <td style="text-align: center;"><input type="text" class="charisme_experience"></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="charisme_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="charisme_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td colspan="6">Niveau mental :</td>
-                    <td style="text-align: center;"><input type="text" class="niveau_mental_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="niveau_mental_score" readonly></td>
                 </tr>
                 <tr>
                     <td colspan="9">
@@ -708,7 +709,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="adaptation_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="adaptation_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -719,7 +720,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="combat_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="combat_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -730,7 +731,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="foi_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="foi_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -741,7 +742,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="magie_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="magie_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -752,7 +753,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="memoire_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="memoire_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
@@ -763,7 +764,7 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <td style="text-align: center;"><input type="text" class="telepathie_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="telepathie_score" readonly></td>
                 </tr>
                 <tr>
                     <td colspan="9">
@@ -774,19 +775,19 @@
                     <td></td>
                     <td></td>
                     <td colspan="6">Sixieme sens :</td>
-                    <td style="text-align: center;"><input type="text" class="sixieme_sens_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="sixieme_sens_score" readonly></td>
                 </tr>
                 <tr>
                     <td></td>
                     <td></td>
                     <td colspan="6">Coordination :</td>
-                    <td style="text-align: center;"><input type="text" class="coordination_score" disabled></td>
+                    <td style="text-align: center;"><input type="text" class="coordination_score" readonly></td>
                 </tr>
             </table>
         </div>
 
         <!-- Caractéristiques Monstres -->
-        <div id="div_model_1" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_1" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
@@ -795,7 +796,9 @@
                     <col style="width: auto;">
                 </colgroup>
                 <tr>
-                    <td colspan="4" style="vertical-align: bottom; text-align: right;">
+                    <td>Nb max de blessures :</td>
+                    <td><input type="text" class="nb_blessures_max"></td>
+                    <td colspan="2" style="vertical-align: bottom; text-align: right;">
                         <button class="switch_to_humanoid"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px; background-color: rgb(128, 128, 255);">Convertir
                             en Humanoide</button>
@@ -886,18 +889,18 @@
                 <tr>
                     <td colspan="4" style="text-align: center;">
                         <textarea class="capacites_monstre" placeholder="Capacites..."
-                            style="width: 99%; box-sizing: border-box; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0; overflow-y: auto; background-color: black; color: white;"></textarea>
+                            style="width: 99%; box-sizing: border-box; resize: none; font-size: x-small; font-style: italic; text-align: justify; border: 0; overflow-y: auto; background-color: rgb(20, 20, 20); color: white;"></textarea>
                     </td>
                 </tr>
             </table>
         </div>
 
         <!-- Div 2 : libre pour le moment -->
-        <div id="div_model_2" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_2" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
         </div>
 
         <!-- Divers -->
-        <div id="div_model_3" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_3" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <colgroup>
                     <col style="width: auto;">
@@ -1132,7 +1135,7 @@
         </div>
 
         <!-- Avantages -->
-        <div id="div_model_4" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_4" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <div class="avantages"
                 style="overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <div style="text-align: right;">
@@ -1648,7 +1651,7 @@
         </div>
 
         <!-- Compétences -->
-        <div id="div_model_5" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_5" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <div class="competences"
                 style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <table
@@ -1673,7 +1676,7 @@
                         <td><input type="text" class="attribut" value="Co" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="esquive">
                         <td>Esquive :&nbsp;</td>
@@ -1681,7 +1684,7 @@
                         <td><input type="text" class="attribut" value="Co+VM" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parade_bouclier">
                         <td>Parade bouclier :&nbsp;</td>
@@ -1689,7 +1692,7 @@
                         <td><input type="text" class="attribut" value="Co" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="escrime">
                         <td>Escrime :&nbsp;</td>
@@ -1697,7 +1700,7 @@
                         <td><input type="text" class="attribut" value="Co" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="tranchantes">
                         <td>Tranchantes :&nbsp;</td>
@@ -1705,7 +1708,7 @@
                         <td><input type="text" class="attribut" value="Co+VP" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="epee tranchantes">
                         <td>Epée :&nbsp;</td>
@@ -1713,7 +1716,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="dague tranchantes">
                         <td>Dague :&nbsp;</td>
@@ -1721,7 +1724,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="couteau tranchantes">
                         <td>Couteau :&nbsp;</td>
@@ -1729,7 +1732,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="hache tranchantes">
                         <td>Hache :&nbsp;</td>
@@ -1737,7 +1740,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="contondantes_ou_d_estoc">
                         <td>Contondantes ou d'estoc :&nbsp;</td>
@@ -1745,7 +1748,7 @@
                         <td><input type="text" class="attribut" value="Co+VP" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-3" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="marteau contondantes_ou_d_estoc">
                         <td>Marteau :&nbsp;</td>
@@ -1753,7 +1756,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="fleau contondantes_ou_d_estoc">
                         <td>Fléau :&nbsp;</td>
@@ -1761,7 +1764,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="lance contondantes_ou_d_estoc">
                         <td>Lance :&nbsp;</td>
@@ -1769,7 +1772,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="baton contondantes_ou_d_estoc">
                         <td>Bâton :&nbsp;</td>
@@ -1777,7 +1780,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="etoile_du_matin contondantes_ou_d_estoc">
                         <td>Etoile du matin :&nbsp;</td>
@@ -1785,7 +1788,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="projectiles">
                         <td>Projectiles :&nbsp;</td>
@@ -1793,7 +1796,7 @@
                         <td><input type="text" class="attribut" value="Co+P" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="arc projectiles">
                         <td>Arc :&nbsp;</td>
@@ -1801,7 +1804,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="arbalete projectiles">
                         <td>Arbalête :&nbsp;</td>
@@ -1809,7 +1812,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="baliste projectiles">
                         <td>Baliste :&nbsp;</td>
@@ -1817,7 +1820,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="fronde projectiles">
                         <td>Fronde :&nbsp;</td>
@@ -1825,7 +1828,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="armes_de_jet">
                         <td>Armes de jet :&nbsp;</td>
@@ -1833,7 +1836,7 @@
                         <td><input type="text" class="attribut" value="Co+F" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="couteau_de_lancer armes_de_jet">
                         <td>Couteau de lancer :&nbsp;</td>
@@ -1841,7 +1844,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="hache_de_lancer armes_de_jet">
                         <td>Hache de lancer :&nbsp;</td>
@@ -1849,7 +1852,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="javelot armes_de_jet">
                         <td>Javelot :&nbsp;</td>
@@ -1857,7 +1860,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="armes_de_melee armes_de_jet">
                         <td>Armes de mêlée :&nbsp;</td>
@@ -1865,7 +1868,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="combat_mains_nues">
                         <td>Combat mains nues :&nbsp;</td>
@@ -1873,7 +1876,7 @@
                         <td><input type="text" class="attribut" value="NP" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="attaque_mains_nues combat_mains_nues">
                         <td>Attaque mains nues :&nbsp;</td>
@@ -1881,7 +1884,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="corps_a_corps combat_mains_nues">
                         <td>Corps à corps :&nbsp;</td>
@@ -1889,7 +1892,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_des_arcanes">
                         <td>Connaissance des arcanes :&nbsp;</td>
@@ -1897,7 +1900,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="maitriser_la_magie connaissance_des_arcanes">
                         <td>Maîtriser la magie :&nbsp;</td>
@@ -1905,7 +1908,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_de_l_occulte">
                         <td>Connaissance de l'occulte :&nbsp;</td>
@@ -1913,7 +1916,7 @@
                         <td><input type="text" class="attribut" value="V" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="theognosie connaissance_de_l_occulte">
                         <td>Théognosie :&nbsp;</td>
@@ -1921,7 +1924,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_des_religions connaissance_de_l_occulte">
                         <td>Connaissance des Religions :&nbsp;</td>
@@ -1929,7 +1932,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-1" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="creatures_surnaturelles connaissance_de_l_occulte">
                         <td>Créatures surnaturelles :&nbsp;</td>
@@ -1937,7 +1940,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="deplacement_dans_la_nature">
                         <td>Déplacement dans la nature :&nbsp;</td>
@@ -1945,7 +1948,7 @@
                         <td><input type="text" class="attribut" value="VP" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="equilibre deplacement_dans_la_nature">
                         <td>Equilibre :&nbsp;</td>
@@ -1953,7 +1956,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="grimper deplacement_dans_la_nature">
                         <td>Grimper :&nbsp;</td>
@@ -1961,7 +1964,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="nager deplacement_dans_la_nature">
                         <td>Nager :&nbsp;</td>
@@ -1969,7 +1972,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="sauter deplacement_dans_la_nature">
                         <td>Sauter :&nbsp;</td>
@@ -1977,7 +1980,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="tomber deplacement_dans_la_nature">
                         <td>Tomber :&nbsp;</td>
@@ -1985,7 +1988,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="acrobatie deplacement_dans_la_nature">
                         <td>Acrobatie :&nbsp;</td>
@@ -1993,7 +1996,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="survie_dans_la_nature">
                         <td>Survie dans la nature :&nbsp;</td>
@@ -2001,7 +2004,7 @@
                         <td><input type="text" class="attribut" value="P+VM" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-3" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="se_reperer survie_dans_la_nature">
                         <td>Se repérer :&nbsp;</td>
@@ -2009,7 +2012,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_des_animaux survie_dans_la_nature">
                         <td>Connaissance des animaux :&nbsp;</td>
@@ -2017,7 +2020,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_des_plantes survie_dans_la_nature">
                         <td>Connaissance des plantes :&nbsp;</td>
@@ -2025,7 +2028,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="pister survie_dans_la_nature">
                         <td>Pister :&nbsp;</td>
@@ -2033,7 +2036,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="chasser survie_dans_la_nature">
                         <td>Chasser :&nbsp;</td>
@@ -2041,7 +2044,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="predire_le_temps survie_dans_la_nature">
                         <td>Prédire le temps :&nbsp;</td>
@@ -2049,7 +2052,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="connaissance_des_mecanismes">
                         <td>Connaissance des mécanismes :&nbsp;</td>
@@ -2057,7 +2060,7 @@
                         <td><input type="text" class="attribut" value="Co+VM" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="detecter_piege_ou_secret connaissance_des_mecanismes">
                         <td>Détecter Piège ou Secret :&nbsp;</td>
@@ -2065,7 +2068,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="desamorcer_un_piege connaissance_des_mecanismes">
                         <td>Désamorcer un piège :&nbsp;</td>
@@ -2073,7 +2076,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="crocheter connaissance_des_mecanismes">
                         <td>Crocheter :&nbsp;</td>
@@ -2081,7 +2084,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="discretion">
                         <td>Discrétion :&nbsp;</td>
@@ -2089,7 +2092,7 @@
                         <td><input type="text" class="attribut" value="P+VM" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-2" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="camouflage discretion">
                         <td>Camouflage :&nbsp;</td>
@@ -2097,7 +2100,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="mener_une_embuscade discretion">
                         <td>Mener une embuscade :&nbsp;</td>
@@ -2105,7 +2108,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="se_cacher discretion">
                         <td>Se cacher :&nbsp;</td>
@@ -2113,7 +2116,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="relations_avec_les_autres">
                         <td>Relations avec les autres :&nbsp;</td>
@@ -2121,7 +2124,7 @@
                         <td><input type="text" class="attribut" value="Ch" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-3" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="detecter_le_mensonge relations_avec_les_autres">
                         <td>Détecter le mensonge :&nbsp;</td>
@@ -2129,7 +2132,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="psychologie relations_avec_les_autres">
                         <td>Psychologie :&nbsp;</td>
@@ -2137,7 +2140,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="eloquence relations_avec_les_autres">
                         <td>Eloquence :&nbsp;</td>
@@ -2145,7 +2148,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="marchander relations_avec_les_autres">
                         <td>Marchander :&nbsp;</td>
@@ -2153,7 +2156,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="seduire relations_avec_les_autres">
                         <td>Séduire :&nbsp;</td>
@@ -2161,7 +2164,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="torturer relations_avec_les_autres">
                         <td>Torturer :&nbsp;</td>
@@ -2169,7 +2172,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="commander relations_avec_les_autres">
                         <td>Commander :&nbsp;</td>
@@ -2177,7 +2180,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="feindre_ou_abuser_les_autres">
                         <td>Feindre ou Abuser les autres :&nbsp;</td>
@@ -2185,7 +2188,7 @@
                         <td><input type="text" class="attribut" value="Ch" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-3" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="mentir feindre_ou_abuser_les_autres">
                         <td>Mentir :&nbsp;</td>
@@ -2193,7 +2196,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="se_deguiser feindre_ou_abuser_les_autres">
                         <td>Se déguiser :&nbsp;</td>
@@ -2201,7 +2204,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="jouer_la_comedie feindre_ou_abuser_les_autres">
                         <td>Jouer la comédie :&nbsp;</td>
@@ -2209,7 +2212,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="erudition">
                         <td>Erudition :&nbsp;</td>
@@ -2217,7 +2220,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-3" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="lire_et_ecrire erudition">
                         <td>Lire et écrire :&nbsp;</td>
@@ -2225,7 +2228,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="lois_et_rites erudition">
                         <td>Lois et rites :&nbsp;</td>
@@ -2233,7 +2236,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="bureaucratie erudition">
                         <td>Bureaucratie :&nbsp;</td>
@@ -2241,7 +2244,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="histoire_et_legendes erudition">
                         <td>Histoire et Légendes :&nbsp;</td>
@@ -2249,7 +2252,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="astro_ou_alchimie_ou_geologie erudition">
                         <td>Astro ou Alchimie ou Géologie :&nbsp;</td>
@@ -2257,7 +2260,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="medecine erudition">
                         <td>Médecine :&nbsp;</td>
@@ -2265,7 +2268,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="pedagogie erudition">
                         <td>Pédagogie :&nbsp;</td>
@@ -2273,7 +2276,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="maitrise_des_poisons erudition">
                         <td>Maitrise des poisons :&nbsp;</td>
@@ -2281,7 +2284,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="philosophie erudition">
                         <td>Philosophie :&nbsp;</td>
@@ -2289,7 +2292,7 @@
                         <td><input type="text" class="attribut" value="" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="equitation competences_mineures">
                         <td>Equitation :&nbsp;</td>
@@ -2297,7 +2300,7 @@
                         <td><input type="text" class="attribut" value="Co+V" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="premiers_soins competences_mineures">
                         <td>Premiers soins :&nbsp;</td>
@@ -2305,7 +2308,7 @@
                         <td><input type="text" class="attribut" value="Co+V" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_humain competences_mineures">
                         <td>Parler Humain :&nbsp;</td>
@@ -2313,7 +2316,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-4" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_elfe competences_mineures">
                         <td>Parler Elfe :&nbsp;</td>
@@ -2321,7 +2324,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-6" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_gnome competences_mineures">
                         <td>Parler Gnome :&nbsp;</td>
@@ -2329,7 +2332,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_aquante competences_mineures">
                         <td>Parler Aquante :&nbsp;</td>
@@ -2337,7 +2340,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_nain competences_mineures">
                         <td>Parler Nain :&nbsp;</td>
@@ -2345,7 +2348,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-6" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_orc competences_mineures">
                         <td>Parler Orc :&nbsp;</td>
@@ -2353,7 +2356,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-7" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_troll competences_mineures">
                         <td>Parler Troll :&nbsp;</td>
@@ -2361,7 +2364,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-6" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="parler_toutlisse competences_mineures">
                         <td>Parler Toutlisse :&nbsp;</td>
@@ -2369,7 +2372,7 @@
                         <td><input type="text" class="attribut" value="Ab" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-7" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="manoeuvrer_un_bateau competences_mineures">
                         <td>Manoeuvrer un bateau :&nbsp;</td>
@@ -2377,7 +2380,7 @@
                         <td><input type="text" class="attribut" value="NP" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="jouer_instrument_1 competences_mineures">
                         <td>Jouer Instrument 1 :&nbsp;</td>
@@ -2385,7 +2388,7 @@
                         <td><input type="text" class="attribut" value="Co+Ch" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="jouer_instrument_2 competences_mineures">
                         <td>Jouer Instrument 2 :&nbsp;</td>
@@ -2393,7 +2396,7 @@
                         <td><input type="text" class="attribut" value="Co+Ch" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                     <tr class="jouer_instrument_3 competences_mineures">
                         <td>Jouer Instrument 3 :&nbsp;</td>
@@ -2401,14 +2404,14 @@
                         <td><input type="text" class="attribut" value="Co+Ch" disabled></td>
                         <td><select class="degres" style="font-size: x-small; box-sizing: border-box;"></select></td>
                         <td><input type="text" class="base" value="-5" disabled></td>
-                        <td><input type="text" class="score" value="" disabled></td>
+                        <td><input type="text" class="score" value="" readonly></td>
                     </tr>
                 </table>
             </div>
         </div>
 
         <!-- Désavantages -->
-        <div id="div_model_6" style="display: none; z-index: 1025; background-color: black; color: white;">
+        <div id="div_model_6" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
             <div class="desavantages"
                 style="overflow-x: none; overflow-y: auto; width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
                 <div style="text-align: right;">
@@ -2973,7 +2976,7 @@
 <!-- === DIALOGUE DE CHOIX D'INTERACTION === -->
 <!-- Fenêtre pour afficher les interactions possibles avec le personnage -->
 <div id="div_interactions"
-    style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: x-small; background-color: black; color: white;">
+    style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: x-small; background-color: rgb(20, 20, 20); color: white;">
     <table style="margin: 0; border-collapse: collapse;">
         <colgroup>
             <col style="width: auto;">
@@ -2989,27 +2992,27 @@
         <tr>
             <td style="text-align: right;">Score :&nbsp;</td>
             <td><input type="text" class="score"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: black;"
+                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
                     disabled></td>
         </tr>
         <tr>
             <td style="text-align: right;">Jet de 3D6 :&nbsp;</td>
             <td><input type="text" class="jet_des"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: black;"
+                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
                     disabled></td>
         </tr>
         <tr>
             <td style="text-align: right;">Résultat :&nbsp;</td>
             <td><input type="text" class="marge"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: black;"
+                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
                     disabled></td>
         </tr>
         <tr>
             <td colspan="2">
                 <table style="width: 100%; border-collapse: collapse; border: 0;">
                     <tr>
-                        <td>Héroïsme :&nbsp;</td>
-                        <td><input type="checkbox" class="heroisme" style="background-color: white; color: black;"></td>
+                        <td>Héroïsme :</td>
+                        <td><input type="checkbox" class="heroisme" style="background-color: white; color: rgb(20, 20, 20);"></td>
                         <td colspan="2" style="vertical-align: middle; text-align: right;">
                             <button class="chance"
                                 style="font-size: x-small; height: 12px; line-height: 1; padding: 0; margin: 0; white-space: nowrap;">
@@ -3687,12 +3690,12 @@
                 <input type="text" style="width: 98%; font-size: x-large; text-align: center; font-style: italic;"
                     value="" disabled>
             </td>
-            <td colspan="5" style="border-left: 3px solid black;">
+            <td colspan="5" style="border-left: 3px solid rgb(20, 20, 20);">
                 <input type="text"
                     style="width: 98%; font-size: x-large; text-align: center; background-color: rgb(192, 255, 192); font-style: italic;"
                     value="(MR : marge de réussite)" disabled>
             </td>
-            <td colspan="4" style="border-left: 3px solid black;">
+            <td colspan="4" style="border-left: 3px solid rgb(20, 20, 20);">
                 <input type="text"
                     style="width: 98%; font-size: x-large; text-align: center; background-color: rgb(255, 192, 192); font-style: italic;"
                     value="(ME : marge d'échec)" disabled>
@@ -3705,14 +3708,14 @@
             </td>
             <td style="text-align: center;"><span class="res_degats">(Néant)</span></td>
             <td>&nbsp;</td>
-            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td style="border-left: 3px solid rgb(20, 20, 20);">&nbsp;</td>
             <td>Durée :&nbsp;</td>
             <td><input type="text" class="prompt_duree_succes"
                     style="width: 124px; font-size: x-large; background-color: rgb(192, 255, 192);">
             </td>
             <td style="text-align: center;"><span class="res_duree_succes">(Néant)</span></td>
             <td>&nbsp;</td>
-            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td style="border-left: 3px solid rgb(20, 20, 20);">&nbsp;</td>
             <td>Durée :&nbsp;</td>
             <td><input type="text" class="prompt_duree_echec"
                     style="width: 124px; font-size: x-large; background-color: rgb(255, 192, 192);">
@@ -3729,13 +3732,13 @@
             </td>
             <td>&nbsp;</td><!-- res_degats -->
             <td>&nbsp;</td>
-            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td style="border-left: 3px solid rgb(20, 20, 20);">&nbsp;</td>
             <td>Etat :&nbsp;</td>
             <td><select id="sel_etat_succes"
                     style="width: 130px; font-size: x-large; background-color: rgb(192, 255, 192);"></select>
             <td>&nbsp;</td><!-- res_duree_succes -->
             <td>&nbsp;</td>
-            <td style="border-left: 3px solid black;">&nbsp;</td>
+            <td style="border-left: 3px solid rgb(20, 20, 20);">&nbsp;</td>
             <td>Etat :&nbsp;</td>
             <td><select id="sel_etat_echec"
                     style="width: 130px; font-size: x-large; background-color: rgb(255, 192, 192);"></select>

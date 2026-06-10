@@ -64,9 +64,10 @@ class ChatServer implements MessageComponentInterface
         if (function_exists('ob_flush')) { @ob_flush(); }
         @flush();
 
-        $this->Set_champs($msg);
         $this->Bascule_sort_connu($msg);
         $this->Set_Model($msg);
+        $this->Set_Pion($msg);
+        $this->Rmv_Pion($msg);
         $this->Set_Nom_model($msg);
         $this->Set_Degres($msg);
         $this->Set_Avantage($msg);
@@ -109,6 +110,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
 
             $sql = "INSERT INTO `competence` (`Nom_model`, `Nom`, `Degres`)
                 SELECT ?, `Nom`, `Degres`
@@ -117,6 +119,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
 
             $sql = "INSERT INTO `avantage` (`Nom_model`, `Nom`, `Selection`, `Parametre`, `Type`, `Niveau_creation`, `Niveau_experience`)
                 SELECT ?, `Nom`, `Selection`, `Parametre`, `Type`, `Niveau_creation`, `Niveau_experience`
@@ -125,8 +128,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
-
-            echo $sql . "\n";
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
 
             $sql = "INSERT INTO `desavantage` (`Nom_model`, `Nom`, `Selection`, `Niveau`)
                 SELECT ?, `Nom`, `Selection`, `Niveau`
@@ -135,6 +137,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
 
             $sql = "INSERT INTO `sort_connu` (`Nom_model`, `Nom_liste`, `Nom_sort`)
             SELECT ?, `Nom_liste`, `Nom_sort`
@@ -143,6 +146,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
 
             $stmt->close();
         }
@@ -178,6 +182,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $result[2], $result[1]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 
@@ -203,6 +208,9 @@ class ChatServer implements MessageComponentInterface
         $nom_model = $result[2];
         $valeur = $result[3];
 
+        if ($valeur == "true") $valeur = 1;
+        else if ($valeur == "false") $valeur = 0;
+
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
@@ -216,6 +224,105 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $valeur, $nom_model);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+    /**
+     * FONCTION DE CHANGEMENT D'UN ATTRIBUT DU PION
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Set_Pion($msg) {
+        $regex = "/^MJ: Set_Pion_([^@ ]+) ([^@]+)@([^@]+)@([^@]+)@([^@]*)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $attribut = $result[1];
+        $type = $result[2];
+        $model = $result[3];
+        $indice = $result[4];
+        $valeur = $result[5];
+
+        if ($valeur == "true") $valeur = 1;
+        else if ($valeur == "false") $valeur = 0;
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else if ($attribut == "Type") {
+            $old_type = ($valeur === "allies") ? "ennemis" : "allies";
+            $sql = "UPDATE pion SET `Type` = ? WHERE `Type` = ? AND `Model` = ? AND `Indice` = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssi", $valeur, $old_type, $model, $indice);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $stmt->close();
+        } else if ($attribut == "Model" || $attribut == "Indice") {
+            echo "Modifier le modèle ou l'indice du pion n'est pas prévu.\n";
+        }
+        else{
+            // Si le pion n'existe pas, on l'ajoute
+            $query = "SELECT * FROM pion WHERE `Type` = ? AND `Model` = ? AND `Indice` = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sss", $type, $model, $indice);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $resultMysql = $stmt->get_result();
+            if ($resultMysql->num_rows == 0) {
+                $sql = "INSERT INTO pion (`Type`, `Model`, `Indice`) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ssi", $type, $model, $indice);
+                $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            }
+
+            // Modification de l'attribut du modèle dans la base de données
+            $sql = "UPDATE pion SET `" . $attribut . "` = ? WHERE Type = ? AND Model = ? AND Indice = ?";
+
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssi", $valeur, $type, $model, $indice);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+        /**
+     * FONCTION DE CHANGEMENT D'UN ATTRIBUT DU PION
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Rmv_Pion($msg) {
+        $regex = "/^MJ: Rmv_Pion ([^@]+)@([^@]+)@([^@]+)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $type = $result[1];
+        $model = $result[2];
+        $indice = $result[3];
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            // Modification de l'attribut du modèle dans la base de données
+            $sql = "DELETE FROM pion WHERE `Type` = ? AND Model = ? AND Indice = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssi", $type, $model, $indice);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 
@@ -240,8 +347,6 @@ class ChatServer implements MessageComponentInterface
         $niveau_creation = $result[6];
         $niveau_experience = $result[7];
 
-        echo $nom_model . " " . $nom . " " . $selection . " " . $parametre . " " . $type . " " . $niveau_creation . " " . $niveau_experience . "\n";
-
         // Connexion à la base de données MySQL
         $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
 
@@ -253,6 +358,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ss", $nom_model, $nom);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $resultMysql = $stmt->get_result();
 
             if ($resultMysql->num_rows > 0) {
@@ -263,6 +369,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("issssss", $selection, $parametre, $type, $niveau_creation, $niveau_experience, $nom_model, $nom);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 
@@ -295,6 +402,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ss", $nom_model, $nom);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $resultMysql = $stmt->get_result();
 
             if ($resultMysql->num_rows > 0) {
@@ -305,6 +413,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("iiss", $selection, $niveau, $nom_model, $nom);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 
@@ -333,6 +442,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($query);
             $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $resultMysql = $stmt->get_result();
 
             if ($resultMysql->num_rows > 0) {
@@ -343,6 +453,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("sss", $result[1], $result[2], $result[3]);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 
@@ -375,6 +486,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($query);
             $stmt->bind_param("ss", $nom_model, $nom);
             $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $resultMysql = $stmt->get_result();
 
             if ($resultMysql->num_rows > 0) {
@@ -385,57 +497,7 @@ class ChatServer implements MessageComponentInterface
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("iss", $degres, $nom_model, $nom);
             $stmt->execute();
-            $stmt->close();
-        }
-
-        return true;
-    }
-
-    /**
-     * FONCTION DE MODIFICATION D'UN CHAMPS D'UNE TABLE
-     * ================================================
-     * @param string $msg - Message contenant les données
-     * @return bool - true si la modification du champs a réussi
-     */
-    private function Set_champs($msg) {
-        $id_table = [
-            "Arme" => "Nom_arme",
-            "Bonus" => "Nom_bonus",
-            "Bonus_sort" => "Nom_liste@Nom_sort@Nom_bonus@Succes",
-            "Competence" => "Nom_competence",
-            "Comp_connue" => "Nom_competence@Nom_model",
-            "Connecteur" => "Nom_liste@Pred_sort@Suc_sort",
-            "Liste" => "Nom_liste",
-            "Model" => "Nom_model",
-            "Sort" => "Nom_liste@Nom_sort",
-            "Sort_connu" => "Nom_model@Nom_liste@Nom_sort",
-            "Model" => "Nom_model"
-        ];
-
-        // Set Nom_attribut@Valeur_attribut@Nom_table@Id_table
-        // Exemple : Set Force@10@Model@Guilhem
-        $regex = "/^MJ: Set ([^@]+)@([^@]+)@([^@]+)@(.+)$/";
-
-        if (! preg_match($regex, $msg, $result)) return false;
-
-        // Extraction des clés et des valeurs de l'ID de la table
-        $key = explode("@", $id_table[$result[3]]);
-        $value = explode("@", $result[4]);
-
-        // Connexion à la base de données MySQL
-        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
-        if ($conn->connect_error) {
-            echo "Echec de connexion à la base de données.\n";
-            die("Échec de la connexion : " . $conn->connect_error);
-        } else {
-            $query = "UPDATE " . $result[3] . " SET `" . $result[1] . "` = \"" . $result[2] . "\"";
-            $query .= " WHERE " . $key[0] . " = \"" . $value[0] . "\"";
-            for ($i = 1; $i < count($key); $i++) {
-                $query .= " AND " . $key[$i] . " = " . $value[$i];
-            }
-
-            $stmt = $conn->prepare($query);
-            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();
         }
 

@@ -353,7 +353,7 @@ class Map {
                 if (!isInBrouillard) {
                     color = "rgb(255, 255, 255)";
                     Terrains.filter(t => t.Position === col + "," + row).forEach(t => {
-                        if (t.Model === "Rocher") color = "rgb(128, 128, 128)";
+                        if (t.Model === "Rocher") color = "rgb(192, 192, 192)";
                         else if (t.Model === "Arbre") color = "rgb(128, 255, 128)";
                         else if (t.Model === "Eau") color = "rgb(0, 255, 255)";
                     });
@@ -424,7 +424,7 @@ class Map {
         }
 
         // On dessine le contour de l'hexagone.
-        ctx.strokeStyle = "black";
+        ctx.strokeStyle = "rgb(20, 20, 20)";
         ctx.lineWidth = 2;
         ctx.stroke();
 
@@ -501,7 +501,7 @@ class Map {
 
             // On ajoute l'indice sur l'image le cas échéant
             if (p != null && typeof p != "undefined" && p.Indice != 0) {
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "rgb(20, 20, 20)";
                 ctx.font = `Bold ${hexSize / 3}px Arial`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
@@ -562,11 +562,11 @@ class Map {
             ctx.restore(); // Supprime le clip
             // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
             ctx.lineWidth = 2;
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = "rgb(20, 20, 20)";
 
             // Affiche les coordonnées si le mode est activé
             if (isMode_coordonnees) {
-                ctx.fillStyle = "black";
+                ctx.fillStyle = "rgb(20, 20, 20)";
                 ctx.font = `Bold ${hexSize / 3}px Arial`;
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
@@ -575,7 +575,7 @@ class Map {
         }
     }
 
-    static drawText(text, fontSize, x, y, background = "", color = "black", textAlign = "center") {
+    static drawText(text, fontSize, x, y, background = "", color = "rgb(20, 20, 20)", textAlign = "center") {
         if (text === "") return;
         const ctx = canvas_zoom.getContext("2d");
         ctx.font = `Bold ${fontSize}px Arial`;
@@ -890,7 +890,7 @@ class Terrain extends Map {
         let type = terrain;
         if (terrain === "gomme") type = "gomme_t";
 
-        if (document.getElementById(type).style.border === "2px solid black") {
+        if (document.getElementById(type).style.border === "2px solid rgb(20, 20, 20)") {
             document.getElementById(type).style.border = "none";
             default_cursor = "default";
             canvas.style.cursor = default_cursor;
@@ -899,7 +899,7 @@ class Terrain extends Map {
             return;
         }
         else
-            document.getElementById(type).style.border = "2px solid black";
+            document.getElementById(type).style.border = "2px solid rgb(20, 20, 20)";
 
         switch (terrain) {
             case "rocher":
@@ -1732,7 +1732,7 @@ canvas.addEventListener("mouseup", (event) => {
             if (t != null && typeof t != "undefined") return;
 
             // Déplacer le pion
-            p.deplace_a(col, row);
+            p.deplace_sur_la_carte(col, row);
         });
     }
     else if (isDragging_right && !isMode_forme && !isMoving_map) {
@@ -1815,7 +1815,7 @@ document.addEventListener("keydown", function (event) {
             // On supprime le(s) pion(s) de la sélection
             let p = Pions.find(x => x.Selected);
             while (p != null && typeof p != "undefined") {
-                Pions.splice(Pions.indexOf(p), 1);
+                p.rmv();
                 p = Pions.find(x => x.Selected);
             }
             break;

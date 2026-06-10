@@ -79,7 +79,7 @@ dialog {
 /* Styles pour les titres et zones de dialogue */
 .titre_dialogue,
 .dialogue {
-    border: 2px solid black;
+    border: 2px solid rgb(20, 20, 20);
     margin: 0;
     padding: 0;
     width: 100%;
@@ -128,7 +128,7 @@ dialog {
     /* Empêche le retour à la ligne */
     font-weight: bold;
     color: white;
-    background-color: black;
+    background-color: rgb(20, 20, 20);
     border: 0px solid white;
     z-index: 1010;
     /* Au-dessus des dialogues */
@@ -225,8 +225,8 @@ input:checked+.slider:before {
 .tab_model {
     flex: 1;
     padding: 3px 2px;
-    border: 1px solid black;
-    background: lightgray;
+    border: 1px solid rgb(20, 20, 20);
+    background: rgb(192, 192, 192);
     cursor: pointer;
     font-size: x-small;
 }
@@ -238,7 +238,7 @@ input:checked+.slider:before {
 
 .tab_model.active {
     background: white;
-    border: 3px solid black;
+    border: 3px solid rgb(20, 20, 20);
     font-weight: bold;
 }
 
@@ -262,11 +262,13 @@ input:checked+.slider:before {
 
 #div_pion input:disabled,
 #div_model input:disabled,
+#div_model input[readonly],
 #div_pion select:disabled,
 #div_model select:disabled,
 #div_pion textarea:disabled,
 #div_model textarea:disabled {
-    background-color: lightgray;
+    background-color: rgb(192, 192, 192);
+    color: black;
 }
 
 #couts_table td:nth-child(2),
@@ -308,15 +310,15 @@ input:checked+.slider:before {
 #couts_table tr:nth-child(even) td,
 #div_model_4 table tr:nth-child(even) td,
 #div_model_6 table tr:nth-child(even) td {
-    background-color: lightgray;
-    color: black;
+    background-color: rgb(192, 192, 192);
+    color: rgb(20, 20, 20);
 }
 
 #couts_table tr:nth-child(odd) td,
 #div_model_4 table tr:nth-child(odd) td,
 #div_model_6 table tr:nth-child(odd) td,
 #div_model_6 table tr td:nth-child(1) {
-    background-color: black;
+    background-color: rgb(20, 20, 20);
     color: white;
 }
 

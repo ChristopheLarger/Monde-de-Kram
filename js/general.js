@@ -166,7 +166,11 @@ class Login {
         }
 
         // Ajouter le pion du joueur à la liste des alliés
-        Pion.add("allies", result[1], 0);
+        const p = new Pion();
+        p.mise_a_jour_pion("allies", result[1], 0);
+        Pions.push(p);
+        p.sendMessage("copy", p);
+
         return true;
     }
 }
@@ -438,7 +442,10 @@ document.getElementById("joueur").addEventListener("change", function (event) {
         if (document.getElementById(("chat_" + joueur).toLowerCase()) === null) {
             Messages.write_chat(joueur.value, "");
         }
-        p = Pion.add("allies", joueur.value, 0);
+        p = new Pion();
+        p.mise_a_jour_pion("allies", joueur.value, 0);
+        Pions.push(p);
+        p.sendMessage("copy", p);
         Login.sendMessage();
     }
 

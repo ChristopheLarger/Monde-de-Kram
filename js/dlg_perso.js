@@ -18,19 +18,19 @@ function info_armes() {
 
   // Bonus de competence d'arme
   if (m_pion.Arme1 !== "" && m_pion.Arme1 !== "Lancement de sort")
-    score1 = m_pion.get_score("Attaque_1");
+    score1 = m_pion.get_stat_combat("Attaque_1");
   if (m_pion.Arme2 !== "" && m_pion.Arme2 !== "Lancement de sort")
-    score2 = m_pion.get_score("Attaque_2");
+    score2 = m_pion.get_stat_combat("Attaque_2");
 
   // Malus d'escrime pour combat à deux armes
   if (score1 !== null && score2 !== null) {
     if (m_pion.Arme1 !== "Bouclier" && m_pion.Arme2 !== "Bouclier") {
       if (m_pion.Arme1 === "Dague" || m_pion.Arme2 === "Dague") {
-        score1 -= Math.max(2 - m_pion.get_score("Escrime"), 0);
-        score2 -= Math.max(2 - m_pion.get_score("Escrime"), 0);
+        score1 -= Math.max(2 - m_pion.get_stat_combat("Escrime"), 0);
+        score2 -= Math.max(2 - m_pion.get_stat_combat("Escrime"), 0);
       } else {
-        score1 -= Math.max(6 - m_pion.get_score("Escrime"), 0);
-        score2 -= Math.max(6 - m_pion.get_score("Escrime"), 0);
+        score1 -= Math.max(6 - m_pion.get_stat_combat("Escrime"), 0);
+        score2 -= Math.max(6 - m_pion.get_stat_combat("Escrime"), 0);
       }
     }
   }
@@ -63,6 +63,7 @@ function delete_etat(i) {
 /**
  * Affichage du détails des champs du pion lors de l'affichage de l'image zoom du pion
  */
+document.addEventListener("DOMContentLoaded", function () { initialise_pion(); });
 function initialise_pion() {
   /**
    * Callback pour la gestion des inputs des cases à cocher des zones de blessures
@@ -102,11 +103,15 @@ function initialise_pion() {
     set_nb_blessures();
   }
 
-  // Mise à jour des points de vie (général)
-  document.querySelector("#div_pion .general_pdv").addEventListener("input", function (event) {
-    m_pion.General = event.target.value;
-    set_nb_blessures();
-  });
+  if ((m_pion === null || typeof m_pion === "undefined") && (Pions.length > 0)) {
+    m_pion = Pions[0];
+    m_pion.selected = true;
+    m_pion.sendMessage("selected");
+    affiche_pion();
+    Map.generateHexMap();
+    Map.drawHexMap();
+    Map.drawHexMap(true);
+  }
 
   ["general", "tete", "brasg", "brasd", "poitrine", "abdomen", "jambeg", "jambed"].forEach(zone => {
     document.querySelector("#div_pion ." + zone + "_X1").addEventListener("input", input_cb_blessures);
@@ -117,31 +122,31 @@ function initialise_pion() {
       const zone = event.target.classList.item(0).replace("_pdv", "");
       const cible = zone.charAt(0).toUpperCase() + zone.slice(1);
       m_pion[cible] = event.target.value;
+      m_pion.sendMessage(zone + "_pdv");
       set_nb_blessures();
-    });
-
-    document.querySelector("#div_pion ." + zone + "_armure").addEventListener("input", function (event) {
-      const zone = event.target.classList.item(0).replace("_armure", "");
-      m_pion["Armure_" + zone] = event.target.value;
-      document.querySelector("#div_pion .general_armure").value = m_pion.armure_generale();
     });
   });
 
   // Mise à jour de la concentration et de la fatigue
   document.querySelector("#div_pion .concentration").addEventListener("input", function (event) {
     m_pion.Concentration = event.target.value;
+    m_pion.sendMessage("Concentration");
   });
 
   document.querySelector("#div_pion .fatigue").addEventListener("input", function (event) {
     m_pion.Fatigue = event.target.value;
+    m_pion.sendMessage("Fatigue");
   });
 
   // Mise à jour du nom et de l'allié
   document.querySelector("#div_pion .nom").addEventListener("input", function (event) {
     m_pion.Titre = event.target.value;
+    m_pion.sendMessage("Titre");
   });
+
   document.querySelector("#div_pion .allie").addEventListener("input", function (event) {
     m_pion.Type = event.target.checked ? "allies" : "ennemis";
+    m_pion.sendMessage("Type");
     Map.generateHexMap();
     Map.drawHexMap();
   });
@@ -152,17 +157,10 @@ function initialise_pion() {
     affiche_model();
   });
 
-  document.querySelector("#div_pion .modele").addEventListener("input", function (event) {
-    m_pion.Model = event.target.value;
-    document.querySelector("#div_pion .arme_principale").click();
-    affiche_pion();
-    Map.generateHexMap();
-    Map.drawHexMap();
-  });
-
   // Mise à jour de l'auto
   document.querySelector("#div_pion .auto").addEventListener("input", function (event) {
     m_pion.Auto = event.target.checked;
+    m_pion.sendMessage("Auto");
     Map.generateHexMap();
     Map.drawHexMap();
   });
@@ -201,11 +199,18 @@ function initialise_pion() {
       m_pion.Incantation = 0;
       m_pion.Fatigue_sort = 0;
       m_pion.Concentration_sort = 0;
+      m_pion.sendMessage("Nom_liste");
+      m_pion.sendMessage("Nom_sort");
+      m_pion.sendMessage("Incantation");
+      m_pion.sendMessage("Fatigue_sort");
+      m_pion.sendMessage("Concentration_sort");
     }
 
     // Mise à jour des armes sélectionnées
     m_pion.Arme1 = arme1.value;
     m_pion.Arme2 = arme2.value;
+    m_pion.sendMessage("Arme1");
+    m_pion.sendMessage("Arme2");
 
     // Mise à jour de l'information affichée
     info_armes();
@@ -216,12 +221,14 @@ function initialise_pion() {
   // Mise à jour de l'arme secondaire
   document.querySelector("#div_pion .arme_secondaire").addEventListener("change", function (event) {
     m_pion.Arme2 = event.target.value;
+    m_pion.sendMessage("Arme2");
     info_armes();
   });
 
   // Mise à jour de la note
   document.querySelector("#div_pion .note").addEventListener("input", function (event) {
     m_pion.Note = event.target.value;
+    m_pion.sendMessage("Note");
   });
 
   // Action sur le bouton de duplication du personnage
@@ -363,27 +370,27 @@ function set_nb_blessures() {
         document.querySelector("#div_pion ." + zone).style.backgroundColor = 'lightcoral';
       }
       else {
-        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'black';
+        document.querySelector("#div_pion ." + zone).style.backgroundColor = 'rgb(20, 20, 20)';
       }
     }
     else {
-      document.querySelector("#div_pion ." + zone).style.backgroundColor = 'black';
+      document.querySelector("#div_pion ." + zone).style.backgroundColor = 'rgb(20, 20, 20)';
     }
   });
 
   // Vérification de l'aptitude au combat
-  let apte = nb_blessures < model_object.Nb_blessures_max;
+  let apte = nb_blessures < model_object.get("nb_blessures_max");
 
   if (document.querySelector("#div_pion .tete_X2").checked) apte = false;
   if (document.querySelector("#div_pion .poitrine_X2").checked) apte = false;
   if (document.querySelector("#div_pion .abdomen_X2").checked) apte = false;
 
   document.querySelector("#div_pion .msg_aptitude").textContent = apte ? "Apte au combat" : "Inapte au combat";
-  document.querySelector("#div_pion .msg_aptitude").style.color = apte ? "blue" : "red";
+  document.querySelector("#div_pion .msg_aptitude").style.color = apte ? "rgb(64, 64, 230)" : "red";
 }
 
 /**
- * Rafraîchit les détails du pion dans la fenetre de zoom
+ * Rafraîchit les détails du pion dans la fenetre de dialogue
  */
 function affiche_pion(col = null, row = null) {
   m_model = null;
@@ -401,45 +408,22 @@ function affiche_pion(col = null, row = null) {
 
   // Mise à jour des seuils de blessures, nombre de blessures max et aptitude
   document.querySelector("#div_pion .seuil_blessures").value = model_object.get("seuil_blessures");
-  document.querySelector("#div_pion .nb_blessures_max").value = model_object.Nb_blessures_max;
+  document.querySelector("#div_pion .nb_blessures_max").value = model_object.get("nb_blessures_max");
 
-  // Mise à jour des points de vie et de l'armure (général)
+  // Mise à jour des points de vie et de l'armure
   document.querySelector("#div_pion .general_pdv").value = m_pion.General;
-  document.querySelector("#div_pion .general_armure").value = m_pion.armure_generale();
+  document.querySelector("#div_pion .general_armure").value = model_object.getArmureGenerale();
 
-  // Mise à jour des points de vie et de l'armure (tête)
-  document.querySelector("#div_pion .tete_pdv").value = m_pion.Tete;
-  document.querySelector("#div_pion .tete_armure").value = m_pion.Armure_tete;
-
-  // Mise à jour des points de vie et de l'armure (bras gauche)
-  document.querySelector("#div_pion .brasg_pdv").value = m_pion.Brasg;
-  document.querySelector("#div_pion .brasg_armure").value = m_pion.Armure_brasg;
-
-  // Mise à jour des points de vie et de l'armure (bras droit)
-  document.querySelector("#div_pion .brasd_pdv").value = m_pion.Brasd;
-  document.querySelector("#div_pion .brasd_armure").value = m_pion.Armure_brasd;
-
-  // Mise à jour des points de vie et de l'armure (poitrine)
-  document.querySelector("#div_pion .poitrine_pdv").value = m_pion.Poitrine;
-  document.querySelector("#div_pion .poitrine_armure").value = m_pion.Armure_poitrine;
-
-  // Mise à jour des points de vie et de l'armure (abdomen)
-  document.querySelector("#div_pion .abdomen_pdv").value = m_pion.Abdomen;
-  document.querySelector("#div_pion .abdomen_armure").value = m_pion.Armure_abdomen;
-
-  // Mise à jour des points de vie et de l'armure (jambes gauche)
-  document.querySelector("#div_pion .jambeg_pdv").value = m_pion.Jambeg;
-  document.querySelector("#div_pion .jambeg_armure").value = m_pion.Armure_jambeg;
-
-  // Mise à jour des points de vie et de l'armure (jambes droite)
-  document.querySelector("#div_pion .jambed_pdv").value = m_pion.Jambed;
-  document.querySelector("#div_pion .jambed_armure").value = m_pion.Armure_jambed;
+  ["tete", "brasg", "brasd", "poitrine", "abdomen", "jambeg", "jambed"].forEach(zone => {
+    document.querySelector("#div_pion ." + zone + "_pdv").value = m_pion[zone.charAt(0).toUpperCase() + zone.slice(1)];
+    document.querySelector("#div_pion ." + zone + "_armure").value = model_object["Armure_" + zone];
+  });
 
   set_nb_blessures();
 
   // Mise à jour de la concentration et de la fatigue
   document.querySelector("#div_pion .concentration").value = m_pion.Concentration;
-  document.querySelector("#div_pion .concentration_max").value = model_object.Concentration;
+  document.querySelector("#div_pion .concentration_max").value = model_object.get("concentration");
   document.querySelector("#div_pion .fatigue").value = m_pion.Fatigue;
   document.querySelector("#div_pion .fatigue_max").value = model_object.get("fatigue");
 
@@ -543,12 +527,15 @@ function affiche_pion(col = null, row = null) {
   document.querySelector("#div_pion .note").value = m_pion.Note;
 
   // Mise à jour du sortilège sélectionné
-  if (m_pion.Nom_sort &&
+  if (m_pion.Nom_sort !== null &&
+    m_pion.Nom_sort !== undefined &&
     m_pion.Nom_sort !== "" &&
-    m_pion.Nom_sort !== "0" &&
-    m_pion.Nom_liste &&
+    m_pion.Nom_sort !== "null" &&
+    m_pion.Nom_liste !== null &&
+    m_pion.Nom_liste !== undefined &&
     m_pion.Nom_liste !== "" &&
-    m_pion.Nom_liste !== "0") {
+    m_pion.Nom_liste !== "null") {
+
     const sort = Sorts.find((s) =>
       s.Nom_liste === m_pion.Nom_liste &&
       s.Nom_sort === m_pion.Nom_sort);
@@ -680,10 +667,12 @@ function initialise_new_pion() {
     const row = dialog_new_pion.querySelector("#row");
 
     // Création du nouveau pion
-    m_pion = new Pion("ennemis", model.value);
+    m_pion = new Pion();
+    m_pion.mise_a_jour_pion("ennemis", model.value);
 
     // Positionnement du pion
     m_pion.Position = col.value + "," + row.value;
+    m_pion.sendMessage("Position");
     Pions[Pions.length] = m_pion;
 
     // Synchronisation avec le serveur
@@ -913,9 +902,22 @@ function initialise_model_0() {
   });
 
   document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
+    input.addEventListener("click", function (event) {
+      if (!input.className.includes("_score")) return;
+      affiche_interactions(0, input.className.replace("_score", ""));
+    });
+  });
+
+  document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
     input.addEventListener("input", function (event) {
       const attribut = event.target.className.replace("_base", "").replace("_experience", "").replace("_race", "");
       const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+
+      if (attribut === "nb_blessures_max") {
+        m_model.Nb_blessures_max = event.target.value;
+        m_model.sendMessage("set_Nb_blessures_max", m_model.Nb_blessures_max);
+        return;
+      }
 
       const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
       const target_exp = document.querySelector("#div_model_0 ." + attribut + "_experience");
@@ -1006,7 +1008,6 @@ function initialise_model_0() {
  * Initialise les événements de la section Monstres du modèle
  */
 function initialise_model_1() {
-
   document.querySelector("#div_model_1 .bool_parade_1_monstre").addEventListener("change", function (event) {
     document.querySelector("#div_model_1 .parade_1_monstre").disabled = !event.target.checked;
   });
@@ -1045,6 +1046,24 @@ function initialise_model_1() {
 
       if (attribut in m_model) m_model[attribut] = event.target.checked ? 1 : 0;
       else console.error("Attribut du modèle non trouvé : ", attribut);
+    });
+  });
+
+  document.querySelectorAll("#div_model_1 input[type=text]").forEach((input) => {
+    input.addEventListener("input", function (event) {
+      if (input.className === "nb_blessures_max") {
+        m_model.Nb_blessures_max = event.target.value;
+        m_model.sendMessage("set_Nb_blessures_max", m_model.Nb_blessures_max);
+        return;
+      }
+      const attribut = event.target.className.replace("_monstre", "");
+      const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+
+      if (att_name in m_model) {
+        m_model[att_name] = event.target.value;
+        m_model.sendMessage("set_" + att_name, event.target.value);
+      }
+      else console.error("Attribut du modèle non trouvé : ", att_name);
     });
   });
 }
@@ -1450,6 +1469,14 @@ function initialise_model_5() {
     }
   });
 
+  document.querySelectorAll("#div_model_5 input[type=text]").forEach((input) => {
+    input.addEventListener("click", function (event) {
+      if (input.className !== "score") return;
+      const cmp = input.closest("tr").querySelectorAll("td")[0].textContent.split(" :")[0];
+      affiche_interactions(5, cmp);
+    });
+  });
+
   document.querySelectorAll("#div_model_5 .degres").forEach((degres) => {
     degres.addEventListener("change", function (event) {
       const Nom_competence = event.target.closest("tr").classList.item(0);
@@ -1513,6 +1540,7 @@ function initialise_model_6() {
  * Initialisation du modèle PJ
  * @returns {void}
  */
+document.addEventListener("DOMContentLoaded", function () { initialise_model(); });
 function initialise_model() {
   initialise_model_X();
   initialise_model_0();
@@ -1682,6 +1710,15 @@ function affiche_model() {
     attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
     if (attribut in m_model) input.checked = m_model[attribut];
     else console.error("Attribut du modèle non trouvé : ", attribut);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+
+  // Remplissage des champs checkbox du modèle monstre
+  document.querySelectorAll("#div_model_1 input[type=text]").forEach((input) => {
+    const attribut = input.className.replace("_monstre", "");
+    const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
+    if (att_name in m_model) input.value = m_model[att_name];
+    else console.error("Attribut du modèle non trouvé : ", att_name);
   });
 
   // Remplissage des champs texte du modèle humanoide
@@ -1786,11 +1823,11 @@ function initialise_interactions() {
     if (event.target.checked) marge = parseInt(marge) + 4;
     else marge = parseInt(marge) - 4;
     document.querySelector('#div_interactions .marge').value = marge;
-  
+
     if (marge >= 0) document.querySelector('#div_interactions .marge').style.backgroundColor = "lightgreen";
     else document.querySelector('#div_interactions .marge').style.backgroundColor = "lightcoral";
   });
-  
+
   document.querySelector('#div_interactions .chance').addEventListener("click", function (event) {
     const jet_des_0 = parseInt(document.querySelector('#div_interactions .jet_des').value);
     const jet_des_1 = LancerDes.rollDice("3D6");
@@ -1799,7 +1836,7 @@ function initialise_interactions() {
     const jet_des_max = Math.max(jet_des_0, jet_des_1, jet_des_2, jet_des_3, 13);
     const jet_des_min = Math.min(jet_des_0, jet_des_1, jet_des_2, jet_des_3, 8);
     const type = parseInt(document.querySelector('#div_interactions .type').value);
-  
+
     let score = parseInt(document.querySelector('#div_interactions .score').value);
     let marge = 0;
     if (type === 0) { // Il s'agit d'un jet de caractéristique
@@ -1811,9 +1848,9 @@ function initialise_interactions() {
       marge = jet_des_max + score - 10;
     }
     if (document.querySelector('#div_interactions .heroisme').checked) marge += 4;
-  
+
     document.querySelector('#div_interactions .marge').value = marge;
-  
+
     if (marge >= 0) document.querySelector('#div_interactions .marge').style.backgroundColor = "lightgreen";
     else document.querySelector('#div_interactions .marge').style.backgroundColor = "lightcoral";
   });
@@ -1833,7 +1870,7 @@ function affiche_interactions(type, nom) {
 
   const jet_des = LancerDes.rollDice("3D6");
   document.querySelector('#div_interactions .jet_des').value = jet_des;
-  
+
   let score = 0;
   let marge = 0;
   if (type === 0) { // Il s'agit d'un jet de caractéristique
