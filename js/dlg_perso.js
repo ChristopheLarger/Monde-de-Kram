@@ -289,12 +289,12 @@ function initialise_pion() {
     });
 
     [pion, model].forEach((panel) => {
-      panel.style.height = (hauteur + 34) + "px"; // Pourquoi le +34 est-il nécessaire ?
+      panel.style.height = (hauteur + 35) + "px"; // Pourquoi le +35 est-il nécessaire ?
     });
 
     // Réaffichage des zone à scroll vertical et dimensionnement du textarea
     document.querySelector("#div_model_1 .capacites_monstre").style.display = "";
-    document.querySelector("#div_model_1 .capacites_monstre").style.height = (hauteur - h[1] + 34 - 9) + "px";
+    document.querySelector("#div_model_1 .capacites_monstre").style.height = (hauteur - h[1] + 35 - 9) + "px";
 
     document.querySelector("#div_model_5 .competences").style.display = "";
     document.querySelector("#div_model_5 .competences").style.height = (hauteur - h[2] - 9) + "px";

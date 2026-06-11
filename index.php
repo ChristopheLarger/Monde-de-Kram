@@ -18,8 +18,8 @@
     <script src="js/pion.js"></script> <!-- Classes pour les pions -->
     <script src="js/arme.js"></script> <!-- Classes pour les armes -->
     <script src="js/divers.js"></script> <!-- Classes diverses -->
-    <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale et des pions -->
-    <script src="js/forme.js"></script> <!-- Gestion des formes géométriques -->
+    <script src="js/map.js"></script> <!-- Gestion de la carte hexagonale -->
+    <script src="js/terrain.js"></script> <!-- Gestion des terrains -->
     <script src="js/general.js"></script> <!-- Fonctions générales et communication WebSocket -->
     <script src="js/magie.js"></script> <!-- Système de magie -->
     <script src="js/combat.js"></script> <!-- Système de combat -->

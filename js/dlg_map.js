@@ -256,11 +256,11 @@ function affiche_dim_carte() {
 document.addEventListener("mouseover", function (event) {
     if (["rocher", "arbre", "eau", "gomme_t",
       "rectangle", "ellipse", "mur", "scission", "gomme_f",
-      "coordonnees", "forme_color", "portee_vue"].includes(event.target.id)) {
+      "coordonnees", "forme_color_btn", "portee_vue"].includes(event.target.id)) {
       tooltip.style.left = event.clientX + 10 + "px";
       tooltip.style.top = event.clientY + 10 + "px";
       tooltip.style.display = "block";
-      if (event.target.id === "forme_color") {
+      if (event.target.id === "forme_color_btn") {
         tooltip.innerHTML = "Couleur de la forme";
       } else {
         tooltip.innerHTML = event.target.alt;
@@ -272,7 +272,7 @@ document.addEventListener("mouseover", function (event) {
   document.addEventListener("mouseout", function (event) {
     if (["rocher", "arbre", "eau", "gomme_t",
       "rectangle", "ellipse", "mur", "scission", "gomme_f",
-      "coordonnees", "forme_color"].includes(event.target.id)) {
+      "coordonnees", "forme_color_btn"].includes(event.target.id)) {
       tooltip.style.display = "none";
     }
   });

@@ -6,13 +6,20 @@
  */
 
 // === RÉFÉRENCES DOM ===
+// === GESTION DE LA COULEUR DES FORMES ===
+const palette_de_couleurs = [
+    "#000000", "#333333", "#666666", "#999999", "#CCCCCC", "#FFFFFF", "#8B4513", "#D2691E",
+    "#8B0000", "#FF0000", "#FF6600", "#FFD700", "#FFFF00", "#ADFF2F", "#00FF00", "#006400",
+    "#00FFFF", "#00BFFF", "#0000FF", "#000080", "#4B0082", "#8B00FF", "#FF00FF", "#FF1493",
+    "#A0522D", "#F4A460", "#DEB887", "#556B2F", "#228B22", "#2F4F4F", "#4682B4", "#87CEEB"
+];
 // Éléments d'interface utilisateur
 const tooltip = document.getElementById("tooltip");                    // Tooltip pour afficher des informations
 const canvas_color = document.getElementById("canvas_color");          // Sélecteur de couleur pour le canvas
 const forme_color = document.getElementById("forme_color");            // Sélecteur de couleur pour les formes
 const canvas = document.getElementById("hexCanvas");                   // Canvas principal pour la carte
 const canvas_selected = document.getElementById("hexCanvas_selected"); // Canvas pour les sélections
-const canvas_zoom = document.getElementById("hexCanvas_zoom");         // Canvas pour les sélections
+// const canvas_zoom = document.getElementById("hexCanvas_zoom");         // Canvas pour les sélections
 
 // === PARAMÈTRES DE LA CARTE ===
 // Dimensions et espacement des hexagones
@@ -36,32 +43,16 @@ let isDragging_right = false;               // Glissement avec clic droit
 
 // Modes d'interaction
 let isMode_terrain = false;                 // Mode placement de terrain
-let isMode_forme = false;                   // Mode placement de formes
 let type_terrain = "";                      // Type de terrain sélectionné
-let type_forme = "";                        // Type de forme sélectionné
-let old_forme = "";                         // Ancien type de forme
 let isMode_coordonnees = false;             // Mode affichage des coordonnées
 
 // Variables de position et interface
 let lastMouseX = 0, lastMouseY = 0;         // Dernière position de la souris
-let last_forme_color = "#000000";           // Dernière couleur de forme utilisée
 let default_cursor = "default";             // Curseur par défaut
-let index_forme_zoom = null;                // Index de la forme en cours de zoom
-let index_forme_move = null;                // Index de la forme en cours de déplacement
-let sommet = null;                          // Sommet d'une forme en cours de modification
 let hexMap = new Array;                     // Tableau contenant la grille d'hexagones
 
-// === IMAGES DE TERRAIN ===
-// images pour les différents types de terrain
-const image_rocher = new Image();
-image_rocher.src = "images/Rocher.png";
-const image_arbre = new Image();
-image_arbre.src = "images/Arbre.png";
-const image_eau = new Image();
-image_eau.src = "images/Eau.png";
-
 // === IMAGES DE PIONS ===
-// images pour les différents types de pions
+// images utilisées pour les différents types de pions
 const image_auto = new Image();
 image_auto.src = "images/Auto.png";
 
@@ -101,18 +92,18 @@ class Map {
      * Traite les messages reçus via WebSocket
      * @param {string} data - Message reçu du serveur
      */
-    static receiveMessage(data) {
-        const regex = /^MJ: Mode_coordonnees ([0-1])$/;
-        const result = data.match(regex);
-        if (!result) return false;
+    // static receiveMessage(data) {
+    //     const regex = /^MJ: Mode_coordonnees ([0-1])$/;
+    //     const result = data.match(regex);
+    //     if (!result) return false;
 
-        isMode_coordonnees = (result[1] === "1") ? true : false;
+    //     isMode_coordonnees = (result[1] === "1") ? true : false;
 
-        Map.generateHexMap();
-        Map.drawHexMap();
+    //     Map.generateHexMap();
+    //     Map.drawHexMap();
 
-        return true;
-    }
+    //     return true;
+    // }
 
     /**
      * Vérifie si une case est visible par les alliés
@@ -137,7 +128,6 @@ class Map {
 
     static get_ColRow(x, y) {
         // Calculer la colonne approximative
-        // Utiliser Math.floor au lieu de Math.round pour les valeurs négatives pour éviter les arrondis incorrects
         let col;
         if (x >= 0) {
             col = Math.round(x / hexHSpacing);
@@ -147,8 +137,6 @@ class Map {
         }
 
         // Pour la ligne, on doit tenir compte du décalage des colonnes impaires
-        // La formule inverse de get_XY : y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0)
-        // Donc : row = (y - ((col % 2 != 0) ? hexVSpacing / 2 : 0)) / hexVSpacing
         const yAdjusted = y - ((col % 2 != 0) ? hexVSpacing / 2 : 0);
         let row;
         if (yAdjusted >= 0) {
@@ -353,9 +341,7 @@ class Map {
                 if (!isInBrouillard) {
                     color = "rgb(255, 255, 255)";
                     Terrains.filter(t => t.Position === col + "," + row).forEach(t => {
-                        if (t.Model === "Rocher") color = "rgb(192, 192, 192)";
-                        else if (t.Model === "Arbre") color = "rgb(128, 255, 128)";
-                        else if (t.Model === "Eau") color = "rgb(0, 255, 255)";
+                        color = t.color;
                     });
 
                     // Définition de la couleur de l'hexagone en fonction du type de pion
@@ -381,7 +367,16 @@ class Map {
         }
     }
 
-    // On dessine un hexagone.
+    /**
+     * Dessine un hexagone sur le canvas
+     * @param {number} x - Coordonnée X du centre de l'hexagone
+     * @param {number} y - Coordonnée Y du centre de l'hexagone
+     * @param {string} color - Couleur de l'hexagone
+     * @param {boolean} strie - Si true, l'hexagone est strié
+     * @param {string} text - Texte à afficher sur l'hexagone
+     * @param {boolean} isInBrouillard - Si true, l'hexagone est dans le brouillard
+     * @param {boolean} selected - Si true, l'hexagone est sélectionné
+     */
     static drawHexagon(x, y, color, strie, text, isInBrouillard, selected = false) {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
@@ -425,7 +420,7 @@ class Map {
 
         // On dessine le contour de l'hexagone.
         ctx.strokeStyle = "rgb(20, 20, 20)";
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1;
         ctx.stroke();
 
         // On dessine l'image au centre de l'hexagone
@@ -468,18 +463,9 @@ class Map {
             // On dessine l'image au centre de l'hexagone (proportions conservées)
             const imgSize = hexSize * 1.2;
             const p = Pions.find(q => q.Position === text);
-            const t = Terrains.find(r => r.Position === text)
             if (p != null && typeof p != "undefined") {
                 const m = Models.find(n => n.Nom_model === p.Model);
                 Map.drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
-                // if (p.Concentration > 0) {
-                // ctx.drawImage(
-                //     image_mage,
-                //     x + hexSize * Math.cos(2 * Math.PI / 3) - imgSize / 9,
-                //     y - hexSize * Math.sin(2 * Math.PI / 3),
-                //     imgSize / 3,
-                //     imgSize / 3);
-                // }
                 if (p.Auto) {
                     ctx.drawImage(
                         image_auto,
@@ -488,15 +474,6 @@ class Map {
                         imgSize / 3,
                         imgSize / 3);
                 }
-            }
-            else if (t != null && typeof t != "undefined" && t.Model === "Rocher") {
-                ctx.drawImage(image_rocher, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-            }
-            else if (t != null && typeof t != "undefined" && t.Model === "Arbre") {
-                ctx.drawImage(image_arbre, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
-            }
-            else if (t != null && typeof t != "undefined" && t.Model === "Eau") {
-                ctx.drawImage(image_eau, x - imgSize / 2, y - imgSize / 2, imgSize, imgSize);
             }
 
             // On ajoute l'indice sur l'image le cas échéant
@@ -513,53 +490,6 @@ class Map {
         }
 
         if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
-            // On définit un clip pour ne dessiner que dans l'hexagone
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(points[0].dx, points[0].dy);
-            for (let i = 1; i < points.length; i++) {
-                ctx.lineTo(points[i].dx, points[i].dy);
-            }
-            ctx.closePath();
-            ctx.clip();
-
-            // Dessine les formes rectangulaires du MJ
-            Formes.filter(rect => (rect.type === "Rectangle" || rect.type === "Mur")).forEach(r => {
-                ctx.save(); // Sauvegarder l'état pour isoler les transformations de ce rectangle
-                ctx.translate(r.x + r.width / 2, r.y + r.height / 2);
-                ctx.rotate(r.theta);
-                ctx.lineWidth = 5;
-                if (r.type === "Mur") {
-                    ctx.fillStyle = r.color;
-                    ctx.fillRect(- r.width / 2, - r.height / 2, r.width, r.height);
-                }
-                else {
-                    ctx.strokeStyle = r.color;
-                    ctx.strokeRect(- r.width / 2, - r.height / 2, r.width, r.height);
-                }
-                ctx.restore(); // Restaurer l'état pour le rectangle suivant
-            });
-
-            // Dessine les formes elliptiques du MJ
-            Formes.filter(e => e.type === "Ellipse").forEach(e => {
-                ctx.save(); // Sauvegarder l'état pour isoler les transformations de cette ellipse
-                ctx.translate(e.x, e.y);
-                ctx.rotate(e.theta);
-                ctx.lineWidth = 5;
-                ctx.strokeStyle = e.color;
-                ctx.beginPath();
-                ctx.ellipse(
-                    0, // x
-                    0, // y
-                    Math.abs(e.width) / 2, // rayonX
-                    Math.abs(e.height) / 2, // rayonY
-                    0, // rotation
-                    0, // Angle de départ
-                    Math.PI * 2); // Angle final
-                ctx.stroke();
-                ctx.restore(); // Restaurer l'état pour l'ellipse suivante
-            });
-            ctx.restore(); // Supprime le clip
             // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
             ctx.lineWidth = 2;
             ctx.strokeStyle = "rgb(20, 20, 20)";
@@ -575,6 +505,16 @@ class Map {
         }
     }
 
+    /**
+     * Dessine du texte sur le canvas
+     * @param {string} text - Texte à afficher
+     * @param {number} fontSize - Taille de la police
+     * @param {number} x - Coordonnée X du texte
+     * @param {number} y - Coordonnée Y du texte
+     * @param {string} background - Couleur de fond
+     * @param {string} color - Couleur du texte
+     * @param {string} textAlign - Alignement du texte
+     */
     static drawText(text, fontSize, x, y, background = "", color = "rgb(20, 20, 20)", textAlign = "center") {
         if (text === "") return;
         const ctx = canvas_zoom.getContext("2d");
@@ -618,8 +558,6 @@ class Map {
         function get_height() {
             let h = window.innerHeight;
             h -= document.getElementById("div_cartouche").offsetHeight;
-            h -= document.getElementById("table_dialogue").offsetHeight;
-            h -= document.getElementById("div_tools").offsetHeight;
             h -= 18;
             return h;
         }
@@ -680,27 +618,11 @@ class Map {
                 hex.isInBrouillard);
         });
 
-        if (isMode_forme && type_forme === "ellipse") {
-            // Dessiner l'ellipse de sélection par-dessus les hexagones
-            ctx.beginPath();
-            ctx.ellipse(SelectRectangle.x, // x
-                SelectRectangle.y, // y
-                Math.abs(SelectRectangle.width) / 2, // rayonX
-                Math.abs(SelectRectangle.height) / 2, // rayonY
-                0, // rotation
-                0, // Angle de départ
-                Math.PI * 2); // Angle final
-            ctx.strokeStyle = SelectRectangle.color;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-        }
-        else {
-            // Dessiner le rectangle de sélection par-dessus les hexagones
-            ctx.beginPath();
-            ctx.strokeStyle = SelectRectangle.color;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(SelectRectangle.x, SelectRectangle.y, SelectRectangle.width, SelectRectangle.height);
-        }
+        // Dessiner le rectangle de sélection par-dessus les hexagones
+        ctx.beginPath();
+        ctx.strokeStyle = SelectRectangle.color;
+        ctx.lineWidth = 1;
+        ctx.strokeRect(SelectRectangle.x, SelectRectangle.y, SelectRectangle.width, SelectRectangle.height);
     }
 
     /**
@@ -709,20 +631,6 @@ class Map {
      * @param {number} row - Ligne de la case
      */
     static update_tooltip(col, row) {
-        const p = Pions.find(x => x.Position === col + "," + row);
-
-        // Masquer le tooltip en mode forme ou terrain
-        if (isMode_forme || isMode_terrain) {
-            tooltip.style.display = "none";
-            return;
-        }
-
-        // On ne montre pas le tooltip dans le cas d'un affichage zoom de l'hexagone
-        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") &&
-            p != null && typeof p != "undefined") {
-            return;
-        }
-
         tooltip.style.display = "block";
         tooltip.innerHTML = "";
 
@@ -741,6 +649,9 @@ class Map {
         if (tooltip.innerHTML === "") tooltip.style.display = "none";
     }
 
+    /**
+     * Active ou désactive le mode affichage des coordonnées
+     */
     static setMode_coordonnees() {
         isMode_coordonnees = !isMode_coordonnees;
 
@@ -750,6 +661,9 @@ class Map {
         Map.drawHexMap();
     }
 
+    /**
+     * Définit la portée de vue des pions
+     */
     static setPortee_vue() {
         const portee_vue = parseInt(document.getElementById("portee_vue").value);
         if (portee_vue < 3) portee_vue = 3;
@@ -763,164 +677,6 @@ class Map {
         Map.drawHexMap();
     }
 }
-
-/**
- * Classe Terrain - Hérite de Map pour représenter les éléments de terrain
- * Gère les rochers, arbres, eau, etc. sur la carte
- */
-class Terrain extends Map {
-
-    /**
-     * Constructeur d'un terrain
-     * @param {string} type_terrain - Type de terrain (rocher, arbre, eau, etc.)
-     * @param {string} pos - Position en coordonnées hexagonales
-     */
-    constructor(type_terrain, pos) {
-        super();
-        this.Type = "terrains";
-        this.Model = type_terrain.substring(0, 1).toUpperCase() + type_terrain.substring(1);
-        this.Position = pos;
-        this.Selected = false;
-    }
-
-    /**
-     * Envoie un message via WebSocket pour synchroniser le terrain
-     * @param {string} tag - Type d'action ("add" ou "rmv")
-     */
-    sendMessage(tag) {
-        switch (tag.toLowerCase()) {
-            case "add":
-                sendMessage("Terrain_Add", this.Model + "@" + this.Position);
-                break;
-            case "rmv":
-                sendMessage("Terrain_Rmv", this.Model + "@" + this.Position);
-                break;
-        }
-    }
-
-    /**
-     * Traite un message reçu via WebSocket pour créer/supprimer un terrain
-     * @param {string} data - Message reçu du serveur
-     * @returns {boolean} - true si le message a été traité
-     */
-    static receiveMessage(data) {
-        var regex = new RegExp("^MJ: Terrain_([a-zA-Z0-9_]+) ([^@]*)@(.*)$");
-        var result = data.match(regex);
-        if (!result) return false;
-
-        const code = result[1];
-        const model = result[2];
-        const pos = result[3];
-
-        // Action selon le type de message
-        switch (code.toLowerCase()) {
-            case "add":
-                Terrain.add(model, pos);
-                return true;
-            case "rmv":
-                const t = Terrains.find(x => x.Position === pos);
-                t.rmv();
-                return true;
-            default:
-        }
-        return false;
-    }
-
-    /**
-     * Ajoute un terrain sur la carte
-     * @param {string} type_terrain - Type de terrain à ajouter
-     * @param {string} pos - Position où ajouter le terrain
-     */
-    static add(type_terrain, pos) {
-        let t = Terrains.find(x => x.Position === pos);
-
-        if (type_terrain === "gomme" && t != null && typeof t != "undefined") {
-            const index = Terrains.indexOf(t);
-            Terrains.splice(index, 1);
-        }
-        else if (t != null && typeof t != "undefined") {
-            t.Model = type_terrain.substring(0, 1).toUpperCase() + type_terrain.substring(1);
-        }
-        else if (type_terrain != "gomme") {
-            t = new Terrain(type_terrain, pos);
-            Terrains[Terrains.length] = t;
-        }
-
-        if (document.getElementById("joueur").value === "MJ") t.sendMessage("Add");
-
-        Map.generateHexMap();
-        Map.drawHexMap();
-    }
-
-    /**
-     * Supprime le terrain de la carte
-     */
-    rmv() {
-        const index = Terrains.indexOf(this);
-        if (document.getElementById("joueur").value === "MJ") this.sendMessage("Rmv");
-
-        Terrains.splice(index, 1);
-
-        Map.generateHexMap();
-        Map.drawHexMap();
-    }
-
-    /**
-     * Active/désactive le mode de placement de terrain
-     * @param {string} terrain - Type de terrain ("rocher", "arbre", "eau", "gomme")
-     */
-    static set_terrain(terrain) {
-        document.getElementById("rectangle").style.border = "none";
-        document.getElementById("ellipse").style.border = "none";
-        document.getElementById("mur").style.border = "none";
-        document.getElementById("scission").style.border = "none";
-        document.getElementById("gomme_f").style.border = "none";
-        isMode_forme = false;
-        type_forme = "";
-
-        if (terrain != "rocher")
-            document.getElementById("rocher").style.border = "none";
-        if (terrain != "arbre")
-            document.getElementById("arbre").style.border = "none";
-        if (terrain != "eau")
-            document.getElementById("eau").style.border = "none";
-        if (terrain != "gomme")
-            document.getElementById("gomme_t").style.border = "none";
-
-        let type = terrain;
-        if (terrain === "gomme") type = "gomme_t";
-
-        if (document.getElementById(type).style.border === "2px solid rgb(20, 20, 20)") {
-            document.getElementById(type).style.border = "none";
-            default_cursor = "default";
-            canvas.style.cursor = default_cursor;
-            isMode_terrain = false;
-            type_terrain = "";
-            return;
-        }
-        else
-            document.getElementById(type).style.border = "2px solid rgb(20, 20, 20)";
-
-        switch (terrain) {
-            case "rocher":
-                default_cursor = "url('images/Rocher.png') 24 24, auto";
-                break;
-            case "arbre":
-                default_cursor = "url('images/Arbre.png') 24 24, auto";
-                break;
-            case "eau":
-                default_cursor = "url('images/Eau.png') 24 24, auto";
-                break;
-            case "gomme":
-                default_cursor = "url('images/Gomme.png') 20 60, auto";
-                break;
-        }
-        canvas.style.cursor = default_cursor;
-        isMode_terrain = true;
-        type_terrain = terrain;
-    }
-}
-let Terrains = new Array;
 
 // ///////// //
 // Listeners //
@@ -980,217 +736,6 @@ canvas.addEventListener("mousedown", (event) => {
         // Mode gomme : suppression du terrain à la position cliquée
         if (t != null && typeof t != "undefined") t.rmv();
     }
-    else if (event.button === 0 && isMode_forme && type_forme === "scission") {
-        // Si mode Scission: procéder à la scission du mur
-        let is_find = false;
-        Formes.filter(x => x.type === "Mur").forEach(r => {
-            if (is_find) return;
-
-            is_find = r.isOnMur(mouseX, mouseY);
-            if (!is_find) return;
-
-            // Calculer le centre du rectangle original
-            const cx = r.x + r.width / 2;
-            const cy = r.y + r.height / 2;
-
-            // Transformer le point de la souris dans le repère local (centré, non-rotaté) du rectangle
-            const mousePoint = Forme.rotatePoint(mouseX, mouseY, cx, cy, -r.theta);
-
-            // Convertir en coordonnées locales centrées (comme fillRect(-width/2, -height/2, ...))
-            const mouseX_local = mousePoint.x - cx;
-            const mouseY_local = mousePoint.y - cy;
-
-            const r1 = new Forme("Mur",
-                { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
-            const r2 = new Forme("Mur",
-                { x: r.x, y: r.y, width: r.width, height: r.height, theta: r.theta, color: r.color });
-
-            // Calculer le coin supérieur gauche visuel de l'original
-            // Le coin supérieur gauche local est (-width/2, -height/2) dans le repère centré
-            const original_topLeft_local = { x: -r.width / 2, y: -r.height / 2 };
-            const original_topLeft_global = Forme.rotatePoint(
-                cx + original_topLeft_local.x,
-                cy + original_topLeft_local.y,
-                cx, cy, r.theta
-            );
-
-            if (r.width < r.height) {
-                // Scission horizontale
-                // Distance depuis le haut du rectangle (dans le repère local centré)
-                const cutY_local = mouseY_local - (-r.height / 2);
-                const r1_height = Math.max(0, cutY_local - hexSize);
-                const r2_height = Math.max(0, r.height - r1_height - 2 * hexSize);
-
-                // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
-                // Le coin supérieur gauche local de r1 est (-width/2, -r1_height/2) dans son repère centré
-                // On veut que ce point, après rotation de theta autour du centre de r1, soit à original_topLeft_global
-                // On inverse : original_topLeft_global - rotate((-width/2, -r1_height/2), theta) = centre de r1
-                const r1_topLeft_local = { x: -r.width / 2, y: -r1_height / 2 };
-                // Rotation inverse du coin local pour trouver où doit être le centre
-                const r1_topLeft_rotated = Forme.rotatePoint(
-                    r1_topLeft_local.x,
-                    r1_topLeft_local.y,
-                    0, 0, r.theta
-                );
-                // Le centre de r1 dans le repère global
-                const r1_centerX = original_topLeft_global.x - r1_topLeft_rotated.x;
-                const r1_centerY = original_topLeft_global.y - r1_topLeft_rotated.y;
-                // Le (x, y) de r1 dans le repère non-rotaté
-                r1.x = r1_centerX - r.width / 2;
-                r1.y = r1_centerY - r1_height / 2;
-                r1.height = Math.abs(r1_height);
-                r1.width = Math.abs(r.width);
-
-                // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
-                // Le coin inférieur de r1 dans le repère local centré est à y = -height/2 + r1_height
-                // Le coin supérieur de r2 doit être à y = -height/2 + r1_height + 2*hexSize
-                // Le centre de r2 dans le repère local centré est à y = -height/2 + r1_height + 2*hexSize + r2_height/2
-                const r2_centerY_local = -r.height / 2 + r1_height + 2 * hexSize + r2_height / 2;
-                const r2_centerX_local = 0; // Même x que l'original
-
-                // Convertir le centre local de r2 en coordonnées globales (après rotation)
-                const r2_center_global = Forme.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
-
-                // Le (x, y) de r2 dans le repère non-rotaté
-                r2.x = r2_center_global.x - r.width / 2;
-                r2.y = r2_center_global.y - r2_height / 2;
-                r2.width = Math.abs(r.width);
-                r2.height = Math.abs(r2_height);
-            }
-            else {
-                // Scission verticale
-                const cutX_local = mouseX_local - (-r.width / 2);
-                const r1_width = Math.max(0, cutX_local - hexSize);
-                const r2_width = Math.max(0, r.width - r1_width - 2 * hexSize);
-
-                // r1 : calculer son (x, y) pour que son coin supérieur gauche visuel = original
-                // Le coin supérieur gauche local de r1 est (-r1_width/2, -height/2) dans son repère centré
-                const r1_topLeft_local = { x: -r1_width / 2, y: -r.height / 2 };
-                // Rotation inverse du coin local pour trouver où doit être le centre
-                const r1_topLeft_rotated = Forme.rotatePoint(
-                    r1_topLeft_local.x,
-                    r1_topLeft_local.y,
-                    0, 0, r.theta
-                );
-                // Le centre de r1 dans le repère global
-                const r1_centerX = original_topLeft_global.x - r1_topLeft_rotated.x;
-                const r1_centerY = original_topLeft_global.y - r1_topLeft_rotated.y;
-                // Le (x, y) de r1 dans le repère non-rotaté
-                r1.x = r1_centerX - r1_width / 2;
-                r1.y = r1_centerY - r.height / 2;
-                r1.width = Math.abs(r1_width);
-                r1.height = Math.abs(r.height);
-
-                // Pour r2 : calculer son centre pour qu'il commence exactement où r1 se termine
-                const r2_centerX_local = -r.width / 2 + r1_width + 2 * hexSize + r2_width / 2;
-                const r2_centerY_local = 0; // Même y que l'original
-
-                // Convertir le centre local de r2 en coordonnées globales (après rotation)
-                const r2_center_global = Forme.rotatePoint(cx + r2_centerX_local, cy + r2_centerY_local, cx, cy, r.theta);
-
-                // Le (x, y) de r2 dans le repère non-rotaté
-                r2.x = r2_center_global.x - r2_width / 2;
-                r2.y = r2_center_global.y - r.height / 2;
-                r2.width = Math.abs(r2_width);
-                r2.height = Math.abs(r.height);
-            }
-
-            if (index_forme_zoom === Formes.indexOf(r)) index_forme_zoom = null;
-            if (index_forme_move === Formes.indexOf(r)) index_forme_move = null;
-
-            Formes.splice(Formes.indexOf(r), 1);
-            r.sendMessage("Rmv");
-            if (r1.width > 0 && r1.height > 0) {
-                Formes.push(r1);
-                r1.sendMessage("Add");
-            }
-            if (r2.width > 0 && r2.height > 0) {
-                Formes.push(r2);
-                r2.sendMessage("Add");
-            }
-        });
-    }
-    else if (event.button === 0 && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
-        // === MODE FORME : MODIFICATION ===
-        // Initialisation de la sélection de forme
-        SelectRectangle.x = mouseX;
-        SelectRectangle.y = mouseY;
-        SelectRectangle.width = 0;
-        SelectRectangle.height = 0;
-
-        index_forme_zoom = null;
-        index_forme_move = null;
-        let is_find = false;
-
-        // Vérification des rectangles pour modification
-        Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
-            if (is_find) return;
-
-            is_find = r.type === "Rectangle" ? r.isOnRectangle(mouseX, mouseY) : r.isOnMur(mouseX, mouseY);
-            if (!is_find) return;
-
-            old_forme = type_forme;
-            type_forme = r.type === "Rectangle" ? "rectangle" : "mur";
-            sommet = r.isOnSommetRectangle(mouseX, mouseY);
-            if (sommet != null) {
-                // Redimensionnement du rectangle
-                index_forme_zoom = Formes.indexOf(r);
-            }
-            else {
-                // Déplacement du rectangle
-                index_forme_move = Formes.indexOf(r);
-            }
-        });
-
-        // Vérification des ellipses pour modification
-        Formes.filter(x => x.type === "Ellipse").forEach(e => {
-            if (is_find) return;
-
-            is_find = e.isOnEllipse(mouseX, mouseY);
-            if (!is_find) return;
-
-            old_forme = type_forme;
-            type_forme = "ellipse";
-            sommet = e.isOnSommetEllipse(mouseX, mouseY);
-            if (sommet != null) {
-                // Redimensionnement de l'ellipse
-                index_forme_zoom = Formes.indexOf(e);
-            }
-            else {
-                // Déplacement de l'ellipse
-                index_forme_move = Formes.indexOf(e);
-            }
-        });
-    }
-    else if (event.button === 0 && isMode_forme) {
-        // === MODE FORME : SUPPRESSION () ===
-        SelectRectangle.x = mouseX;
-        SelectRectangle.y = mouseY;
-        SelectRectangle.width = 0;
-        SelectRectangle.height = 0;
-        isDragging_select = true;
-
-        let is_find = false;
-
-        // Suppression des rectangles à la position cliquée
-        Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
-            if (r.type === "Rectangle" && !r.isOnRectangle(mouseX, mouseY)) return;
-            if (r.type === "Mur" && !r.isOnMur(mouseX, mouseY)) return;
-            // Suppression du rectangle
-            r.sendMessage("Rmv");
-            if (!is_find) Formes.splice(Formes.indexOf(r), 1);
-            is_find = true;
-        });
-
-        // Suppression des ellipses à la position cliquée
-        Formes.filter(x => x.type === "Ellipse").forEach(e => {
-            if (!e.isOnEllipse(mouseX, mouseY)) return;
-            // Suppression de l'ellipse
-            e.sendMessage("Rmv");
-            if (!is_find) Formes.splice(Formes.indexOf(e), 1);
-            is_find = true;
-        });
-    }
     else if (event.button === 0 && event.ctrlKey && p != null && typeof p != "undefined" && myself === "MJ") {
         // === SÉLECTION MULTIPLE (CTRL + CLIC) ===
         // Ajout/suppression du pion de la sélection multiple
@@ -1221,35 +766,6 @@ canvas.addEventListener("mousedown", (event) => {
         SelectRectangle.height = 0;
         isDragging_select = true;
         Map.drawHexMap(true);
-    }
-    else if (event.button === 2 && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
-        // On fait pivoter une forme
-        event.preventDefault();
-
-        index_forme_move = null;
-        let is_find = false;
-
-        Formes.filter(f => f.type === "Rectangle" || f.type === "Mur").forEach(r => {
-            if (is_find) return;
-
-            is_find = r.isOnRectangle(mouseX, mouseY);
-            if (!is_find) return;
-
-            old_forme = type_forme;
-            type_forme = r.type === "Rectangle" ? "rectangle" : "mur";
-            index_forme_move = Formes.indexOf(r);
-        });
-
-        Formes.filter(f => f.type === "Ellipse").forEach(e => {
-            if (is_find) return;
-
-            is_find = e.isOnEllipse(mouseX, mouseY);
-            if (!is_find) return;
-
-            old_forme = type_forme;
-            type_forme = "ellipse";
-            index_forme_move = Formes.indexOf(e);
-        });
     }
     else if (event.button === 2 && p != null &&
         typeof p != "undefined" && (["MJ", p.Model, p.Control].includes(myself))) {
@@ -1296,212 +812,6 @@ canvas.addEventListener("mousemove", (event) => {
         const t = Terrains.find(x => x.Position === col + "," + row);
         if (t != null && typeof t != "undefined") t.rmv();
         Map.generateHexMap();
-        Map.drawHexMap();
-    }
-    else if (isDragging_left && isMode_forme && index_forme_move != null) {
-        // Le bouton gauche de la souris est enfoncé : on déplace une forme
-        const dx = mouseX - lastMouseX;
-        const dy = mouseY - lastMouseY;
-        lastMouseX = mouseX;
-        lastMouseY = mouseY;
-        const r = Formes[index_forme_move];
-
-        r.sendMessage("Rmv");
-
-        r.x += dx;
-        r.y += dy;
-
-        r.sendMessage("Add");
-
-        Map.drawHexMap();
-    }
-    else if (isDragging_left && isMode_forme && index_forme_zoom != null) {
-        // === REDIMENSIONNEMENT D'UNE FORME ===
-        // Le bouton gauche de la souris est enfoncé : on redimensionne une forme
-        if (Formes[index_forme_zoom].type === "Rectangle" || Formes[index_forme_zoom].type === "Mur") {
-            const r = Formes[index_forme_zoom];
-
-            r.sendMessage("Rmv");
-
-            // === CALCUL DE LA POSITION INITIALE DU SOMMET ===
-            let R1 = null;
-            if (sommet.x === 0 && sommet.y === 0) {
-                // Sommet en bas à droite
-                R1 = Forme.rotatePoint(
-                    r.x + r.width, r.y + r.height,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else if (sommet.x === 0 && sommet.y != 0) {
-                // Sommet en haut à droite
-                R1 = Forme.rotatePoint(
-                    r.x + r.width, r.y,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else if (sommet.x != 0 && sommet.y === 0) {
-                // Sommet en bas à gauche
-                R1 = Forme.rotatePoint(
-                    r.x, r.y + r.height,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else if (sommet.x != 0 && sommet.y != 0) {
-                // Sommet en haut à gauche
-                R1 = Forme.rotatePoint(
-                    r.x, r.y,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-
-            // === CALCUL DU DÉPLACEMENT DE LA SOURIS ===
-            const rLM = Forme.rotatePoint(
-                mouseX - lastMouseX, mouseY - lastMouseY, 0, 0, - r.theta);
-
-            // === MISE À JOUR DES DIMENSIONS ===
-            if (sommet.x === 0) r.width -= rLM.x;
-            else r.width += rLM.x;
-
-            if (sommet.y === 0) r.height -= rLM.y;
-            else r.height += rLM.y;
-
-            let R2 = null;
-            if (sommet.x === 0 && sommet.y === 0) {
-                R2 = Forme.rotatePoint(
-                    r.x + r.width, r.y + r.height,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else if (sommet.x === 0 && sommet.y != 0) {
-                R2 = Forme.rotatePoint(
-                    r.x + r.width, r.y,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else if (sommet.x != 0 && sommet.y === 0) {
-                R2 = Forme.rotatePoint(
-                    r.x, r.y + r.height,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-            else { // if (sommet.x != 0 && sommet.y != 0) {
-                R2 = Forme.rotatePoint(
-                    r.x, r.y,
-                    r.x + r.width / 2, r.y + r.height / 2,
-                    r.theta);
-            }
-
-            r.x -= R2.x - R1.x;
-            r.y -= R2.y - R1.y;
-
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
-
-            r.sendMessage("Add");
-        }
-        else {
-            // === REDIMENSIONNEMENT D'UNE ELLIPSE ===
-            const e = Formes[index_forme_zoom];
-
-            e.sendMessage("Rmv");
-
-            // === CALCUL DE LA POSITION INITIALE DU SOMMET ===
-            let E1 = null;
-            if (sommet.x > 0 && sommet.y === 0) {
-                // Sommet à droite
-                E1 = Forme.rotatePoint(
-                    e.x - e.width / 2, e.y,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else if (sommet.x < 0 && sommet.y === 0) {
-                // Sommet à gauche
-                E1 = Forme.rotatePoint(
-                    e.x + e.width / 2, e.y,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else if (sommet.x === 0 && sommet.y > 0) {
-                // Sommet en haut
-                E1 = Forme.rotatePoint(
-                    e.x, e.y - e.height / 2,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else {
-                // Sommet en bas
-                E1 = Forme.rotatePoint(
-                    e.x, e.y + e.height / 2,
-                    e.x, e.y,
-                    e.theta);
-            }
-
-            const rLM = Forme.rotatePoint(
-                mouseX - lastMouseX, mouseY - lastMouseY, 0, 0, - e.theta);
-
-            if (sommet.x > 0) e.width += rLM.x;
-            else e.width -= rLM.x;
-
-            if (sommet.y > 0) e.height += rLM.y;
-            else e.height -= rLM.y;
-
-            let E2 = null;
-            if (sommet.x > 0 && sommet.y === 0) {
-                E2 = Forme.rotatePoint(
-                    e.x - e.width / 2, e.y,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else if (sommet.x < 0 && sommet.y === 0) {
-                E2 = Forme.rotatePoint(
-                    e.x + e.width / 2, e.y,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else if (sommet.x === 0 && sommet.y > 0) {
-                E2 = Forme.rotatePoint(
-                    e.x, e.y - e.height / 2,
-                    e.x, e.y,
-                    e.theta);
-            }
-            else {
-                E2 = Forme.rotatePoint(
-                    e.x, e.y + e.height / 2,
-                    e.x, e.y,
-                    e.theta);
-            }
-
-            e.x -= E2.x - E1.x;
-            e.y -= E2.y - E1.y;
-
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
-
-            e.sendMessage("Add");
-        }
-
-        Map.drawHexMap();
-    }
-    else if (isDragging_left && isMode_forme && type_forme != "gomme" && type_forme != "scission") {
-        // Le bouton gauche de la souris est enfoncé : on dessine une forme (sélection)
-        if (type_forme === "ellipse") {
-            // Ellipse : la souris est positionnée au bord
-            const w = 2 * Math.sqrt(2) * (mouseX - lastMouseX);
-            const h = 2 * Math.sqrt(2) * (mouseY - lastMouseY);
-            SelectRectangle.width = Math.abs(w);
-            SelectRectangle.height = Math.abs(h);
-            if (w < 0) SelectRectangle.x = mouseX;
-            if (h < 0) SelectRectangle.y = mouseY;
-        }
-        else { // Rectangle : la souris est le sommet opposé
-            const w = (mouseX - lastMouseX);
-            const h = (mouseY - lastMouseY);
-            SelectRectangle.width = Math.abs(w);
-            SelectRectangle.height = Math.abs(h);
-            if (w < 0) SelectRectangle.x = mouseX;
-            if (h < 0) SelectRectangle.y = mouseY;
-        }
-
         Map.drawHexMap();
     }
     else if (isDragging_left && isDragging_select) {
@@ -1571,37 +881,6 @@ canvas.addEventListener("mousemove", (event) => {
 
         canvas_selected.style.display = "";
     }
-    else if (isDragging_right && isMode_forme && index_forme_move != null) {
-        // Le bouton droit de la souris est enfoncé : on pivote une forme
-        const f = Formes[index_forme_move];
-
-        f.sendMessage("Rmv");
-
-        let O = null;
-        let OM = null;
-        if (f.type === "Rectangle" || f.type === "Mur") {
-            O = { x: f.x + f.width / 2, y: f.y + f.height / 2 };
-            OM = { x: f.width / 2, y: f.height / 2 };
-        }
-        else { // Ellipse
-            O = { x: f.x, y: f.y };
-            OM = { x: f.width / 2, y: 0 };
-        }
-        const OP = { x: mouseX - O.x, y: mouseY - O.y };
-        // Produit scalaire de OM et OP
-        const scalaire = OM.x * OP.x + OM.y * OP.y;
-        const vectoriel = OM.x * OP.y - OM.y * OP.x;
-        // Normes des vecteurs OM et OP
-        const normeOM = Math.sqrt(OM.x ** 2 + OM.y ** 2);
-        const normeOP = Math.sqrt(OP.x ** 2 + OP.y ** 2);
-        // Calcul de l'angle en radians
-        if (vectoriel > 0) f.theta = Math.acos(scalaire / (normeOM * normeOP));
-        else f.theta = -Math.acos(scalaire / (normeOM * normeOP));
-
-        f.sendMessage("Add");
-
-        Map.drawHexMap();
-    }
     else if (isDragging_right) {
         // Bouton droit enfoncé : on déplace la carte
         const deltaX = mouseX - lastMouseX;
@@ -1622,51 +901,6 @@ canvas.addEventListener("mousemove", (event) => {
 
         Map.drawHexMap();
     }
-    else if (isMode_forme) {
-        // On affiche un pointeur en petite main s'il y a une forme à attrapper
-        canvas.style.cursor = default_cursor;
-
-        let cursor_zoom = "url('images/Zoom.png') 38 4, auto";
-        let cursor_move = "url('images/Move.png') 32 32, auto";
-        let cursor_scis = "url('images/Scission.png') 27 24, auto";
-
-        if (type_forme === "gomme") {
-            cursor_zoom = "url('images/Gomme.png') 20 60, auto";
-            cursor_move = "url('images/Gomme.png') 20 60, auto";
-            cursor_scis = "url('images/Gomme.png') 20 60, auto";
-        }
-
-        let is_find = false;
-        Formes.filter(x => x.type === "Rectangle" || x.type === "Mur").forEach(r => {
-            if (is_find) return;
-
-            is_find = r.type === "Rectangle" ? r.isOnRectangle(mouseX, mouseY) : r.isOnMur(mouseX, mouseY);
-            if (!is_find) return;
-
-            if (type_forme === "scission" && r.type === "Mur") {
-                canvas.style.cursor = cursor_scis;
-            }
-            else if (type_forme !== "scission" && r.isOnSommetRectangle(mouseX, mouseY)) {
-                canvas.style.cursor = cursor_zoom;
-            }
-            else if (type_forme !== "scission") {
-                canvas.style.cursor = cursor_move;
-            }
-        });
-
-        Formes.filter(x => x.type === "Ellipse").forEach(e => {
-            if (is_find) return;
-
-            is_find = e.isOnEllipse(mouseX, mouseY);
-            if (!is_find) return;
-
-            const s = e.isOnSommetEllipse(mouseX, mouseY);
-            if (s != null) {
-                canvas.style.cursor = cursor_zoom;
-            }
-            else canvas.style.cursor = cursor_move;
-        });
-    }
     else {
         // On ne montre pas le tooltip dans le cas d'un affichage zoom de l'hexagone
         if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") &&
@@ -1684,22 +918,7 @@ canvas.addEventListener("mousemove", (event) => {
 
 // Bouton souris relevé
 canvas.addEventListener("mouseup", (event) => {
-    if (isMode_forme && isDragging_left && type_forme != "scission") {
-        const type = type_forme.substring(0, 1).toUpperCase() + type_forme.substring(1);
-        // On enregistre la nouvelle forme
-        if (index_forme_move === null) {
-            Formes[Formes.length] = new Forme(type);
-            const r = Formes[Formes.length - 1];
-            r.x = SelectRectangle.x;
-            r.y = SelectRectangle.y;
-            r.width = SelectRectangle.width;
-            r.height = SelectRectangle.height;
-            r.color = document.getElementById("forme_color").value;
-
-            if (r.type !== "Gomme") r.sendMessage("Add");
-        }
-    }
-    else if (!isMode_terrain && isDragging_left && !isDragging_select) {
+    if (!isMode_terrain && isDragging_left && !isDragging_select) {
         // On déplace le(s) pion(s) de la sélection d'autant que la souris bouge.
         const joueur = document.getElementById("joueur").value;
 
@@ -1923,10 +1142,6 @@ canvas.addEventListener("wheel", function (event) {
     hexHSpacing = hexSize * 1.5;
     hexVSpacing = hexHeight * Math.sqrt(3) / 2;
 
-    // Sauvegarder les anciennes valeurs de offsetX et offsetY avant modification
-    const oldOffsetX = offsetX;
-    const oldOffsetY = offsetY;
-
     // Calculer la position de la case après le zoom
     const hexXY_after = Map.get_XY(col, row);
 
@@ -1934,87 +1149,11 @@ canvas.addEventListener("wheel", function (event) {
     offsetX = mouseX - relX_before * ratio - hexXY_after.x;
     offsetY = mouseY - relY_before * ratio - hexXY_after.y;
 
-    // Utiliser les anciennes valeurs de offsetX et offsetY pour le calcul du zoom
-    Formes.forEach(r => {
-        r.x = ratio * (r.x - oldOffsetX) + offsetX;
-        r.y = ratio * (r.y - oldOffsetY) + offsetY;
-        r.width = ratio * r.width;
-        r.height = ratio * r.height;
-    });
-
-    if (image_fond != null) {
-        forme_fond.x = ratio * (forme_fond.x - oldOffsetX) + offsetX;
-        forme_fond.y = ratio * (forme_fond.y - oldOffsetY) + offsetY;
-        forme_fond.width = ratio * forme_fond.width;
-        forme_fond.height = ratio * forme_fond.height;
-    }
-
     Map.generateHexMap();
     Map.drawHexMap();
 });
 
-// === SYNCHRONISATION DE LA CARTE ===
-// Bouton de synchronisation : envoie toutes les données de la carte aux joueurs
-document.getElementById("synchroniser").addEventListener("click", () => {
-    // On efface tout
-    Map.sendMessage("ClearAll");
-    // On renvoie tout
-    Pions.forEach(p => { p.sendMessage("SetAll"); });
-});
-
-// === GESTION DE LA COULEUR DES FORMES ===
-// Changement de couleur des formes et fermeture de la fenêtre de sélection
-document.getElementById("forme_color").addEventListener("input", function () {
-    // === FONCTIONS UTILITAIRES DE CONVERSION DE COULEURS ===
-
-    // Convertit HEX en RGB
-    function hexToRgb(hex) {
-        let bigint = parseInt(hex.slice(1), 16);
-        return {
-            r: (bigint >> 16) & 255,
-            g: (bigint >> 8) & 255,
-            b: bigint & 255
-        };
-    }
-
-    // Convertit RGB en HSL
-    function rgbToHsl(rgb) {
-        let r = rgb.r / 255, g = rgb.g / 255, b = rgb.b / 255;
-        let max = Math.max(r, g, b), min = Math.min(r, g, b);
-        let h, s, l = (max + min) / 2;
-
-        if (max === min) {
-            h = s = 0; // Gris
-        } else {
-            let d = max - min;
-            s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                case b: h = (r - g) / d + 4; break;
-            }
-            h /= 6;
-        }
-        return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
-    }
-
-    // Détecte si seul le Hue (teinte) a changé
-    function isHueChange(oldColor, newColor) {
-        let hslOld = rgbToHsl(hexToRgb(oldColor));
-        let hslNew = rgbToHsl(hexToRgb(newColor));
-        return hslOld.h !== hslNew.h && hslOld.s === hslNew.s && hslOld.l === hslNew.l;
-    }
-
-    // Si seule la teinte a changé, on ne touche à rien, sinon, on ferme la pop-up de sélection de couleur.
-    if (isHueChange(last_forme_color, this.value)) return;
-    last_forme_color = this.value;
-    let newInput = this.cloneNode(true);
-    this.parentNode.replaceChild(newInput, this);
-    newInput.addEventListener("input", arguments.callee);
-});
-
 // === GESTION DU FOND DE CARTE ===
-// Changement du fond de la carte
 document.getElementById("img_fond").addEventListener("change", async (event) => {
     const form = document.getElementById("upload_fond");
     const formData = new FormData(form);

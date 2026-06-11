@@ -67,6 +67,69 @@ select {
     border-style: solid;
 }
 
+/* === PALETTE DE COULEURS (formes) === */
+.color-picker {
+    position: relative;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.color-picker-btn {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    padding: 0;
+    background-color: #000000;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: 3px;
+    box-shadow: none;
+}
+
+.color-picker-btn:hover {
+    transform: none;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.45);
+}
+
+.color-picker-palette {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    z-index: 1100;
+    grid-template-columns: repeat(8, 20px);
+    gap: 2px;
+    padding: 4px;
+    background: rgb(240, 240, 240);
+    border: 1px solid rgb(136, 136, 136);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-picker-palette.is-open {
+    display: grid;
+}
+
+.color-picker-swatch {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    box-shadow: none;
+}
+
+.color-picker-swatch:hover {
+    transform: none;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.color-picker-swatch.is-selected {
+    outline: 2px solid rgb(0, 0, 0);
+    outline-offset: 1px;
+}
+
 /* === STYLES DES FENÊTRES MODALES === */
 /* Configuration des dialogues modaux */
 dialog {
@@ -77,7 +140,6 @@ dialog {
 
 /* === STYLES DES DIALOGUES === */
 /* Styles pour les titres et zones de dialogue */
-.titre_dialogue,
 .dialogue {
     border: 2px solid rgb(20, 20, 20);
     margin: 0;
@@ -137,8 +199,7 @@ dialog {
 }
 
 /* === STYLES DES BOUTONS === */
-/* Boutons de synchronisation et de fond */
-#synchroniser,
+/* Boutons de de fond */
 #fond {
     background-color: rgb(128, 128, 192);
     /* Bleu moyen */
@@ -157,7 +218,6 @@ dialog {
 }
 
 /* Effet de survol pour les boutons */
-#synchroniser:hover,
 #fond:hover {
     background-color: rgb(64, 64, 192);
     /* Bleu plus foncé au survol */

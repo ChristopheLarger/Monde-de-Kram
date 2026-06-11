@@ -1,35 +1,27 @@
 <!-- === INTERFACE PRINCIPALE === -->
 <!-- Barre de contrôle en haut de l'écran -->
-<div id="div_cartouche" style="margin: 0;">
-    <!-- Sélection du personnage/joueur -->
-    <label for="joueur">Perso :&nbsp;</label>
-    <select id="joueur">
-        <option value="">--</option>
-        <option value="MJ">Maitre du Jeu</option>
-    </select>
-
-    <!-- Bouton pour lancer 3 dés à 6 faces -->
-    <button id="3D6">3D6</button>
-
-    <!-- Champ pour lancer des dés personnalisés (format: XdY+Z) -->
-    <input type="text" id="personnalisation" style="width: 80px;" placeholder="prompt...">
-</div>
-
-<!-- === ZONE DE DIALOGUE === -->
-<!-- Table pour afficher les conversations entre joueurs -->
-<table id="table_dialogue" style="width: 98%; border: 0; margin: 0;">
-    <tr id="titre_dialogue"></tr> <!-- En-têtes des colonnes de dialogue -->
-    <tr id="dialogue"></tr> <!-- Contenu des dialogues -->
-</table>
-<!-- === ZONE DE COMBAT === -->
-<!-- Interface de combat (masquée par défaut) -->
-<div id="combat" style="width: 97.8%; display: none; position: relative;">
+<div style="display: flex; justify-content: space-between; width: 97.8%; margin: 0; padding: 0;">
+    <div id="div_cartouche"
+        style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+        <!-- Sélection du personnage/joueur -->
+        <label for="joueur">Perso :&nbsp;</label>
+        <select id="joueur">
+            <option value="">--</option>
+            <option value="MJ">Maitre du Jeu</option>
+        </select>
+    </div>
+    <div style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+        <!-- Bouton pour lancer 3 dés à 6 faces -->
+        <label for="3D6">Dés :&nbsp;</label>
+        <button id="3D6">3d6</button>
+        &nbsp;&nbsp;
+        <input type="text" id="personnalisation" style="width: 80px;" placeholder="XdY+Z...">
+    </div>
     <!-- Barre d'outils pour la gestion de la carte -->
-    <div id="div_tools" class="titre_dialogue"
-        style="display: flex; align-items: center; margin: 0; background-color: white; justify-content: space-between; white-space: nowrap;">
+    <div id="div_tools"
+        style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
         <!-- Outils de terrain et formes -->
-        <div
-            style="display: flex; align-items: center; margin: 4px; background-color: white; justify-content: space-between; font-size: x-large;">
+        <div style="display: flex; align-items: center; margin: 4px; justify-content: space-between;">
             <!-- Outils de terrain -->
             Terrains :&nbsp;
             <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
@@ -41,21 +33,6 @@
             <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');"
                 alt="Suppression de terrain" style="width: 30px; height: 30px; cursor: pointer;">
             &nbsp;&nbsp;&nbsp;
-            <!-- Outils de formes géométriques -->
-            Formes :&nbsp;
-            <input type="color" id="forme_color" value="#000000"
-                style="width: 20px; height: 20px; min-width: 20px;">&nbsp;
-            <img id="rectangle" src="images/Rectangle.png" onclick="Forme.setFormeMode('rectangle');" alt="Rectangle"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="ellipse" src="images/Ellipse.png" onclick="Forme.setFormeMode('ellipse');" alt="Ellipse"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="mur" src="images/Mur.png" onclick="Forme.setFormeMode('mur');" alt="Mur"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="scission" src="images/Scission.png" onclick="Forme.setFormeMode('scission');" alt="Percer un mur"
-                style="width: 30px; height: 30px; cursor: pointer;">&nbsp;
-            <img id="gomme_f" src="images/Gomme.png" onclick="Forme.setFormeMode('gomme');" alt="Suppression de forme"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            &nbsp;&nbsp;&nbsp;
             <!-- Portée de vue -->
             Vue :&nbsp;
             <input type="number" id="portee_vue" min="3" max="99" value="12" step="1" alt="Portée de vue en mètres"
@@ -65,28 +42,39 @@
             Divers :&nbsp;
             <img id="coordonnees" src="images/Coordonnees.png" onclick="Map.setMode_coordonnees();"
                 alt="Affichage des coordonnees sur la carte" style="width: 30px; height: 30px; cursor: pointer;">
-        </div>
-
-        <!-- Outils de gestion de carte -->
-        <div>
-            <form id="upload_fond" enctype="multipart/form-data">
-                <label for="img_fond" id="fond">Fond de carte</label>
-                <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">
-                <button id="synchroniser">Synchroniser</button>
-            </form>
+            &nbsp;&nbsp;&nbsp;
         </div>
     </div>
+    <!-- Fond de carte -->
+    <div style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+        <form id="upload_fond" enctype="multipart/form-data">
+            <label for="img_fond" id="fond">Fond de carte</label>
+            <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">
+        </form>
+    </div>
+</div>
 
+
+<!-- === ZONE DE DIALOGUE === -->
+<!-- Table pour afficher les conversations entre joueurs -->
+<table id="table_dialogue" style="display: none; width: 97.8%; border: 0; margin: 0;">
+    <tr id="titre_dialogue"></tr> <!-- En-têtes des colonnes de dialogue -->
+    <tr id="dialogue"></tr> <!-- Contenu des dialogues -->
+</table>
+
+<!-- === ZONE DE COMBAT === -->
+<!-- Interface de combat (masquée par défaut) -->
+<div id="combat" style="width: 97.8%; display: none; position: relative;">
     <!-- Canvas principal pour la carte hexagonale -->
     <canvas id="hexCanvas" tabindex="0"
-        style="position: absolute; width: 100%; height: auto; margin: 0; border: 1px solid rgb(20, 20, 20); cursor: default;"></canvas>
+        style="display: block; width: 100%; height: auto; margin: 0; border: 1px solid rgb(20, 20, 20); cursor: default;"></canvas>
 
     <!-- Canvas pour l'affichage des éléments sélectionnés (superposé) -->
     <canvas id="hexCanvas_selected" tabindex="0"
         style="position: absolute; display: none; width: 100%; height: auto; margin: 0; border: 0; opacity: 0.5; pointer-events: none; z-index: 1050;"></canvas>
 
     <div id="div_pion"
-        style="position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
+        style="position: absolute; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
         <table style="width: 100%; margin: 0; white-space: nowrap; border-collapse: collapse; font-size: x-small;">
             <colgroup>
                 <col style="width: 100px;">
@@ -112,7 +100,8 @@
                         </tr>
                         <tr>
                             <td><a class="modele_link"
-                                    style="cursor: pointer; color: rgb(64, 64, 230); text-decoration: underline;">Modele</a> :</td>
+                                    style="cursor: pointer; color: rgb(64, 64, 230); text-decoration: underline;">Modele</a>
+                                :</td>
                             <td><select class="modele" style="font-size: x-small; width: 100%;" disabled>
                                     <option value="">--</option>
                                 </select></td>
@@ -184,7 +173,8 @@
             <span style="font-size: x-small;">Seuil de blessures :
                 <input type="text" class="seuil_blessures" style="text-align: center; width: 17px; font-size: x-small;"
                     disabled></span>
-            <span style="font-size: x-small; color: rgb(64, 64, 230); font-weight: bold;" class="msg_aptitude">Apte au combat</span>
+            <span style="font-size: x-small; color: rgb(64, 64, 230); font-weight: bold;" class="msg_aptitude">Apte au
+                combat</span>
             <span style="font-size: x-small;">&nbsp;Nb. blessures max :
                 <input type="text" class="nb_blessures_max" style="text-align: center; width: 17px; font-size: x-small;"
                     disabled></span>
@@ -366,9 +356,11 @@
             </tr>
             <tr>
                 <td colspan="7">
-                    <span class="liste" style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Liste</span>
+                    <span class="liste"
+                        style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Liste</span>
                     <br>
-                    <span class="sort" style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Sort</span>
+                    <span class="sort"
+                        style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Sort</span>
                     <span class="incantation"
                         style="font-size: x-small; color: rgb(64, 64, 230); font-style: italic;">Incantation</span>
                     <table class="etats"
@@ -499,7 +491,7 @@
     </script>
 
     <div id="div_model"
-        style="display: none; position: fixed; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
+        style="display: none; position: absolute; bottom: 0; left: 0; z-index: 1025; background-color: rgb(20, 20, 20); color: white; border: 3px solid rgb(20, 20, 20);">
         <div class="div_model_tabs">
             <div style="display: flex; justify-content: space-between;">
                 <button type="button" class="tab-model humanoid" data-tab="0"
@@ -2971,60 +2963,83 @@
             </div>
         </div>
     </div>
-</div>
 
-<!-- === DIALOGUE DE CHOIX D'INTERACTION === -->
-<!-- Fenêtre pour afficher les interactions possibles avec le personnage -->
-<div id="div_interactions"
-    style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); font-size: x-small; background-color: rgb(20, 20, 20); color: white;">
-    <table style="margin: 0; border-collapse: collapse;">
-        <colgroup>
-            <col style="width: auto;">
-            <col style="width: 1px;">
-            <col style="width: 1px;">
-        </colgroup>
-        <tr>
-            <td colspan="2" style="text-align: center;"><span class="nom"></span><input type="text" class="type"
-                    value="" style="display: none;">
-                <hr>
-            </td>
-        </tr>
-        <tr>
-            <td style="text-align: right;">Score :&nbsp;</td>
-            <td><input type="text" class="score"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
-                    disabled></td>
-        </tr>
-        <tr>
-            <td style="text-align: right;">Jet de 3D6 :&nbsp;</td>
-            <td><input type="text" class="jet_des"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
-                    disabled></td>
-        </tr>
-        <tr>
-            <td style="text-align: right;">Résultat :&nbsp;</td>
-            <td><input type="text" class="marge"
-                    style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
-                    disabled></td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <table style="width: 100%; border-collapse: collapse; border: 0;">
-                    <tr>
-                        <td>Héroïsme :</td>
-                        <td><input type="checkbox" class="heroisme" style="background-color: white; color: rgb(20, 20, 20);"></td>
-                        <td colspan="2" style="vertical-align: middle; text-align: right;">
-                            <button class="chance"
-                                style="font-size: x-small; height: 12px; line-height: 1; padding: 0; margin: 0; white-space: nowrap;">
-                                Point de chance</button>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</div>
+    <div id="div_terrain" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
+        <table style="margin: 0; font-size: x-small;">
+            <tr>
+                <td>Terrain :&nbsp;</td>
+                <td><input type="text" class="terrain" style="width: 45px; font-size: x-large;"></td>
+            </tr>
+            <tr>
+                <td>
+                    <div id="forme_color_wrapper" class="color-picker">
+                        <input type="hidden" id="forme_color" value="#000000">
+                        <button type="button" id="forme_color_btn" class="color-picker-btn"
+                            aria-label="Couleur de la forme"></button>
+                        <div id="forme_color_palette" class="color-picker-palette"></div>
+                    </div>&nbsp;
+                    <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');"
+                        alt="Suppression de forme" style="width: 30px; height: 30px; cursor: pointer;">
+                    &nbsp;&nbsp;&nbsp;
+                </td>
+            </tr>
+        </table>
+    </div>
 
+    <!-- === DIALOGUE DE CHOIX D'INTERACTION === -->
+    <!-- Fenêtre pour afficher les interactions possibles avec le personnage -->
+    <div id="div_interactions"
+        style="position: absolute; top: 0; left: 0; font-size: x-small; background-color: rgb(20, 20, 20); color: white;">
+        <table style="margin: 0; border-collapse: collapse;">
+            <colgroup>
+                <col style="width: auto;">
+                <col style="width: 1px;">
+                <col style="width: 1px;">
+            </colgroup>
+            <tr>
+                <td colspan="2" style="text-align: center;"><span class="nom"></span><input type="text" class="type"
+                        value="" style="display: none;">
+                    <hr>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">Score :&nbsp;</td>
+                <td><input type="text" class="score"
+                        style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
+                        disabled></td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">Jet de 3D6 :&nbsp;</td>
+                <td><input type="text" class="jet_des"
+                        style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
+                        disabled></td>
+            </tr>
+            <tr>
+                <td style="text-align: right;">Résultat :&nbsp;</td>
+                <td><input type="text" class="marge"
+                        style="width: 17px; text-align: center; font-size: x-small; background-color: white; color: rgb(20, 20, 20);"
+                        disabled></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <table style="width: 100%; border-collapse: collapse; border: 0;">
+                        <tr>
+                            <td>Héroïsme :</td>
+                            <td><input type="checkbox" class="heroisme"
+                                    style="background-color: white; color: rgb(20, 20, 20);"></td>
+                            <td colspan="2" style="vertical-align: middle; text-align: right;">
+                                <button class="chance"
+                                    style="font-size: x-small; height: 12px; line-height: 1; padding: 0; margin: 0; white-space: nowrap;">
+                                    Point de chance</button>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
 <!-- Fenêtre pour définir les dimensions de la carte de combat -->
 <dialog id="dialog_dim_carte">
