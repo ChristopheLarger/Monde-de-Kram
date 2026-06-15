@@ -4,43 +4,22 @@
  */
 class Pion {
     constructor(data = {}) {
-        this.Type = data.Type || "";          // Type : "allies" ou "ennemis"
-        this.Model = data.Model || "";         // Modèle de personnage
-        this.Position = data.Position || "0,0";    // Position en coordonnées hexagonales (Col, Row)
-        this.Selected = data.Selected || false;    // État de sélection
-
-        this.Indice = data.Indice || 0;
-
-        this.Attaquant = data.Attaquant || false;
-        this.Defenseur = data.Defenseur || false;
-        this.Nb_action = data.Nb_action || 0;
-        this.Arme1_engagee = data.Arme1_engagee || false;
-        this.Arme2_engagee = data.Arme2_engagee || false;
-        this.Esquive = data.Esquive || false;
-        this.Est_blesse = data.Est_blesse || false;
-        this.Vue = data.Vue || 6;
+        this.Type = data.Type || "";            // Type : "allies" ou "ennemis"
+        this.Model = data.Model || "";          // Modèle de personnage
+        this.Indice = data.Indice || 0;         // Indice du pion
+        this.Position = data.Position || "0,0"; // Position en coordonnées hexagonales (Col, Row)
+        this.Selected = data.Selected || false; // État de sélection
+        this.Auto = data.Auto || false;
 
         this.Titre = data.Titre || "";
         this.Arme1 = data.Arme1 || "";
         this.Arme2 = data.Arme2 || "";
         this.Note = data.Note || "";
-
-        this.Nom_liste = data.Nom_liste || "";
-        this.Nom_sort = data.Nom_sort || "";
-        this.Incantation = data.Incantation || 0;
-        this.Fatigue_sort = data.Fatigue_sort || 0;
-        this.Concentration_sort = data.Concentration_sort || 0;
-
-        this.Cible_sort = data.Cible_sort || false;
-
-        this.Auto = data.Auto || false;
-
-        this.Is_flying = data.Is_flying || false;
+        this.Vue = data.Vue || 1;
 
         this.Fatigue = data.Fatigue || 0;
-        this.Fatigue_down = data.Fatigue_down || 0;
-        this.Fatigue_eco = data.Fatigue_eco || false;
         this.Concentration = data.Concentration || 0;
+
         this.General = data.General || 0;
         this.Tete = data.Tete || 0;
         this.Poitrine = data.Poitrine || 0;
@@ -49,16 +28,6 @@ class Pion {
         this.Brasd = data.Brasd || 0;
         this.Jambeg = data.Jambeg || 0;
         this.Jambed = data.Jambed || 0;
-
-        this.Jet_att = data.Jet_att || 0;
-        this.Loc_att = data.Loc_att || "";
-        this.At1_att = data.At1_att || true;
-        this.At2_att = data.At2_att || true;
-
-        this.Jet_def = data.Jet_def || 0;
-        this.Pr1_def = data.Pr1_def || false;
-        this.Pr2_def = data.Pr2_def || false;
-        this.Esq_def = data.Esq_def || false;
     }
 
     /**
@@ -500,7 +469,7 @@ class Pion {
                     c.Indice_ennemi === pion2.Indice)) return;
 
                 // Créer un combat au corps à corps entre les deux pions
-                if (isInMeleeCombat(pion1, pion2)) {
+                if (isCaC(pion1, pion2)) {
                     const c = new Cac();
                     c.Model_allie = pion1.Model;
                     c.Indice_allie = pion1.Indice;
@@ -550,10 +519,10 @@ class Pion {
         save = save.replace("Mag", pion.get_attribut("Magie"));
         save = save.replace("6eS", pion.get_attribut("Sixieme_sens"));
         save = save.replace("Mem", pion.get_attribut("Memoire"));
-        save = save.replace("NM",  pion.get_attribut("Niveau_mental"));
+        save = save.replace("NM", pion.get_attribut("Niveau_mental"));
         save = save.replace("Per", pion.get_attribut("Perception"));
         save = save.replace("Thp", pion.get_attribut("Telepathie"));
-        save = save.replace("VM",  pion.get_attribut("Vivacite_mentale"));
+        save = save.replace("VM", pion.get_attribut("Vivacite_mentale"));
         save = save.replace("Cha", pion.get_attribut("Charisme"));
 
         save = eval(save);
@@ -750,6 +719,39 @@ class Pion {
         if (document.getElementById("joueur").value === "MJ") {
             await Pion.saveToServer(doc);
         }
+    }
+
+    /**
+     * Calcule l'initiative d'un pion
+     * @param {Object} pion - Pion dont calculer l'initiative
+     * @returns {number} Initiative calculée
+     */
+    calculateInitiative(main = 0) {
+        const arme1 = this.Arme1 ? Armes.find(a => a.Nom_arme === this.Arme1) : null;
+        const arme2 = this.Arme2 ? Armes.find(a => a.Nom_arme === this.Arme2) : null;
+        if (arme1 === null && arme2 === null) return 0;
+
+        const init1 = arme1 ? arme1.Init : 99;
+        const init2 = arme2 ? arme2.Init : 99;
+        const Vp_bonus = - Math.floor((this.get_attribut("Vivacite_physique") - 10) / 2);
+        const res1 = init1 + Vp_bonus + this.get_bonus("Initiative");
+        const res2 = init2 + Vp_bonus + this.get_bonus("Initiative");
+
+        if (main === 1) return res1;
+        if (main === 2) return res2;
+
+        return Math.min(res1, res2);
+    }
+
+    get_nb_blessures() {
+        const model = Models.find((x) => x.Nom_model === this.Model);
+        const seuil_blessures = model.get("seuil_blessures");
+        let nb_blessures = 0;
+        ["General", "Tete", "Brasg", "Brasd", "Poitrine", "Abdomen", "Jambeg", "Jambed"].forEach(zone => {
+            if (this[zone] >= seuil_blessures) nb_blessures++;
+            if (this[zone] >= 2 *seuil_blessures) nb_blessures++;
+        });
+        return nb_blessures;
     }
 }
 

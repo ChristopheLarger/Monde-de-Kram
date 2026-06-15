@@ -309,29 +309,12 @@
             $js .= "    Position: " . toJS($row['Position']) . ",\n";
             $js .= "    Selected: " . toJS($row['Selected'], 'bool') . ",\n";
             $js .= "    Indice: " . toJS($row['Indice'], 'int') . ",\n";
-            $js .= "    Attaquant: " . toJS($row['Attaquant'], 'bool') . ",\n";
-            $js .= "    Defenseur: " . toJS($row['Defenseur'], 'bool') . ",\n";
-            $js .= "    Nb_action: " . toJS($row['Nb_action'], 'int') . ",\n";
-            $js .= "    Arme1_engagee: " . toJS($row['Arme1_engagee'], 'bool') . ",\n";
-            $js .= "    Arme2_engagee: " . toJS($row['Arme2_engagee'], 'bool') . ",\n";
-            $js .= "    Esquive: " . toJS($row['Esquive'], 'bool') . ",\n";
-            $js .= "    Est_blesse: " . toJS($row['Est_blesse'], 'bool') . ",\n";
             $js .= "    Vue: " . toJS($row['Vue'], 'int') . ",\n";
             $js .= "    Titre: " . toJS($row['Titre']) . ",\n";
             $js .= "    Arme1: " . toJS($row['Arme1']) . ",\n";
             $js .= "    Arme2: " . toJS($row['Arme2']) . ",\n";
             $js .= "    Note: " . toJS($row['Note']) . ",\n";
-            $js .= "    Nom_liste: " . toJS($row['Nom_liste']) . ",\n";
-            $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
-            $js .= "    Incantation: " . toJS($row['Incantation'], 'int') . ",\n";
-            $js .= "    Fatigue_sort: " . toJS($row['Fatigue_sort'], 'int') . ",\n";
-            $js .= "    Concentration_sort: " . toJS($row['Concentration_sort'], 'int') . ",\n";
-            $js .= "    Cible_sort: " . toJS($row['Cible_sort'], 'bool') . ",\n";
-            $js .= "    Auto: " . toJS($row['Auto'], 'bool') . ",\n";
-            $js .= "    Is_flying: " . toJS($row['Is_flying'], 'bool') . ",\n";
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
-            $js .= "    Fatigue_down: " . toJS($row['Fatigue_down'], 'int') . ",\n";
-            $js .= "    Fatigue_eco: " . toJS($row['Fatigue_eco'], 'bool') . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
             $js .= "    General: " . toJS($row['General'], 'int') . ",\n";
             $js .= "    Tete: " . toJS($row['Tete'], 'int') . ",\n";
@@ -341,14 +324,6 @@
             $js .= "    Brasd: " . toJS($row['Brasd'], 'int') . ",\n";
             $js .= "    Jambeg: " . toJS($row['Jambeg'], 'int') . ",\n";
             $js .= "    Jambed: " . toJS($row['Jambed'], 'int') . ",\n";
-            $js .= "    Jet_att: " . toJS($row['Jet_att'], 'int') . ",\n";
-            $js .= "    Loc_att: " . toJS($row['Loc_att']) . ",\n";
-            $js .= "    At1_att: " . toJS($row['At1_att'], 'bool') . ",\n";
-            $js .= "    At2_att: " . toJS($row['At2_att'], 'bool') . ",\n";
-            $js .= "    Jet_def: " . toJS($row['Jet_def'], 'int') . ",\n";
-            $js .= "    Pr1_def: " . toJS($row['Pr1_def'], 'bool') . ",\n";
-            $js .= "    Pr2_def: " . toJS($row['Pr2_def'], 'bool') . ",\n";
-            $js .= "    Esq_def: " . toJS($row['Esq_def'], 'bool') . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -563,6 +538,8 @@
         document.getElementById("joueur").value = "MJ";
         const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
+
+        affiche_attaque();
 
     </script>
 </body>

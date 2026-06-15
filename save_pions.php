@@ -41,25 +41,18 @@ if (file_put_contents($file, json_encode($saveDoc, JSON_PRETTY_PRINT | JSON_UNES
 
 $columns = [
     'Type', 'Model', 'Position', 'Selected', 'Indice',
-    'Attaquant', 'Defenseur', 'Nb_action', 'Arme1_engagee', 'Arme2_engagee',
-    'Esquive', 'Est_blesse', 'Vue', 'Titre', 'Arme1', 'Arme2', 'Note',
-    'Nom_liste', 'Nom_sort', 'Incantation', 'Fatigue_sort', 'Concentration_sort',
-    'Cible_sort', 'Auto', 'Is_flying', 'Fatigue', 'Fatigue_down', 'Fatigue_eco',
-    'Concentration', 'General', 'Tete', 'Poitrine', 'Abdomen', 'Brasg', 'Brasd',
-    'Jambeg', 'Jambed', 'Jet_att', 'Loc_att', 'At1_att', 'At2_att',
-    'Jet_def', 'Pr1_def', 'Pr2_def', 'Esq_def'
+    'Vue', 'Titre', 'Arme1', 'Arme2', 'Note',
+    'Auto', 'Fatigue', 'Concentration', 'General', 'Tete', 'Poitrine', 'Abdomen', 'Brasg', 'Brasd',
+    'Jambeg', 'Jambed'
 ];
 
 $bools = [
-    'Selected', 'Attaquant', 'Defenseur', 'Arme1_engagee', 'Arme2_engagee',
-    'Esquive', 'Est_blesse', 'Cible_sort', 'Auto', 'Is_flying', 'Fatigue_eco',
-    'At1_att', 'At2_att', 'Pr1_def', 'Pr2_def', 'Esq_def'
+    'Selected', 'Auto'
 ];
 
 $ints = [
-    'Indice', 'Nb_action', 'Vue', 'Incantation', 'Fatigue_sort', 'Concentration_sort',
-    'Fatigue', 'Fatigue_down', 'Concentration', 'General', 'Tete', 'Poitrine',
-    'Abdomen', 'Brasg', 'Brasd', 'Jambeg', 'Jambed', 'Jet_att', 'Jet_def'
+    'Indice', 'Vue', 'Fatigue', 'Concentration', 'General', 'Tete', 'Poitrine',
+    'Abdomen', 'Brasg', 'Brasd', 'Jambeg', 'Jambed'
 ];
 
 $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');

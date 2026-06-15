@@ -365,6 +365,8 @@ input:checked+.slider:before {
 #div_pion input:disabled,
 #div_model input:disabled,
 #div_model input[readonly],
+#table_attaque input[readonly],
+#table_attaque input[type="checkbox"][readonly],
 #div_pion select:disabled,
 #div_model select:disabled,
 #div_pion textarea:disabled,
