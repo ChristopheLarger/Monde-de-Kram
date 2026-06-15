@@ -8,18 +8,15 @@
 // === RÉFÉRENCES DOM ===
 // === GESTION DE LA COULEUR DES FORMES ===
 const palette_de_couleurs = [
-    "#000000", "#333333", "#666666", "#999999", "#CCCCCC", "#FFFFFF", "#8B4513", "#D2691E",
+    "#000000", "#333333", "#666666", "#999999", "#CCCCCC", "#8B4513", "#D2691E",
     "#8B0000", "#FF0000", "#FF6600", "#FFD700", "#FFFF00", "#ADFF2F", "#00FF00", "#006400",
     "#00FFFF", "#00BFFF", "#0000FF", "#000080", "#4B0082", "#8B00FF", "#FF00FF", "#FF1493",
     "#A0522D", "#F4A460", "#DEB887", "#556B2F", "#228B22", "#2F4F4F", "#4682B4", "#87CEEB"
 ];
 // Éléments d'interface utilisateur
 const tooltip = document.getElementById("tooltip");                    // Tooltip pour afficher des informations
-const canvas_color = document.getElementById("canvas_color");          // Sélecteur de couleur pour le canvas
-const forme_color = document.getElementById("forme_color");            // Sélecteur de couleur pour les formes
 const canvas = document.getElementById("hexCanvas");                   // Canvas principal pour la carte
 const canvas_selected = document.getElementById("hexCanvas_selected"); // Canvas pour les sélections
-// const canvas_zoom = document.getElementById("hexCanvas_zoom");         // Canvas pour les sélections
 
 // === PARAMÈTRES DE LA CARTE ===
 // Dimensions et espacement des hexagones
@@ -40,6 +37,7 @@ let offsetY = canvas.height / 2;            // Décalage vertical initial (centr
 let isDragging_select = false;              // Glissement pour sélection
 let isDragging_left = false;                // Glissement avec clic gauche
 let isDragging_right = false;               // Glissement avec clic droit
+let SelectRectangle = { x: 0, y: 0, width: 0, height: 0, color: "blue" }; // Rectangle de sélection
 
 // Modes d'interaction
 let isMode_terrain = false;                 // Mode placement de terrain
@@ -58,18 +56,13 @@ image_auto.src = "images/Auto.png";
 
 // === IMAGES DE FOND ===
 let image_fond = null;                       // Image de fond de la carte
-let forme_fond = null;                       // Forme de fond
+let forme_fond = { x: 0, y: 0, width: 0, height: 0 }; // Forme de fond
 
 /**
  * Classe Map - Représente un élément sur la carte hexagonale
  * Peut être un pion (allié/ennemi) ou un terrain
  */
 class Map {
-    Type = "";          // Type : "allies", "ennemis" ou "terrains"
-    Model = "";         // Modèle de personnage ou terrain
-    Position = "0,0";    // Position en coordonnées hexagonales (Col, Row)
-    Selected = false;    // État de sélection
-
     /**
      * Dessine une image centrée en (centerX, centerY) en conservant ses proportions,
      * en l'inscrivant dans un carré de côté maxSize.
@@ -86,6 +79,57 @@ class Map {
         const drawW = w * scale;
         const drawH = h * scale;
         ctx.drawImage(img, centerX - drawW / 2, centerY - drawH / 2, drawW, drawH);
+    }
+
+    /**
+     * Assombrit une couleur rgb(...) ou #hex de percent %.
+     */
+    static darkenColor(color, percent = 50) {
+        const factor = 1 - percent / 100;
+        let r, g, b;
+        if (color.startsWith("#")) {
+            const hex = color.length === 4
+                ? "#" + color.slice(1).split("").map(c => c + c).join("")
+                : color;
+            r = parseInt(hex.slice(1, 3), 16);
+            g = parseInt(hex.slice(3, 5), 16);
+            b = parseInt(hex.slice(5, 7), 16);
+        } else {
+            [r, g, b] = color.match(/\d+/g).map(Number);
+        }
+        return `rgb(${Math.round(r * factor)}, ${Math.round(g * factor)}, ${Math.round(b * factor)})`;
+    }
+
+    /** Couleur terrain laissant voir le fond de carte (pas de remplissage) */
+    static isTerrainTransparent(color) {
+        return color === "transparent"
+            || color === "rgb(255, 255, 255)"
+            || (typeof color === "string" && color.toLowerCase() === "#ffffff");
+    }
+
+    /** Recalcule la position et la taille du fond de carte sur le canvas */
+    static updateFormeFond() {
+        if (image_fond == null) return;
+        const hexHS = hexSize * 1.5;
+        const hexVS = hexSize * Math.sqrt(3);
+        forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
+        forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
+        forme_fond.x = offsetX - forme_fond.width / 2;
+        forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
+    }
+
+    /** Charge l'image de fond (ex. images/Figurines/Fond.png) */
+    static loadImageFond(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                image_fond = img;
+                Map.updateFormeFond();
+                resolve(img);
+            };
+            img.onerror = () => reject(new Error("Image de fond introuvable : " + src));
+            img.src = src;
+        });
     }
 
     /**
@@ -306,14 +350,13 @@ class Map {
      */
     static distance(col1, row1, col2, row2) {
         // Conversion des coordonnées hexagonales en coordonnées cartésiennes
-        // Le pas est de 3 mètres entre les hexagones.
         const x1 = col1 * (3 / 2);
         const y1 = row1 * (Math.sqrt(3)) + (Math.abs(col1) % 2) * (Math.sqrt(3) / 2);
         const x2 = col2 * (3 / 2);
         const y2 = row2 * (Math.sqrt(3)) + (Math.abs(col2) % 2) * (Math.sqrt(3) / 2);
 
         // Calcul de la distance euclidienne
-        const dist = 3 * Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) / Math.sqrt(3);
+        const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) / Math.sqrt(3);
 
         return Math.round(100 * dist) / 100;
     }
@@ -334,35 +377,27 @@ class Map {
 
                 // Propriétés par défaut de la case
                 let color = "rgb(192, 192, 192)"; // Couleur de brouillard
-                let strie = false;                 // Pas de striage par défaut
                 let isInBrouillard = !Map.is_visible(col, row); // Brouillard si non visible
 
                 // Si la case est visible (pas de brouillard)
-                if (!isInBrouillard) {
-                    color = "rgb(255, 255, 255)";
-                    Terrains.filter(t => t.Position === col + "," + row).forEach(t => {
-                        color = t.color;
-                    });
-
-                    // Définition de la couleur de l'hexagone en fonction du type de pion
-                    let magicien = Pions.find(p => p.Attaquant && p.Nom_liste != "");
-                    if (typeof magicien === "undefined") magicien = null;
-
-                    Pions.filter(p => p.Position === col + "," + row).forEach(p => {
-                        if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
-                        else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
-                        else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
-                        else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
-                        else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
-                    });
-                }
-
-                // Est-ce un ennemi ?
-                Pions.filter(p => p.Position === col + "," + row).forEach(p => {
-                    if (p.Type === "ennemis") strie = true;
+                color = "rgb(255, 255, 255)";
+                Terrains.filter(t => t.Position === col + "," + row).forEach(t => {
+                    color = t.Color;
                 });
 
-                hexMap.push({ x, y, col, row, color, strie, isInBrouillard });
+                // Définition de la couleur de l'hexagone en fonction du type de pion
+                let magicien = Pions.find(p => p.Attaquant && p.Nom_liste != "");
+                if (typeof magicien === "undefined") magicien = null;
+
+                Pions.filter(p => p.Position === col + "," + row).forEach(p => {
+                    if (p.Attaquant && magicien === null) color = "rgb(255, 0, 0)";
+                    else if (p.Defenseur && magicien === null) color = "rgb(0, 0, 255)";
+                    else if (p.Cible_sort && magicien !== null) color = "rgb(0, 255, 0)";
+                    else if (p.Selected && p.Type === "allies") color = "rgb(192, 192, 255)";
+                    else if (p.Selected && p.Type === "ennemis") color = "rgb(255, 192, 192)";
+                });
+
+                hexMap.push({ x, y, col, row, color, isInBrouillard });
             }
         }
     }
@@ -377,7 +412,7 @@ class Map {
      * @param {boolean} isInBrouillard - Si true, l'hexagone est dans le brouillard
      * @param {boolean} selected - Si true, l'hexagone est sélectionné
      */
-    static drawHexagon(x, y, color, strie, text, isInBrouillard, selected = false) {
+    static drawHexagon(x, y, color, text, isInBrouillard, selected = false) {
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
@@ -394,6 +429,7 @@ class Map {
         const ctx = canvas.getContext("2d");
 
         // On enregistre et dessine les sommets des hexagones.
+        ctx.save();
         ctx.beginPath();
         let points = [];
         for (let i = 0; i < 6; i++) {
@@ -405,103 +441,121 @@ class Map {
         }
         ctx.closePath();
 
-        // On remplit de la couleur indiquée, si ce n'est pas du blanc (couleur de transparence)
-        if (color != "rgb(255, 255, 255)") {
+        // Transparent = laisse voir le fond de carte
+        const isTransparent = Map.isTerrainTransparent(color);
+        if (isInBrouillard) {
             if (document.getElementById("joueur").value === "MJ") {
-                if (isInBrouillard) ctx.globalAlpha = 0.8;
+                // MJ : voile gris semi-transparent, la carte reste visible en dessous
+                if (!isTransparent) {
+                    ctx.globalAlpha = 0.65;
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+                ctx.fillStyle = "rgba(100, 100, 100, 0.75)";
+                ctx.fill();
+            } else {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+                ctx.fill();
             }
-            else {
-                if (isInBrouillard) ctx.globalAlpha = 0.8;
-            }
+        } else if (!isTransparent) {
             ctx.fillStyle = color;
             ctx.fill();
-            ctx.globalAlpha = 1;
         }
 
-        // On dessine le contour de l'hexagone.
-        ctx.strokeStyle = "rgb(20, 20, 20)";
+        // On ne dessine pas le contour si le brouillard est actif et que le joueur n'est pas MJ
+        if (isInBrouillard && document.getElementById("joueur").value !== "MJ") return;
+
+        // On dessine le contour de l'hexagone et la couleur de l'hexagone
+        ctx.strokeStyle = "rgb(200, 150, 150)";
         ctx.lineWidth = 1;
         ctx.stroke();
+        ctx.restore();
+
+        let strie = false;
+        Terrains.filter(t => t.Position === text).forEach(t => {
+            if (t.Type === "strie") strie = true;
+        });
+        Pions.filter(p => p.Position === text).forEach(p => {
+            if (p.Type === "ennemis") strie = true;
+            else strie = false; // On ne strie pas les terrains où il y a un allié
+        });
 
         // On dessine l'image au centre de l'hexagone
-        if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
-            if (strie) {
-                // On définit un clip pour ne dessiner que dans l'hexagone
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(points[0].dx, points[0].dy);
-                for (let i = 1; i < points.length; i++) {
-                    ctx.lineTo(points[i].dx, points[i].dy);
-                }
-                ctx.closePath();
-                ctx.clip();
+        if (strie) {
+            // On définit un clip pour ne dessiner que dans l'hexagone
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(points[0].dx, points[0].dy);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].dx, points[i].dy);
+            }
+            ctx.closePath();
+            ctx.clip();
 
-                // On strie l'hexagone dans le clip
-                const spacing = Math.round(hexSize / 8);
-                const minX = Math.min(...points.map(p => p.dx)) - spacing;
-                const maxX = Math.max(...points.map(p => p.dx)) + spacing;
-                const minY = Math.min(...points.map(p => p.dy)) - spacing;
-                const maxY = Math.max(...points.map(p => p.dy)) + spacing;
-                ctx.beginPath();
+            // On strie l'hexagone dans le clip
+            const spacing = Math.round(hexSize / 8);
+            const minX = Math.min(...points.map(p => p.dx)) - spacing;
+            const maxX = Math.max(...points.map(p => p.dx)) + spacing;
+            const minY = Math.min(...points.map(p => p.dy)) - spacing;
+            const maxY = Math.max(...points.map(p => p.dy)) + spacing;
+            ctx.beginPath();
 
-                if (color === "rgb(192, 192, 192)") {
-                    ctx.strokeStyle = "white";
-                }
-                else {
-                    ctx.strokeStyle = "gray";
-                }
-
-                ctx.lineWidth = 1;
-                for (let x = minX - (maxY - minY); x <= maxX; x += spacing) {
-                    ctx.moveTo(x, minY);
-                    ctx.lineTo(x + (maxY - minY), maxY);
-                }
-                ctx.stroke();
-                ctx.restore(); // Supprime le clip
+            if (color === "rgb(192, 192, 192)") {
+                ctx.strokeStyle = "white";
+            }
+            else {
+                ctx.strokeStyle = "gray";
             }
 
-            // On dessine l'image au centre de l'hexagone (proportions conservées)
-            const imgSize = hexSize * 1.2;
-            const p = Pions.find(q => q.Position === text);
-            if (p != null && typeof p != "undefined") {
-                const m = Models.find(n => n.Nom_model === p.Model);
-                Map.drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
-                if (p.Auto) {
-                    ctx.drawImage(
-                        image_auto,
-                        x - hexSize + imgSize / 24,
-                        y - imgSize / 6,
-                        imgSize / 3,
-                        imgSize / 3);
-                }
+            ctx.lineWidth = 1;
+            for (let x = minX - (maxY - minY); x <= maxX; x += spacing) {
+                ctx.moveTo(x, minY);
+                ctx.lineTo(x + (maxY - minY), maxY);
             }
+            ctx.stroke();
+            ctx.restore(); // Supprime le clip
+        }
 
-            // On ajoute l'indice sur l'image le cas échéant
-            if (p != null && typeof p != "undefined" && p.Indice != 0) {
-                ctx.fillStyle = "rgb(20, 20, 20)";
-                ctx.font = `Bold ${hexSize / 3}px Arial`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(p.Indice,
-                    x + hexSize * Math.cos(Math.PI / 3) - imgSize / 9,
-                    y - hexSize * Math.sin(Math.PI / 3) + imgSize / 6);
-
+        // On dessine l'image au centre de l'hexagone (proportions conservées)
+        const imgSize = hexSize * 1.2;
+        const p = Pions.find(q => q.Position === text);
+        if (p != null && typeof p != "undefined") {
+            const m = Models.find(n => n.Nom_model === p.Model);
+            Map.drawImageCenteredFit(ctx, m.Image, x, y, imgSize);
+            if (p.Auto) {
+                ctx.drawImage(
+                    image_auto,
+                    x - hexSize + imgSize / 24,
+                    y - imgSize / 6,
+                    imgSize / 3,
+                    imgSize / 3);
             }
         }
 
-        if (!isInBrouillard || document.getElementById("joueur").value === "MJ") {
-            // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = "rgb(20, 20, 20)";
+        // On ajoute l'indice sur l'image le cas échéant
+        if (p != null && typeof p != "undefined" && p.Indice != 0) {
+            ctx.fillStyle = "rgb(20, 20, 20)";
+            ctx.font = `Bold ${hexSize / 3}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(p.Indice,
+                x + hexSize * Math.cos(Math.PI / 3) - imgSize / 9,
+                y - hexSize * Math.sin(Math.PI / 3) + imgSize / 6);
 
-            // Affiche les coordonnées si le mode est activé
-            if (isMode_coordonnees) {
-                ctx.fillStyle = "rgb(20, 20, 20)";
-                ctx.font = `Bold ${hexSize / 3}px Arial`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.fillText(text, x, y);
-            }
+        }
+
+        // Réinitialiser les propriétés du contexte pour éviter qu'elles n'affectent les hexagones suivants
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "rgb(20, 20, 20)";
+
+        // Affiche les coordonnées si le mode est activé
+        if (isMode_coordonnees) {
+            ctx.fillStyle = "rgb(20, 20, 20)";
+            ctx.font = `Bold ${hexSize / 3}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(text, x, y);
         }
     }
 
@@ -555,13 +609,6 @@ class Map {
      * @param {boolean} selected - Si true, dessine sur le canvas de sélection
      */
     static drawHexMap(selected = false) {
-        function get_height() {
-            let h = window.innerHeight;
-            h -= document.getElementById("div_cartouche").offsetHeight;
-            h -= 18;
-            return h;
-        }
-
         if (selected) {
             const ctx = canvas_selected.getContext("2d");
 
@@ -586,7 +633,7 @@ class Map {
             ctx.clearRect(0, 0, canvas_selected.width, canvas_selected.height);
             hexMap.forEach(hex => {
                 Map.drawHexagon(hex.x + offsetX, hex.y + offsetY,
-                    null, null, `${hex.col},${hex.row}`, null, true);
+                    hex.color, `${hex.col},${hex.row}`, null, true);
             });
             return;
         }
@@ -594,12 +641,12 @@ class Map {
         const ctx = canvas.getContext("2d");
 
         canvas.width = window.innerWidth;
-        canvas.height = get_height();
+        canvas.height = window.innerHeight - document.getElementById("barre_outils").offsetHeight;
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Chargement de la carte de fond
-        if (image_fond != null) {
+        if (image_fond != null && forme_fond.width > 0 && forme_fond.height > 0
+            && image_fond.complete && image_fond.naturalWidth > 0) {
             ctx.drawImage(
                 image_fond,
                 forme_fond.x,
@@ -613,7 +660,6 @@ class Map {
                 hex.x + offsetX,
                 hex.y + offsetY,
                 hex.color,
-                hex.strie,
                 `${hex.col},${hex.row}`,
                 hex.isInBrouillard);
         });
@@ -639,7 +685,7 @@ class Map {
         if (p_sel != null && typeof p_sel != "undefined") {
             const c_sel = p_sel.Position.split(",")[0];
             const r_sel = p_sel.Position.split(",")[1];
-            tooltip.innerHTML += "(" + Map.distance(c_sel, r_sel, col, row) + " m)";
+            tooltip.innerHTML += "(" + Map.distance(c_sel, r_sel, col, row) + " cases)";
         }
 
         if (isMode_coordonnees) {
@@ -666,15 +712,126 @@ class Map {
      */
     static setPortee_vue() {
         const portee_vue = parseInt(document.getElementById("portee_vue").value);
-        if (portee_vue < 3) portee_vue = 3;
+        if (portee_vue < 1) portee_vue = 1;
         if (portee_vue > 99) portee_vue = 99;
         document.getElementById("portee_vue").value = portee_vue;
 
         // Tout le monde a cette portée de vue par défaut
-        Pions.forEach(p => { p.Vue = portee_vue; });
+        Pions.forEach(p => {
+            p.Vue = portee_vue;
+            p.sendMessage("Vue");
+        });
 
         Map.generateHexMap();
         Map.drawHexMap();
+    }
+
+    /**
+     * Vérifie si deux segments de droite se croisent
+     * @param {Object} p1 - Premier point du premier segment {x, y}
+     * @param {Object} p2 - Deuxième point du premier segment {x, y}
+     * @param {Object} p3 - Premier point du deuxième segment {x, y}
+     * @param {Object} p4 - Deuxième point du deuxième segment {x, y}
+     * @returns {boolean} - true si les segments se croisent
+     */
+    static segmentsIntersect(p1, p2, p3, p4) {
+        // Sous-fonction : Vérifie si un point est sur un segment (utilisé pour les cas limites)
+        function isPointOnSegment(segStart, segEnd, point) {
+            // Vérifier si le point est colinéaire avec le segment
+            const crossProduct = (point.y - segStart.y) * (segEnd.x - segStart.x) -
+                (point.x - segStart.x) * (segEnd.y - segStart.y);
+            if (Math.abs(crossProduct) > 1e-10) return false;
+
+            // Vérifier si le point est dans la bounding box du segment
+            const minX = Math.min(segStart.x, segEnd.x);
+            const maxX = Math.max(segStart.x, segEnd.x);
+            const minY = Math.min(segStart.y, segEnd.y);
+            const maxY = Math.max(segStart.y, segEnd.y);
+
+            return (point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY);
+        }
+
+        // Fonction pour calculer l'orientation de trois points (CCW)
+        const ccw = (A, B, C) => {
+            return (C.y - A.y) * (B.x - A.x) - (B.y - A.y) * (C.x - A.x);
+        };
+
+        // Vérifier si les segments se croisent
+        const o1 = ccw(p1, p2, p3);
+        const o2 = ccw(p1, p2, p4);
+        const o3 = ccw(p3, p4, p1);
+        const o4 = ccw(p3, p4, p2);
+
+        // Cas général : les segments se croisent si les orientations sont différentes
+        if ((o1 * o2 < 0) && (o3 * o4 < 0)) {
+            return true;
+        }
+
+        // Cas spéciaux : segments colinéaires ou points sur les bords
+        // Vérifier si p3 est sur le segment p1-p2
+        if (o1 === 0 && isPointOnSegment(p1, p2, p3)) return true;
+        // Vérifier si p4 est sur le segment p1-p2
+        if (o2 === 0 && isPointOnSegment(p1, p2, p4)) return true;
+        // Vérifier si p1 est sur le segment p3-p4
+        if (o3 === 0 && isPointOnSegment(p3, p4, p1)) return true;
+        // Vérifier si p2 est sur le segment p3-p4
+        if (o4 === 0 && isPointOnSegment(p3, p4, p2)) return true;
+
+        return false;
+    }
+
+    /**
+     * Vérifie si un segment de droite (défini par deux points) coupe un hexagone
+     * @param {Object} linePoint1 - Premier point du segment de droite {x, y}
+     * @param {Object} linePoint2 - Deuxième point du segment de droite {x, y}
+     * @param {Object} hexagon - Hexagone avec {x, y} (centre)
+     * @returns {boolean} - true si le segment coupe l'hexagone
+     */
+    static lineIntersectsHexagon(linePoint1, linePoint2, hexagon) {
+        // Sous-fonction : Vérifie si un point est dans un hexagone
+        function isPointInHexagon(point, hexagon) {
+            const dx = point.x - hexagon.x;
+            const dy = point.y - hexagon.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            return distance <= hexSize;
+        }
+
+        // Obtenir les 6 sommets de l'hexagone
+        const hexVertices = [];
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 3) * i;
+            hexVertices.push({
+                x: hexagon.x + hexSize * Math.cos(angle),
+                y: hexagon.y + hexSize * Math.sin(angle)
+            });
+        }
+
+        // Vérifier si le segment coupe l'une des 6 arêtes de l'hexagone
+        for (let i = 0; i < 6; i++) {
+            const edgeStart = hexVertices[i];
+            const edgeEnd = hexVertices[(i + 1) % 6];
+
+            if (Map.segmentsIntersect(linePoint1, linePoint2, edgeStart, edgeEnd)) {
+                return true;
+            }
+        }
+
+        // Vérifier aussi si les deux points du segment sont de part et d'autre de l'hexagone
+        // On vérifie si un point est à l'intérieur et l'autre à l'extérieur
+        const p1Inside = isPointInHexagon(linePoint1, hexagon);
+        const p2Inside = isPointInHexagon(linePoint2, hexagon);
+
+        // Si un point est dedans et l'autre dehors, le segment coupe forcément
+        if (p1Inside !== p2Inside) {
+            return true;
+        }
+
+        // Si les deux points sont dedans, le segment est entièrement dans l'hexagone
+        if (p1Inside && p2Inside) {
+            return true;
+        }
+
+        return false;
     }
 }
 
@@ -892,11 +1049,9 @@ canvas.addEventListener("mousemove", (event) => {
         isMoving_map = true;
 
         offsetX += deltaX;
-        Formes.forEach(r => { r.x += deltaX; });
         if (image_fond != null) forme_fond.x += deltaX;
 
         offsetY += deltaY;
-        Formes.forEach(r => { r.y += deltaY; });
         if (image_fond != null) forme_fond.y += deltaY;
 
         Map.drawHexMap();
@@ -947,14 +1102,12 @@ canvas.addEventListener("mouseup", (event) => {
             // Vérifier si la place est disponible
             const q = Pions.find(x => !x.Selected && x.Position === col + "," + row);
             if (q != null && typeof q != "undefined") return;
-            const t = Terrains.find(x => x.Model === "Rocher" && x.Position === col + "," + row);
-            if (t != null && typeof t != "undefined") return;
 
             // Déplacer le pion
             p.deplace_sur_la_carte(col, row);
         });
     }
-    else if (isDragging_right && !isMode_forme && !isMoving_map) {
+    else if (isDragging_right && !isMoving_map) {
         // Clic droit : on ouvre la fenetre de création d'un pion
         event.preventDefault();
 
@@ -986,9 +1139,6 @@ canvas.addEventListener("mouseup", (event) => {
     isDragging_right = false;
     canvas_selected.style.display = "none";
 
-    if (old_forme != "") type_forme = old_forme;
-    old_forme = "";
-
     Map.generateHexMap();
     Map.drawHexMap();
     Map.drawHexMap(true);
@@ -1007,7 +1157,7 @@ document.addEventListener("keydown", function (event) {
     switch (event.key) {
         case "Escape":
         case "Esc":
-            const elements = document.querySelectorAll("#rocher, #arbre, #eau, #gomme_t, #rectangle, #ellipse, #mur, #scission, #gomme_f");
+            const elements = document.querySelectorAll("#non_strie, #strie, #gomme");
             elements.forEach(element => { element.style.border = "none"; });
             isMode_terrain = false;
             type_terrain = "";
@@ -1053,13 +1203,6 @@ document.addEventListener("keydown", function (event) {
             hexHSpacing = hexSize * 1.5;
             hexVSpacing = hexHeight * Math.sqrt(3) / 2;
 
-            Formes.forEach(r => {
-                r.x = ratio * (r.x - offsetX) + offsetX;
-                r.y = ratio * (r.y - offsetY) + offsetY;
-                r.width = ratio * r.width;
-                r.height = ratio * r.height;
-            });
-
             if (image_fond != null) {
                 forme_fond.x = ratio * (forme_fond.x - offsetX) + offsetX;
                 forme_fond.y = ratio * (forme_fond.y - offsetY) + offsetY;
@@ -1069,22 +1212,18 @@ document.addEventListener("keydown", function (event) {
             break;
         case "ArrowUp":
             offsetY += 10;
-            Formes.forEach(r => { r.y += 10; });
             if (image_fond != null) forme_fond.y += 10;
             break;
         case "ArrowDown":
             offsetY -= 10;
-            Formes.forEach(r => { r.y -= 10; });
             if (image_fond != null) forme_fond.y -= 10;
             break;
         case "ArrowLeft":
             offsetX += 10;
-            Formes.forEach(r => { r.x += 10; });
             if (image_fond != null) forme_fond.x += 10;
             break;
         case "ArrowRight":
             offsetX -= 10;
-            Formes.forEach(r => { r.x -= 10; });
             if (image_fond != null) forme_fond.x -= 10;
             break;
         default:
@@ -1127,6 +1266,7 @@ canvas.addEventListener("wheel", function (event) {
 
     // Appliquer le zoom
     let ratio = 1;
+    let d = 0;
     if (event.deltaY > 0) {
         // Zoom out (molette vers le bas)
         if (hexSize < 10) return;
@@ -1142,6 +1282,13 @@ canvas.addEventListener("wheel", function (event) {
     hexHSpacing = hexSize * 1.5;
     hexVSpacing = hexHeight * Math.sqrt(3) / 2;
 
+    if (image_fond != null) {
+        forme_fond.x = ratio * (forme_fond.x - mouseX) + mouseX;
+        forme_fond.y = ratio * (forme_fond.y - mouseY) + mouseY;
+        forme_fond.width = ratio * forme_fond.width;
+        forme_fond.height = ratio * forme_fond.height;
+    }
+
     // Calculer la position de la case après le zoom
     const hexXY_after = Map.get_XY(col, row);
 
@@ -1151,34 +1298,4 @@ canvas.addEventListener("wheel", function (event) {
 
     Map.generateHexMap();
     Map.drawHexMap();
-});
-
-// === GESTION DU FOND DE CARTE ===
-document.getElementById("img_fond").addEventListener("change", async (event) => {
-    const form = document.getElementById("upload_fond");
-    const formData = new FormData(form);
-    formData.append("image", event.target.files[0]);
-    formData.append("nom", "Fond");
-    fetch("upload.php", { method: "POST", body: formData })
-        .then((r) => r.json())
-        .then((data) => {
-            if (data.ok) {
-                if (event.target.files.length === 0) {
-                    // Aucun fichier sélectionné
-                    image_fond = null;
-                }
-                else {
-                    image_fond = new Image();
-                    image_fond.src = data.path + "?t=" + new Date().getTime();
-                }
-                URL.revokeObjectURL(blobUrl);
-            }
-            else console.warn("Upload fond:", data.message);
-        })
-        .catch((e) => {
-            console.warn("Upload fond:", e);
-            URL.revokeObjectURL(blobUrl);
-        });
-
-    affiche_dim_carte();
 });

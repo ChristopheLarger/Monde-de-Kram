@@ -105,8 +105,8 @@ function initialise_pion() {
 
   if ((m_pion === null || typeof m_pion === "undefined") && (Pions.length > 0)) {
     m_pion = Pions[0];
-    m_pion.selected = true;
-    m_pion.sendMessage("selected");
+    Pions.forEach(p => { p.Selected = false; });
+    m_pion.Selected = true;
     affiche_pion();
     Map.generateHexMap();
     Map.drawHexMap();
@@ -268,7 +268,7 @@ function initialise_pion() {
     });
 
     [pion, model].forEach((panel) => {
-      panel.style.width = (largeur + 9) + "px"; // Pourquoi le +9 est-il nécessaire ?
+      panel.style.width = (largeur + 12) + "px"; // Pourquoi le +9 est-il nécessaire ?
     });
 
     document.querySelector("#div_model_5 .competences").style.display = "none";
@@ -799,7 +799,13 @@ function initialise_model_X() {
       }
       else if (tab_index === "3") {
         update_cout_total();
-        update_cout_magie();
+        if (m_model.Is_monster) {
+          document.getElementById('couts_table').style.display = 'none';
+       }
+        else {
+          document.getElementById('couts_table').style.display = 'block';
+        }
+
         document.getElementById('div_model_3').style.display = 'block';
       }
       else {
@@ -902,23 +908,28 @@ function initialise_model_0() {
   });
 
   document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
-    input.addEventListener("click", function (event) {
+    input.addEventListener("contextmenu", function (event) {
       if (!input.className.includes("_score")) return;
+      event.preventDefault();
       affiche_interactions(0, input.className.replace("_score", ""));
     });
   });
 
   document.querySelectorAll("#div_model_0 input[type=text]").forEach((input) => {
     input.addEventListener("input", function (event) {
-      const attribut = event.target.className.replace("_base", "").replace("_experience", "").replace("_race", "");
-      const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
-
-      if (attribut === "nb_blessures_max") {
+      if (input.className === "nb_blessures_max") {
         m_model.Nb_blessures_max = event.target.value;
         m_model.sendMessage("set_Nb_blessures_max", m_model.Nb_blessures_max);
         return;
       }
+      else if (input.className === "vue") {
+        m_model.Vue = event.target.value;
+        m_model.sendMessage("set_Vue", m_model.Vue);
+        return;
+      }
 
+      const attribut = event.target.className.replace("_base", "").replace("_experience", "").replace("_race", "");
+      const att_name = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
       const target_base = document.querySelector("#div_model_0 ." + attribut + "_base");
       const target_exp = document.querySelector("#div_model_0 ." + attribut + "_experience");
 
@@ -1008,6 +1019,19 @@ function initialise_model_0() {
  * Initialise les événements de la section Monstres du modèle
  */
 function initialise_model_1() {
+  document.querySelectorAll("#div_model_1 input[type=text]").forEach((input) => {
+    input.addEventListener("contextmenu", function (event) {
+      if (["puissance_physique_monstre", "vivacite_physique2_monstre", "puissance_mentale_monstre"].includes(input.className)) {
+        event.preventDefault();
+        affiche_interactions(0, input.className.replace("_monstre", ""));
+      }
+      else if (["esquive_monstre", "feinte_de_corps_monstre"].includes(input.className)) {
+        event.preventDefault();
+        affiche_interactions(1, input.className.replace("_monstre", ""));
+      }
+    });
+  });
+
   document.querySelector("#div_model_1 .bool_parade_1_monstre").addEventListener("change", function (event) {
     document.querySelector("#div_model_1 .parade_1_monstre").disabled = !event.target.checked;
   });
@@ -1054,6 +1078,11 @@ function initialise_model_1() {
       if (input.className === "nb_blessures_max") {
         m_model.Nb_blessures_max = event.target.value;
         m_model.sendMessage("set_Nb_blessures_max", m_model.Nb_blessures_max);
+        return;
+      }
+      else if (input.className === "vue") {
+        m_model.Vue = event.target.value;
+        m_model.sendMessage("set_Vue", m_model.Vue);
         return;
       }
       const attribut = event.target.className.replace("_monstre", "");
@@ -1182,7 +1211,7 @@ function set_competences_bornes(nom_competence) {
     if (max > 9) max = 9;
   }
 
-  let old_value = degres.value ? parseInt(degres.value) : 0;
+  let old_value = degres.value !== "" ? parseInt(degres.value) : 0;
   if (old_value < min) old_value = min;
   if (old_value > max) old_value = max;
   degres.innerHTML = "";
@@ -1194,7 +1223,6 @@ function set_competences_bornes(nom_competence) {
   }
   degres.value = old_value;
 
-  degres.dispatchEvent(new Event("change", { bubbles: true }));
 }
 
 /**
@@ -1427,25 +1455,16 @@ function initialise_model_4() {
       switch (nom_avantage) {
         case "Maitre de magie":
           if (!avantage.Selection) break;
-          document.querySelector("#div_model_3 .concentration").closest("tr").style.visibility = avantage.Selection ? "visible" : "hidden";
-          document.querySelector("#div_model_3 .concentration").disabled = avantage.Selection;
-
-          m_model.Magie_type = avantage.Selection ? "classique" : "sans";
-          m_model.sendMessage("set_Magie_type", m_model.Magie_type);
+          document.querySelector("#div_model_3 .concentration").closest("tr").style.visibility = "visible";
+          document.querySelector("#div_model_3 .concentration").disabled = true;
           document.querySelector("#div_model_3 .concentration").value = m_model.get("concentration");
           break;
         case "Guide spirituel":
           if (!avantage.Selection) break;
-          document.querySelector("#div_model_3 .concentration").closest("tr").style.visibility = avantage.Selection ? "visible" : "hidden";
-          document.querySelector("#div_model_3 .concentration").disabled = !avantage.Selection;
-
-          m_model.Magie_type = avantage.Selection ? "religieuse" : "sans";
-          m_model.sendMessage("set_Magie_type", m_model.Magie_type);
+          document.querySelector("#div_model_3 .concentration").closest("tr").style.visibility = "visible";
+          document.querySelector("#div_model_3 .concentration").disabled = false;
           document.querySelector("#div_model_3 .concentration").value = m_model.get("concentration");
-
-          m_model.Liste_pretre = shortName[avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase()];
-          m_model.sendMessage("set_Liste_pretre", m_model.Liste_pretre);
-          break;
+         break;
       }
     });
   });
@@ -1470,10 +1489,11 @@ function initialise_model_5() {
   });
 
   document.querySelectorAll("#div_model_5 input[type=text]").forEach((input) => {
-    input.addEventListener("click", function (event) {
+    input.addEventListener("contextmenu", function (event) {
       if (input.className !== "score") return;
+      event.preventDefault();
       const cmp = input.closest("tr").querySelectorAll("td")[0].textContent.split(" :")[0];
-      affiche_interactions(5, cmp);
+      affiche_interactions(1, cmp);
     });
   });
 
@@ -1489,6 +1509,7 @@ function initialise_model_5() {
       }
 
       cmp.Degres = event.target.value;
+
       cmp.sendMessage("set_Degres", cmp.Degres);
 
       event.target.closest("tr").querySelector(".score").value = cmp.get_score();
@@ -1593,32 +1614,61 @@ function update_cout_total() {
     -2000;
   document.querySelector("#div_model_3 .total_cout").value = total_cout;
 
+  document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = "none";
   if (m_model.get_cout_attributs_experience() > 0.25 * total_cout) {
     document.querySelector("#div_model_3 .attributs_experience_cout").style.color = "red";
-    document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = "block";
+    if (!m_model.Is_monster) document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = "block";
   }
   else {
     document.querySelector("#div_model_3 .attributs_experience_cout").style.color = "";
-    document.querySelector("#div_model_3 .remarques_cout_attributs").style.display = "none";
   }
 
+  document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = "none";
   if (50 * m_model.get_cout_avantages_experience() > 0.25 * total_cout) {
     document.querySelector("#div_model_3 .avantages_experience_cout").style.color = "red";
-    document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = "block";
+    if (!m_model.Is_monster) document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = "block";
   }
   else {
     document.querySelector("#div_model_3 .avantages_experience_cout").style.color = "";
-    document.querySelector("#div_model_3 .remarques_cout_avantages").style.display = "none";
   }
+
+  // Mise à jour du coût de la magie
+  update_cout_magie();
 }
 
+/**
+ * Mise à jour du coût de la magie
+ */
 function update_cout_magie() {
   if (!m_model) return;
 
-  const av = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Maitre de magie" && avantage.Selection);
-  if (av === null || typeof av === "undefined") return;
-  if (av.Niveau_creation === "-" && av.Niveau_experience === "-") return;
+  document.querySelector("#div_model_3 .cout_listes_magie").closest("tr").style.display = "";
+  document.querySelector("#div_model_3 .cout_sorts_connus").closest("tr").style.display = "";
+  document.querySelector("#cout_magie_table").style.display = "";
+  document.querySelector("#cout_magie_table").querySelectorAll("tr").forEach(tr => {
+    if (tr.querySelector("th") !== null) tr.style.display = "";
+  });
+  document.querySelector("#div_model_3 .hr_cout_magie").style.display = "";
 
+  const av = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Maitre de magie" && avantage.Selection);
+  if (av === null || typeof av === "undefined" || (av.Niveau_creation === "-" && av.Niveau_experience === "-")) {
+    // Cas où le personnage n'a pas de maître de magie
+    document.querySelector("#div_model_3 .cout_listes_magie").closest("tr").style.display = "none";
+    document.querySelector("#div_model_3 .cout_sorts_connus").closest("tr").style.display = "none";
+    document.querySelector("#cout_magie_table").querySelectorAll("tr").forEach(tr => {
+      if (tr.querySelector("th") !== null) tr.style.display = "none";
+    });
+
+    const av_religieux = Avantages.find(avantage => avantage.Nom_model === m_model.Nom_model && avantage.Nom === "Guide spirituel" && avantage.Selection);
+    if (av_religieux === null || typeof av_religieux === "undefined" || (av_religieux.Niveau_creation === "-" && av_religieux.Niveau_experience === "-")) {
+      // Cas où le personnage n'a pas de guide spirituel non plus
+      document.querySelector("#cout_magie_table").style.display = "none";
+      document.querySelector("#div_model_3 .hr_cout_magie").style.display = "none";
+    }
+    return;
+  }
+
+  // Cas où le personnage a un maître de magie (classique)
   let niveau = av.Niveau_creation === "-" ? 0 : parseInt(av.Niveau_creation);
   niveau += av.Niveau_experience === "-" ? 0 : parseInt(av.Niveau_experience);
 
@@ -1735,6 +1785,7 @@ function affiche_model() {
     if (tr.querySelector(".degres") === null) return;
     const Nom_competence = tr.querySelectorAll("td")[0].textContent.split(" :")[0];
     let cmp = Competences.find(comp => comp.Nom_model === m_model.Nom_model && comp.Nom === Nom_competence);
+
     if (cmp === null || typeof cmp === "undefined") {
       cmp = new Competence({ Nom_model: m_model.Nom_model, Nom: Nom_competence, Degres: 0 });
       Competences.push(cmp);
@@ -1745,7 +1796,6 @@ function affiche_model() {
     if (cmp.Degres > degres_max) degres_max = cmp.Degres;
 
     set_competences_bornes(Nom_competence);
-
     tr.querySelector(".degres").value = cmp.Degres;
     tr.querySelector(".degres").dispatchEvent(new Event("change", { bubbles: true }));
   });
@@ -1863,9 +1913,11 @@ function initialise_interactions() {
  */
 
 function affiche_interactions(type, nom) {
-  document.querySelector('#div_interactions .nom').textContent = "Jet de " + nom;
+  let nice_name = nom.slice(0, 1).toUpperCase() + nom.slice(1).toLowerCase();
+  nice_name = nice_name.replace("_", " ").replace("2", "");
+  document.querySelector('#div_interactions .nom').textContent = "Jet de " + nice_name;
   if (["a", "e", "i", "o", "u", "y"].includes(nom.charAt(0).normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase())) {
-    document.querySelector('#div_interactions .nom').textContent = "Jet d'" + nom + " :";
+    document.querySelector('#div_interactions .nom').textContent = "Jet d'" + nice_name + " :";
   }
 
   const jet_des = LancerDes.rollDice("3D6");

@@ -1,0 +1,36 @@
+{
+    "version": 1,
+    "savedAt": "2026-06-12T13:49:06.884Z",
+    "terrains": [
+        {
+            "Type": "strie",
+            "Position": "6,-3",
+            "Color": "#00FFFF"
+        },
+        {
+            "Type": "strie",
+            "Position": "6,3",
+            "Color": "#FF0000"
+        },
+        {
+            "Type": "strie",
+            "Position": "7,-3",
+            "Color": "#00FFFF"
+        },
+        {
+            "Type": "strie",
+            "Position": "7,2",
+            "Color": "#FF0000"
+        },
+        {
+            "Type": "strie",
+            "Position": "8,-2",
+            "Color": "#00FFFF"
+        },
+        {
+            "Type": "strie",
+            "Position": "8,2",
+            "Color": "#FF0000"
+        }
+    ]
+}

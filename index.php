@@ -94,6 +94,8 @@
             $js .= "    Telepathie_experience: " . toJS($row['Telepathie_experience'], 'int') . ",\n";
 
             $js .= "    Nb_blessures_max: " . toJS($row['Nb_blessures_max'], 'int') . ",\n";
+            $js .= "    Vue: " . toJS($row['Vue'], 'int') . ",\n";
+            
             $js .= "    Seuil_blessures: " . toJS($row['Seuil_blessures'], 'int') . ",\n";
             $js .= "    Fatigue: " . toJS($row['Fatigue'], 'int') . ",\n";
             $js .= "    Puissance_mentale: " . toJS($row['Puissance_mentale'], 'int') . ",\n";
@@ -117,9 +119,7 @@
             $js .= "    Coefficient_dommages_2: " . toJS($row['Coefficient_dommages_2']) . ",\n";
             $js .= "    Bonus_dommages_2: " . toJS($row['Bonus_dommages_2'], 'int') . ",\n";
 
-            $js .= "    Magie_type: " . toJS($row['Magie_type']) . ",\n";
             $js .= "    Concentration: " . toJS($row['Concentration'], 'int') . ",\n";
-            $js .= "    Liste_pretre: " . toJS($row['Liste_pretre'], 'null') . ",\n";
 
             $js .= "    Armure_tete: " . toJS($row['Armure_Tete'], 'int') . ",\n";
             $js .= "    Armure_poitrine: " . toJS($row['Armure_Poitrine'], 'int') . ",\n";
@@ -279,6 +279,20 @@
             $js .= "    Nom_sort: " . toJS($row['Nom_sort']) . ",\n";
             $js .= "    Succes: " . toJS($row['Succes'], 'bool') . ",\n";
             $js .= "    Valeur: " . toJS($row['Valeur'], 'null') . "\n";
+            $js .= "});\n";
+            return $js;
+        }
+
+        /**
+         * Génère le code JavaScript pour initialiser un terrain
+         * Correspond intégralement et exclusivement aux propriétés du constructeur Pion (js/terrain.js)
+         */
+        function generateTerrainJS($row, $index)
+        {
+            $js = "Terrains[$index] = new Terrain({\n";
+            $js .= "    Type: " . toJS($row['Type']) . ",\n";
+            $js .= "    Position: " . toJS($row['Position']) . ",\n";
+            $js .= "    Color: " . toJS($row['Color']) . "\n";
             $js .= "});\n";
             return $js;
         }
@@ -481,6 +495,18 @@
                 }
             }
 
+            // === CHARGEMENT DES TERRAINS ===
+            $query = "SELECT * FROM terrain ORDER BY `Type` ASC, Position ASC";
+            $result = $conn->query($query);
+
+            if ($result->num_rows > 0) {
+                $ligne = 0;
+                while ($row = $result->fetch_assoc()) {
+                    echo generateTerrainJS($row, $ligne);
+                    $ligne++;
+                }
+            }
+
             // === CHARGEMENT DES PIONS ===
             $query = "SELECT * FROM pion ORDER BY Type ASC, Model ASC, Indice ASC";
             $result = $conn->query($query);
@@ -511,7 +537,7 @@
 
         (async () => { // Attendre que les images soient chargées
             while (count < Models.length) { await sleep(100); }
-            // Régénérer la carte pour afficher les pions
+            await Map.loadImageFond("images/Figurines/Fond.png").catch(() => {});
             Map.generateHexMap();
             Map.drawHexMap();
         })();

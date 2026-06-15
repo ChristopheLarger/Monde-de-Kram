@@ -184,6 +184,7 @@ class Model {
     this.Is_monster = data.Is_monster || 0;
 
     this.Nb_blessures_max = data.Nb_blessures_max || 1;
+    this.Vue = data.Vue || 1;
 
     // Attributs de base (Humanoide)
     this.Force = data.Force || 0;
@@ -245,10 +246,8 @@ class Model {
     this.Coefficient_dommages_2 = data.Coefficient_dommages_2 || 0;
     this.Bonus_dommages_2 = data.Bonus_dommages_2 || 0;
 
-    // Caractéristiques de magie
-    this.Magie_type = data.Magie_type || "";
+    // Caractéristiques de magie pour les prêtres
     this.Concentration = data.Concentration || 0;
-    this.Liste_pretre = data.Liste_pretre || 0;
 
     // Protection par zone
     this.Armure_tete = data.Armure_tete || 0;
@@ -367,21 +366,26 @@ class Model {
   }
 
   /**
-  * Calcul les points de concentration
+  * Calcul les points de concentration (Magie classique)
   * @returns {number} - Points de concentration
   */
   get_cout_sorts() {
-    if (this.Magie_type !== "classique") return 0;
-
-    let res = 0;
-    SortsConnus.filter((sort) => sort.Nom_model === this.Nom_model).forEach((sort) => {
-      const don_directeur = this.get(getDonDirecteur(sort.Nom_liste));
-      const score = Math.round((don_directeur + this.get("memoire")) / 2);
-      const cout_niveau = parametres_couts[score].degres_spe;
-      const s = Sorts.find((s) => s.Nom_liste === sort.Nom_liste && s.Nom_sort === sort.Nom_sort);
-      res += s.Niveau * cout_niveau;
-    });
-    return res;
+      const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === this.Nom_model &&
+      avantage.Nom === "Maitre de magie" && avantage.Selection);
+  
+    if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+      (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
+      let res = 0;
+      SortsConnus.filter((sort) => sort.Nom_model === this.Nom_model).forEach((sort) => {
+        const don_directeur = this.get(getDonDirecteur(sort.Nom_liste));
+        const score = Math.round((don_directeur + this.get("memoire")) / 2);
+        const cout_niveau = parametres_couts[score].degres_spe;
+        const s = Sorts.find((s) => s.Nom_liste === sort.Nom_liste && s.Nom_sort === sort.Nom_sort);
+        res += s.Niveau * cout_niveau;
+      });
+      return res;
+    }
+    return 0;
   }
 
   /**
@@ -470,12 +474,18 @@ class Model {
   * @returns {number} - Coût de la concentration
   */
   get_cout_concentration() {
-    if (this.Magie_type !== "religieuse") return 0;
+    const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === this.Nom_model &&
+      avantage.Nom === "Guide spirituel" && avantage.Selection);
 
-    const don_directeur = this.get(getDonDirecteur(this.Liste_pretre));
-    const score = Math.round((don_directeur + this.get("foi")) / 2);
-    const cout_niveau = parametres_couts[score].degres_spe;
-    return 2 * cout_niveau * this.Concentration;
+    if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+      (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
+        const don_directeur = this.get(getDonDirecteur(av_guide_spirituel.Parametre));
+        const score = Math.round((don_directeur + this.get("foi")) / 2);
+        if (score < 1) return 0;
+        const cout_niveau = parametres_couts[score].degres_spe;
+        return 2 * cout_niveau * this.Concentration;
+    }
+    return 0;
   }
 
   /**
@@ -498,9 +508,20 @@ class Model {
   * @returns {number} - Points de concentration
   */
   #get_concentration() {
-    if (this.Magie_type === "religieuse") return this.Concentration;
-    if (this.Magie_type === "sans") return 0;
-    return Math.ceil(this.get_cout_sorts() / 20); // Magie_type === "classique"
+    const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === this.Nom_model &&
+      avantage.Nom === "Maitre de magie" && avantage.Selection);
+    const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === this.Nom_model &&
+      avantage.Nom === "Guide spirituel" && avantage.Selection);
+
+    if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+      (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
+      return Math.ceil(this.get_cout_sorts() / 20);
+    }
+    if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+      (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
+      return this.Concentration;
+    }
+    return 0;
   }
 
   /**

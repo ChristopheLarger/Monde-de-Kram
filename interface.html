@@ -1,8 +1,9 @@
 <!-- === INTERFACE PRINCIPALE === -->
 <!-- Barre de contrôle en haut de l'écran -->
-<div style="display: flex; justify-content: space-between; width: 97.8%; margin: 0; padding: 0;">
+<div id="barre_outils"
+    style="display: flex; align-items: center; justify-content: space-between; width: 97.8%; margin: 0; padding: 0;">
     <div id="div_cartouche"
-        style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+        style="display: flex; align-items: center; margin: 0; padding: 0; justify-content: space-between; white-space: nowrap;">
         <!-- Sélection du personnage/joueur -->
         <label for="joueur">Perso :&nbsp;</label>
         <select id="joueur">
@@ -10,7 +11,8 @@
             <option value="MJ">Maitre du Jeu</option>
         </select>
     </div>
-    <div style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+    <div
+        style="display: flex; align-items: center; margin: 0; padding: 0; justify-content: space-between; white-space: nowrap;">
         <!-- Bouton pour lancer 3 dés à 6 faces -->
         <label for="3D6">Dés :&nbsp;</label>
         <button id="3D6">3d6</button>
@@ -18,39 +20,50 @@
         <input type="text" id="personnalisation" style="width: 80px;" placeholder="XdY+Z...">
     </div>
     <!-- Barre d'outils pour la gestion de la carte -->
-    <div id="div_tools"
-        style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
-        <!-- Outils de terrain et formes -->
-        <div style="display: flex; align-items: center; margin: 4px; justify-content: space-between;">
-            <!-- Outils de terrain -->
-            Terrains :&nbsp;
-            <img id="rocher" src="images/Rocher.png" onclick="Terrain.set_terrain('rocher');" alt="Rocher"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="arbre" src="images/Arbre.png" onclick="Terrain.set_terrain('arbre');" alt="Arbre"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="eau" src="images/Eau.png" onclick="Terrain.set_terrain('eau');" alt="Eau"
-                style="width: 30px; height: 30px; cursor: pointer;">
-            <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');"
-                alt="Suppression de terrain" style="width: 30px; height: 30px; cursor: pointer;">
-            &nbsp;&nbsp;&nbsp;
-            <!-- Portée de vue -->
-            Vue :&nbsp;
-            <input type="number" id="portee_vue" min="3" max="99" value="12" step="1" alt="Portée de vue en mètres"
-                style="width: 45px; font-size: x-large;" onchange="Map.setPortee_vue();">
-            &nbsp;&nbsp;&nbsp;
-            <!-- Outils divers -->
-            Divers :&nbsp;
-            <img id="coordonnees" src="images/Coordonnees.png" onclick="Map.setMode_coordonnees();"
-                alt="Affichage des coordonnees sur la carte" style="width: 30px; height: 30px; cursor: pointer;">
-            &nbsp;&nbsp;&nbsp;
+    <div id="div_tools" style="margin: 0; padding: 0; white-space: nowrap;">
+        <!-- Outils de terrain -->
+        <span>Terrains :&nbsp;</span>
+        <div id="color_terrain_wrapper" class="color-picker">
+            <input type="hidden" id="color_terrain" value="#000000">
+            <button type="button" id="color_terrain_btn" class="color-picker-btn"
+                aria-label="Couleur du terrain"></button>
+            <div id="color_terrain_palette" class="color-picker-palette"></div>
         </div>
+        <img id="non_strie" src="images/Hex.png" onclick="Terrain.set_terrain('non_strie');" alt="Terrain non strié"
+            style="width: 30px; height: 30px; cursor: pointer;">
+        <img id="strie" src="images/Hex strie.png" onclick="Terrain.set_terrain('strie');" alt="Terrain strié"
+            style="width: 30px; height: 30px; cursor: pointer;">
+        <img id="gomme" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');" alt="Suppression de terrain"
+            style="width: 30px; height: 30px; cursor: pointer;">
+        &nbsp;&nbsp;&nbsp;
+        <!-- Portée de vue -->
+        Vue :&nbsp;
+        <input type="number" id="portee_vue" min="1" max="99" value="1" step="1" alt="Portée de vue en cases"
+            style="width: 30px;" onchange="Map.setPortee_vue();">
+        &nbsp;&nbsp;&nbsp;
+        <!-- Outils divers -->
+        Divers :&nbsp;
+        <img id="coordonnees" src="images/Coordonnees.png" onclick="Map.setMode_coordonnees();"
+            alt="Affichage des coordonnees sur la carte" style="width: 25px; height: 25px; cursor: pointer;">
+        &nbsp;&nbsp;&nbsp;
     </div>
-    <!-- Fond de carte -->
-    <div style="display: flex; align-items: center; margin: 0; justify-content: space-between; white-space: nowrap;">
+    <!-- Fond de carte et sauvegarde des pions -->
+    <div
+        style="display: flex; align-items: center; margin: 0; padding: 0; justify-content: space-between; white-space: nowrap;">
         <form id="upload_fond" enctype="multipart/form-data">
             <label for="img_fond" id="fond">Fond de carte</label>
             <input type="file" id="img_fond" accept="image/*" name="image" style="display: none;">
         </form>
+        &nbsp;&nbsp;
+        <button type="button" id="save_pions"
+            title="Télécharge un fichier JSON et enregistre sur le serveur (MJ)">Sauver perso</button>
+        <button type="button" id="load_pions" title="Charger depuis un fichier JSON">Charger perso</button>
+        <input type="file" id="load_pions_file" accept=".json,application/json" style="display: none;">
+        &nbsp;&nbsp;
+        <button type="button" id="save_terrains"
+            title="Télécharge un fichier JSON et enregistre sur le serveur (MJ)">Sauver terrains</button>
+        <button type="button" id="load_terrains" title="Charger depuis un fichier JSON">Charger terrains</button>
+        <input type="file" id="load_terrains_file" accept=".json,application/json" style="display: none;">
     </div>
 </div>
 
@@ -564,7 +577,18 @@
                     <col style="width: 1px;">
                 </colgroup>
                 <tr>
-                    <td>Nb max de blessures :<input type="text" class="nb_blessures_max"></td>
+                    <td rowspan="2">
+                        <table>
+                            <tr>
+                                <td>Nb max de blessures :</td>
+                                <td><input type="text" class="nb_blessures_max"></td>
+                            </tr>
+                            <tr>
+                                <td>Portée de vue :</td>
+                                <td><input type="text" class="vue"></td>
+                            </tr>
+                        </table>
+                    </td>
                     <td colspan="8" style="vertical-align: bottom; text-align: right;">
                         <button class="switch_to_monster"
                             style="font-size: x-small; background-color: rgb(255, 32, 32);">Convertir
@@ -572,7 +596,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td></td>
+                    <!-- <td></td> -->
                     <td></td>
                     <td style="text-align: center;">Base</td>
                     <td></td>
@@ -790,11 +814,16 @@
                 <tr>
                     <td>Nb max de blessures :</td>
                     <td><input type="text" class="nb_blessures_max"></td>
-                    <td colspan="2" style="vertical-align: bottom; text-align: right;">
+                    <td colspan="2" rowspan="2" style="vertical-align: top; text-align: right;">
                         <button class="switch_to_humanoid"
                             style="font-size: x-small; margin-top: 5px; margin-bottom: 5px; background-color: rgb(128, 128, 255);">Convertir
                             en Humanoide</button>
                     </td>
+                </tr>
+                <tr>
+                    <td>Portée de vue :</td>
+                    <td><input type="text" class="vue"></td>
+                    <!-- <td colspan="2"></td> -->
                 </tr>
                 <tr>
                     <td>Seuil de blessures :&nbsp;</td>
@@ -914,7 +943,7 @@
                                 <td colspan="3">
                                     <div style="display: flex; justify-content: space-between;">
                                         <span>Concentration :&nbsp;<input type="text" class="concentration"
-                                                disabled></span>
+                                                disabled>&nbsp;&nbsp;</span>
                                         <button class="arbre_magie"
                                             style="font-size: x-small; background-color: rgb(128, 128, 255);">Arbre de
                                             magie</button>
@@ -946,7 +975,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2">
+                    <td colspan="2" class="hr_cout_magie">
                         <hr>
                     </td>
                 </tr>
@@ -1120,7 +1149,6 @@
                                 Le coût de l'achat d'avantages par l'expériencedoit être inférieur ou égal à 25% du coût
                                 total.</span>
                         </div>
-                        <hr>
                     </td>
                 </tr>
             </table>
@@ -2964,28 +2992,6 @@
         </div>
     </div>
 
-    <div id="div_terrain" style="display: none; z-index: 1025; background-color: rgb(20, 20, 20); color: white;">
-        <table style="margin: 0; font-size: x-small;">
-            <tr>
-                <td>Terrain :&nbsp;</td>
-                <td><input type="text" class="terrain" style="width: 45px; font-size: x-large;"></td>
-            </tr>
-            <tr>
-                <td>
-                    <div id="forme_color_wrapper" class="color-picker">
-                        <input type="hidden" id="forme_color" value="#000000">
-                        <button type="button" id="forme_color_btn" class="color-picker-btn"
-                            aria-label="Couleur de la forme"></button>
-                        <div id="forme_color_palette" class="color-picker-palette"></div>
-                    </div>&nbsp;
-                    <img id="gomme_t" src="images/Gomme.png" onclick="Terrain.set_terrain('gomme');"
-                        alt="Suppression de forme" style="width: 30px; height: 30px; cursor: pointer;">
-                    &nbsp;&nbsp;&nbsp;
-                </td>
-            </tr>
-        </table>
-    </div>
-
     <!-- === DIALOGUE DE CHOIX D'INTERACTION === -->
     <!-- Fenêtre pour afficher les interactions possibles avec le personnage -->
     <div id="div_interactions"
@@ -3045,12 +3051,12 @@
 <dialog id="dialog_dim_carte">
     <table style="margin: 0; font-size: x-large;">
         <tr>
-            <td>Largeur (en m) :&nbsp;</td>
+            <td>Largeur (en cases) :&nbsp;</td>
             <td> </td>
             <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
         </tr>
         <tr>
-            <td>Hauteur (en m) :&nbsp;</td>
+            <td>Hauteur (en cases) :&nbsp;</td>
             <td> </td>
             <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
         </tr>
@@ -3063,96 +3069,6 @@
             <td colspan="3">
                 <div style="width: 100%; text-align: right;">
                     <button id="Valider" style="font-size: x-large;">Valider</button>
-                </div>
-            </td>
-        </tr>
-    </table>
-</dialog>
-
-<!-- === DIALOGUE DE CRÉATION DE RECTANGLE === -->
-<!-- Fenêtre pour créer une forme rectangulaire -->
-<dialog id="dialog_dim_rectangle">
-    <table style="margin: 0; font-size: x-large;">
-        <tr>
-            <td>Largeur (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
-        </tr>
-        <tr>
-            <td>Hauteur (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;"></td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <hr>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div style="width: 100%; text-align: right;">
-                    <button id="Creer" style="font-size: x-large;">Créer</button>
-                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
-                </div>
-            </td>
-        </tr>
-    </table>
-</dialog>
-
-<!-- === DIALOGUE DE CRÉATION DE MUR === -->
-<!-- Fenêtre pour créer une forme mur -->
-<dialog id="dialog_dim_mur">
-    <table style="margin: 0; font-size: x-large;">
-        <tr>
-            <td>Largeur (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="largeur" style="width: 45px; font-size: x-large;"></td>
-        </tr>
-        <tr>
-            <td>Hauteur (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="hauteur" style="width: 45px; font-size: x-large;" value="0.5"></td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <hr>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div style="width: 100%; text-align: right;">
-                    <button id="Creer" style="font-size: x-large;">Créer</button>
-                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
-                </div>
-            </td>
-        </tr>
-    </table>
-</dialog>
-
-<!-- === DIALOGUE DE CRÉATION D'ELLIPSE === -->
-<!-- Fenêtre pour créer une forme elliptique -->
-<dialog id="dialog_dim_ellipse">
-    <table style="margin: 0; font-size: x-large;">
-        <tr>
-            <td>Grand axe (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="grand_axe" style="width: 45px; font-size: x-large;"></td>
-        </tr>
-        <tr>
-            <td>Petit axe (en m) :&nbsp;</td>
-            <td> </td>
-            <td><input type="text" class="petit_axe" style="width: 45px; font-size: x-large;"></td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <hr>
-            </td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <div style="width: 100%; text-align: right;">
-                    <button id="Creer" style="font-size: x-large;">Créer</button>
-                    <button id="Fermer" style="font-size: x-large;">Fermer</button>
                 </div>
             </td>
         </tr>

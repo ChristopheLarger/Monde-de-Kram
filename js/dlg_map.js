@@ -19,20 +19,10 @@ function initialise_dim_carte() {
     const h = dialog_dim_carte.querySelector(".hauteur").value;
 
     // Calcul des dimensions hexagonales
-    hexDimensionsX = Math.round((((w - 1) / 2 / 3) * Math.sqrt(3)) / 1.5);
-    hexDimensionsY = Math.round((h - 1) / 2 / 3);
+    hexDimensionsX = Math.round((((w - 1) / 2) * Math.sqrt(3)) / 1.5);
+    hexDimensionsY = Math.round((h - 1) / 2);
 
-    // Création de la forme de fond si une image est définie
-    if (image_fond != null) {
-      const hexHS = hexSize * 1.5;
-      const hexVS = hexSize * Math.sqrt(3);
-
-      forme_fond = new Forme("Rectangle");
-      forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
-      forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
-      forme_fond.x = offsetX - forme_fond.width / 2;
-      forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
-    }
+    Map.updateFormeFond();
 
     // Régénération et redessin de la carte
     Map.generateHexMap();
@@ -51,8 +41,8 @@ function initialise_dim_carte() {
   // Calcul automatique de la hauteur selon la largeur
   dialog_dim_carte.querySelector(".largeur").addEventListener("input", function (event) {
     if (image_fond === null) return;
-    dialog_dim_carte.querySelector(".hauteur").value = Math.round(
-      (event.target.value * image_fond.height) / image_fond.width);
+    dialog_dim_carte.querySelector(".hauteur").value =
+    Math.round(      (event.target.value * image_fond.height) / image_fond.width);
   });
 
   // Calcul automatique de la largeur selon la hauteur
@@ -68,211 +58,158 @@ function initialise_dim_carte() {
  * Permet de spécifier la largeur et la hauteur de la carte de fond
  */
 function affiche_dim_carte() {
-    // Valeur par défaut pour la largeur si vide
-    if (dialog_dim_carte.querySelector(".largeur").value === "") {
-      dialog_dim_carte.querySelector(".largeur").value = 100;
-    }
-  
-    // Gestion de la hauteur selon l'image de fond
-    if (image_fond == null) {
-      dialog_dim_carte.querySelector(".hauteur").value = 100;
-    } else {
-      // Calcul automatique de la hauteur basé sur l'image de fond
-      image_fond.onload = function () {
-        dialog_dim_carte.querySelector(".hauteur").value = Math.round(
-          (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) / image_fond.width);
-      };
-    }
-    dialog_dim_carte.showModal();
+  // Valeur par défaut pour la largeur si vide
+  if (dialog_dim_carte.querySelector(".largeur").value === "") {
+    dialog_dim_carte.querySelector(".largeur").value = 20;
   }
-  
-  /**
-   * Initialise le dialogue de dimensions d'un rectangle
-   */
-  initialise_dim_rectangle();
-  function initialise_dim_rectangle() {
-    const dialog_dim_rectangle = document.getElementById("dialog_dim_rectangle");
-  
-    // Fermeture du dialogue de création de rectangle
-    dialog_dim_rectangle.querySelector("#Fermer").addEventListener("click", function (event) {
-      dialog_dim_rectangle.close();
-    });
-  
-    // Création d'un rectangle avec les dimensions spécifiées
-    dialog_dim_rectangle.querySelector("#Creer").addEventListener("click", function (event) {
-      // Récupération des dimensions saisies
-      const w = dialog_dim_rectangle.querySelector(".largeur").value;
-      const h = dialog_dim_rectangle.querySelector(".hauteur").value;
-  
-      // Création de la nouvelle forme rectangle
-      Formes[Formes.length] = new Forme("Rectangle");
-      const r = Formes[Formes.length - 1];
-  
-      // Calcul des dimensions en pixels selon le système hexagonal
-      r.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
-      r.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
-  
-      // Positionnement au centre du canvas
-      r.x = canvas.width / 2 - r.width / 2;
-      r.y = canvas.height / 2 - r.height / 2;
-  
-      // Application de la couleur sélectionnée
-      r.color = document.getElementById("forme_color").value;
-  
-      dialog_dim_rectangle.close();
-      Map.drawHexMap();
-    });
-  
-    // Gestion de la touche Entrée pour créer le rectangle
-    dialog_dim_rectangle.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        dialog_dim_rectangle.querySelector("#Creer").click();
-      }
-    });
+
+  // Gestion de la hauteur selon l'image de fond
+  if (image_fond == null) {
+    dialog_dim_carte.querySelector(".hauteur").value = 20;
+  } else {
+    // Calcul automatique de la hauteur basé sur l'image de fond
+    image_fond.onload = function () {
+      dialog_dim_carte.querySelector(".hauteur").value = Math.round(
+        (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) / image_fond.width);
+    };
   }
-  
-  /**
-   * Affiche le dialogue pour définir les dimensions d'un rectangle
-   */
-  function affiche_dim_rectangle() {
-    Forme.setFormeMode("rectangle");
-    dialog_dim_rectangle.showModal();
-  }
-  
-  /**
-   * Initialise le dialogue de dimensions d'un mur
-   */
-  initialise_dim_mur();
-  function initialise_dim_mur() {
-    const dialog_dim_mur = document.getElementById("dialog_dim_mur");
-  
-    // Fermeture du dialogue de création de rectangle
-    dialog_dim_mur.querySelector("#Fermer").addEventListener("click", function (event) {
-      dialog_dim_mur.close();
-    });
-  
-    // Création d'un rectangle avec les dimensions spécifiées
-    dialog_dim_mur.querySelector("#Creer").addEventListener("click", function (event) {
-      // Récupération des dimensions saisies
-      const w = dialog_dim_mur.querySelector(".largeur").value;
-      const h = dialog_dim_mur.querySelector(".hauteur").value;
-  
-      // Création de la nouvelle forme rectangle
-      Formes[Formes.length] = new Forme("Mur");
-      const r = Formes[Formes.length - 1];
-  
-      // Calcul des dimensions en pixels selon le système hexagonal
-      r.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
-      r.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
-  
-      // Positionnement au centre du canvas
-      r.x = canvas.width / 2 - r.width / 2;
-      r.y = canvas.height / 2 - r.height / 2;
-  
-      // Application de la couleur sélectionnée
-      r.color = document.getElementById("forme_color").value;
-  
-      dialog_dim_mur.close();
-      Map.drawHexMap();
-    });
-  
-    // Gestion de la touche Entrée pour créer le rectangle
-    dialog_dim_mur.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        dialog_dim_mur.querySelector("#Creer").click();
-      }
-    });
-  }
-  
-  /**
-   * Affiche le dialogue pour définir les dimensions d'un mur
-   */
-  function affiche_dim_mur() {
-    Forme.setFormeMode("mur");
-    dialog_dim_mur.showModal();
-  }
-  
-  /**
-   * Initialise le dialogue de dimensions d'une ellipse
-   */
-  initialise_dim_ellipse();
-  function initialise_dim_ellipse() {
-    const dialog_dim_ellipse = document.getElementById("dialog_dim_ellipse");
-  
-    // Fermeture du dialogue de création d'ellipse
-    dialog_dim_ellipse.querySelector("#Fermer").addEventListener("click", function (event) {
-      dialog_dim_ellipse.close();
-    });
-  
-    // Création d'une ellipse avec les dimensions spécifiées
-    dialog_dim_ellipse.querySelector("#Creer").addEventListener("click", function (event) {
-      // Récupération des dimensions saisies
-      const w = dialog_dim_ellipse.querySelector(".grand_axe").value;
-      const h = dialog_dim_ellipse.querySelector(".petit_axe").value;
-  
-      // Création de la nouvelle forme ellipse
-      Formes[Formes.length] = new Forme("Ellipse");
-      const e = Formes[Formes.length - 1];
-  
-      // Calcul des dimensions en pixels selon le système hexagonal
-      e.width = Math.abs((w / 3) * Math.sqrt(3) * hexSize);
-      e.height = Math.abs((h / 3) * Math.sqrt(3) * hexSize);
-  
-      // Positionnement au centre du canvas
-      e.x = canvas.width / 2;
-      e.y = canvas.height / 2;
-  
-      // Application de la couleur sélectionnée
-      e.color = document.getElementById("forme_color").value;
-  
-      dialog_dim_ellipse.close();
-      Map.drawHexMap();
-    });
-  
-    // Gestion de la touche Entrée pour créer l'ellipse
-    dialog_dim_ellipse.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        dialog_dim_ellipse.querySelector("#Creer").click();
-      }
-    });
-  
-    // Synchronisation automatique du petit axe avec le grand axe
-    dialog_dim_ellipse.querySelector(".grand_axe").addEventListener("input", function (event) {
-      dialog_dim_ellipse.querySelector(".petit_axe").value = event.target.value;
-    });
-  }
-  
-  /**
-   * Affiche le dialogue pour définir les dimensions d'une ellipse
-   */
-  function affiche_dim_ellipse() {
-    Forme.setFormeMode("ellipse");
-    dialog_dim_ellipse.showModal();
-  }
-  
+  dialog_dim_carte.showModal();
+}
+
 // === ÉVÉNEMENTS GÉNÉRAUX ===
+
+// === GESTION DU FOND DE CARTE ===
+document.getElementById("img_fond").addEventListener("change", async (event) => {
+  const form = document.getElementById("upload_fond");
+  const formData = new FormData(form);
+  const blobUrl = URL.createObjectURL(event.target.files[0]);
+  formData.append("image", event.target.files[0]);
+  formData.append("nom", "Fond");
+  fetch("upload.php", { method: "POST", body: formData })
+      .then((r) => r.json())
+      .then((data) => {
+          if (data.ok) {
+              if (event.target.files.length === 0) {
+                  // Aucun fichier sélectionné
+                  image_fond = null;
+              }
+              else {
+                  image_fond = new Image();
+                  image_fond.onload = function () {
+                      Map.updateFormeFond();
+                      Map.generateHexMap();
+                      Map.drawHexMap();
+                  };
+                  image_fond.src = data.path + "?t=" + new Date().getTime();
+              }
+              URL.revokeObjectURL(blobUrl);
+          }
+          else console.warn("Upload fond:", data.message);
+      })
+      .catch((e) => {
+          console.warn("Upload fond:", e);
+          URL.revokeObjectURL(blobUrl);
+      });
+
+  affiche_dim_carte();
+});
 
 // Tooltips pour les boutons de terrain, formes et coordonnées
 document.addEventListener("mouseover", function (event) {
-    if (["rocher", "arbre", "eau", "gomme_t",
-      "rectangle", "ellipse", "mur", "scission", "gomme_f",
-      "coordonnees", "forme_color_btn", "portee_vue"].includes(event.target.id)) {
-      tooltip.style.left = event.clientX + 10 + "px";
-      tooltip.style.top = event.clientY + 10 + "px";
-      tooltip.style.display = "block";
-      if (event.target.id === "forme_color_btn") {
-        tooltip.innerHTML = "Couleur de la forme";
-      } else {
-        tooltip.innerHTML = event.target.alt;
-      }
+  if (["non_strie", "strie", "gomme",
+    "coordonnees", "color_terrain_btn", "portee_vue"].includes(event.target.id)) {
+    tooltip.style.left = event.clientX + 10 + "px";
+    tooltip.style.top = event.clientY + 10 + "px";
+    tooltip.style.display = "block";
+    if (event.target.id === "color_terrain_btn") {
+      tooltip.innerHTML = "Couleur du terrain";
+    } else {
+      tooltip.innerHTML = event.target.alt;
     }
-  });
-  
-  // Tooltips pour les boutons de terrain, formes et coordonnées
-  document.addEventListener("mouseout", function (event) {
-    if (["rocher", "arbre", "eau", "gomme_t",
-      "rectangle", "ellipse", "mur", "scission", "gomme_f",
-      "coordonnees", "forme_color_btn"].includes(event.target.id)) {
-      tooltip.style.display = "none";
+  }
+});
+
+// Tooltips pour les boutons de terrain, formes et coordonnées
+document.addEventListener("mouseout", function (event) {
+  if (["non_strie", "strie", "gomme",
+    "coordonnees", "color_terrain_btn"].includes(event.target.id)) {
+    tooltip.style.display = "none";
+  }
+});
+
+/**
+ * Affiche le dialogue de modification d'un terrain
+ */
+function affiche_terrain() {
+  document.getElementById("div_pion").style.display = "none";
+  document.getElementById("div_model").style.display = "none";
+  document.getElementById("div_terrain").style.display = "block";
+}
+
+/**
+ * Initialise la palette de couleurs pour les terrains (32 : transparent + 31 couleurs)
+ */
+const TERRAIN_COLOR_TRANSPARENT = "transparent";
+const PALETTE_TERRAIN_COUNT = 32;
+
+init_color_terrain();
+function init_color_terrain() {
+    const palette = document.getElementById("color_terrain_palette");
+    const btn = document.getElementById("color_terrain_btn");
+
+    const swatchTransparent = document.createElement("button");
+    swatchTransparent.type = "button";
+    swatchTransparent.className = "color-picker-swatch color-picker-swatch-transparent";
+    swatchTransparent.dataset.color = TERRAIN_COLOR_TRANSPARENT;
+    swatchTransparent.title = "Transparent";
+    swatchTransparent.addEventListener("click", (event) => {
+        event.stopPropagation();
+        set_color_terrain(TERRAIN_COLOR_TRANSPARENT);
+        palette.classList.remove("is-open");
+    });
+    palette.appendChild(swatchTransparent);
+
+    palette_de_couleurs.slice(0, PALETTE_TERRAIN_COUNT - 1).forEach((color) => {
+        const swatch = document.createElement("button");
+        swatch.type = "button";
+        swatch.className = "color-picker-swatch";
+        swatch.dataset.color = color;
+        swatch.style.backgroundColor = color;
+        swatch.title = color;
+        swatch.addEventListener("click", (event) => {
+            event.stopPropagation();
+            set_color_terrain(color);
+            palette.classList.remove("is-open");
+        });
+        palette.appendChild(swatch);
+    });
+
+    set_color_terrain(document.getElementById("color_terrain").value);
+
+    btn.addEventListener("click", (event) => {
+        event.stopPropagation();
+        palette.classList.toggle("is-open");
+    });
+
+    document.addEventListener("click", () => palette.classList.remove("is-open"));
+}
+
+/**
+ * Définit la couleur du terrain
+ * @param {string} color - Couleur du terrain
+ */
+function set_color_terrain(color) {
+    const btn = document.getElementById("color_terrain_btn");
+    document.getElementById("color_terrain").value = color;
+    if (color === TERRAIN_COLOR_TRANSPARENT) {
+        btn.style.backgroundColor = "";
+        btn.classList.add("is-transparent");
+    } else {
+        btn.style.backgroundColor = color;
+        btn.classList.remove("is-transparent");
     }
-  });
+    document.querySelectorAll("#color_terrain_palette .color-picker-swatch").forEach((swatch) => {
+        swatch.classList.toggle("is-selected", swatch.dataset.color === color);
+    });
+    document.getElementById("color_terrain_palette").dispatchEvent(new Event("input", { bubbles: true }));
+}

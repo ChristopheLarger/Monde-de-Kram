@@ -18,7 +18,7 @@ class Pion {
         this.Arme2_engagee = data.Arme2_engagee || false;
         this.Esquive = data.Esquive || false;
         this.Est_blesse = data.Est_blesse || false;
-        this.Vue = data.Vue || 12;
+        this.Vue = data.Vue || 6;
 
         this.Titre = data.Titre || "";
         this.Arme1 = data.Arme1 || "";
@@ -313,11 +313,7 @@ class Pion {
 
         hexMap.forEach(hex => {
             const p = Pions.find(x => x.Position === hex.col + "," + hex.row);
-            const t = Terrains.find(x =>
-                x.Position === hex.col + "," + hex.row && x.Model === "Rocher");
-
             if (p != null && typeof p != "undefined") return;
-            if (t != null && typeof t != "undefined") return;
 
             const dist = Map.distance(col, row, hex.col, hex.row);
 
@@ -409,9 +405,9 @@ class Pion {
 
         let is_visible = true;
 
-        // Si le pion n'est pas en vol, on tient compte des terrains qui cachent la vue
+        // Si le pion n'est pas en vol, on tient compte des terrains qui cachent la vue (striés)
         if (!this.Is_flying) {
-            Terrains.filter(x => x.Model != "Eau").forEach(t => {
+            Terrains.filter(x => x.Type === "strie").forEach(t => {
                 if (!is_visible) return;
 
                 const hex_col = t.Position.split(",")[0];
@@ -422,7 +418,7 @@ class Pion {
                 if (hex_x === start_x && hex_y === start_y) return;
                 if (hex_x === end_x && hex_y === end_y) return;
 
-                if (Forme.lineIntersectsHexagon(
+                if (Map.lineIntersectsHexagon(
                     { x: start_x, y: start_y },
                     { x: end_x, y: end_y },
                     { x: hex_x, y: hex_y })) {
@@ -430,19 +426,6 @@ class Pion {
                 }
             });
         }
-
-        // En vol ou pas, on ne voit pas derrière les murs à cause des plafonds
-        Formes.filter(x => x.type === "Mur").forEach(m => {
-            if (!is_visible) return;
-
-            if (m.hexagonIntersectsRectangle({ x: end_x + offsetX, y: end_y + offsetY })) return;
-
-            if (m.lineIntersectsRectangle(
-                { x: start_x + offsetX, y: start_y + offsetY },
-                { x: end_x + offsetX, y: end_y + offsetY })) {
-                is_visible = false;
-            }
-        });
 
         return is_visible;
     }
@@ -677,5 +660,139 @@ class Pion {
 
         return duree;
     }
+
+    /** Propriétés sérialisables du constructeur Pion */
+    static getSerializableKeys() {
+        return Object.keys(new Pion());
+    }
+
+    /** Convertit un pion en objet simple (sans méthodes) */
+    static toData(pion) {
+        const data = {};
+        Pion.getSerializableKeys().forEach((key) => {
+            data[key] = pion[key];
+        });
+        return data;
+    }
+
+    /** Sérialise le tableau Pions pour export JSON */
+    static serializeAll() {
+        return Pions.map((p) => Pion.toData(p));
+    }
+
+    /** Construit le document JSON de sauvegarde */
+    static buildSaveDocument() {
+        return {
+            version: 1,
+            savedAt: new Date().toISOString(),
+            pions: Pion.serializeAll()
+        };
+    }
+
+    /** Télécharge le tableau Pions dans un fichier JSON */
+    static saveToFile() {
+        const doc = Pion.buildSaveDocument();
+        const json = JSON.stringify(doc, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "pions_" + new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-") + ".json";
+        link.click();
+        URL.revokeObjectURL(link.href);
+        return doc;
+    }
+
+    /** Enregistre sur le serveur (fichier + base MySQL), réservé au MJ */
+    static async saveToServer(doc = null) {
+        const payload = doc || Pion.buildSaveDocument();
+        const response = await fetch("save_pions.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+        if (!result.ok) throw new Error(result.message || "Échec de la sauvegarde serveur");
+        return result;
+    }
+
+    /** Charge le tableau Pions depuis des données JSON */
+    static loadAll(pionsData) {
+        if (!Array.isArray(pionsData)) throw new Error("Format invalide : tableau « pions » attendu");
+        Pions.length = 0;
+        pionsData.forEach((data) => Pions.push(new Pion(data)));
+        Map.generateHexMap();
+        Map.drawHexMap();
+        Map.drawHexMap(true);
+    }
+
+    /** Charge depuis un fichier JSON local */
+    static async loadFromFile(file) {
+        const text = await file.text();
+        const doc = JSON.parse(text);
+        const list = Array.isArray(doc) ? doc : doc.pions;
+        Pion.loadAll(list);
+        if (document.getElementById("joueur").value === "MJ") {
+            await Pion.saveToServer({ version: 1, savedAt: new Date().toISOString(), pions: list });
+        }
+    }
+
+    /** Charge depuis le fichier serveur data/pions.json */
+    static async loadFromServer() {
+        const response = await fetch("load_pions.php");
+        const doc = await response.json();
+        if (!doc.ok) throw new Error(doc.message || "Échec du chargement serveur");
+        Pion.loadAll(doc.pions);
+    }
+
+    /** Sauvegarde locale + serveur si MJ */
+    static async saveAll() {
+        const doc = Pion.saveToFile();
+        if (document.getElementById("joueur").value === "MJ") {
+            await Pion.saveToServer(doc);
+        }
+    }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    const btnSave = document.getElementById("save_pions");
+    const btnLoad = document.getElementById("load_pions");
+    const btnLoadServer = document.getElementById("load_pions_server");
+    const inputLoad = document.getElementById("load_pions_file");
+
+    if (btnSave) {
+        btnSave.addEventListener("click", async () => {
+            try {
+                await Pion.saveAll();
+                Messages.ecriture_directe("Pions sauvegardés.");
+            } catch (e) {
+                Messages.ecriture_directe("Erreur sauvegarde pions : " + e.message);
+            }
+        });
+    }
+    if (btnLoad && inputLoad) {
+        btnLoad.addEventListener("click", () => inputLoad.click());
+        inputLoad.addEventListener("change", async (event) => {
+            const file = event.target.files[0];
+            event.target.value = "";
+            if (!file) return;
+            try {
+                await Pion.loadFromFile(file);
+                Messages.ecriture_directe("Pions chargés depuis le fichier.");
+            } catch (e) {
+                Messages.ecriture_directe("Erreur chargement pions : " + e.message);
+            }
+        });
+    }
+    if (btnLoadServer) {
+        btnLoadServer.addEventListener("click", async () => {
+            try {
+                await Pion.loadFromServer();
+                Messages.ecriture_directe("Pions chargés depuis le serveur.");
+            } catch (e) {
+                Messages.ecriture_directe("Erreur chargement serveur : " + e.message);
+            }
+        });
+    }
+});
+
 let Pions = new Array;

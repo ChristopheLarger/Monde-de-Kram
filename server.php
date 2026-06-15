@@ -66,6 +66,8 @@ class ChatServer implements MessageComponentInterface
 
         $this->Bascule_sort_connu($msg);
         $this->Set_Model($msg);
+        $this->Set_Terrain($msg);
+        $this->Rmv_Terrain($msg);
         $this->Set_Pion($msg);
         $this->Rmv_Pion($msg);
         $this->Set_Nom_model($msg);
@@ -102,9 +104,9 @@ class ChatServer implements MessageComponentInterface
         } else {
             // Changement du nom du modèle dans la base de données
             $sql = "INSERT INTO `model` (
-                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`)
+                `Nom_model`, `Is_joueur`, `Is_monster`, `Capacites`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`, `Vue`)
                 SELECT
-                ?, `Is_joueur`, `Is_monster`, `Capacites`, `Magie_type`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Liste_pretre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`
+                ?, `Is_joueur`, `Is_monster`, `Capacites`, `Race`, `Puissance_mentale`, `Puissance_physique`, `Fatigue`, `Concentration`, `Ambidextre`, `Force`, `Constitution`, `Vivacite_physique`, `Perception`, `Vivacite_mentale`, `Abstraction`, `Volonte`, `Charisme`, `Foi`, `Magie`, `Adaptation`, `Combat`, `Memoire`, `Telepathie`, `Force_experience`, `Constitution_experience`, `Vivacite_physique_experience`, `Perception_experience`, `Vivacite_mentale_experience`, `Abstraction_experience`, `Volonte_experience`, `Charisme_experience`, `Adaptation_experience`, `Combat_experience`, `Foi_experience`, `Magie_experience`, `Telepathie_experience`, `Memoire_experience`, `Armure_Tete`, `Armure_Poitrine`, `Armure_Abdomen`, `Armure_BrasG`, `Armure_BrasD`, `Armure_JambeG`, `Armure_JambeD`, `Seuil_blessures`, `Nb_blessures_max`, `Vivacite_physique2`, `Initiative`, `Agressivite`, `Sociabilite`, `Esquive`, `Feinte_de_corps`, `Attaque_1`, `Parade_1`, `Bool_parade_1`, `Coefficient_dommages_1`, `Bonus_dommages_1`, `Attaque_2`, `Bool_attaque_2`, `Parade_2`, `Bool_parade_2`, `Coefficient_dommages_2`, `Bonus_dommages_2`, `Vue`
                 FROM `model`
                 WHERE `Nom_model` = ?";
             $stmt = $conn->prepare($sql);
@@ -223,6 +225,87 @@ class ChatServer implements MessageComponentInterface
 
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ss", $valeur, $nom_model);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+    /**
+     * FONCTION DE CHANGEMENT D'UN ATTRIBUT DU PION
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Set_Terrain($msg) {
+        $regex = "/^MJ: Set_Terrain ([^@]+)@([^@]+)@([^@]+)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $type = $result[1];
+        $position = $result[2];
+        $color = $result[3];
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        }
+        else{
+            // Si le terrain n'existe pas, on l'ajoute
+            $query = "SELECT * FROM terrain WHERE `Position` = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("s", $position);
+            $stmt->execute();
+            if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            $resultMysql = $stmt->get_result();
+            if ($resultMysql->num_rows == 0) {
+                $sql = "INSERT INTO terrain (`Type`, `Position`, `Color`) VALUES (?, ?, ?)";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sss", $type, $position, $color);
+                $stmt->execute();
+                if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            } else {
+                $sql = "UPDATE terrain SET `Type` = ?, `Color` = ? WHERE `Position` = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("sss", $type, $color, $position);
+                $stmt->execute();
+                if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
+            }
+            $stmt->close();
+        }
+
+        return true;
+    }
+
+        /**
+     * FONCTION DE CHANGEMENT D'UN ATTRIBUT DU PION
+     * ==============================================
+     * @param string $msg - Message contenant les données
+     * @return bool - true si la modification de l'attribut a réussi
+     */
+    private function Rmv_Terrain($msg) {
+        $regex = "/^MJ: Rmv_Terrain ([^@]+)@([^@]+)$/";
+        if (! preg_match($regex, $msg, $result)) return false;
+
+        $type = $result[1];
+        $model = $result[2];
+        $indice = $result[3];
+
+        // Connexion à la base de données MySQL
+        $conn = new mysqli('localhost', 'kram_app', 'Titoon#01', 'Kram');
+
+        if ($conn->connect_error) {
+            echo "Echec de connexion à la base de données.\n";
+            die("Échec de la connexion : " . $conn->connect_error);
+        } else {
+            // Modification de l'attribut du modèle dans la base de données
+            $sql = "DELETE FROM pion WHERE `Type` = ? AND Model = ? AND Indice = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssi", $type, $model, $indice);
             $stmt->execute();
             if ($stmt->error) { echo "Erreur SQL : " . $stmt->error . "\n"; }
             $stmt->close();

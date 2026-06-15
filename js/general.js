@@ -38,7 +38,6 @@ ws.onmessage = function (event) {
         () => Login.receiveMessage(event.data),
         () => Terrain.receiveMessage(event.data),
         () => Pion.receiveMessage(event.data),
-        () => Forme.receiveMessage(event.data),
         () => Map.receiveMessage(event.data),
         () => Messages.receiveMessage(event.data)
     ];

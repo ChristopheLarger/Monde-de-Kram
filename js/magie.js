@@ -158,7 +158,10 @@ function getShortName(Nom_liste) {
  * @returns {string} Le don directeur de la liste de magie
  */
 function getDonDirecteur(Nom_liste) {
-  return don_directeur[getShortName(Nom_liste)];
+  const nom_liste_long = Nom_liste.charAt(0).toUpperCase() + Nom_liste.slice(1).toLowerCase();
+  const nom_liste_short = getShortName(nom_liste_long);
+  if (nom_liste_short !== null && typeof nom_liste_short !== "undefined") return don_directeur[nom_liste_short];
+  return don_directeur[nom_liste_long];
 }
 
 /**
@@ -190,8 +193,24 @@ function affiche_roue_magie() {
     }
   });
 
+  let type_magie = "";
+  const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Maitre de magie" && avantage.Selection);
+  const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Guide spirituel" && avantage.Selection);
+
+  if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+    (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
+      type_magie = "classique";
+  }
+  else if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+    (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
+      type_magie = "religieuse";
+  }
+  else {
+    type_magie = "sans";
+  }
+
   // Mettre en vert les listes des sorts connus du personnage sélectionné
-  if (m_model.Magie_type === "classique") {
+  if (type_magie === "classique") {
     SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
       const element = document.getElementById(getShortName(x.Nom_liste));
       if (element) {
@@ -209,11 +228,10 @@ function affiche_roue_magie() {
       button.innerHTML = button.id;
       if (niveau_max > 0) button.innerHTML += " (" + niveau_max + ")";
     });
-  
+
   }
-  else if (m_model.Magie_type === "religieuse") {
-    const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
-    const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+  else if (type_magie === "religieuse") {
+    const nom_liste_pretre = av_guide_spirituel.Parametre.slice(0, 1).toUpperCase() + av_guide_spirituel.Parametre.slice(1).toLowerCase();
     const liste_pretre = document.getElementById(nom_liste_pretre);
     liste_pretre.style.color = "white";
     liste_pretre.style.backgroundColor = "green";
@@ -233,9 +251,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function closeModal() {
     if (modal) modal.style.display = "none";
-    if(document.getElementById('div_model_3').style.display === 'block') {
+    if (document.getElementById('div_model_3').style.display === 'block') {
       update_cout_total();
-      update_cout_magie();
     }
   }
 
@@ -637,16 +654,21 @@ function createListeModal(Nom_liste) {
       // Vérifier si le sort est connu par le joueur sélectionné
       if (typeof m_pion !== "undefined" && m_pion !== null && m_pion.Model) {
         let isKnown = false;
-        if (m_model.Magie_type === "classique") {
+
+        const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Maitre de magie" && avantage.Selection);
+        const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Guide spirituel" && avantage.Selection);
+
+        if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+          (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
           isKnown = SortsConnus.some(sc =>
             sc.Nom_model === m_pion.Model &&
             sc.Nom_liste === Nom_liste &&
             sc.Nom_sort === sort.Nom_sort);
         }
-        else if (m_model.Magie_type === "religieuse") {
-          const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
+        else if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+          (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
           const theognosie = Competences.find((c) => c.Nom_model === m_model.Nom_model && c.Nom === "Théognosie").get_score();
-          const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+          const nom_liste_pretre = av_guide_spirituel.Parametre.slice(0, 1).toUpperCase() + av_guide_spirituel.Parametre.slice(1).toLowerCase();
           if (shortName[nom_liste_pretre] === Nom_liste && sort.Niveau <= theognosie) {
             isKnown = true;
           }
@@ -754,8 +776,24 @@ function createListeModal(Nom_liste) {
 
   conteneur.addEventListener("click", function (e) {
     if (e.target.classList.contains("spell-node")) {
+      let type_magie = "";
+      const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Maitre de magie" && avantage.Selection);
+      const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Guide spirituel" && avantage.Selection);
+    
+      if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+        (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
+          type_magie = "classique";
+      }
+      else if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+        (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
+          type_magie = "religieuse";
+      }
+      else {
+        type_magie = "sans";
+      }
+    
       // Si Ctrl est pressé, ne pas ouvrir les informations du sort
-      if (e.ctrlKey && m_model.Magie_type === "classique") {
+      if (e.ctrlKey && type_magie === "classique") {
         e.preventDefault();
         // Basculer entre vert et blanc (couleur par défaut)
         if (e.target.style.backgroundColor === "green") {
@@ -817,10 +855,26 @@ function createListeModal(Nom_liste) {
   // Gestion de la fermeture
   closeBtn.addEventListener("click", function () {
     document.body.removeChild(modal);
+    let type_magie = "";
+    const av_magie_classique = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Maitre de magie" && avantage.Selection);
+    const av_guide_spirituel = Avantages.find(avantage => avantage.Nom_model === m_pion.Model && avantage.Nom === "Guide spirituel" && avantage.Selection);
+  
+    if (av_magie_classique !== null && typeof av_magie_classique !== "undefined" &&
+      (av_magie_classique.Niveau_creation !== "-" || av_magie_classique.Niveau_experience !== "-")) {
+        type_magie = "classique";
+    }
+    else if (av_guide_spirituel !== null && typeof av_guide_spirituel !== "undefined" &&
+      (av_guide_spirituel.Niveau_creation !== "-" || av_guide_spirituel.Niveau_experience !== "-")) {
+        type_magie = "religieuse";
+    }
+    else {
+      type_magie = "sans";
+    }
+
     // Mettre en vert les listes des sorts connus du personnage sélectionné
     // x = n'importe quel element de liste
     // Mettre en vert les listes des sorts connus du personnage sélectionné
-    if (m_model.Magie_type === "classique") {
+    if (type_magie === "classique") {
       SortsConnus.filter((s) => s.Nom_model === m_pion.Model).forEach((x) => {
         const element = document.getElementById(getShortName(x.Nom_liste));
         if (element) {
@@ -829,9 +883,8 @@ function createListeModal(Nom_liste) {
         }
       });
     }
-    else if (m_model.Magie_type === "religieuse") {
-      const avantage = Avantages.find((a) => a.Nom_model === m_model.Nom_model && a.Nom === "Guide spirituel" && a.Selection);
-      const nom_liste_pretre = avantage.Parametre.slice(0, 1).toUpperCase() + avantage.Parametre.slice(1).toLowerCase();
+    else if (type_magie === "religieuse") {
+      const nom_liste_pretre = av_guide_spirituel.Parametre.slice(0, 1).toUpperCase() + av_guide_spirituel.Parametre.slice(1).toLowerCase();
       const liste_pretre = document.getElementById(nom_liste_pretre);
       liste_pretre.style.color = "white";
       liste_pretre.style.backgroundColor = "green";
