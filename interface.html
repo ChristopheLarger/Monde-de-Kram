@@ -3044,7 +3044,7 @@
             </tr>
         </table>
         <!-- === TABLEAU D'ATTAQUE === -->
-        <table id="table_attaque" style="display: none;margin: 0; border-collapse: collapse; font-size: x-small;">
+        <table id="table_attaque" style="display: none; margin: 0; border-collapse: collapse; font-size: x-small;">
             <tr>
                 <td colspan="3" style="vertical-align: top;">
                     Attaquant :&nbsp;<input type="text" class="attaquant" style="font-size: x-small;" readonly>
@@ -3053,7 +3053,7 @@
                         <span><a style="cursor: pointer; text-decoration: underline; color: rgb(64, 64, 230);"
                                 class="att_titre">Score d'attaque</a> :&nbsp;</span>
                         <input type="text" class="score_attaque"
-                            style="width: 17px; text-align: center; font-size: x-small;">
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
                     </div>
                     <br>
                     <table class="att_details"
@@ -3062,70 +3062,73 @@
                             <td>Score de base :&nbsp;</td>
                             <td style="text-align: right;">
                                 <input type="text" class="att_base"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                    style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Héroïsme (+4)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="att_heroisme">
                             </td>
                         </tr>
                         <tr>
                             <td>Avantage positionnel (+2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_avantage_positionnel"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_avantage_positionnel">
                             </td>
                         </tr>
                         <tr class="att_distante">
                             <td>Temps pour viser (+2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_temps_pour_viser"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_temps_pour_viser">
                             </td>
                         </tr>
                         <tr class="att_distante">
                             <td>Courte portée (+2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_courte_portee"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_courte_portee">
                             </td>
                         </tr>
                         <tr class="att_distante">
                             <td>Longue portée (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_longue_portee"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_longue_portee">
                             </td>
                         </tr>
                         <tr>
                             <td>Désavantage positionnel (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_desavantage_positionnel"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_desavantage_positionnel">
                             </td>
                         </tr>
                         <tr class="att_melee">
                             <td>Economie d'énergie (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_economie_energie"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_economie_energie">
                             </td>
                         </tr>
                         <tr>
                             <td>Gêné dans ses mouvements (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_gene_mouvements"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="att_gene_mouvements">
+                            </td>
+                        </tr>
+                        <tr class="att_double">
+                            <td>Double attaque (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="att_double_attaque">
                             </td>
                         </tr>
                         <tr>
                             <td>Une blessures (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_une_blessure"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="att_une_blessure" disabled>
                             </td>
                         </tr>
                         <tr>
                             <td>Deux blessures (-4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="att_deux_blessures"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="att_deux_blessures" disabled>
                             </td>
                         </tr>
                     </table>
@@ -3137,7 +3140,7 @@
                         <span><a style="cursor: pointer; text-decoration: underline; color: rgb(64, 64, 230);"
                                 class="fdc_titre">Feinte de corps</a> :&nbsp;</span>
                         <input type="text" class="feinte_de_corps"
-                            style="width: 17px; text-align: center; font-size: x-small;">
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
                     </div>
                     <br>
                     <table class="fdc_details"
@@ -3146,107 +3149,462 @@
                             <td>Score de base :&nbsp;</td>
                             <td style="text-align: right;">
                                 <input type="text" class="fdc_base"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                    style="width: 17px; text-align: center; font-size: x-small;" readonly>
                             </td>
                         </tr>
                         <tr>
-                            <td>Immobile (0)</td>
+                            <td>Héroïsme (+4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_immobile"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_heroisme">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Immobile (=0)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_immobile">
                             </td>
                         </tr>
                         <tr>
                             <td>Mobilité réduite (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_mobilite_reduite"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_mobilite_reduite">
                             </td>
                         </tr>
                         <tr>
                             <td>Mobilité très réduite (-4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_mobilite_tres_reduite"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_mobilite_tres_reduite">
                             </td>
                         </tr>
                         <tr>
                             <td>Distrait (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_non_concentre"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_non_concentre">
                             </td>
                         </tr>
                         <tr>
                             <td>Légèrement aveuglé (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_legerement_aveugle"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_legerement_aveugle">
                             </td>
                         </tr>
                         <tr>
                             <td>Fortement aveuglé (-4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_fortement_aveugle"
-                                    style="width: 17px; text-align: center; font-size: x-small;">
+                                <input type="checkbox" class="def_fortement_aveugle">
                             </td>
                         </tr>
                         <tr>
                             <td>Deux attaquants (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_deux_attaquants"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="def_deux_attaquants" disabled>
                             </td>
                         </tr>
                         <tr>
                             <td>Plus de 2 attaquants (-4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_plus_de_deux_attaquants"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="def_plus_de_deux_attaquants" disabled>
                             </td>
                         </tr>
                         <tr>
                             <td>Une blessures (-2)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_une_blessure"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="def_une_blessure" disabled>
                             </td>
                         </tr>
                         <tr>
                             <td>Deux blessures (-4)</td>
                             <td style="text-align: right;">
-                                <input type="checkbox" class="def_deux_blessures"
-                                    style="width: 17px; text-align: center; font-size: x-small;" disabled>
+                                <input type="checkbox" class="def_deux_blessures" disabled>
                             </td>
                         </tr>
                     </table>
                 </td>
             </tr>
             <tr>
-                <td colspan="3" style="text-align: center;">
-                    <input type="radio" name="arme" value="1" class="arme_radio1">
-                    <span class="main1" onclick="document.querySelector('#table_attaque .arme_radio1').checked = true;">
-                        1ère main (...)
-                    </span>
-                </td>
-                <td colspan="3" style="text-align: center;">
-                    <input type="radio" name="arme" value="2" class="arme_radio2">
-                    <span class="main2" onclick="document.querySelector('#table_attaque .arme_radio2').checked = true;">
-                        2nde main (...)
-                    </span>
+                <td colspan="6" style="text-align: center;">
+                    <div style="display: flex; width: 100%;">
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <input type="radio" name="arme_attaque" value="1" class="arme_radio1">
+                            <span class="main1" style="cursor: pointer;">
+                                1ère main...
+                            </span>
+                        </div>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <input type="radio" name="arme_attaque" value="2" class="arme_radio2">
+                            <span class="main2" style="cursor: pointer;">
+                                2nde main...
+                            </span>
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td colspan="6" style="text-align: center;">
+                    <hr>
+                    Jet de dés :&nbsp;
+                    <input type="text" class="jet_des_attaque"
+                        style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    &nbsp;
+                    <button class="lancer" style="font-size: x-small;">Lancer</button>
+                    <button class="chance" style="font-size: x-small;" disabled>Point de chance</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    <a style="cursor: pointer; text-decoration: underline; color: rgb(64, 64, 230);"
+                        class="ciblage_titre">Ciblage des zones</a> (1 Point de malus à la réussite pour chaque zone
+                    non-ciblée) :
+                    <table class="ciblage_details"
+                        style="display: table; width: 100%; border-collapse: collapse; border: 0; font-size: x-small;">
+                        <tr style="height: 30px;">
+                            <td colspan="2"></td>
+                            <td colspan="2" style="text-align: center;">
+                                <br>
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Tête<input type="checkbox" class="tete" checked>
+                                </label>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="2" rowspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Bras gauche<input type="checkbox" class="brasg" checked>
+                                </label>
+                            </td>
+                            <td colspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Poitrine<input type="checkbox" class="poitrine" checked>
+                                </label>
+                            </td>
+                            <td colspan="2" rowspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Bras droit<input type="checkbox" class="brasd" checked>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Abdomen<input type="checkbox" class="abdomen" checked>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="3" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Jambe gauche<input type="checkbox" class="jambeg" checked>
+                                </label>
+                            </td>
+                            <td colspan="3" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Jambe droite<input type="checkbox" class="jambed" checked>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    Réussite :&nbsp;
+                    <input type="text" class="att_reussite"
+                        style="width: 17px; text-align: center; font-size: x-small;">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <br>
                     <div style="display: flex; justify-content: space-between;">
                         <button class="annuler" style="font-size: x-small;">Annuler</button>
-                        <button class="attaquer" style="font-size: x-small;">Attaquer</button>
+                        <button class="rafraichir" style="font-size: x-small;">Rafraichir</button>
+                        <button class="attaquer" style="font-size: x-small;" disabled>Appliquer</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- === TABLEAU DE DEFENSE === -->
+        <table id="table_defense" style="display: none; margin: 0; border-collapse: collapse; font-size: x-small;">
+            <tr>
+                <td colspan="3" style="vertical-align: top;">
+                    Attaquant :&nbsp;<input type="text" class="attaquant" style="font-size: x-small;" readonly>
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Marge de l'attaque :&nbsp;</span>
+                        <input type="text" class="marge_attaque"
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    </div>
+                </td>
+                <td colspan="3" style="vertical-align: top;">
+                    Defenseur :&nbsp;<input type="text" class="defenseur" style="font-size: x-small;" readonly>
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span><a style="cursor: pointer; text-decoration: underline; color: rgb(64, 64, 230);"
+                                class="def_titre">Défense</a> :&nbsp;</span>
+                        <input type="text" class="score_defense"
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    </div>
+                    <br>
+                    <table class="def_details"
+                        style="display: table; width: 100%; border-collapse: collapse; border: 0; font-size: x-small;">
+                        <tr>
+                            <td>Score de base :&nbsp;</td>
+                            <td style="text-align: right;">
+                                <input type="text" class="def_base"
+                                    style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Héroïsme (+4)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_heroisme">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Défense préparée (+2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_defense_preparee">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Allonge supérieure (+2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_allonge_superieure">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Sans vision claire (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_sans_vision_claire">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Gêné dans ses mouvements (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_genee_dans_ses_mouvements">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Allonge inférieure (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_allonge_inferieure">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Economie d'énergie (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_economie_energie">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Longue portée (+2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_longue_portee" disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Courte portée (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_courte_portee" disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Une blessures (-2)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_une_blessure" disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Deux blessures (-4)</td>
+                            <td style="text-align: right;">
+                                <input type="checkbox" class="def_deux_blessures" disabled>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <div style="display: flex; width: 100%;">
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <input type="radio" name="arme_defense" value="1" class="arme_radio1">
+                            <span class="main1" style="cursor: pointer;">
+                                1ère main...
+                            </span>
+                        </div>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <input type="radio" name="arme_defense" value="2" class="arme_radio2">
+                            <span class="main2" style="cursor: pointer;">
+                                2nde main...
+                            </span>
+                        </div>
+                        <div style="flex: 1; display: flex; justify-content: center; align-items: center;">
+                            <input type="radio" name="arme_defense" value="0" class="arme_radio0">
+                            <span class="main0" style="cursor: pointer;">
+                                Esquive
+                            </span>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    Jet de dés :&nbsp;
+                    <input type="text" class="jet_des_defense"
+                        style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    &nbsp;
+                    <button class="lancer" style="font-size: x-small;">Lancer</button>
+                    <button class="chance" style="font-size: x-small;" disabled>Point de chance</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    Marge de l'attaquant :&nbsp;
+                    <input type="text" class="resultat" style="width: 17px; text-align: center; font-size: x-small;">
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <button class="annuler" style="font-size: x-small;">Annuler</button>
+                        <button class="rafraichir" style="font-size: x-small;">Rafraichir</button>
+                        <button class="dommages" style="font-size: x-small;" disabled>Appliquer</button>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <!-- === TABLEAU DE DOMMAGES === -->
+        <table id="table_dommages" style="display: none; margin: 0; border-collapse: collapse; font-size: x-small;">
+            <tr>
+                <td colspan="3" style="vertical-align: top;">
+                    Attaquant :&nbsp;<input type="text" class="attaquant" style="font-size: x-small;" readonly>
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Marge finale :&nbsp;</span>
+                        <input type="text" class="marge_finale"
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    </div>
+                </td>
+                <td colspan="3" style="vertical-align: top;">
+                    Defenseur :&nbsp;<input type="text" class="defenseur" style="font-size: x-small;" readonly>
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>Seuil de blessures :&nbsp;</span>
+                        <input type="text" class="seuil_blessures"
+                            style="width: 17px; text-align: center; font-size: x-small;" readonly>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    <button class="lancer" style="font-size: x-small;">Lancer</button>
+                    <button class="chance" style="font-size: x-small;" disabled>Point de chance</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    <a style="cursor: pointer; text-decoration: underline; color: rgb(64, 64, 230);"
+                        class="ciblage_titre">Ciblage de la zone :</a>
+                    <span class="ciblage_unique" style="display: none;">Ciblage de la zone : général</span>
+                    <table class="ciblage_details"
+                        style="width: 100%; border-collapse: collapse; border: 0; font-size: x-small;">
+                        <tr style="display: none;">
+                            <td colspan="2"></td>
+                            <td colspan="2" style="text-align: center;">
+                                <br>
+                                <label style="display: inline-flex; align-items: center; gap: 4px;">
+                                    Tête <span class="general_armure">Armure...</span><input type="radio" name="zone"
+                                        value="0" class="general" disabled>
+                                </label>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="2"></td>
+                            <td colspan="2" style="text-align: center;">
+                                <br>
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Tête <span class="tete_armure">Armure...</span><input type="radio" name="zone"
+                                        value="1" class="tete" disabled>
+                                </label>
+                            </td>
+                            <td colspan="2"></td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="2" rowspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Bras gauche <span class="brasg_armure">Armure...</span><input type="radio"
+                                        name="zone" value="2" class="brasg" disabled>
+                                </label>
+                            </td>
+                            <td colspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Poitrine <span class="poitrine_armure">Armure...</span><input type="radio"
+                                        name="zone" value="3" class="poitrine" disabled>
+                                </label>
+                            </td>
+                            <td colspan="2" rowspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Bras droit <span class="brasd_armure">Armure...</span><input type="radio"
+                                        name="zone" value="4" class="brasd" disabled>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="2" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Abdomen <span class="abdomen_armure">Armure...</span><input type="radio" name="zone"
+                                        value="5" class="abdomen" disabled>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr style="height: 30px;">
+                            <td colspan="3" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Jambe gauche <span class="jambeg_armure">Armure...</span><input type="radio"
+                                        name="zone" value="6" class="jambeg" disabled>
+                                </label>
+                            </td>
+                            <td colspan="3" style="text-align: center;">
+                                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                                    Jambe droite <span class="jambed_armure">Armure...</span><input type="radio"
+                                        name="zone" value="7" class="jambed" disabled>
+                                </label>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <hr>
+                    Dommages :&nbsp;
+                    <input type="text" class="dommages" style="width: 17px; text-align: center; font-size: x-small;">
+                    <span class="nb_blessures"></span>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="6" style="text-align: center;">
+                    <br>
+                    <div style="display: flex; justify-content: space-between;">
+                        <button class="annuler" style="font-size: x-small;">Annuler</button>
+                        <button class="rafraichir" style="font-size: x-small;">Rafraichir</button>
+                        <button class="appliquer" style="font-size: x-small;" disabled>Appliquer</button>
                     </div>
                 </td>
             </tr>
         </table>
     </div>
-
 </div>
 <!-- === DIALOGUE DE DIMENSION DE CARTE === -->
 <!-- Fenêtre pour définir les dimensions de la carte de combat -->

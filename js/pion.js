@@ -120,6 +120,21 @@ class Pion {
     }
 
     /**
+     * Récupère la valeur d'un élément
+     * @param {string} element - Nom de l'élément
+     * @returns {number} - Valeur de l'élément
+     */
+    get(element) {
+        const model = Models.find(m => m.Nom_model === this.Model);
+        if (model === null || typeof model === "undefined") return null;
+
+        const champs = Object.keys(this).filter(key => typeof this[key] != "function");
+        if (champs.includes(element)) return this[element];
+
+        return model.get(element);
+    }
+
+    /**
      * Calcul la compétence
      * @param {string} stat_combat - Nom de la compétence
      * @returns {number} - Compétence

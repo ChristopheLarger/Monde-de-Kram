@@ -366,13 +366,105 @@ input:checked+.slider:before {
 #div_model input:disabled,
 #div_model input[readonly],
 #table_attaque input[readonly],
-#table_attaque input[type="checkbox"][readonly],
+#table_defense input[readonly],
+#table_dommages input[readonly],
 #div_pion select:disabled,
 #div_model select:disabled,
 #div_pion textarea:disabled,
 #div_model textarea:disabled {
     background-color: rgb(192, 192, 192);
     color: black;
+}
+
+/* Alignement et taille uniformes des cases à cocher dans table_attaque */
+#table_attaque .att_details td:nth-child(2),
+#table_attaque .fdc_details td:nth-child(2),
+#table_defense .def_details td:nth-child(2),
+#table_dommages .dommages_details td:nth-child(2) {
+    width: 20px;
+    min-width: 20px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0;
+}
+
+#table_attaque input[type="checkbox"],
+#table_defense input[type="checkbox"],
+#table_dommages input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    display: block;
+    width: 17px;
+    height: 17px;
+    margin: 0 auto;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid rgb(160, 160, 160);
+    border-radius: 2px;
+    background-color: white;
+    cursor: pointer;
+    font-size: x-small;
+}
+
+#table_attaque input[type="checkbox"]:checked,
+#table_defense input[type="checkbox"]:checked,
+#table_dommages input[type="checkbox"]:checked {
+    border-color: rgb(64, 64, 230);
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M2 7l4 4 6-8' fill='none' stroke='%234040e6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px 12px;
+}
+
+#table_attaque input[type="checkbox"]:disabled,
+#table_defense input[type="checkbox"]:disabled,
+#table_dommages input[type="checkbox"]:disabled {
+    opacity: 1;
+    cursor: default;
+    background-color: rgba(224, 224, 224, 0.438);
+}
+
+#table_attaque input[type="checkbox"]:disabled:checked,
+#table_defense input[type="checkbox"]:disabled:checked,
+#table_dommages input[type="checkbox"]:disabled:checked {
+    border-color: rgb(200, 32, 32);
+    background-color: rgb(255, 240, 240);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 3l8 8M11 3L3 11' fill='none' stroke='%23c02020' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 12px 12px;
+}
+
+#table_dommages input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    border: 1px solid rgb(160, 160, 160);
+    border-radius: 50%;
+    background-color: white;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+#table_dommages input[type="radio"]:checked {
+    border-color: rgb(64, 64, 230);
+    background-color: rgb(64, 64, 230);
+    box-shadow: inset 0 0 0 3px white;
+}
+
+#table_dommages input[type="radio"]:disabled,
+#table_dommages input[type="radio"]:disabled:checked {
+    opacity: 0;
+    cursor: default;
+    pointer-events: none;
+    border-color: rgb(20, 20, 20);
+    background-color: rgb(20, 20, 20);
+    box-shadow: none;
 }
 
 #couts_table td:nth-child(2),

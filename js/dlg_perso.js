@@ -100,6 +100,7 @@ function initialise_pion() {
       }
     }
     document.querySelector("#div_pion ." + zone.toLowerCase() + "_pdv").value = m_pion[zone];
+    m_pion.sendMessage(zone);
     set_nb_blessures();
   }
 
@@ -122,7 +123,7 @@ function initialise_pion() {
       const zone = event.target.classList.item(0).replace("_pdv", "");
       const cible = zone.charAt(0).toUpperCase() + zone.slice(1);
       m_pion[cible] = event.target.value;
-      m_pion.sendMessage(zone + "_pdv");
+      m_pion.sendMessage(cible);
       set_nb_blessures();
     });
   });

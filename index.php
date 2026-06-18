@@ -141,14 +141,14 @@
             $js = "Armes[$index] = new Arme({\n";
             $js .= "    Nom_arme: " . toJS($row['Nom_arme']) . ",\n";
             $js .= "    Competence: " . toJS($row['Competence']) . ",\n";
-            $js .= "    Facteur_parade: " . toJS($row['Facteur_parade'], 'int') . ",\n";
+            $js .= "    Facteur_parade: " . toJS($row['Facteur_parade'], 'null') . ",\n";
             $js .= "    Is_personnel: " . toJS($row['Is_personnel'], 'bool') . ",\n";
             $js .= "    Deux_mains: " . toJS($row['Deux_mains'], 'bool') . ",\n";
             $js .= "    A_projectile: " . toJS($row['A_projectile'], 'bool') . ",\n";
-            $js .= "    Facteur: " . toJS($row['Facteur'], 'int') . ",\n";
+            $js .= "    Facteur: " . toJS($row['Facteur'], 'null') . ",\n";
             $js .= "    Bonus: " . toJS($row['Bonus'], 'int') . ",\n";
             $js .= "    Plafond: " . toJS($row['Plafond'], 'int') . ",\n";
-            $js .= "    Coeff_force: " . toJS($row['Coeff_force'], 'int') . ",\n";
+            $js .= "    Coeff_force: " . toJS($row['Coeff_force'], 'null') . ",\n";
             $js .= "    A_distance: " . toJS($row['A_distance'], 'bool') . ",\n";
             $js .= "    Portee: " . toJS($row['Portee'], 'int') . ",\n";
             $js .= "    Init: " . toJS($row['Init'], 'int') . "\n";
@@ -539,8 +539,9 @@
         const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
+        Attaquant = Pions.find(pion => pion.Type === 'allies');
+        Defenseur = Pions.find(pion => pion.Type === 'ennemis');
         affiche_attaque();
-
     </script>
 </body>
 
