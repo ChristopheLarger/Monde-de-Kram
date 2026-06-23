@@ -452,53 +452,47 @@ class Pion {
         // Si le pion est déjà à la position d'arrivée, on ne fait rien
         if (col_start === col_end && row_start === row_end) return;
 
-        // Si le pion est en combat, on ne peut pas se déplacer
-        if (init_round) {
-            Messages.ecriture_directe("Le pion " + this.Titre + " est déjà en combat et ne peut pas se déplacer.");
-            return;
-        }
-
         this.Position = col_end + "," + row_end;
 
-        if (!Cacs_save) Cacs_save = [];
+        // if (!Cacs_save) Cacs_save = [];
 
         // On réinitialise les avantages des combats au corps à corps pour ce pion
-        Cacs_save.forEach(c => {
-            if ((c.Model_allie === this.Model && c.Indice_allie === this.Indice) ||
-                (c.Model_ennemi === this.Model && c.Indice_ennemi === this.Indice)) {
-                c.init_avantage();
-            }
-        });
+        // Cacs_save.forEach(c => {
+        //     if ((c.Model_allie === this.Model && c.Indice_allie === this.Indice) ||
+        //         (c.Model_ennemi === this.Model && c.Indice_ennemi === this.Indice)) {
+        //         c.init_avantage();
+        //     }
+        // });
 
         // On supprime les combats au corps à corps qui ne sont plus en combat
-        Cacs_save = Cacs_save.filter(c => c.Avantage !== 0)
+        // Cacs_save = Cacs_save.filter(c => c.Avantage !== 0)
 
         // On ajoute les combats au corps à corps qui sont en combat
-        Pions.forEach(pion1 => {
-            if (pion1.Type !== "allies") return;
+        // Pions.forEach(pion1 => {
+        //     if (pion1.Type !== "allies") return;
 
-            Pions.forEach(pion2 => {
-                if (pion2.Type !== "ennemis") return;
+        //     Pions.forEach(pion2 => {
+        //         if (pion2.Type !== "ennemis") return;
 
-                // Si le combat existe déjà, on ne l'ajoute pas
-                if (Cacs_save.find(c => c.Model_allie === pion1.Model &&
-                    c.Indice_allie === pion1.Indice &&
-                    c.Model_ennemi === pion2.Model &&
-                    c.Indice_ennemi === pion2.Indice)) return;
+        //         // Si le combat existe déjà, on ne l'ajoute pas
+        //         if (Cacs_save.find(c => c.Model_allie === pion1.Model &&
+        //             c.Indice_allie === pion1.Indice &&
+        //             c.Model_ennemi === pion2.Model &&
+        //             c.Indice_ennemi === pion2.Indice)) return;
 
-                // Créer un combat au corps à corps entre les deux pions
-                if (isCaC(pion1, pion2)) {
-                    const c = new Cac();
-                    c.Model_allie = pion1.Model;
-                    c.Indice_allie = pion1.Indice;
-                    c.Model_ennemi = pion2.Model;
-                    c.Indice_ennemi = pion2.Indice;
-                    c.Attaque = 0;
-                    c.init_avantage();
-                    Cacs_save.push(c);
-                }
-            });
-        });
+        //         // Créer un combat au corps à corps entre les deux pions
+        //         if (isCaC(pion1, pion2)) {
+        //             const c = new Cac();
+        //             c.Model_allie = pion1.Model;
+        //             c.Indice_allie = pion1.Indice;
+        //             c.Model_ennemi = pion2.Model;
+        //             c.Indice_ennemi = pion2.Indice;
+        //             c.Attaque = 0;
+        //             c.init_avantage();
+        //             Cacs_save.push(c);
+        //         }
+        //     });
+        // });
 
         this.sendMessage("Position");
     }

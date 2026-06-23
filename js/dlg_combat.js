@@ -248,9 +248,14 @@ function initialise_attaque() {
     jet += Math.floor(Math.random() * 6) + 1;
 
     document.querySelector('#table_attaque .jet_des_attaque').value = jet;
-    document.querySelector('#table_attaque .resultat').value = jet + calcul_attaque() - calcul_feinte_de_corps() - 10;
     document.querySelector('#table_attaque .chance').disabled = false;
     document.querySelector('#table_attaque .appliquer').disabled = false;
+
+    let resultat = jet + calcul_attaque() - calcul_feinte_de_corps() - 10;
+    ['tete', 'brasg', 'poitrine', 'brasd', 'abdomen', 'jambeg', 'jambed'].forEach(z => {
+      if (!document.querySelector('#table_attaque .' + z).checked) resultat -= 1;
+    });
+    document.querySelector('#table_attaque .resultat').value = resultat;
   });
 
   document.querySelector('#table_attaque .chance').addEventListener("click", function (event) {
@@ -272,17 +277,31 @@ function initialise_attaque() {
     let jet = Math.max(jet1, jet2, jet3, 13, parseInt(document.querySelector('#table_attaque .jet_des_attaque').value));
 
     document.querySelector('#table_attaque .jet_des_attaque').value = jet;
-    document.querySelector('#table_attaque .resultat').value = jet + calcul_attaque() - calcul_feinte_de_corps() - 10;
+
+    let resultat = jet + calcul_attaque() - calcul_feinte_de_corps() - 10;
+    ['tete', 'brasg', 'poitrine', 'brasd', 'abdomen', 'jambeg', 'jambed'].forEach(z => {
+      if (!document.querySelector('#table_attaque .' + z).checked) resultat -= 1;
+    });
+    document.querySelector('#table_attaque .resultat').value = resultat;
   });
 
   // Gestion des checkboxes du ciblage des zones
   ['tete', 'brasg', 'poitrine', 'brasd', 'abdomen', 'jambeg', 'jambed'].forEach(zone => {
     document.querySelector('#table_attaque .' + zone).addEventListener("change", function (event) {
       if (!event.target.checked) {
-        if (parseInt(document.querySelector('#table_attaque .resultat').value) > 0) {
+        // Le résultat ne peut pas être négatif
+        if (parseInt(document.querySelector('#table_attaque .resultat').value) <= 0) event.target.checked = true;
+
+        // On refuse de désactiver la zone si toutes les autres zones sont désactivées : il faut au moins une cible !
+        let all_unchecked = true;
+        ['tete', 'brasg', 'poitrine', 'brasd', 'abdomen', 'jambeg', 'jambed'].forEach(z => {
+          if (document.querySelector('#table_attaque .' + z).checked) all_unchecked = false;
+        });
+        if (all_unchecked) event.target.checked = true;
+
+        if (!event.target.checked) {
           document.querySelector('#table_attaque .resultat').value = parseInt(document.querySelector('#table_attaque .resultat').value) - 1;
         }
-        else event.target.checked = true;
       }
       else {
         document.querySelector('#table_attaque .resultat').value = parseInt(document.querySelector('#table_attaque .resultat').value) + 1;
@@ -293,8 +312,6 @@ function initialise_attaque() {
 
 // Calcul et affichage du score de la Feinte de corps
 function calcul_feinte_de_corps() {
-
-  console.log(document.querySelector('#table_attaque .def_heroisme').checked);
   // Affichage de la base de la Feinte de corps
   const model_def = Models.find(x => x.Nom_model === defenseur.Model);
   if (model_def === undefined || model_def === null) return -99;
@@ -530,8 +547,6 @@ function affiche_attaque() {
       document.querySelector('#table_attaque .att_escrime').value = -Math.max(2 - model_att.get_stat_combat("Escrime"), 0);
     }
     else {
-      console.log("escrime", attaquant.get_stat_combat("Escrime"));
-
       document.querySelector('#table_attaque .att_escrime').value = -Math.max(6 - attaquant.get_stat_combat("Escrime"), 0);
     }
   }
@@ -692,11 +707,10 @@ function initialise_defense() {
     document.querySelector(`#table_defense .def_${element}`).addEventListener("change", function (event) {
       defenseur[`Def_${element}`] = event.target.checked;
       document.querySelector('#table_defense .score_defense').value = calcul_defense();
+
       const jet = parseInt(document.querySelector('#table_defense .jet_des_defense').value);
-      const marge_attaque = parseInt(document.querySelector('#table_defense .marge_attaque').value);
-      if (!isNaN(jet)) {
-        document.querySelector('#table_defense .resultat').value = marge_attaque - Math.max(jet + calcul_defense() - 10, 0);
-      }
+      if (!isNaN(jet)) des_lances(jet);
+      else calcul_defense();
     });
   });
 
@@ -786,6 +800,22 @@ function calcul_defense() {
     else def = model_def.Esquive - nb_esquives;
   }
   document.querySelector('#table_defense .def_base').value = def;
+
+  // Malus d'escrime pour combat à deux armes (Humanoïdes)
+  document.querySelector('#table_defense .def_escrime').value = 0;
+  if (!model_def.Is_monster &&
+    defenseur.Arme1 !== "" &&
+    defenseur.Arme1 !== "Bouclier" &&
+    defenseur.Arme2 !== "" &&
+    defenseur.Arme2 !== "Bouclier" &&
+    !document.querySelector('#table_defense .arme_radio0').checked) {
+    if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
+      document.querySelector('#table_defense .def_escrime').value = -Math.max(2 - defenseur.get_stat_combat("Escrime"), 0);
+    }
+    else {
+      document.querySelector('#table_defense .def_escrime').value = -Math.max(6 - defenseur.get_stat_combat("Escrime"), 0);
+    }
+  }
 
   // Calcul du score de défense
   def += parseInt(document.querySelector('#table_defense .def_escrime').value);
@@ -907,19 +937,6 @@ function affiche_defense() {
     document.querySelector('#table_defense .arme_radio0').checked = true;
     document.querySelector('#table_defense .arme_radio0').dispatchEvent(new Event('change'));
   }
-  
-  // Malus d'escrime pour combat à deux armes (Humanoïdes)
-  document.querySelector('#table_defense .def_escrime').value = 0;
-  if (!model_def.Is_monster && defenseur.Arme1 !== "" && defenseur.Arme1 !== "Bouclier" && defenseur.Arme2 !== "" && defenseur.Arme2 !== "Bouclier") {
-    if (defenseur.Arme1 === "Dague" || defenseur.Arme2 === "Dague") {
-      document.querySelector('#table_defense .def_escrime').value = -Math.max(2 - defenseur.get_stat_combat("Escrime"), 0);
-    }
-    else {
-      console.log("escrime", defenseur.get_stat_combat("Escrime"));
-
-      document.querySelector('#table_defense .def_escrime').value = -Math.max(6 - defenseur.get_stat_combat("Escrime"), 0);
-    }
-  }
 
   calcul_defense();
 
@@ -943,9 +960,7 @@ function initialise_dommages() {
 
   document.querySelector('#table_dommages .appliquer').addEventListener("click", function (event) {
     const dommages = parseInt(document.querySelector('#table_dommages .dommages').value);
-    console.log("dommages : ", dommages);
-
-    if (dommages > 0) {
+      if (dommages > 0) {
       switch (zone_selectionnee) {
         case 'general': defenseur.General += dommages; defenseur.sendMessage("General", defenseur.General); break;
         case 'tete': defenseur.Tete += dommages; defenseur.sendMessage("Tete", defenseur.Tete); break;
@@ -996,7 +1011,6 @@ function initialise_dommages() {
       defenseur = tmp;
     }
     else if (dommages === 0) {
-      console.log("contre-attaque");
       contre_attaque = true;
       const tmp = attaquant; // On inverse les rôles
       attaquant = defenseur;
@@ -1072,6 +1086,7 @@ function initialise_dommages() {
   // Gestion des boutons de la fenêtre de dommages
   document.querySelector('#table_dommages .lancer').addEventListener("click", function (event) {
     let zone = des_lances();
+    while (!document.querySelector('#table_attaque .' + zone).checked) zone = des_lances();
 
     document.querySelector('#table_dommages .' + zone).disabled = false;
 
@@ -1085,10 +1100,10 @@ function initialise_dommages() {
 
   document.querySelector('#table_dommages .chance').addEventListener("click", function (event) {
     for (let i = 0; i < 3; i++) {
-      // On vérifie si toutes les zones sont désactivées
+      // On vérifie qu'il y a au moins une zone à activer
       let has_disabled_zone = false;
       ['tete', 'brasg', 'brasd', 'poitrine', 'abdomen', 'jambeg', 'jambed'].forEach(zone => {
-        if (document.querySelector('#table_dommages .' + zone).disabled) {
+        if (document.querySelector('#table_attaque .' + zone).checked && document.querySelector('#table_dommages .' + zone).disabled) {
           has_disabled_zone = true;
         }
       });
@@ -1096,7 +1111,7 @@ function initialise_dommages() {
 
       // On active une nouvelle zone aléatoirement
       let zone = des_lances();
-      while (!document.querySelector('#table_dommages .' + zone).disabled) {
+      while (!document.querySelector('#table_attaque .' + zone).checked || !document.querySelector('#table_dommages .' + zone).disabled) {
         zone = des_lances();
       }
       document.querySelector('#table_dommages .' + zone).disabled = false;

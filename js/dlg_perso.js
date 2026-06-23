@@ -883,7 +883,11 @@ function initialise_model_X() {
         event.target.value = event.target.value.replace(/[^0-9\-]/g, ""); // Integer
       }
 
-      let attribut = event.target.className.replace("_base", "").replace("_divers_communs", "");
+      // On ne traite pas les armures : elles sont gérées ailleurs
+      if (["tete", "brasg", "brasd", "poitrine", "abdomen", "jambeg", "jambed"].includes(event.target.className)) return;
+
+      // On traite les autres attributs
+      let attribut = event.target.className.replace("_base", "").replace("_monstre", "");
       attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
       if (!event.target.disabled && attribut !== "") {
         if (attribut in m_model) {
@@ -1104,6 +1108,13 @@ function initialise_model_1() {
 function initialise_model_3() {
   document.querySelector("#div_model_3 .arbre_magie").addEventListener("click", function () {
     affiche_roue_magie();
+  });
+
+  document.querySelectorAll("#armures_table input").forEach((input) => {
+    input.addEventListener("input", function (event) {
+      m_model["Armure_" + input.className] = event.target.value;
+      m_model.sendMessage("set_Armure_" + input.className, m_model["Armure_" + input.className]);
+    });
   });
 }
 
@@ -1779,6 +1790,11 @@ function affiche_model() {
     attribut = attribut.slice(0, 1).toUpperCase() + attribut.slice(1).toLowerCase();
     if (attribut in m_model) input.value = m_model[attribut];
     else console.error("Attribut non trouvé : ", attribut);
+  });
+
+  // Remplissage des champs texte des armures (Div Divers)
+  document.querySelectorAll("#armures_table input").forEach((input) => {
+    input.value = m_model["Armure_" + input.className];
   });
 
   // Remplissage des champs du modèle competences
