@@ -159,6 +159,9 @@ class Pion {
         const model = Models.find(m => m.Nom_model === this.Model);
 
         switch (stat_combat) {
+            case "Escrime":
+                if (model.Is_monster) return null;
+                else return this.#get_competence("Escrime");
             case "Esquive":
                 if (model.Is_monster) return model[stat_combat];
                 else return this.#get_competence("Esquive");
@@ -758,13 +761,17 @@ class Pion {
         return Math.min(res1, res2);
     }
 
+    /**
+     * Retourne le nombre de blessures d'un pion
+     * @returns {number} Nombre de blessures
+     */
     get_nb_blessures() {
         const model = Models.find((x) => x.Nom_model === this.Model);
         const seuil_blessures = model.get("seuil_blessures");
         let nb_blessures = 0;
         ["General", "Tete", "Brasg", "Brasd", "Poitrine", "Abdomen", "Jambeg", "Jambed"].forEach(zone => {
             if (this[zone] >= seuil_blessures) nb_blessures++;
-            if (this[zone] >= 2 *seuil_blessures) nb_blessures++;
+            if (this[zone] >= 2 * seuil_blessures) nb_blessures++;
         });
         return nb_blessures;
     }

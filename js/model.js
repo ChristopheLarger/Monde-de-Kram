@@ -553,7 +553,7 @@ class Model {
     if (attribute === "niveau_physique") return this.#get_niveau_physique();
 
     let value = parseInt(this[attribute.slice(0, 1).toUpperCase() + attribute.slice(1).toLowerCase()]) || 0;
-
+  
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attrib) => {
       if (attribute === attrib) {
         value += parseInt(this[attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase() + "_experience"]) || 0;

@@ -40,69 +40,90 @@ function isCaC(pion1, pion2) {
     return distance <= 1.5; // Distance de corps à corps
 }
 
+class Attaquant {
+    constructor(pion) {
+        this.pion = pion;
+        this.avantage = false;
+        this.avantage_next_turn = false;
+    }
+}
 /**
- * Classe Melee - Représente un combat au corps à corps
+ * Classe Melee - Représente un combat au corps à corps (1 vs 1 ou 1 vs plusieurs)
  */
 class Melee {
     /**
      * Initialise un combat au corps à corps
      * @param {Object} def - Pion défenseur
      * @param {Object} att1 - Pion attaquant 1
+     * @param {Object} att2 - Pion attaquant 2
+     * @param {Object} att3 - Pion attaquant 3
+     * @param {Object} att4 - Pion attaquant 4
+     * @param {Object} att5 - Pion attaquant 5
+     * @param {Object} att6 - Pion attaquant 6
      */
     constructor(def, att1, att2 = null, att3 = null, att4 = null, att5 = null, att6 = null) {
         this.defenseur = def;
-
-        this.attaquant_1 = att1;
-        this.attaquant_2 = att2;
-        this.attaquant_3 = att3;
-        this.attaquant_4 = att4;
-        this.attaquant_5 = att5;
-        this.attaquant_6 = att6;
+        this.attaquants = [new Attaquant(att1)];
+        if (att2 !== null) this.attaquants.push(new Attaquant(att2));
+        if (att3 !== null) this.attaquants.push(new Attaquant(att3));
+        if (att4 !== null) this.attaquants.push(new Attaquant(att4));
+        if (att5 !== null) this.attaquants.push(new Attaquant(att5));
+        if (att6 !== null) this.attaquants.push(new Attaquant(att6));
 
         // Calcul des initiatives pour déterminer l'avantage
         const init_def = def.calculateInitiative();
 
         // Détermination de l'avantage des attaquants selon l'initiative et la valeur de VP
         let avantage = false;
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === null) continue;
+        for (const att of this.attaquants) {
+            const pion = att.pion;
+            const init_att = pion.calculateInitiative();
+            const vp_att = pion.get_attribut("Vivacite_physique");
+            const vp_def = this.defenseur.get_attribut("Vivacite_physique");
 
-            const init_att = this["attaquant_" + i].calculateInitiative();
+            if (init_def < init_att) att.avantage = false;
+            else if (init_def > init_att) att.avantage = true;
+            else if (vp_att > vp_def) att.avantage = true;
+            else if (vp_att < vp_def) att.avantage = false;
+            else att.avantage = (pion.Type === "allies");
 
-            if (init_def < init_att) {
-                this["avantage_" + i] = false;
-            }
-            else if (init_def > init_att) {
-                this["avantage_" + i] = true;
-            }
-            else if (this["attaquant_" + i].Vivacite_physique > this.defenseur.Vivacite_physique) {
-                this["avantage_" + i] = true;
-            }
-            else if (this["attaquant_" + i].Vivacite_physique < this.defenseur.Vivacite_physique) {
-                this["avantage_" + i] = false;
-            }
-            else {
-                this["avantage_" + i] = (this["attaquant_" + i].Type === "allies");
-            }
-
-            if (this["avantage_" + i]) avantage = true;
+            if (att.avantage) avantage = true;
         }
 
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] !== null) this["avantage_" + i] = avantage;
+        for (const att of this.attaquants) {
+            att.avantage = avantage;
         }
     }
 
     /**
+     * Passe au tour suivant (recopie les avantages futurs en actuels)
+     */
+    next_turn() {
+        for (const a of this.attaquants) {
+            a.avantage = a.avantage_next_turn;
+        }
+    }
+
+    /**
+     * Retourne la liste des attaquants sans avantage
+     * @returns {Array} Liste des attaquants sans avantage
+     */
+    get_attaquants_sans_avantage() {
+        let liste_attaquants = [];
+        for (const a of this.attaquants) {
+            if (!a.avantage) liste_attaquants.push(a);
+        }
+        return liste_attaquants;
+    }
+
+    /**
      * Retourne l'avantage d'un attaquant
-     * @param {number} i - Indice de l'attaquant
-     * @returns {boolean} true si l'attaquant a l'avantage
+     * @param {Object} att - Pion attaquant
+     * @returns {boolean|null} true si l'attaquant a l'avantage
      */
     get_avantage(att) {
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === att) return this["avantage_" + i];
-        }
-        return null;
+        const found = this.attaquants.find(a => a.pion === att);
+        return found ? found.avantage : null;
     }
 
     /**
@@ -111,20 +132,15 @@ class Melee {
      * @returns {boolean} true si l'attaquant a été ajouté
      */
     add_attaquant(att) {
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === null) {
-                this["attaquant_" + i] = att;
-                return true;
-            }
-        }
-        return false;
-    }
+        if (this.attaquants.length >= 6) return false;
 
-    is_attaquant(att) {
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === att) return true;
+        const nouveau = new Attaquant(att);
+        nouveau.avantage = true;
+        for (const a of this.attaquants) {
+            if (!a.avantage) nouveau.avantage = false;
         }
-        return false;
+        this.attaquants.push(nouveau);
+        return true;
     }
 
     /**
@@ -133,13 +149,10 @@ class Melee {
      * @returns {boolean} true si l'attaquant a été retiré
      */
     rmv_attaquant(att) {
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === att) {
-                this["attaquant_" + i] = null;
-                return true;
-            }
-        }
-        return false;
+        const index = this.attaquants.findIndex(a => a.pion === att);
+        if (index === -1) return false;
+        this.attaquants.splice(index, 1);
+        return true;
     }
 
     /**
@@ -147,27 +160,35 @@ class Melee {
      * @returns {number} Nombre d'attaquants
      */
     nb_attaquants() {
-        let res = 0;
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] !== null) res++;
-        }
-        return res;
+        return this.attaquants.length;
     }
 
     /**
-     * Définit l'avantage d'un attaquant
+     * Retourne le prochain attaquant selon l'avantage
      * @param {Object} att - Pion attaquant
      * @param {boolean} avantage - Avantage de l'attaquant
+     * @returns {Object|null} Prochain attaquant
+     */
+    get_other_attaquant(att, avantage) {
+        for (const a of this.attaquants) {
+            if (a.pion === att) continue;
+            if (a.avantage !== avantage) continue;
+            return a.pion;
+        }
+        return null;
+    }
+
+    /**
+     * Définit l'avantage du tour suivant pour un attaquant
+     * @param {Object} att - Pion attaquant
+     * @param {boolean} avantage - Avantage du tour suivant
      * @returns {boolean} true si l'avantage a été défini
      */
-    set_avantage(att, avantage) {
-        for (let i = 1; i <= 6; i++) {
-            if (this["attaquant_" + i] === att) {
-                this["avantage_" + i] = avantage;
-                return true;
-            }
-        }
-        return false;
+    set_avantage_next_turn(att, avantage) {
+        const found = this.attaquants.find(a => a.pion === att);
+        if (!found) return false;
+        found.avantage_next_turn = avantage;
+        return true;
     }
 }
 

@@ -107,6 +107,9 @@ class Map {
             || (typeof color === "string" && color.toLowerCase() === "#ffffff");
     }
 
+    /** Opacité du remplissage des hexagones coloriés (terrain, pions…) */
+    static hexColorAlpha = 0.7;
+
     /** Recalcule la position et la taille du fond de carte sur le canvas */
     static updateFormeFond() {
         if (image_fond == null) return;
@@ -459,8 +462,10 @@ class Map {
                 ctx.fill();
             }
         } else if (!isTransparent) {
+            ctx.globalAlpha = Map.hexColorAlpha;
             ctx.fillStyle = color;
             ctx.fill();
+            ctx.globalAlpha = 1;
         }
 
         // On ne dessine pas le contour si le brouillard est actif et que le joueur n'est pas MJ

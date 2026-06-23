@@ -539,8 +539,13 @@
         const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
 
-        Attaquant = Pions.find(pion => pion.Type === 'allies');
-        Defenseur = Pions.find(pion => pion.Type === 'ennemis');
+        const def = Pions.find(pion => pion.Type === 'allies');
+        const att1 = Pions.filter(pion => pion.Type === 'ennemis')[0];
+        const att2 = Pions.filter(pion => pion.Type === 'ennemis')[1];
+        const m = new Melee(def, att1, att2);
+        Melees.push(m);
+
+        initialise_melee();
         affiche_attaque();
     </script>
 </body>
