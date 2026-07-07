@@ -498,6 +498,21 @@ class Pion {
     }
 
     /**
+     * Vérifie si le pion a une attaque à distance
+     * @returns {boolean} - True si le pion a une attaque à distance, false sinon
+     */
+    has_distante_attaque() {
+        let res = false;
+        let arme1 = null;
+        let arme2 = null;
+        if (this.Arme1 !== null && this.Arme1 !== undefined && this.Arme1 !== "") arme1 = Armes.find(a => a.Nom_arme === this.Arme1);
+        if (this.Arme2 !== null && this.Arme2 !== undefined && this.Arme2 !== "") arme2 = Armes.find(a => a.Nom_arme === this.Arme2);
+        if (arme1 && arme1.A_distance) res = true;
+        if (arme2 && arme2.A_distance) res = true;
+        return res;
+    }
+
+    /**
      * Sauvegarde au sort
      * @param {string} save - Sauvegarde au sort
      * @returns {number} - Résultat de la sauvegarde

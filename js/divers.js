@@ -67,7 +67,7 @@ class Competence {
             case "Co+Ch":
                 return parametres_couts[Math.round((model.get("coordination") + model.get("charisme")) / 2)].ajustement;
             default:
-                return 0;
+                return null;
         }
     }
     /**
@@ -87,11 +87,10 @@ class Competence {
 
         let base = tr.querySelector(".base").value;
         let attribut = this.#get_ajustement(tr.querySelector(".attribut").value);
-        if (base === "" || base === "-") base = 0;
-        if (attribut === "") attribut = 0;
+        if (base === null || base === undefined || base === "" || base === "-") base = 0;
+        if (attribut === null || attribut === undefined || attribut === "") attribut = 0;
 
         let score = parseInt(base) + parseInt(this.Degres ? this.Degres : 0) + parseInt(attribut);
-
         if (classe_maitre === null) return score;
 
         let tr_maitre = Array.from(document.querySelectorAll("#div_model_5 tr")).find(element => element.classList.item(0) === classe_maitre);

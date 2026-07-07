@@ -11,7 +11,7 @@ let old_defenseur = null;
 
 let double_attaque = false;
 let contre_attaque = false;
-let main_imposee = 0; // Arme de la seconde attaque : la même que la première en double attaque et l'autre en contre-attaque (1 ou 2)
+let main_imposee = null; // Arme de la seconde attaque : la même que la première en double attaque et l'autre en contre-attaque (1 ou 2)
 
 let affiche_fdc_details = true;
 let affiche_att_details = true;
@@ -20,22 +20,169 @@ let affiche_def_details = true;
 
 let zone_selectionnee = null;
 
-let melee = null;
+let is_declaration_attaque = false;
+let is_declaration_cible = false;
 
 /**
- * Initialise le combat
- * @param {Object} new_melee - Nouveau combat
+ * Déclaration de l'attaque
+ * @returns {boolean} - True si la déclaration a été faite, false sinon
  */
-function initialise_melee() {
-  melee = Melees[0];
-  const liste = melee.get_attaquants_sans_avantage();
-  if (liste.length > 0) {
-    attaquant = melee.defenseur;
-    defenseur = liste[0].pion;
+function declaration_attaque() {
+  is_declaration_attaque = true;
+
+  // Tri des pions par vivacité physique décroissante
+  Pions.sort((a, b) => {
+    const modelA = Models.find(m => m.Nom_model === a.Model);
+    const modelB = Models.find(m => m.Nom_model === b.Model);
+    return (modelB.get("vivacite_physique") - modelA.get("vivacite_physique"));
+  });
+
+  // Recherche du premier pion sans cible
+  let next_pion = null;
+  Pions.forEach(pion => {
+    if (next_pion !== null) return;
+    if (pion.cible !== null && pion.cible !== undefined && pion.cible !== "") return;
+    next_pion = pion;
+  });
+
+  Pions.forEach(pion => { pion.Selected = false; pion.Attaquant = false; pion.Defenseur = false; });
+
+  if (next_pion === null) {
+    // Fin de la déclaration de l'attaque : tout le monde à une cible
+    is_declaration_attaque = false;
+    Pions.forEach(x => { console.log("x : ", x.Titre, " x.cible : ", x.cible.Titre); });
+    Pions.forEach(x => { if (isCaC(x, x.cible)) add_combat(x, x.cible); });
+    console.log("Melees : ", Melees);
+    next_combat();
+    return;
   }
-  else {
-    attaquant = melee.attaquants[0].pion;
-    defenseur = melee.defenseur;
+
+  m_pion = next_pion;
+  m_pion.Selected = true;
+  m_pion.Attaquant = true;
+
+  Pions.forEach(pion => {
+    if (pion === m_pion) return;
+    const visible = Map.is_visible(parseInt(pion.Position.split(",")[0]), parseInt(pion.Position.split(",")[1]));
+    const distante = m_pion.has_distante_attaque();
+    const cac = isCaC(m_pion, pion);
+    if (((visible && distante) || cac) && pion.Type !== m_pion.Type) pion.Defenseur = true;
+  });
+
+  affiche_pion();
+  Map.generateHexMap();
+  Map.drawHexMap();
+}
+
+/**
+ * Passage au prochain combat : on choisit les attaquant et defenseur pour le prochain combat
+ * @returns {void}
+ */
+function next_combat() {
+  if (double_attaque) {
+    console.log("double_attaque");
+    // Sélection du second defenseur parmi la melee où se trouve l'attaquant
+    if (is_declaration_cible) {
+      is_declaration_cible = false;
+      console.log("is_declaration_cible");
+      affiche_attaque();
+      return;
+    }
+    const melee = Melees.find(m => m.defenseur === attaquant);
+    if (melee !== undefined && melee !== null) {
+      const liste = melee.get_defenseurs().filter(d => d !== old_defenseur);
+      Pions.forEach(p => { p.Defenseur = false; });
+      is_declaration_cible = false;
+
+      if (liste.length === 1) {
+        defenseur = liste[0];
+        defenseur.Defenseur = true;
+        Map.generateHexMap();
+        Map.drawHexMap();
+        affiche_attaque();
+      }
+      else {
+        // On choisit le defenseur parmi la liste des attaquants sans avantage
+        liste.forEach(d => { d.Defenseur = true; });
+        is_declaration_cible = true;
+        Map.generateHexMap();
+        Map.drawHexMap();
+      }
+    }
+    return;
+  }
+
+  attaquant = null;
+
+  // Attaque en mêlée
+  Melees.forEach(m => {
+    if (attaquant !== null) return;
+
+    const liste = m.get_defenseurs(); // Liste des attaquants sans avantage
+    if (liste.length > 0 && !m.defenseur.has_attaqued) { // Le defenseur a l'avantage sur certains attaquants et n'a pas encore attaqué
+      attaquant = m.defenseur;
+      if (liste.length === 1) defenseur = liste[0];
+      else {
+        if (!is_declaration_cible) defenseur = null; // On choisit parmi la liste des attaquants sans avantage : voir plus loin
+      }
+    }
+    else { // Le defenseur n'a l'avantage sur aucun attaquant
+      attaquant = m.get_next_attaquant();
+      if (attaquant === null) return;
+      defenseur = m.defenseur;
+    }
+
+    Pions.forEach(p => { p.Attaquant = false; p.Defenseur = false; p.Selected = false; });
+    attaquant.Selected = true;
+    m_pion = attaquant;
+    affiche_pion();
+    attaquant.Attaquant = true;
+
+    is_declaration_cible = false;
+
+    if (defenseur !== null) {
+      // 1 vs 1
+      defenseur.Defenseur = true;
+      attaquant.has_attaqued = true;
+      affiche_attaque();
+      Map.generateHexMap();
+      Map.drawHexMap();
+    }
+    else {
+      // 1 vs plusieurs : on choisit le defenseur parmi la liste des attaquants sans avantage
+      liste.forEach(d => { d.Defenseur = true; });
+      is_declaration_cible = true;
+      Map.generateHexMap();
+      Map.drawHexMap();
+    }
+  });
+
+  // Attaque à distance
+  Pions.forEach(x => {
+    if (attaquant !== null) return;
+    if (x.has_attaqued) return;
+    if (Melees.some(m => m.defenseur === x || m.attaquants.some(a => a.pion === x))) return;
+
+    attaquant = x;
+    defenseur = x.cible;
+    Pions.forEach(p => { p.Attaquant = false; p.Defenseur = false; p.Selected = false; });
+    attaquant.Selected = true;
+    m_pion = attaquant;
+    affiche_pion();
+    attaquant.Attaquant = true;
+    defenseur.Defenseur = true;
+    Map.generateHexMap();
+    Map.drawHexMap();
+
+    attaquant.has_attaqued = true;
+    affiche_attaque();
+  });
+
+  // S'il n'y a plus d'attaquant, on efface les sélections
+  if (attaquant === null) {
+    Pions.forEach(p => { p.Attaquant = false; p.Defenseur = false; p.Selected = false; });
+    Map.generateHexMap();
+    Map.drawHexMap();
   }
 }
 
@@ -52,6 +199,7 @@ function initialise_attaque() {
 
   document.querySelector('#table_attaque .annuler').addEventListener("click", function (event) {
     document.querySelector('#table_attaque').style.display = 'none';
+    next_combat();
   });
 
   document.querySelector('#table_attaque .appliquer').addEventListener("click", function (event) {
@@ -66,7 +214,7 @@ function initialise_attaque() {
 
     document.querySelector('#table_attaque').style.display = 'none';
 
-    if (document.querySelector('#table_attaque .resultat').value >= 0) affiche_defense();
+    affiche_defense();
   });
 
   document.querySelector('#table_attaque .resultat').addEventListener("input", function (event) {
@@ -84,7 +232,7 @@ function initialise_attaque() {
         nom_arme = document.querySelector('#table_attaque .main2').innerText;
       }
 
-      if (!nom_arme.includes("Arme naturelle ")) {
+      if (!nom_arme.includes("Arme naturelle ") && nom_arme !== "") {
         const arme = Armes.find(arme => arme.Nom_arme === nom_arme);
         const is_distant = arme.A_distance;
         if (!is_distant) {
@@ -318,6 +466,11 @@ function calcul_feinte_de_corps() {
 
   if (!model_def.Is_monster) {
     const cmp = Competences.find(competence => competence.Nom_model === defenseur.Model && competence.Nom === "Feinte de corps");
+    if (cmp === null || typeof cmp === "undefined") {
+      cmp = new Competence({ Nom_model: m_model.Nom_model, Nom: Nom_competence_full, Degres: 0 });
+      Competences.push(cmp);
+      cmp.sendMessage("set_Degres", cmp.Degres);
+    }
     fdc = cmp.get_score();
   }
   else fdc = model_def.Feinte_de_corps;
@@ -344,7 +497,6 @@ function calcul_feinte_de_corps() {
   return fdc;
 }
 
-
 // Calcul et affichage du score d'attaque
 function calcul_attaque() {
   const model_att = Models.find(x => x.Nom_model === attaquant.Model);
@@ -352,17 +504,18 @@ function calcul_attaque() {
   // Calcul du score de l'attaque 1
   let att = -99;
   let is_distant = false;
-  if (document.querySelector('#table_attaque .arme_radio1').checked) { // Bonne main
-    if (!model_att.Is_monster) {
+  if (document.querySelector('#table_attaque .arme_radio1').checked) {
+    if (!model_att.Is_monster && attaquant.Arme1 !== "") {
       const arme = Armes.find(arme => arme.Nom_arme === attaquant.Arme1);
       const cmp = Competences.find(competence => competence.Nom_model === attaquant.Model && competence.Nom === arme.Competence);
       att = cmp.get_score();
+
       is_distant = arme.A_distance;
     }
     else att = model_att.Attaque_1;
   }
-  else if (document.querySelector('#table_attaque .arme_radio2').checked) { // Mauvaise main ==> Malus d'attaque
-    if (!model_att.Is_monster) {
+  else if (document.querySelector('#table_attaque .arme_radio2').checked) {
+    if (!model_att.Is_monster && attaquant.Arme2 !== "") {
       const arme = Armes.find(arme => arme.Nom_arme === attaquant.Arme2);
       const cmp = Competences.find(competence => competence.Nom_model === attaquant.Model && competence.Nom === arme.Competence);
       att = cmp.get_score()
@@ -381,7 +534,8 @@ function calcul_attaque() {
   let att_double = false;
   const av = Avantages.find(avantage => avantage.Nom_model === attaquant.Model && avantage.Nom === "Combat contre plusieurs" && avantage.Selection);
   if (av !== undefined && av !== null) {
-    if (melee.get_other_attaquant(defenseur, false) != null) att_double = true;
+    const melee = Melees.find(melee => melee.defenseur === attaquant);
+    if (melee !== undefined && melee !== null && melee.get_defenseurs().length > 1) att_double = true;
     else if (double_attaque) att_double = true;
   }
   document.querySelector('#table_attaque .att_double').style.display = att_double ? '' : 'none';
@@ -402,6 +556,11 @@ function calcul_attaque() {
   if (document.querySelector('#table_attaque .att_une_blessure').checked) att -= 2;
   if (document.querySelector('#table_attaque .att_deux_blessures').checked) att -= 4;
 
+  if (document.querySelector('#table_attaque .att_double_attaque').checked) {
+    main_imposee = document.querySelector('#table_attaque .arme_radio1').checked ? 1 : 2;
+  }
+  else main_imposee = null;
+
   document.querySelector('#table_attaque .score_attaque').value = att;
 
   return att;
@@ -409,6 +568,11 @@ function calcul_attaque() {
 
 // Affichage de la fenêtre d'attaque
 function affiche_attaque() {
+
+  if (contre_attaque) document.querySelector('#table_attaque .titre').innerText = "Contre-attaque";
+  else if (double_attaque) document.querySelector('#table_attaque .titre').innerText = "Double attaque";
+  else document.querySelector('#table_attaque .titre').innerText = "Attaque";
+
   document.querySelector('#table_attaque .attaquant').value = attaquant.Titre;
   document.querySelector('#table_attaque .defenseur').value = defenseur.Titre;
 
@@ -444,7 +608,7 @@ function affiche_attaque() {
   // Détermination du nombre d'attaquants (défenseur)
   let nb_attaquants = 1;
   const melee_def = Melees.find(melee => melee.defenseur === defenseur);
-  if (melee_def !== undefined) nb_attaquants = melee_def.nb_attaquants();
+  if (melee_def !== undefined) nb_attaquants = melee_def.nb_attaquants_CaC();
   if (nb_attaquants === 1) {
     document.querySelector('#table_attaque .def_deux_attaquants').checked = false;
     document.querySelector('#table_attaque .def_plus_de_deux_attaquants').checked = false;
@@ -491,24 +655,34 @@ function affiche_attaque() {
   // Affichage du choix de l'arme
   const model_att = Models.find(x => x.Nom_model === attaquant.Model);
 
-  if (model_att.Is_monster && attaquant.Arme1 === "" && (!attaquant.Arme1_engagee || main_imposee === 1)) {
+  if (model_att.Is_monster && attaquant.Arme1 === "") {
     document.querySelector('#table_attaque .main1').innerText = "Arme naturelle 1";
+  }
+  else {
+    document.querySelector('#table_attaque .main1').innerText = attaquant.Arme1;
+  }
+
+  if (model_att.Is_monster && attaquant.Arme1 === "" && (!attaquant.Arme1_engagee || main_imposee === 1)) {
     document.querySelector('#table_attaque .arme_radio1').closest('div').style.display = 'flex';
   }
   else if (attaquant.Arme1 !== "" && attaquant.Arme1 !== "Bouclier" && (!attaquant.Arme1_engagee || main_imposee === 1)) {
-    document.querySelector('#table_attaque .main1').innerText = attaquant.Arme1;
     document.querySelector('#table_attaque .arme_radio1').closest('div').style.display = 'flex';
   }
   else {
     document.querySelector('#table_attaque .arme_radio1').closest('div').style.display = 'none';
   }
 
-  if (model_att.Is_monster && attaquant.Arme2 === "" && model_att.Bool_attaque_2 && (!attaquant.Arme2_engagee || main_imposee === 2)) {
+  if (model_att.Is_monster && attaquant.Arme2 === "") {
     document.querySelector('#table_attaque .main2').innerText = "Arme naturelle 2";
+  }
+  else {
+    document.querySelector('#table_attaque .main2').innerText = attaquant.Arme2;
+  }
+
+  if (model_att.Is_monster && attaquant.Arme2 === "" && model_att.Bool_attaque_2 && (!attaquant.Arme2_engagee || main_imposee === 2)) {
     document.querySelector('#table_attaque .arme_radio2').closest('div').style.display = 'flex';
   }
   else if (attaquant.Arme2 !== "" && attaquant.Arme2 !== "Bouclier" && (!attaquant.Arme2_engagee || main_imposee === 2)) {
-    document.querySelector('#table_attaque .main2').innerText = attaquant.Arme2;
     document.querySelector('#table_attaque .arme_radio2').closest('div').style.display = 'flex';
   }
   else {
@@ -554,10 +728,13 @@ function affiche_attaque() {
   calcul_feinte_de_corps();
   calcul_attaque();
 
-  // Affichage de la fenêtre d'attaque si une arme est disponible
-  if (document.querySelector('#table_attaque .arme_radio1').checked || document.querySelector('#table_attaque .arme_radio2').checked) {
+  // Affichage de la fenêtre d'attaque si une arme est disponible et qu'une esquive n'a pas été utilisée
+  let nb_esquives = parseInt(attaquant.Nb_esquives);
+  if (isNaN(nb_esquives)) nb_esquives = 0;
+  if ((document.querySelector('#table_attaque .arme_radio1').checked || document.querySelector('#table_attaque .arme_radio2').checked) && nb_esquives === 0) {
     document.querySelector('#table_attaque').style.display = '';
   }
+  else next_combat();
 }
 
 // ----------------------------------------- //
@@ -577,7 +754,8 @@ function initialise_defense() {
 
     document.querySelector('#table_defense').style.display = 'none';
 
-    if (document.querySelector('#table_defense .marge_attaque').value >= 0) affiche_dommages();
+    // if (document.querySelector('#table_defense .marge_attaque').value >= 0) affiche_dommages();
+    affiche_dommages();
   });
 
   document.querySelector('#table_defense .appliquer').addEventListener("click", function (event) {
@@ -597,19 +775,25 @@ function initialise_defense() {
     // Perte d'initiative si esquive (-4) ou parade (-2)
     const resultat = parseInt(document.querySelector('#table_defense .resultat').value);
     document.querySelector('#table_defense .initiative').innerText = "";
-    if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
-      if (defenseur === melee.defenseur) {
-        melee.set_avantage_next_turn(attaquant, false);
+
+    if (!contre_attaque) {
+      const melee = Melees.find(melee => melee.defenseur === defenseur);
+      if (melee !== undefined && melee !== null) {
+        if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
+          document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+          if (defenseur === melee.defenseur) {
+            melee.set_avantage_next_turn(attaquant, false);
+          }
+          else melee.set_avantage_next_turn(defenseur, true);
+        }
+        if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
+          document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+          if (defenseur === melee.defenseur) {
+            melee.set_avantage_next_turn(attaquant, false);
+          }
+          else melee.set_avantage_next_turn(defenseur, true);
+        }
       }
-      else melee.set_avantage_next_turn(defenseur, true);
-    }
-    if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
-      if (defenseur === melee.defenseur) {
-        melee.set_avantage_next_turn(attaquant, false);
-      }
-      else melee.set_avantage_next_turn(defenseur, true);
     }
 
     // Affichage des dommages
@@ -622,11 +806,14 @@ function initialise_defense() {
     const resultat = parseInt(document.querySelector('#table_defense .resultat').value);
 
     document.querySelector('#table_defense .initiative').innerText = "";
-    if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
-    }
-    if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+
+    if (!contre_attaque) {
+      if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
+        document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+      }
+      if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
+        document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+      }
     }
 
     document.querySelector('#table_defense .appliquer').disabled = false;
@@ -668,12 +855,16 @@ function initialise_defense() {
           document.querySelector('#table_defense .marge_attaque').value - Math.max(jet + calcul_defense() - 10, 0);
 
         const resultat = parseInt(document.querySelector('#table_defense .resultat').value);
+
         document.querySelector('#table_defense .initiative').innerText = "";
-        if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
-          document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
-        }
-        if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
-          document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+
+        if (!contre_attaque) {
+          if (document.querySelector('#table_defense .arme_radio0').checked && resultat <= -4) { // C'est une esquive
+            document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+          }
+          if (!document.querySelector('#table_defense .arme_radio0').checked && resultat <= -2) { // C'est une parade
+            document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+          }
         }
       }
       else calcul_defense();
@@ -723,11 +914,14 @@ function initialise_defense() {
     document.querySelector('#table_defense .resultat').value = marge_finale;
 
     document.querySelector('#table_defense .initiative').innerText = "";
-    if (document.querySelector('#table_defense .arme_radio0').checked && marge_finale <= -4) { // C'est une esquive
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
-    }
-    if (!document.querySelector('#table_defense .arme_radio0').checked && marge_finale <= -2) { // C'est une parade
-      document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+
+    if (!contre_attaque) {
+      if (document.querySelector('#table_defense .arme_radio0').checked && marge_finale <= -4) { // C'est une esquive
+        document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+      }
+      if (!document.querySelector('#table_defense .arme_radio0').checked && marge_finale <= -2) { // C'est une parade
+        document.querySelector('#table_defense .initiative').innerText = "(Initiative reprise)";
+      }
     }
 
     document.querySelector('#table_defense .appliquer').disabled = false;
@@ -938,11 +1132,72 @@ function affiche_defense() {
     document.querySelector('#table_defense .arme_radio0').dispatchEvent(new Event('change'));
   }
 
+  // Seule une esquive est possible après une esquive
+  let nb_esquives = parseInt(defenseur.Nb_esquives);
+  if (isNaN(nb_esquives)) nb_esquives = 0;
+  if (nb_esquives > 0) {
+    document.querySelector('#table_defense .arme_radio1').closest('div').style.display = 'none';
+    document.querySelector('#table_defense .arme_radio2').closest('div').style.display = 'none';
+    document.querySelector('#table_defense .arme_radio0').checked = true;
+    document.querySelector('#table_defense .arme_radio0').dispatchEvent(new Event('change'));
+  }
+
   calcul_defense();
 
   // Affichage de la fenêtre de défense si la marge d'attaque est positive
   if (parseInt(document.querySelector('#table_attaque .resultat').value) < 0) {
-    document.querySelector('#table_defense .appliquer').dispatchEvent(new Event('click'));
+    // Perte de l'initiative contre cet adversaire
+    const melee = Melees.find(melee => melee.defenseur === defenseur);
+    if (melee !== undefined && melee !== null) {
+      if (defenseur === melee.defenseur) {
+        for (const a of melee.attaquants) {
+          if (a.pion === attaquant) a.avantage_next_turn = true;
+        }
+      }
+      else melee.set_avantage_next_turn(defenseur, false);
+    }
+
+    let nb_esquives = parseInt(attaquant.Nb_esquives);
+    if (isNaN(nb_esquives)) nb_esquives = 0;
+
+    // Une contre-attaque est possible (si on n'est pas déjà dans une contre-attaque)
+    if (contre_attaque) {
+      contre_attaque = false;
+      const tmp = attaquant; // On remet les rôles en place
+      attaquant = defenseur;
+      defenseur = tmp;
+    }
+    else if (isCaC(attaquant, defenseur) && nb_esquives === 0) {
+      contre_attaque = true;
+      const tmp = attaquant; // On inverse les rôles
+      attaquant = defenseur;
+      defenseur = tmp;
+      affiche_attaque();
+      return;
+    }
+
+    console.log("gestion de la double attaque");
+    console.log("double_attaque", double_attaque);
+    console.log("attaquant.Att_double_attaque", attaquant.Att_double_attaque);
+    console.log("old_defenseur", old_defenseur);
+    console.log("defenseur", defenseur);
+    console.log("main_imposee", main_imposee);
+
+    // Gestion de la double attaque
+    if (double_attaque) {
+      double_attaque = false;
+      main_imposee = null;
+      defenseur = old_defenseur; // On remet le défenseur principal en place
+      old_defenseur = null;
+    }
+    else if (attaquant.Att_double_attaque) {
+      double_attaque = true;
+      old_defenseur = defenseur;
+      defenseur = null;
+      // On retourne dans next_combat pour sélectionner le nouveau défenseur
+    }
+
+    next_combat();
   }
   else document.querySelector('#table_defense').style.display = '';
 }
@@ -960,7 +1215,7 @@ function initialise_dommages() {
 
   document.querySelector('#table_dommages .appliquer').addEventListener("click", function (event) {
     const dommages = parseInt(document.querySelector('#table_dommages .dommages').value);
-      if (dommages > 0) {
+    if (dommages > 0) {
       switch (zone_selectionnee) {
         case 'general': defenseur.General += dommages; defenseur.sendMessage("General", defenseur.General); break;
         case 'tete': defenseur.Tete += dommages; defenseur.sendMessage("Tete", defenseur.Tete); break;
@@ -973,26 +1228,32 @@ function initialise_dommages() {
       }
 
       // Perte de l'initiative contre tous les autres joueurs si blessé
-      if (defenseur === melee.defenseur) {
-        for (const a of melee.attaquants) a.avantage_next_turn = true;
+      const melee = Melees.find(melee => melee.defenseur === defenseur);
+      if (melee !== undefined && melee !== null) {
+        if (defenseur === melee.defenseur) {
+          for (const a of melee.attaquants) a.avantage_next_turn = true;
+        }
+        else melee.set_avantage_next_turn(defenseur, false);
       }
-      else melee.set_avantage_next_turn(defenseur, false);
     }
 
     // On efface le pion si le nombre de blessures est supérieur au nombre de blessures max
     const model_def = Models.find(x => x.Nom_model === defenseur.Model);
     if (defenseur.get_nb_blessures() >= model_def.Nb_blessures_max) {
-      if (defenseur === melee.defenseur) {
-        // La mêlée est à effacer
-        Melees.splice(Melees.indexOf(melee), 1);
-      }
-      else if (melee.nb_attaquants() > 1) {
-        // On retire l'attaquant de la mêlée
-        melee.rmv_attaquant(defenseur);
-      }
-      else {
-        // La mêlée est à effacer
-        Melees.splice(Melees.indexOf(melee), 1);
+      const melee = Melees.find(melee => melee.defenseur === defenseur);
+      if (melee !== undefined && melee !== null) {
+        if (defenseur === melee.defenseur) {
+          // La mêlée est à effacer
+          Melees.splice(Melees.indexOf(melee), 1);
+        }
+        else if (melee.nb_attaquants() > 1) {
+          // On retire l'attaquant de la mêlée
+          melee.rmv_attaquant(defenseur);
+        }
+        else {
+          // La mêlée est à effacer
+          Melees.splice(Melees.indexOf(melee), 1);
+        }
       }
 
       // On efface le pion de la carte
@@ -1003,6 +1264,9 @@ function initialise_dommages() {
 
     document.querySelector('#table_dommages').style.display = 'none';
 
+    let nb_esquives = parseInt(attaquant.Nb_esquives);
+    if (isNaN(nb_esquives)) nb_esquives = 0;
+
     // Gestion de la contre-attaque
     if (contre_attaque) {
       contre_attaque = false;
@@ -1010,14 +1274,13 @@ function initialise_dommages() {
       attaquant = defenseur;
       defenseur = tmp;
     }
-    else if (dommages === 0) {
+    else if (dommages === 0 && isCaC(attaquant, defenseur) && nb_esquives === 0) {
       contre_attaque = true;
       const tmp = attaquant; // On inverse les rôles
       attaquant = defenseur;
       defenseur = tmp;
       affiche_attaque();
       return;
-
     }
 
     // Gestion de la double attaque
@@ -1027,18 +1290,15 @@ function initialise_dommages() {
       defenseur = old_defenseur; // On remet le défenseur principal en place
       old_defenseur = null;
     }
-    else if (document.querySelector('#table_attaque .att_double_attaque').checked) {
+    else if (attaquant.Att_double_attaque) {
       double_attaque = true;
-      main_imposee = document.querySelector('#table_attaque .arme_radio1').checked ? 1 : 2;
-      // On désengage l'arme de l'attaquant
-      // if (main_imposee === 1) attaquant.Arme1_engagee = false;
-      // else attaquant.Arme2_engagee = false;
       old_defenseur = defenseur;
-      const m = Melees.find(melee => melee.defenseur === attaquant);
-      defenseur = m.get_other_attaquant(defenseur, false);
-      affiche_attaque();
+      // On retourne dans next_combat pour sélectionner le nouveau défenseur
+      next_combat();
       return;
     }
+
+    next_combat();
   });
 
   document.querySelector('#table_dommages .dommages').addEventListener("input", function (event) {
@@ -1235,5 +1495,4 @@ function affiche_dommages() {
     document.querySelector('#table_dommages .appliquer').dispatchEvent(new Event('click'));
   }
   else document.querySelector('#table_dommages').style.display = '';
-
 }

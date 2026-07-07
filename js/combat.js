@@ -108,12 +108,31 @@ class Melee {
      * Retourne la liste des attaquants sans avantage
      * @returns {Array} Liste des attaquants sans avantage
      */
-    get_attaquants_sans_avantage() {
+    get_defenseurs() {
         let liste_attaquants = [];
         for (const a of this.attaquants) {
-            if (!a.avantage) liste_attaquants.push(a);
+            if (!a.avantage) liste_attaquants.push(a.pion);
         }
         return liste_attaquants;
+    }
+
+    /**
+     * Retourne le prochain attaquant avec avantage
+     * @returns {Object|null} Prochain attaquant avec avantage
+     */
+    get_next_attaquant() {
+        let next_attaquant = null;
+        let vp_max = -99;
+
+        for (const a of this.attaquants) {
+            if (a.avantage && !a.pion.has_attaqued) {
+                if (a.pion.get_attribut("Vivacite_physique") > vp_max) {
+                    vp_max = a.pion.get_attribut("Vivacite_physique");
+                    next_attaquant = a.pion;
+                }
+            }
+        }
+        return next_attaquant;
     }
 
     /**
@@ -133,6 +152,7 @@ class Melee {
      */
     add_attaquant(att) {
         if (this.attaquants.length >= 6) return false;
+        if (this.attaquants.find(a => a.pion === att)) return true;
 
         const nouveau = new Attaquant(att);
         nouveau.avantage = true;
@@ -164,18 +184,11 @@ class Melee {
     }
 
     /**
-     * Retourne le prochain attaquant selon l'avantage
-     * @param {Object} att - Pion attaquant
-     * @param {boolean} avantage - Avantage de l'attaquant
-     * @returns {Object|null} Prochain attaquant
+     * Retourne le nombre d'attaquants au corps-à-corps
+     * @returns {number} Nombre d'attaquants au corps-à-corps
      */
-    get_other_attaquant(att, avantage) {
-        for (const a of this.attaquants) {
-            if (a.pion === att) continue;
-            if (a.avantage !== avantage) continue;
-            return a.pion;
-        }
-        return null;
+    nb_attaquants_CaC() {
+        return this.attaquants.filter(a => isCaC(a.pion, this.defenseur)).length;
     }
 
     /**
@@ -193,6 +206,56 @@ class Melee {
 }
 
 let Melees = [];
+
+function add_combat(att, def) {
+    const cac = isCaC(att, def);
+    if (!cac) {
+        console.log("Le pion " + att.Titre + " attaque le pion " + def.Titre + " à distance");
+        return true; // L'attaquant attaque le défenseur à distance
+    }
+
+    const melee_0 = Melees.find(m => m.defenseur === att);
+    if (melee_0) {
+        console.log("Le pion " + att.Titre + " est déjà dans un combat (defenseur)");
+        return false; // L'attaquant est déjà dans un combat
+    }
+
+    const melee_1 = Melees.find(m => m.attaquants.some(a => a.pion === att));
+    if (melee_1) {
+        console.log("Le pion " + att.Titre + " est déjà dans un combat (attaquant)");
+        return false; // L'attaquant est déjà dans un combat
+    }
+
+    const melee_2 = Melees.find(m => m.defenseur === def);
+    if (melee_2) {
+        const ok = melee_2.add_attaquant(att); // L'attaquant s'ajoute à la liste des attaquants du défenseur
+        if (!ok) {
+            console.log("Le pion " + def.Titre + " est déjà attaqué par 6 personnages");
+            return false;
+        }
+        return true;
+    }
+
+    const melee_3 = Melees.find(m => m.attaquants.some(a => a.pion === def));
+    if (melee_3 && melee_3.nb_attaquants() === 1) {
+        // 1 vs 1
+        // On intervertit les rôles du defenseur et de l'attaquant et on ajoute l'attaquant au combat
+        Melees.push(new Melee(melee_3.attaquants[0].pion, melee_3.defenseur, att));
+        Melees.splice(Melees.indexOf(melee_3), 1);
+        return true;
+    }
+    else if (melee_3) {
+        // 1 vs plusieurs
+        // Le defenseur fait partie des attaquants d'un autre combat : on le retire de ce combat et on créé un nouveau combat
+        melee_3.rmv_attaquant(def);
+        Melees.push(new Melee(def, att));
+        return true;
+    }
+
+    // L'attaquant et le défenseur ne font partie d'aucun combat : on créé un nouveau combat
+    Melees.push(new Melee(def, att));
+    return true;
+}
 
 /**
  * Classe Attaque - Représente une attaque dans l'ordre d'initiative
@@ -221,9 +284,3 @@ class Attaque {
 }
 
 let Attaques = [];
-
-/**
- * Initialise et démarre le système d'attaques
- */
-function next_round() {
-}

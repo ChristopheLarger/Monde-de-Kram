@@ -512,7 +512,11 @@
 
         (async () => { // Attendre que les images soient chargées
             while (count < Models.length) { await sleep(100); }
-            await Map.loadImageFond("images/Figurines/Fond.png").catch(() => {});
+            <?php
+            $fondPath = __DIR__ . '/images/Figurines/Fond.png';
+            $fondVersion = is_file($fondPath) ? filemtime($fondPath) : time();
+            ?>
+            await Map.loadImageFond("images/Figurines/Fond.png?v=<?php echo $fondVersion; ?>").catch(() => {});
             Map.generateHexMap();
             Map.drawHexMap();
         })();
@@ -538,15 +542,6 @@
         document.getElementById("joueur").value = "MJ";
         const changeEvent = new Event('change', { bubbles: true, cancelable: true });
         document.getElementById("joueur").dispatchEvent(changeEvent);
-
-        const def = Pions.find(pion => pion.Type === 'allies');
-        const att1 = Pions.filter(pion => pion.Type === 'ennemis')[0];
-        const att2 = Pions.filter(pion => pion.Type === 'ennemis')[1];
-        const m = new Melee(def, att1, att2);
-        Melees.push(m);
-
-        initialise_melee();
-        affiche_attaque();
     </script>
 </body>
 

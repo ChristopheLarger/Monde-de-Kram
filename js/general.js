@@ -247,127 +247,127 @@ class Messages {
      * @param {string} joueur - Nom du joueur
      * @param {string} msg - Message à afficher
      */
-    static write_chat(joueur, msg) {
-        if (document.getElementById("chat_mj") === null) {
-            Messages.construct_chat("MJ");
-        }
-        if (document.getElementById(("chat_" + joueur).toLowerCase()) === null) {
-            Messages.construct_chat(joueur);
-        }
+    // static write_chat(joueur, msg) {
+    //     if (document.getElementById("chat_mj") === null) {
+    //         Messages.construct_chat("MJ");
+    //     }
+    //     if (document.getElementById(("chat_" + joueur).toLowerCase()) === null) {
+    //         Messages.construct_chat(joueur);
+    //     }
 
-        let div = document.getElementById(("chat_" + joueur).toLowerCase());
+    //     let div = document.getElementById(("chat_" + joueur).toLowerCase());
 
-        let ligne = document.createElement("div");
-        ligne.innerHTML = msg;
-        div.appendChild(ligne);
+    //     let ligne = document.createElement("div");
+    //     ligne.innerHTML = msg;
+    //     div.appendChild(ligne);
 
-        div = document.getElementById(("dial_" + joueur).toLowerCase());
-        div.scrollTop = div.scrollHeight;
-    }
+    //     div = document.getElementById(("dial_" + joueur).toLowerCase());
+    //     div.scrollTop = div.scrollHeight;
+    // }
 
     /**
      * Écrit directement un message dans le chat du joueur actuel
      * @param {string} txt - Texte à afficher
      * @param {boolean} temporaire - Si true, le message peut être remplacé
      */
-    static ecriture_directe(txt, temporaire = false) {
-        const joueur = document.getElementById("joueur").value;
+    // static ecriture_directe(txt, temporaire = false) {
+    //     const joueur = document.getElementById("joueur").value;
 
-        if (document.getElementById("chat_mj") === null) {
-            Messages.construct_chat("MJ");
-        }
-        if (document.getElementById(("chat_" + joueur).toLowerCase()) === null) {
-            Messages.construct_chat(joueur);
-        }
-        let div = document.getElementById(("chat_" + joueur).toLowerCase());
+    //     if (document.getElementById("chat_mj") === null) {
+    //         Messages.construct_chat("MJ");
+    //     }
+    //     if (document.getElementById(("chat_" + joueur).toLowerCase()) === null) {
+    //         Messages.construct_chat(joueur);
+    //     }
+    //     let div = document.getElementById(("chat_" + joueur).toLowerCase());
 
-        if (Messages.message_temp != null) {
-            div.removeChild(Messages.message_temp);
-            Messages.message_temp = null;
-        }
+    //     if (Messages.message_temp != null) {
+    //         div.removeChild(Messages.message_temp);
+    //         Messages.message_temp = null;
+    //     }
 
-        // Timestamp
-        let ligne = document.createElement("div");
-        ligne.innerHTML = new Date().toLocaleTimeString() + " : " + txt;
-        div.appendChild(ligne);
+    //     // Timestamp
+    //     let ligne = document.createElement("div");
+    //     ligne.innerHTML = new Date().toLocaleTimeString() + " : " + txt;
+    //     div.appendChild(ligne);
 
-        if (temporaire) {
-            Messages.message_temp = ligne;
-        }
+    //     if (temporaire) {
+    //         Messages.message_temp = ligne;
+    //     }
 
-        div = document.getElementById(("dial_" + joueur).toLowerCase());
-        div.scrollTop = div.scrollHeight;
-    }
+    //     div = document.getElementById(("dial_" + joueur).toLowerCase());
+    //     div.scrollTop = div.scrollHeight;
+    // }
 
     /**
      * Construit l'interface de chat pour un joueur
      * @param {string} joueur - Nom du joueur
      */
-    static construct_chat(joueur) {
-        let tr = document.getElementById("titre_dialogue");
-        let td = tr.insertCell();
-        td.style.width = "15%";
-        let div = document.createElement("div");
-        div.className = "titre_dialogue";
-        td.appendChild(div);
-        let span = document.createElement("span");
-        span.id = ("titre_" + joueur).toLowerCase();
-        span.className = "titre_perso";
-        span.textContent = joueur;
-        div.appendChild(span);
-        let p = document.createElement("p");
-        if (joueur != "MJ") p.innerHTML =
-            " (F : <input type='text' id='" + ("fat_" + joueur).toLowerCase() +
-            "' style='width: 25px;' " + (document.getElementById("joueur").value === "MJ" ? "" : "disabled") + ">" +
-            " C : <input type='text' id='" + ("con_" + joueur).toLowerCase() +
-            "' style='width: 25px;' " + (document.getElementById("joueur").value === "MJ" ? "" : "disabled") + ">)";
-        else p.innerHTML = "&nbsp;";
-        div.appendChild(p);
+    // static construct_chat(joueur) {
+    //     let tr = document.getElementById("titre_dialogue");
+    //     let td = tr.insertCell();
+    //     td.style.width = "15%";
+    //     let div = document.createElement("div");
+    //     div.className = "titre_dialogue";
+    //     td.appendChild(div);
+    //     let span = document.createElement("span");
+    //     span.id = ("titre_" + joueur).toLowerCase();
+    //     span.className = "titre_perso";
+    //     span.textContent = joueur;
+    //     div.appendChild(span);
+    //     let p = document.createElement("p");
+    //     if (joueur != "MJ") p.innerHTML =
+    //         " (F : <input type='text' id='" + ("fat_" + joueur).toLowerCase() +
+    //         "' style='width: 25px;' " + (document.getElementById("joueur").value === "MJ" ? "" : "disabled") + ">" +
+    //         " C : <input type='text' id='" + ("con_" + joueur).toLowerCase() +
+    //         "' style='width: 25px;' " + (document.getElementById("joueur").value === "MJ" ? "" : "disabled") + ">)";
+    //     else p.innerHTML = "&nbsp;";
+    //     div.appendChild(p);
 
-        span.addEventListener("click", () => {
-            if (tr.style.display === "") tr.style.display = "none";
-            else tr.style.display = "";
-            Map.drawHexMap();
-        });
+    //     span.addEventListener("click", () => {
+    //         if (tr.style.display === "") tr.style.display = "none";
+    //         else tr.style.display = "";
+    //         Map.drawHexMap();
+    //     });
 
-        tr = document.getElementById("dialogue");
-        td = tr.insertCell(-1);
-        td.style.width = "15%";
-        div = document.createElement("div");
-        div.id = ("dial_" + joueur).toLowerCase();
-        div.className = "dialogue";
-        td.appendChild(div);
-        let div2 = document.createElement("div");
-        div2.id = ("chat_" + joueur).toLowerCase();
-        div.appendChild(div2);
+    //     tr = document.getElementById("dialogue");
+    //     td = tr.insertCell(-1);
+    //     td.style.width = "15%";
+    //     div = document.createElement("div");
+    //     div.id = ("dial_" + joueur).toLowerCase();
+    //     div.className = "dialogue";
+    //     td.appendChild(div);
+    //     let div2 = document.createElement("div");
+    //     div2.id = ("chat_" + joueur).toLowerCase();
+    //     div.appendChild(div2);
 
-        let trs = tr.getElementsByTagName("td");
-        trs[0].style.width = 15 * (trs.length - 1) + "%";
+    //     let trs = tr.getElementsByTagName("td");
+    //     trs[0].style.width = 15 * (trs.length - 1) + "%";
 
-        document.getElementById(("titre_" + joueur).toLowerCase()).addEventListener("contextmenu", function (event) {
-            event.preventDefault(); // Empêche l'affichage du menu contextuel par défaut
-            m_pion = Pions.find((x) => x.Titre === joueur);
-            affiche_pion();
-        });
+    //     document.getElementById(("titre_" + joueur).toLowerCase()).addEventListener("contextmenu", function (event) {
+    //         event.preventDefault(); // Empêche l'affichage du menu contextuel par défaut
+    //         m_pion = Pions.find((x) => x.Titre === joueur);
+    //         affiche_pion();
+    //     });
 
-        if (joueur === "MJ") return;
+    //     if (joueur === "MJ") return;
 
-        const m = Models.find(x => x.Nom_model === joueur);
-        document.getElementById(("fat_" + joueur).toLowerCase()).value = m.Fatigue;
-        document.getElementById(("con_" + joueur).toLowerCase()).value = m.Concentration;
+    //     const m = Models.find(x => x.Nom_model === joueur);
+    //     document.getElementById(("fat_" + joueur).toLowerCase()).value = m.Fatigue;
+    //     document.getElementById(("con_" + joueur).toLowerCase()).value = m.Concentration;
 
-        document.getElementById(("fat_" + joueur).toLowerCase()).addEventListener("input", function (event) {
-            const p = Pions.find(x => x.Model === joueur);
-            p.Fatigue = event.target.value;
-            sendMessage("Fatigue", joueur + "@" + event.target.value);
-        });
+    //     document.getElementById(("fat_" + joueur).toLowerCase()).addEventListener("input", function (event) {
+    //         const p = Pions.find(x => x.Model === joueur);
+    //         p.Fatigue = event.target.value;
+    //         sendMessage("Fatigue", joueur + "@" + event.target.value);
+    //     });
 
-        document.getElementById(("con_" + joueur).toLowerCase()).addEventListener("input", function (event) {
-            const p = Pions.find(x => x.Model === joueur);
-            p.Concentration = event.target.value;
-            sendMessage("Concentration", joueur + "@" + event.target.value);
-        });
-    }
+    //     document.getElementById(("con_" + joueur).toLowerCase()).addEventListener("input", function (event) {
+    //         const p = Pions.find(x => x.Model === joueur);
+    //         p.Concentration = event.target.value;
+    //         sendMessage("Concentration", joueur + "@" + event.target.value);
+    //     });
+    // }
 
     /**
      * Traite les messages de fatigue et concentration
@@ -419,20 +419,14 @@ document.getElementById("joueur").addEventListener("change", function (event) {
     new Localisation();
 
     // === INITIALISATION SELON LE RÔLE ===
-    if (joueur.value === "MJ") {
-        // Mode Maître de Jeu
-        document.getElementById("titre_dialogue").innerHTML = "";
-        document.getElementById("dialogue").innerHTML = "";
-
-        Localisation.sendMessage();
-    }
-    else {
+    if (joueur.value !== "MJ") {
         // Mode Joueur
         document.getElementById("div_tools").style.display = "none";
+        document.getElementById("menu_combat").style.display = "none";
     }
 
     // Ouverture de la fenêtre de discussion MJ
-    Messages.write_chat("MJ", "");
+    // Messages.write_chat("MJ", "");
 
     document.getElementById("combat").style.display = "";
 

@@ -554,6 +554,12 @@ class Model {
 
     let value = parseInt(this[attribute.slice(0, 1).toUpperCase() + attribute.slice(1).toLowerCase()]) || 0;
   
+    if (this.Is_monster) {
+      if (attribute === "vivacite_physique") return this.Vivacite_physique2;
+      return value;
+    }
+
+    // Pour les humanoïdes, c'est plus compliqué car on doit ajouter les expériences et les avantages
     ["force", "constitution", "vivacite_physique", "perception", "vivacite_mentale", "volonte", "abstraction", "charisme", "adaptation", "combat", "foi", "magie", "memoire", "telepathie"].forEach((attrib) => {
       if (attribute === attrib) {
         value += parseInt(this[attrib.slice(0, 1).toUpperCase() + attrib.slice(1).toLowerCase() + "_experience"]) || 0;

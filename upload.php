@@ -136,7 +136,7 @@ try {
 
     // Retour de la réponse (vider tout sorti parasite puis envoyer le JSON)
     ob_end_clean();
-    echo json_encode(['ok' => true, 'path' => 'images/Figurines/' . $nom . '.png']);
+    echo json_encode(['ok' => true, 'path' => 'images/Figurines/' . $nom . '.png', 'version' => filemtime($dest)]);
 } catch (Throwable $e) {
     if (ob_get_level()) ob_end_clean();
     echo json_encode(['ok' => false, 'message' => 'Erreur: ' . $e->getMessage()]);

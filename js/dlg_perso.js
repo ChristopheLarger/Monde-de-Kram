@@ -1885,41 +1885,41 @@ function affiche_model() {
 
 initialise_interactions();
 function initialise_interactions() {
-  document.querySelector('#div_interactions .heroisme').addEventListener("change", function (event) {
-    let marge = document.querySelector('#div_interactions .marge').value;
+  document.querySelector('#table_interactions .heroisme').addEventListener("change", function (event) {
+    let marge = document.querySelector('#table_interactions .marge').value;
     if (event.target.checked) marge = parseInt(marge) + 4;
     else marge = parseInt(marge) - 4;
-    document.querySelector('#div_interactions .marge').value = marge;
+    document.querySelector('#table_interactions .marge').value = marge;
 
-    if (marge >= 0) document.querySelector('#div_interactions .marge').style.backgroundColor = "lightgreen";
-    else document.querySelector('#div_interactions .marge').style.backgroundColor = "lightcoral";
+    if (marge >= 0) document.querySelector('#table_interactions .marge').style.backgroundColor = "lightgreen";
+    else document.querySelector('#table_interactions .marge').style.backgroundColor = "lightcoral";
   });
 
-  document.querySelector('#div_interactions .chance').addEventListener("click", function (event) {
-    const jet_des_0 = parseInt(document.querySelector('#div_interactions .jet_des').value);
+  document.querySelector('#table_interactions .chance').addEventListener("click", function (event) {
+    const jet_des_0 = parseInt(document.querySelector('#table_interactions .jet_des').value);
     const jet_des_1 = LancerDes.rollDice("3D6");
     const jet_des_2 = LancerDes.rollDice("3D6");
     const jet_des_3 = LancerDes.rollDice("3D6");
     const jet_des_max = Math.max(jet_des_0, jet_des_1, jet_des_2, jet_des_3, 13);
     const jet_des_min = Math.min(jet_des_0, jet_des_1, jet_des_2, jet_des_3, 8);
-    const type = parseInt(document.querySelector('#div_interactions .type').value);
+    const type = parseInt(document.querySelector('#table_interactions .type').value);
 
-    let score = parseInt(document.querySelector('#div_interactions .score').value);
+    let score = parseInt(document.querySelector('#table_interactions .score').value);
     let marge = 0;
     if (type === 0) { // Il s'agit d'un jet de caractéristique
-      document.querySelector('#div_interactions .jet_des').value = jet_des_min;
+      document.querySelector('#table_interactions .jet_des').value = jet_des_min;
       marge = score - jet_des_min;
     }
     else { // Il s'agit d'un jet de compétence
-      document.querySelector('#div_interactions .jet_des').value = jet_des_max;
+      document.querySelector('#table_interactions .jet_des').value = jet_des_max;
       marge = jet_des_max + score - 10;
     }
-    if (document.querySelector('#div_interactions .heroisme').checked) marge += 4;
+    if (document.querySelector('#table_interactions .heroisme').checked) marge += 4;
 
-    document.querySelector('#div_interactions .marge').value = marge;
+    document.querySelector('#table_interactions .marge').value = marge;
 
-    if (marge >= 0) document.querySelector('#div_interactions .marge').style.backgroundColor = "lightgreen";
-    else document.querySelector('#div_interactions .marge').style.backgroundColor = "lightcoral";
+    if (marge >= 0) document.querySelector('#table_interactions .marge').style.backgroundColor = "lightgreen";
+    else document.querySelector('#table_interactions .marge').style.backgroundColor = "lightcoral";
   });
 }
 
@@ -1932,13 +1932,13 @@ function initialise_interactions() {
 function affiche_interactions(type, nom) {
   let nice_name = nom.slice(0, 1).toUpperCase() + nom.slice(1).toLowerCase();
   nice_name = nice_name.replace("_", " ").replace("2", "");
-  document.querySelector('#div_interactions .nom').textContent = "Jet de " + nice_name;
+  document.querySelector('#table_interactions .nom').textContent = "Jet de " + nice_name;
   if (["a", "e", "i", "o", "u", "y"].includes(nom.charAt(0).normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase())) {
-    document.querySelector('#div_interactions .nom').textContent = "Jet d'" + nice_name + " :";
+    document.querySelector('#table_interactions .nom').textContent = "Jet d'" + nice_name + " :";
   }
 
   const jet_des = LancerDes.rollDice("3D6");
-  document.querySelector('#div_interactions .jet_des').value = jet_des;
+  document.querySelector('#table_interactions .jet_des').value = jet_des;
 
   let score = 0;
   let marge = 0;
@@ -1951,11 +1951,11 @@ function affiche_interactions(type, nom) {
     score = comp.get_score();
     marge = jet_des + score - 10;
   }
-  // if (document.querySelector('#div_interactions .heroisme').checked) marge += 4;
-  document.querySelector('#div_interactions .type').value = type;
-  document.querySelector('#div_interactions .score').value = score;
-  document.querySelector('#div_interactions .marge').value = marge;
+  // if (document.querySelector('#table_interactions .heroisme').checked) marge += 4;
+  document.querySelector('#table_interactions .type').value = type;
+  document.querySelector('#table_interactions .score').value = score;
+  document.querySelector('#table_interactions .marge').value = marge;
 
-  if (marge >= 0) document.querySelector('#div_interactions .marge').style.backgroundColor = "lightgreen";
-  else document.querySelector('#div_interactions .marge').style.backgroundColor = "lightcoral";
+  if (marge >= 0) document.querySelector('#table_interactions .marge').style.backgroundColor = "lightgreen";
+  else document.querySelector('#table_interactions .marge').style.backgroundColor = "lightcoral";
 }

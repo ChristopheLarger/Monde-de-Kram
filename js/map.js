@@ -22,6 +22,7 @@ const canvas_selected = document.getElementById("hexCanvas_selected"); // Canvas
 // Dimensions et espacement des hexagones
 let hexDimensionsX = 20;                        // Largeur de la carte en hexagones
 let hexDimensionsY = 20;                        // Hauteur de la carte en hexagones
+const carteLargeurCasesDefaut = 40;             // Largeur par défaut (en cases) lors du chargement du fond
 let hexSize = 40;                               // Taille des hexagones en pixels
 let hexWidth = Math.sqrt(3) * hexSize;          // Largeur d'un hexagone
 let hexHeight = 2 * hexSize;                    // Hauteur d'un hexagone
@@ -110,13 +111,44 @@ class Map {
     /** Opacité du remplissage des hexagones coloriés (terrain, pions…) */
     static hexColorAlpha = 0.7;
 
-    /** Recalcule la position et la taille du fond de carte sur le canvas */
+    /** Pion en train de lancer un sort (Attaquant + liste de magie active) */
+    static isMagicien(p) {
+        return p.Attaquant
+            && p.Nom_liste != null
+            && p.Nom_liste !== ""
+            && p.Nom_liste !== "null";
+    }
+
+    /**
+     * Ajuste la grille hexagonale pour qu'elle épouse le fond de carte.
+     * La largeur est fixée en cases ; la hauteur suit les proportions de l'image.
+     * @param {number} largeurCases - Largeur de la carte en cases
+     */
+    static setHexDimensionsFromFond(largeurCases) {
+        if (image_fond == null) return;
+        const w = Number(largeurCases);
+        if (!w || w <= 0) return;
+        const hexHS = hexSize * 1.5;
+        const hexVS = hexSize * Math.sqrt(3);
+        hexDimensionsX = Math.round((((w - 1) / 2) * Math.sqrt(3)) / 1.5);
+        const fondWidth = (2 * hexDimensionsX + 1.5) * hexHS;
+        const imgW = image_fond.naturalWidth || image_fond.width;
+        const imgH = image_fond.naturalHeight || image_fond.height;
+        const fondHeight = imgW > 0 ? fondWidth * (imgH / imgW) : fondWidth;
+        hexDimensionsY = Math.max(1, Math.round((fondHeight / hexVS - 1.5) / 2));
+    }
+
+    /** Recalcule la position et la taille du fond de carte sur le canvas (largeur fixée, hauteur proportionnelle) */
     static updateFormeFond() {
         if (image_fond == null) return;
         const hexHS = hexSize * 1.5;
         const hexVS = hexSize * Math.sqrt(3);
         forme_fond.width = (2 * hexDimensionsX + 1.5) * hexHS;
-        forme_fond.height = (2 * hexDimensionsY + 1.5) * hexVS;
+        const imgW = image_fond.naturalWidth || image_fond.width;
+        const imgH = image_fond.naturalHeight || image_fond.height;
+        forme_fond.height = imgW > 0
+            ? forme_fond.width * (imgH / imgW)
+            : (2 * hexDimensionsY + 1.5) * hexVS;
         forme_fond.x = offsetX - forme_fond.width / 2;
         forme_fond.y = offsetY - forme_fond.height / 2 + hexVS / 4;
     }
@@ -127,6 +159,7 @@ class Map {
             const img = new Image();
             img.onload = () => {
                 image_fond = img;
+                Map.setHexDimensionsFromFond(carteLargeurCasesDefaut);
                 Map.updateFormeFond();
                 resolve(img);
             };
@@ -389,7 +422,7 @@ class Map {
                 });
 
                 // Définition de la couleur de l'hexagone en fonction du type de pion
-                let magicien = Pions.find(p => p.Attaquant && p.Nom_liste != "");
+                let magicien = Pions.find(p => Map.isMagicien(p));
                 if (typeof magicien === "undefined") magicien = null;
 
                 Pions.filter(p => p.Position === col + "," + row).forEach(p => {
@@ -853,8 +886,6 @@ canvas.addEventListener("contextmenu", function (event) {
 
 // Bouton de la souris abaissé
 canvas.addEventListener("mousedown", (event) => {
-    const myself = document.getElementById("joueur").value;
-
     canvas.focus({ preventScroll: true });
 
     const mousePos = Map.getMousePosition(event);
@@ -869,26 +900,49 @@ canvas.addEventListener("mousedown", (event) => {
     const col = hex.col;
     const row = hex.row;
 
-    const p = Pions.find(x => x.Position === col + "," + row);
-    const t = Terrains.find(x => x.Position === col + "," + row);
-    let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
-    if (typeof magicien === "undefined") magicien = null;
+    let p = Pions.find(x => x.Position === col + "," + row); // Pion à la position cliquée
+    if (typeof p === "undefined") p = null;
+    let t = Terrains.find(x => x.Position === col + "," + row); // Terrain à la position cliquée
+    if (typeof t === "undefined") t = null;
+    let m = Pions.find(x => Map.isMagicien(x)); // Magicien
+    if (typeof m === "undefined") m = null;
 
     // Glisser gauche ou sinon droit en cours
     if (event.button === 0) isDragging_left = true;
     else if (event.button === 2) isDragging_right = true;
 
-    // === GESTION DES CLICS GAUCHES ===
-    if (event.button === 0 && p != null && typeof p != "undefined" && p.Defenseur && myself === "MJ") {
-        // Clic gauche sur le défenseur choisi => on résout l'attaque
-        Pions.forEach(x => { x.Defenseur = false; });
-        p.Defenseur = true;
-        affiche_attaque(1);
+    if (event.button === 2 && p != null) {
+        // Clic droit sur le défenseur choisi => on enregistre la cible
+        event.preventDefault();
+        isDragging_right = false;
+
+        if (is_declaration_attaque) {
+            Pions.filter(x => x.Selected).forEach(x => {
+                const visible = Map.is_visible(parseInt(p.Position.split(",")[0]), parseInt(p.Position.split(",")[1]));
+                const distante = x.has_distante_attaque();
+                const cac = isCaC(x, p);
+                if (((visible && distante) || cac) && x.Type !== p.Type) {
+                    x.cible = p;
+                    if (cac && (p.cible === null || p.cible === undefined || p.cible === "")) p.cible = x;
+                }
+                else alert("Le pion " + x.Titre + " ne peut attaquer le pion " + p.Titre);
+            });
+            declaration_attaque();
+        }
+        else if (is_declaration_cible) {
+            // On est en phase de résolution de l'attaque : on marque le pion comme cible
+            if (p.Defenseur) {
+                defenseur = p;
+                Pions.filter(x => x !== p).forEach(x => { x.Defenseur = false; });
+                next_combat();
+            }
+        }
+
     }
-    else if (event.button === 0 && p != null && typeof p != "undefined" && magicien != null) {
-        // Clic gauche sur la cible de sort choisi => on le marque comme cible
+    else if (event.button === 2 && p != null && m != null) {
+        // Clic droit sur la cible de sort choisi => on le marque comme cible d'un sort
+        event.preventDefault();
         p.Cible_sort = !p.Cible_sort;
-        p.affiche_Details();
     }
     else if (event.button === 0 && isMode_terrain && type_terrain != "gomme") {
         // Mode terrain : ajout d'un terrain à la position cliquée
@@ -896,30 +950,29 @@ canvas.addEventListener("mousedown", (event) => {
     }
     else if (event.button === 0 && isMode_terrain) {
         // Mode gomme : suppression du terrain à la position cliquée
-        if (t != null && typeof t != "undefined") t.rmv();
+        if (t != null) t.rmv();
     }
-    else if (event.button === 0 && event.ctrlKey && p != null && typeof p != "undefined" && myself === "MJ") {
+    else if (event.button === 0 && event.ctrlKey && p != null) {
         // === SÉLECTION MULTIPLE (CTRL + CLIC) ===
         // Ajout/suppression du pion de la sélection multiple
         if (p.Selected) p.Selected = false;
         else p.Selected = true;
         isDragging_select = false;
-        p.affiche_Details();
         Map.drawHexMap(true);
     }
-    else if (event.button === 0 && p != null &&
-        typeof p != "undefined" && (["MJ", p.Model, p.Control].includes(myself))) {
+    else if (event.button === 0 && p != null) {
         // === SÉLECTION SIMPLE ===
         // Si le pion n'est pas sélectionné, on nettoie la sélection et sélectionne le pion seul
         if (!p.Selected) {
             Pions.forEach(x => { x.Selected = false; });
             p.Selected = true;
+            m_pion = p;
+            affiche_pion();
         }
         isDragging_select = false;
-        p.affiche_Details();
         Map.drawHexMap(true);
     }
-    else if (event.button === 0 && myself === "MJ") {
+    else if (event.button === 0) {
         // Il n'y a pas de pion à cette position : la sélection est réinitialisée et ouverte
         Pions.forEach(x => { x.Selected = false; });
         SelectRectangle.x = mouseX;
@@ -928,12 +981,6 @@ canvas.addEventListener("mousedown", (event) => {
         SelectRectangle.height = 0;
         isDragging_select = true;
         Map.drawHexMap(true);
-    }
-    else if (event.button === 2 && p != null &&
-        typeof p != "undefined" && (["MJ", p.Model, p.Control].includes(myself))) {
-        // Clic droit : on ouvre la fenetre de modification d'un pion
-        event.preventDefault();
-        p.affiche_Details();
     }
     else if (event.button === 2) {
         isMoving_map = false;
@@ -948,6 +995,8 @@ canvas.addEventListener("mousedown", (event) => {
 
 // Déplacement de la souris
 canvas.addEventListener("mousemove", (event) => {
+    const myself = document.getElementById("joueur").value;
+
     const mousePos = Map.getMousePosition(event);
     let mouseX = mousePos.x;
     let mouseY = mousePos.y;
@@ -991,7 +1040,7 @@ canvas.addEventListener("mousemove", (event) => {
         if (h < 0) SelectRectangle.y = y2 + offsetY;
 
         // La présence du magicien indique que l'on selectionne les cibles du sortilège
-        let magicien = Pions.find(x => x.Attaquant && x.Nom_liste != "");
+        let magicien = Pions.find(x => Map.isMagicien(x));
         if (typeof magicien === "undefined") magicien = null;
 
         hexMap.forEach(hex => {
@@ -1063,7 +1112,7 @@ canvas.addEventListener("mousemove", (event) => {
     }
     else {
         // On ne montre pas le tooltip dans le cas d'un affichage zoom de l'hexagone
-        if ((Map.is_visible(col, row) || document.getElementById("joueur").value === "MJ") &&
+        if ((Map.is_visible(col, row) || myself === "MJ") &&
             p != null && typeof p != "undefined") {
             tooltip.style.display = "none";
         }
@@ -1094,7 +1143,6 @@ canvas.addEventListener("mouseup", (event) => {
             // Convertir (col, row) en (x, y)
             let x = col * hexHSpacing + offsetX;
             let y = row * hexVSpacing + ((col % 2 + 2) % 2) * (hexHeight / 2) + offsetY;
-            // let y = row * hexVSpacing + ((col % 2 != 0) ? hexVSpacing / 2 : 0) + offsetY;
 
             // Appliquer le déplacement en (x, y)
             x += deltaX;
@@ -1111,6 +1159,8 @@ canvas.addEventListener("mouseup", (event) => {
             // Déplacer le pion
             p.deplace_sur_la_carte(col, row);
         });
+        // Si la déclaration d'attaque est en cours, on la relance pour tenir compte des déplacements
+        if (is_declaration_attaque) declaration_attaque();
     }
     else if (isDragging_right && !isMoving_map) {
         // Clic droit : on ouvre la fenetre de création d'un pion
@@ -1125,10 +1175,7 @@ canvas.addEventListener("mouseup", (event) => {
         const row = Math.round((mouseY - offsetY - ((col % 2 + 2) % 2) * (hexHeight / 2)) / hexVSpacing);
 
         m_pion = Pions.find(x => x.Position === col + "," + row);
-        if (m_pion != null && typeof m_pion != "undefined") {
-            affiche_pion();
-        }
-        else {
+        if (m_pion === null || typeof m_pion === "undefined") {
             // Affichage du dialogue de création d'un nouveau pion
             m_pion = null;
             affiche_pion(col, row);

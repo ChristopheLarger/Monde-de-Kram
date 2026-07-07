@@ -14,20 +14,11 @@ function initialise_dim_carte() {
 
   // Validation des dimensions de carte
   dialog_dim_carte.querySelector("#Valider").addEventListener("click", function (event) {
-    // Récupération des dimensions saisies
-    const w = dialog_dim_carte.querySelector(".largeur").value;
-    const h = dialog_dim_carte.querySelector(".hauteur").value;
-
-    // Calcul des dimensions hexagonales
-    hexDimensionsX = Math.round((((w - 1) / 2) * Math.sqrt(3)) / 1.5);
-    hexDimensionsY = Math.round((h - 1) / 2);
-
+    const w = Number(dialog_dim_carte.querySelector(".largeur").value);
+    Map.setHexDimensionsFromFond(w);
     Map.updateFormeFond();
-
-    // Régénération et redessin de la carte
     Map.generateHexMap();
     Map.drawHexMap();
-
     dialog_dim_carte.close();
   });
 
@@ -37,42 +28,14 @@ function initialise_dim_carte() {
       dialog_dim_carte.querySelector("#Valider").click();
     }
   });
-
-  // Calcul automatique de la hauteur selon la largeur
-  dialog_dim_carte.querySelector(".largeur").addEventListener("input", function (event) {
-    if (image_fond === null) return;
-    dialog_dim_carte.querySelector(".hauteur").value =
-    Math.round(      (event.target.value * image_fond.height) / image_fond.width);
-  });
-
-  // Calcul automatique de la largeur selon la hauteur
-  dialog_dim_carte.querySelector(".hauteur").addEventListener("input", function (event) {
-    if (image_fond === null) return;
-    dialog_dim_carte.querySelector(".largeur").value = Math.round(
-      (event.target.value * image_fond.width) / image_fond.height);
-  });
 }
 
 /**
  * Affiche le dialogue pour définir les dimensions de la carte
- * Permet de spécifier la largeur et la hauteur de la carte de fond
+ * Permet de spécifier la largeur de la carte de fond (hauteur déduite des proportions de l'image)
  */
 function affiche_dim_carte() {
-  // Valeur par défaut pour la largeur si vide
-  if (dialog_dim_carte.querySelector(".largeur").value === "") {
-    dialog_dim_carte.querySelector(".largeur").value = 20;
-  }
-
-  // Gestion de la hauteur selon l'image de fond
-  if (image_fond == null) {
-    dialog_dim_carte.querySelector(".hauteur").value = 20;
-  } else {
-    // Calcul automatique de la hauteur basé sur l'image de fond
-    image_fond.onload = function () {
-      dialog_dim_carte.querySelector(".hauteur").value = Math.round(
-        (dialog_dim_carte.querySelector(".largeur").value * image_fond.height) / image_fond.width);
-    };
-  }
+  dialog_dim_carte.querySelector(".largeur").value = carteLargeurCasesDefaut;
   dialog_dim_carte.showModal();
 }
 
@@ -86,32 +49,32 @@ document.getElementById("img_fond").addEventListener("change", async (event) => 
   formData.append("image", event.target.files[0]);
   formData.append("nom", "Fond");
   fetch("upload.php", { method: "POST", body: formData })
-      .then((r) => r.json())
-      .then((data) => {
-          if (data.ok) {
-              if (event.target.files.length === 0) {
-                  // Aucun fichier sélectionné
-                  image_fond = null;
-              }
-              else {
-                  image_fond = new Image();
-                  image_fond.onload = function () {
-                      Map.updateFormeFond();
-                      Map.generateHexMap();
-                      Map.drawHexMap();
-                  };
-                  image_fond.src = data.path + "?t=" + new Date().getTime();
-              }
-              URL.revokeObjectURL(blobUrl);
-          }
-          else console.warn("Upload fond:", data.message);
-      })
-      .catch((e) => {
-          console.warn("Upload fond:", e);
-          URL.revokeObjectURL(blobUrl);
-      });
-
-  affiche_dim_carte();
+    .then((r) => r.json())
+    .then((data) => {
+      if (data.ok) {
+        if (event.target.files.length === 0) {
+          // Aucun fichier sélectionné
+          image_fond = null;
+        }
+        else {
+          image_fond = new Image();
+          image_fond.onload = function () {
+            Map.setHexDimensionsFromFond(carteLargeurCasesDefaut);
+            Map.updateFormeFond();
+            Map.generateHexMap();
+            Map.drawHexMap();
+            affiche_dim_carte();
+          };
+          image_fond.src = data.path + "?v=" + (data.version || Date.now());
+        }
+        URL.revokeObjectURL(blobUrl);
+      }
+      else console.warn("Upload fond:", data.message);
+    })
+    .catch((e) => {
+      console.warn("Upload fond:", e);
+      URL.revokeObjectURL(blobUrl);
+    });
 });
 
 // Tooltips pour les boutons de terrain, formes et coordonnées
@@ -154,44 +117,44 @@ const PALETTE_TERRAIN_COUNT = 32;
 
 init_color_terrain();
 function init_color_terrain() {
-    const palette = document.getElementById("color_terrain_palette");
-    const btn = document.getElementById("color_terrain_btn");
+  const palette = document.getElementById("color_terrain_palette");
+  const btn = document.getElementById("color_terrain_btn");
 
-    const swatchTransparent = document.createElement("button");
-    swatchTransparent.type = "button";
-    swatchTransparent.className = "color-picker-swatch color-picker-swatch-transparent";
-    swatchTransparent.dataset.color = TERRAIN_COLOR_TRANSPARENT;
-    swatchTransparent.title = "Transparent";
-    swatchTransparent.addEventListener("click", (event) => {
-        event.stopPropagation();
-        set_color_terrain(TERRAIN_COLOR_TRANSPARENT);
-        palette.classList.remove("is-open");
+  const swatchTransparent = document.createElement("button");
+  swatchTransparent.type = "button";
+  swatchTransparent.className = "color-picker-swatch color-picker-swatch-transparent";
+  swatchTransparent.dataset.color = TERRAIN_COLOR_TRANSPARENT;
+  swatchTransparent.title = "Transparent";
+  swatchTransparent.addEventListener("click", (event) => {
+    event.stopPropagation();
+    set_color_terrain(TERRAIN_COLOR_TRANSPARENT);
+    palette.classList.remove("is-open");
+  });
+  palette.appendChild(swatchTransparent);
+
+  palette_de_couleurs.slice(0, PALETTE_TERRAIN_COUNT - 1).forEach((color) => {
+    const swatch = document.createElement("button");
+    swatch.type = "button";
+    swatch.className = "color-picker-swatch";
+    swatch.dataset.color = color;
+    swatch.style.backgroundColor = color;
+    swatch.title = color;
+    swatch.addEventListener("click", (event) => {
+      event.stopPropagation();
+      set_color_terrain(color);
+      palette.classList.remove("is-open");
     });
-    palette.appendChild(swatchTransparent);
+    palette.appendChild(swatch);
+  });
 
-    palette_de_couleurs.slice(0, PALETTE_TERRAIN_COUNT - 1).forEach((color) => {
-        const swatch = document.createElement("button");
-        swatch.type = "button";
-        swatch.className = "color-picker-swatch";
-        swatch.dataset.color = color;
-        swatch.style.backgroundColor = color;
-        swatch.title = color;
-        swatch.addEventListener("click", (event) => {
-            event.stopPropagation();
-            set_color_terrain(color);
-            palette.classList.remove("is-open");
-        });
-        palette.appendChild(swatch);
-    });
+  set_color_terrain(document.getElementById("color_terrain").value);
 
-    set_color_terrain(document.getElementById("color_terrain").value);
+  btn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    palette.classList.toggle("is-open");
+  });
 
-    btn.addEventListener("click", (event) => {
-        event.stopPropagation();
-        palette.classList.toggle("is-open");
-    });
-
-    document.addEventListener("click", () => palette.classList.remove("is-open"));
+  document.addEventListener("click", () => palette.classList.remove("is-open"));
 }
 
 /**
@@ -199,17 +162,17 @@ function init_color_terrain() {
  * @param {string} color - Couleur du terrain
  */
 function set_color_terrain(color) {
-    const btn = document.getElementById("color_terrain_btn");
-    document.getElementById("color_terrain").value = color;
-    if (color === TERRAIN_COLOR_TRANSPARENT) {
-        btn.style.backgroundColor = "";
-        btn.classList.add("is-transparent");
-    } else {
-        btn.style.backgroundColor = color;
-        btn.classList.remove("is-transparent");
-    }
-    document.querySelectorAll("#color_terrain_palette .color-picker-swatch").forEach((swatch) => {
-        swatch.classList.toggle("is-selected", swatch.dataset.color === color);
-    });
-    document.getElementById("color_terrain_palette").dispatchEvent(new Event("input", { bubbles: true }));
+  const btn = document.getElementById("color_terrain_btn");
+  document.getElementById("color_terrain").value = color;
+  if (color === TERRAIN_COLOR_TRANSPARENT) {
+    btn.style.backgroundColor = "";
+    btn.classList.add("is-transparent");
+  } else {
+    btn.style.backgroundColor = color;
+    btn.classList.remove("is-transparent");
+  }
+  document.querySelectorAll("#color_terrain_palette .color-picker-swatch").forEach((swatch) => {
+    swatch.classList.toggle("is-selected", swatch.dataset.color === color);
+  });
+  document.getElementById("color_terrain_palette").dispatchEvent(new Event("input", { bubbles: true }));
 }
